@@ -1,5 +1,6 @@
 import { Divider, Flex, Image, Typography } from "antd";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import AskLiv from "../components/ask";
 
 const dummyProjectData: any = {
   metadata: {
@@ -154,9 +155,11 @@ const ProjectPage: React.FC = () => {
                 <path d="M12 17.5V14l-3-3 4-3 2 3h2" />
               </svg>
               <Flex vertical>
-              <Typography.Text>{amenity.replace('_', ' ')}</Typography.Text>
+                <Typography.Text>{amenity.replace("_", " ")}</Typography.Text>
 
-              <Typography.Text>{dummyProjectData.amenities[amenity]}</Typography.Text>
+                <Typography.Text>
+                  {dummyProjectData.amenities[amenity]}
+                </Typography.Text>
               </Flex>
             </Flex>
           );
@@ -186,15 +189,35 @@ const ProjectPage: React.FC = () => {
   return (
     <Flex vertical>
       {gallery()}
-      <Flex style={{ width: "70%", marginTop: 16 }} vertical gap={24}>
-        {header()}
-        {projectSummary()}
-        <Divider style={{ margin: 0 }}></Divider>
-        {projectAmenities()}
-        <Divider style={{ margin: 0 }}></Divider>
-        {projectInfra()}
-        <Divider style={{ margin: 0 }}></Divider>
-        {projectPlots()}
+      <Flex style={{ marginTop: 24 }}>
+        <Flex
+          style={{
+            width: "65%",
+            marginRight: "4%",
+          }}
+          vertical
+          gap={24}
+        >
+          {header()}
+          {projectSummary()}
+          <Divider style={{ margin: 0 }}></Divider>
+          {projectAmenities()}
+          <Divider style={{ margin: 0 }}></Divider>
+          {projectInfra()}
+          <Divider style={{ margin: 0 }}></Divider>
+          {projectPlots()}
+        </Flex>
+        <Flex
+          style={{
+            width: "30%",
+            height: 800,
+            border: "1px solid",
+            borderRadius: 16,
+            borderColor: COLORS.borderColorDark,
+          }}
+        >
+          <AskLiv></AskLiv>
+        </Flex>
       </Flex>
     </Flex>
   );

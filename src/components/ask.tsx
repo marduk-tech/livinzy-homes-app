@@ -1,8 +1,8 @@
 import { ProChat } from "@ant-design/pro-chat";
-import React from "react";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
+import { COLORS } from "../theme/style-constants";
 
-export default function AskPage() {
+export default function AskLiv() {
   const handleRequest = async (messages: any[]) => {
     const latestMessage = messages[messages.length - 1];
     try {
@@ -29,10 +29,10 @@ export default function AskPage() {
 
   return (
     <ProChat
-      style={{ height: "calc(100vh - 100px)" }}
+      style={{ height: "100%" }}
       request={handleRequest}
       locale="en-US"
-      helloMessage="Hello! How can I assist you today?"
+      helloMessage="Hello! I am Liv, I can answer any question you might have about this project?"
       placeholder="Type your question here..."
     />
   );

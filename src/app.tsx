@@ -11,7 +11,7 @@ export const App: FunctionComponent<AppProps> = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ConfigProvider theme={antTheme}>
-        <AntApp style={{maxWidth: 1400, margin: "auto"}}>
+        <AntApp style={{maxWidth: 1600, margin: "auto"}}>
           <Router />
         </AntApp>
       </ConfigProvider>
