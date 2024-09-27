@@ -1,10 +1,13 @@
 import { ThemeConfig } from "antd";
+import { COLORS, FONTS } from "./style-constants";
 
 export const antTheme: ThemeConfig = {
   token: {
-    colorPrimary: "#31cbcb",
-    colorInfo: "#31cbcb",
-    colorSuccess: "#61e38e",
-    colorTextBase: "#2d3748"
+    colorPrimary: COLORS.primaryColor,
+    colorSuccess: COLORS.greenIdentifier,
+    colorTextBase: COLORS.textColorDark,
+    controlHeight: 50,
+    fontFamily: FONTS.primary,
+    fontSize: 16,
   }
 };

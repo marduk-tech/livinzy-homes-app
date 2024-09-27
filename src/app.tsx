@@ -5,16 +5,16 @@ import { FunctionComponent } from "react";
 import { queryClient } from "./libs/query-client";
 import { Router } from "./routes/routes";
 import { antTheme } from "./theme/ant-theme";
+import "./theme/globals.scss";
 
 export const App: FunctionComponent<AppProps> = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ConfigProvider theme={antTheme}>
-        <AntApp>
+        <AntApp style={{maxWidth: 1400, margin: "auto"}}>
           <Router />
         </AntApp>
       </ConfigProvider>
-
       <ReactQueryDevtools />
     </QueryClientProvider>
   );
