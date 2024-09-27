@@ -36,178 +36,143 @@ const dummyProjectData: any = {
   },
 };
 
-const ProjectPage: React.FC = () => {
-  const gallery = () => {
-    return (
-      <div
-        style={{
-          height: 500,
-          width: "100%",
-          overflowX: "scroll",
-          whiteSpace: "nowrap",
-          scrollbarWidth: "none",
-        }}
-      >
-        {dummyProjectData.media.map((img: any) => {
-          return (
-            <img
-              src={img.url}
-              height="100%"
-              width="auto"
-              style={{ borderRadius: 8, marginRight: 8 }}
-            ></img>
-          );
-        })}
-      </div>
-    );
-  };
-  const header = () => {
-    return (
-      <Flex vertical gap={8}>
-        <Typography.Title style={{ margin: 0 }}>
-          {dummyProjectData.metadata.name}
-        </Typography.Title>
+const Gallery: React.FC = () => (
+  <div
+    style={{
+      height: 500,
+      width: "100%",
+      overflowX: "scroll",
+      whiteSpace: "nowrap",
+      scrollbarWidth: "none",
+    }}
+  >
+    {dummyProjectData.media.map((img: any, index: number) => (
+      <img
+        key={index}
+        src={img.url}
+        height="100%"
+        width="auto"
+        style={{ borderRadius: 8, marginRight: 8 }}
+        alt={`Project image ${index + 1}`}
+      />
+    ))}
+  </div>
+);
+
+const Header: React.FC = () => (
+  <Flex vertical gap={8}>
+    <Typography.Title style={{ margin: 0 }}>
+      {dummyProjectData.metadata.name}
+    </Typography.Title>
+    <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
+      {dummyProjectData.metadata.one_liner}
+    </Typography.Text>
+  </Flex>
+);
+
+const ProjectSummary: React.FC = () => (
+  <Flex vertical gap={16}>
+    <Typography.Title level={3}>What are you Buying ?</Typography.Title>
+    <Flex align="center" gap={16}>
+      <Image height={40} width={40} src="../../images/plot.png"></Image>
+      <Flex vertical>
+        <Typography.Text style={{ fontSize: 18, color: COLORS.textColorLight }}>
+          Plots
+        </Typography.Text>
         <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
-          {dummyProjectData.metadata.one_liner}
+          {dummyProjectData.metadata.plots_summary}
         </Typography.Text>
       </Flex>
-    );
-  };
-
-  const projectSummary = () => {
-    return (
-      <Flex vertical gap={16}>
-        <Typography.Title level={3}>What are you Buying ?</Typography.Title>
-        <Flex align="center" gap={16}>
-          <Image height={40} width={40} src="../../images/plot.png"></Image>
-          <Flex vertical>
-            <Typography.Text
-              style={{ fontSize: 18, color: COLORS.textColorLight }}
-            >
-              Plots
-            </Typography.Text>
-            <Typography.Text
-              style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
-            >
-              {dummyProjectData.metadata.plots_summary}
-            </Typography.Text>
-          </Flex>
-        </Flex>
-        <Flex align="center" gap={16}>
-          <Image height={40} width={40} src="../../images/rupee.png"></Image>
-          <Flex vertical>
-            <Typography.Text
-              style={{ fontSize: 18, color: COLORS.textColorLight }}
-            >
-              Costing
-            </Typography.Text>
-            <Typography.Text
-              style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
-            >
-              {dummyProjectData.metadata.cost_summary}
-            </Typography.Text>
-          </Flex>
-        </Flex>
-        <Flex align="center" gap={16}>
-          <Image height={40} width={40} src="../../images/rupee.png"></Image>
-          <Flex vertical>
-            <Typography.Text
-              style={{ fontSize: 18, color: COLORS.textColorLight }}
-            >
-              Services
-            </Typography.Text>
-            <Typography.Text
-              style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
-            >
-              {dummyProjectData.metadata.services_summary}
-            </Typography.Text>
-          </Flex>
-        </Flex>
-        <Typography.Text style={{ marginTop: 16, fontSize: 18 }}>
-          {dummyProjectData.metadata.description}
+    </Flex>
+    <Flex align="center" gap={16}>
+      <Image height={40} width={40} src="../../images/rupee.png"></Image>
+      <Flex vertical>
+        <Typography.Text style={{ fontSize: 18, color: COLORS.textColorLight }}>
+          Costing
+        </Typography.Text>
+        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
+          {dummyProjectData.metadata.cost_summary}
         </Typography.Text>
       </Flex>
-    );
-  };
-
-  const projectAmenities = () => {
-    return (
+    </Flex>
+    <Flex align="center" gap={16}>
+      <Image height={40} width={40} src="../../images/rupee.png"></Image>
       <Flex vertical>
-        <Typography.Title level={3}>Amenities Offered</Typography.Title>
-        {Object.keys(dummyProjectData.amenities).map((amenity: string) => {
-          return (
-            <Flex>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                className="lucide lucide-bike"
-              >
-                <circle cx="18.5" cy="17.5" r="3.5" />
-                <circle cx="5.5" cy="17.5" r="3.5" />
-                <circle cx="15" cy="5" r="1" />
-                <path d="M12 17.5V14l-3-3 4-3 2 3h2" />
-              </svg>
-              <Flex vertical>
-                <Typography.Text>{amenity.replace("_", " ")}</Typography.Text>
-
-                <Typography.Text>
-                  {dummyProjectData.amenities[amenity]}
-                </Typography.Text>
-              </Flex>
-            </Flex>
-          );
-        })}
+        <Typography.Text style={{ fontSize: 18, color: COLORS.textColorLight }}>
+          Services
+        </Typography.Text>
+        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
+          {dummyProjectData.metadata.services_summary}
+        </Typography.Text>
       </Flex>
-    );
-  };
+    </Flex>
+    <Typography.Text style={{ marginTop: 16, fontSize: 18 }}>
+      {dummyProjectData.metadata.description}
+    </Typography.Text>
+  </Flex>
+);
 
-  const projectInfra = () => {
-    return (
-      <Flex vertical>
-        <Typography.Title level={3}>
-          More about Farmland & Infra
-        </Typography.Title>
-      </Flex>
-    );
-  };
+const ProjectAmenities: React.FC = () => (
+  <Flex vertical>
+    <Typography.Title level={3}>Amenities Offered</Typography.Title>
+    {Object.entries(dummyProjectData.amenities).map(
+      ([amenity, description]) => (
+        <Flex key={amenity}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            className="lucide lucide-bike"
+          >
+            <circle cx="18.5" cy="17.5" r="3.5" />
+            <circle cx="5.5" cy="17.5" r="3.5" />
+            <circle cx="15" cy="5" r="1" />
+            <path d="M12 17.5V14l-3-3 4-3 2 3h2" />
+          </svg>
+          <Flex vertical>
+            <Typography.Text>{amenity.replace("_", " ")}</Typography.Text>
+            <Typography.Text>{description as string}</Typography.Text>
+          </Flex>
+        </Flex>
+      )
+    )}
+  </Flex>
+);
 
-  const projectPlots = () => {
-    return (
-      <Flex vertical>
-        <Typography.Title level={3}>More about the plots</Typography.Title>
-      </Flex>
-    );
-  };
+const ProjectInfra: React.FC = () => (
+  <Flex vertical>
+    <Typography.Title level={3}>More about Farmland & Infra</Typography.Title>
+  </Flex>
+);
 
+const ProjectPlots: React.FC = () => (
+  <Flex vertical>
+    <Typography.Title level={3}>More about the plots</Typography.Title>
+  </Flex>
+);
+
+const ProjectPage: React.FC = () => {
   return (
     <Flex vertical>
-      {gallery()}
-      <Flex style={{ marginTop: 24 }}>
-        <Flex
-          style={{
-            width: "65%",
-            marginRight: "4%",
-          }}
-          vertical
-          gap={24}
-        >
-          {header()}
-          {projectSummary()}
-          <Divider style={{ margin: 0 }}></Divider>
-          {projectAmenities()}
-          <Divider style={{ margin: 0 }}></Divider>
-          {projectInfra()}
-          <Divider style={{ margin: 0 }}></Divider>
-          {projectPlots()}
-        </Flex>
-        <Flex
+      <Gallery />
+      <Flex>
+      <Flex style={{ width: "66%", marginTop: 16, marginRight: "4%" }} vertical gap={24}>
+        <Header />
+        <ProjectSummary />
+        <Divider style={{ margin: 0 }}></Divider>
+        <ProjectAmenities />
+        <Divider style={{ margin: 0 }}></Divider>
+        <ProjectInfra />
+        <Divider style={{ margin: 0 }}></Divider>
+        <ProjectPlots />
+      </Flex>
+      <Flex
           style={{
             width: "30%",
             height: 800,

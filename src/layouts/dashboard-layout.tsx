@@ -12,8 +12,8 @@ export const DashboardLayout: React.FC = () => {
 
   return (
     <CustomErrorBoundary>
-      <Layout style={{ minHeight: "100vh" }}>
-        <Layout>
+      <Layout style={{ minHeight: "100vh", backgroundColor: "transparent"}}>
+        <Layout style={{backgroundColor: "transparent"}}>
           <Header style={{ padding: "8px 24px", background: "transparent" }}>
             <Flex align="center" justify="space-between">
               <Link to="/">
