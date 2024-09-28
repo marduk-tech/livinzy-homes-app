@@ -1,6 +1,9 @@
 import { Divider, Flex, Image, Typography } from "antd";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import AskLiv from "../components/ask";
+import { useFetchProject } from "../hooks/use-project";
+import { useParams } from "react-router-dom";
+import { Loader } from "../components/common/loader";
 
 const dummyProjectData: any = {
   metadata: {
@@ -158,6 +161,16 @@ const ProjectPlots: React.FC = () => (
 );
 
 const ProjectPage: React.FC = () => {
+  const { projectId } = useParams();
+
+  const { data: projectData, isLoading: projectDataLoading } = useFetchProject(
+    projectId!
+  );
+
+  if (!projectData) {
+    return <Loader></Loader>
+  }
+
   return (
     <Flex vertical>
       <Gallery />
