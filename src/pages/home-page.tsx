@@ -3,14 +3,13 @@ import { Col, Flex, Row } from "antd";
 import { Loader } from "../components/common/loader";
 import { ProjectCard } from "../components/common/project-card";
 import { useDevice } from "../hooks/use-device";
-import { useFetchProject } from "../hooks/use-project";
-import { queries } from "../libs/queries";
+import { useFetchProjects } from "../hooks/use-project";
 import { Project } from "../types/Project";
 
 export function HomePage() {
   const { isMobile } = useDevice();
 
-  const { data: projects, isLoading: projectIsLoading } = useFetchProject();
+  const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
 
   if (projectIsLoading) {
     return <Loader />;
@@ -27,7 +26,7 @@ export function HomePage() {
         }}
       >
         <Row gutter={[35, 30]} style={{ width: "100%" }}>
-          {projects.map((project: Project) => (
+          {projects.map((project) => (
             <Col key={project._id} xs={24} md={12} lg={6}>
               <ProjectCard project={project} key={project._id} />
             </Col>

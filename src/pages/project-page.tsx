@@ -1,9 +1,9 @@
 import { Divider, Flex, Image, Typography } from "antd";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import AskLiv from "../components/ask-liv";
-import { useFetchProject } from "../hooks/use-project";
 import { useParams } from "react-router-dom";
+import AskLiv from "../components/ask-liv";
 import { Loader } from "../components/common/loader";
+import { useFetchProjectById } from "../hooks/use-project";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 
 const dummyProjectData: any = {
   metadata: {
@@ -163,29 +163,32 @@ const ProjectPlots: React.FC = () => (
 const ProjectPage: React.FC = () => {
   const { projectId } = useParams();
 
-  const { data: projectData, isLoading: projectDataLoading } = useFetchProject(
-    projectId!
-  );
+  const { data: projectData, isLoading: projectDataLoading } =
+    useFetchProjectById(projectId!);
 
   if (!projectData) {
-    return <Loader></Loader>
+    return <Loader></Loader>;
   }
 
   return (
     <Flex vertical>
       <Gallery />
       <Flex>
-      <Flex style={{ width: "66%", marginTop: 16, marginRight: "4%" }} vertical gap={24}>
-        <Header />
-        <ProjectSummary />
-        <Divider style={{ margin: 0 }}></Divider>
-        <ProjectAmenities />
-        <Divider style={{ margin: 0 }}></Divider>
-        <ProjectInfra />
-        <Divider style={{ margin: 0 }}></Divider>
-        <ProjectPlots />
-      </Flex>
-      <Flex
+        <Flex
+          style={{ width: "66%", marginTop: 16, marginRight: "4%" }}
+          vertical
+          gap={24}
+        >
+          <Header />
+          <ProjectSummary />
+          <Divider style={{ margin: 0 }}></Divider>
+          <ProjectAmenities />
+          <Divider style={{ margin: 0 }}></Divider>
+          <ProjectInfra />
+          <Divider style={{ margin: 0 }}></Divider>
+          <ProjectPlots />
+        </Flex>
+        <Flex
           style={{
             width: "30%",
             height: 800,
@@ -194,7 +197,7 @@ const ProjectPage: React.FC = () => {
             borderColor: COLORS.borderColorDark,
           }}
         >
-          <AskLiv></AskLiv>
+          <AskLiv projectName={projectData.metadata.name} />
         </Flex>
       </Flex>
     </Flex>
