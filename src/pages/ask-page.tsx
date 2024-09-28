@@ -1,5 +1,5 @@
 import { Flex } from "antd";
-import AskLiv from "../components/ask";
+import AskLiv from "../components/ask-liv";
 
 export default function AskPage() {
   return (

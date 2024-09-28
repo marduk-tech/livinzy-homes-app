@@ -1,6 +1,6 @@
 import { Divider, Flex, Image, Typography } from "antd";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import AskLiv from "../components/ask";
+import AskLiv from "../components/ask-liv";
 import { useFetchProject } from "../hooks/use-project";
 import { useParams } from "react-router-dom";
 import { Loader } from "../components/common/loader";
