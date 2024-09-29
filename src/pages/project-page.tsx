@@ -4,7 +4,7 @@ import AskLiv from "../components/ask-liv";
 import { Loader } from "../components/common/loader";
 import { useFetchProjectById } from "../hooks/use-project";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { IAmenities, IMetadata } from "../types/Project";
+import { IAmenities, IMedia, IMetadata } from "../types/Project";
 import {
   AmenityGenIcon,
   ClubhouseIcon,
@@ -48,7 +48,7 @@ const dummyProjectData: any = {
   },
 };
 
-const Gallery: React.FC = () => (
+const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => (
   <div
     style={{
       height: 500,
@@ -58,7 +58,7 @@ const Gallery: React.FC = () => (
       scrollbarWidth: "none",
     }}
   >
-    {dummyProjectData.media.map((img: any, index: number) => (
+    {(media ? media : dummyProjectData.media).map((img: any, index: number) => (
       <img
         key={index}
         src={img.url}
@@ -170,7 +170,9 @@ const ProjectAmenities: React.FC<{ amenities: IAmenities }> = ({
           <Flex key={amenity} align="center" gap={8}>
             {labelAndIcon.icon}
             <Flex vertical>
-              <Typography.Text style={{color: COLORS.textColorLight}}>{labelAndIcon.label}</Typography.Text>
+              <Typography.Text style={{ color: COLORS.textColorLight }}>
+                {labelAndIcon.label}
+              </Typography.Text>
               <Typography.Text>{description as string}</Typography.Text>
             </Flex>
           </Flex>
@@ -203,7 +205,7 @@ const ProjectPage: React.FC = () => {
 
   return (
     <Flex vertical>
-      <Gallery />
+      <Gallery media={projectData.media} />
       <Flex>
         <Flex
           style={{ width: "66%", marginTop: 16, marginRight: "4%" }}
