@@ -1,6 +1,19 @@
 import { Divider, Flex, Image, Typography } from "antd";
+import { useParams } from "react-router-dom";
+import AskLiv from "../components/ask-liv";
+import { Loader } from "../components/common/loader";
+import { useFetchProjectById } from "../hooks/use-project";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import AskLiv from "../components/ask";
+import { IAmenities, IMetadata } from "../types/Project";
+import {
+  AmenityGenIcon,
+  ClubhouseIcon,
+  KidsIcon,
+  OutdoorsIcon,
+  ParkingIcon,
+  renderAmenityIcon,
+  SwimmingIcon,
+} from "../libs/icons";
 
 const dummyProjectData: any = {
   metadata: {
@@ -59,18 +72,16 @@ const Gallery: React.FC = () => (
   </div>
 );
 
-const Header: React.FC = () => (
+const Header: React.FC<{ metadata: IMetadata }> = ({ metadata }) => (
   <Flex vertical gap={8}>
-    <Typography.Title style={{ margin: 0 }}>
-      {dummyProjectData.metadata.name}
-    </Typography.Title>
+    <Typography.Title style={{ margin: 0 }}>{metadata.name}</Typography.Title>
     <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
-      {dummyProjectData.metadata.one_liner}
+      {metadata.oneLiner}
     </Typography.Text>
   </Flex>
 );
 
-const ProjectSummary: React.FC = () => (
+const ProjectSummary: React.FC<{ metadata: IMetadata }> = ({ metadata }) => (
   <Flex vertical gap={16}>
     <Typography.Title level={3}>What are you Buying ?</Typography.Title>
     <Flex align="center" gap={16}>
@@ -107,41 +118,65 @@ const ProjectSummary: React.FC = () => (
       </Flex>
     </Flex>
     <Typography.Text style={{ marginTop: 16, fontSize: 18 }}>
-      {dummyProjectData.metadata.description}
+      {metadata.description}
     </Typography.Text>
   </Flex>
 );
 
-const ProjectAmenities: React.FC = () => (
-  <Flex vertical>
+const getAmenityIconAndLabel = (amenity: string) => {
+  switch (amenity) {
+    case "sports_external":
+      return {
+        label: "Outdoor Sports",
+        icon: <OutdoorsIcon></OutdoorsIcon>,
+      };
+    case "clubhouse":
+      return {
+        label: "Clubhouse",
+        icon: <ClubhouseIcon></ClubhouseIcon>,
+      };
+    case "kids":
+      return {
+        label: "Kids Activity",
+        icon: <KidsIcon></KidsIcon>,
+      };
+    case "parking":
+      return {
+        label: "Parking",
+        icon: <ParkingIcon></ParkingIcon>,
+      };
+    case "swimming_pool":
+      return {
+        label: "Swimming",
+        icon: <SwimmingIcon></SwimmingIcon>,
+      };
+    default:
+      return {
+        label: "Also",
+        icon: <AmenityGenIcon></AmenityGenIcon>,
+      };
+  }
+};
+
+const ProjectAmenities: React.FC<{ amenities: IAmenities }> = ({
+  amenities,
+}) => (
+  <Flex vertical gap={16}>
     <Typography.Title level={3}>Amenities Offered</Typography.Title>
-    {Object.entries(dummyProjectData.amenities).map(
-      ([amenity, description]) => (
-        <Flex key={amenity}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            className="lucide lucide-bike"
-          >
-            <circle cx="18.5" cy="17.5" r="3.5" />
-            <circle cx="5.5" cy="17.5" r="3.5" />
-            <circle cx="15" cy="5" r="1" />
-            <path d="M12 17.5V14l-3-3 4-3 2 3h2" />
-          </svg>
-          <Flex vertical>
-            <Typography.Text>{amenity.replace("_", " ")}</Typography.Text>
-            <Typography.Text>{description as string}</Typography.Text>
+    {Object.entries(amenities)
+      .filter((am: any) => am[0] !== "_id")
+      .map(([amenity, description]) => {
+        const labelAndIcon = getAmenityIconAndLabel(amenity);
+        return (
+          <Flex key={amenity} align="center" gap={8}>
+            {labelAndIcon.icon}
+            <Flex vertical>
+              <Typography.Text style={{color: COLORS.textColorLight}}>{labelAndIcon.label}</Typography.Text>
+              <Typography.Text>{description as string}</Typography.Text>
+            </Flex>
           </Flex>
-        </Flex>
-      )
-    )}
+        );
+      })}
   </Flex>
 );
 
@@ -158,30 +193,44 @@ const ProjectPlots: React.FC = () => (
 );
 
 const ProjectPage: React.FC = () => {
+  const { projectId } = useParams();
+
+  const { data: projectData, isLoading: projectDataLoading } =
+    useFetchProjectById(projectId!);
+
+  if (!projectData) {
+    return <Loader></Loader>;
+  }
+
   return (
     <Flex vertical>
       <Gallery />
       <Flex>
-      <Flex style={{ width: "66%", marginTop: 16, marginRight: "4%" }} vertical gap={24}>
-        <Header />
-        <ProjectSummary />
-        <Divider style={{ margin: 0 }}></Divider>
-        <ProjectAmenities />
-        <Divider style={{ margin: 0 }}></Divider>
-        <ProjectInfra />
-        <Divider style={{ margin: 0 }}></Divider>
-        <ProjectPlots />
-      </Flex>
-      <Flex
+        <Flex
+          style={{ width: "66%", marginTop: 16, marginRight: "4%" }}
+          vertical
+          gap={24}
+        >
+          <Header metadata={projectData.metadata} />
+          <ProjectSummary metadata={projectData.metadata} />
+          <Divider style={{ margin: 0 }}></Divider>
+          <ProjectAmenities amenities={projectData.amenities} />
+          {/* <Divider style={{ margin: 0 }}></Divider>
+          <ProjectInfra />
+          <Divider style={{ margin: 0 }}></Divider>
+          <ProjectPlots /> */}
+        </Flex>
+        <Flex
           style={{
             width: "30%",
             height: 800,
             border: "1px solid",
             borderRadius: 16,
             borderColor: COLORS.borderColorDark,
+            overflow: "hidden",
           }}
         >
-          <AskLiv></AskLiv>
+          <AskLiv projectName={projectData.metadata.name} />
         </Flex>
       </Flex>
     </Flex>

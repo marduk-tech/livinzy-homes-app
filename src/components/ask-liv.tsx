@@ -2,12 +2,15 @@ import { ProChat } from "@ant-design/pro-chat";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { COLORS } from "../theme/style-constants";
 
-export default function AskLiv() {
+export default function AskLiv({ projectName }: { projectName?: string }) {
   const handleRequest = async (messages: any[]) => {
     const latestMessage = messages[messages.length - 1];
     try {
       const response = await axiosApiInstance.post("/ai/ask", {
         question: latestMessage.content,
+        project: {
+          name: projectName || "",
+        },
       });
 
       if (response.data && response.data.data) {
