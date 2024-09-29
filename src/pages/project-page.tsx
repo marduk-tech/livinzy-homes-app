@@ -4,6 +4,7 @@ import AskLiv from "../components/ask-liv";
 import { Loader } from "../components/common/loader";
 import { useFetchProjectById } from "../hooks/use-project";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { IMetadata } from "../types/Project";
 
 const dummyProjectData: any = {
   metadata: {
@@ -62,11 +63,9 @@ const Gallery: React.FC = () => (
   </div>
 );
 
-const Header: React.FC = () => (
+const Header: React.FC<{ metadata: IMetadata }> = ({ metadata }) => (
   <Flex vertical gap={8}>
-    <Typography.Title style={{ margin: 0 }}>
-      {dummyProjectData.metadata.name}
-    </Typography.Title>
+    <Typography.Title style={{ margin: 0 }}>{metadata.name}</Typography.Title>
     <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
       {dummyProjectData.metadata.one_liner}
     </Typography.Text>
@@ -179,7 +178,7 @@ const ProjectPage: React.FC = () => {
           vertical
           gap={24}
         >
-          <Header />
+          <Header metadata={projectData.metadata} />
           <ProjectSummary />
           <Divider style={{ margin: 0 }}></Divider>
           <ProjectAmenities />
@@ -195,6 +194,7 @@ const ProjectPage: React.FC = () => {
             border: "1px solid",
             borderRadius: 16,
             borderColor: COLORS.borderColorDark,
+            overflow: "hidden",
           }}
         >
           <AskLiv projectName={projectData.metadata.name} />
