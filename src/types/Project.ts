@@ -10,6 +10,7 @@ export interface IMetadata {
   location: string;
   website: string;
   oneLiner?: string;
+  description: string;
 }
 
 export interface ILand {
