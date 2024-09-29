@@ -11,7 +11,6 @@ import {
   KidsIcon,
   OutdoorsIcon,
   ParkingIcon,
-  renderAmenityIcon,
   SwimmingIcon,
 } from "../libs/icons";
 
