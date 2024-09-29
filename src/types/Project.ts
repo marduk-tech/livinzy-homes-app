@@ -11,6 +11,7 @@ export interface IMetadata {
   website: string;
   oneLiner?: string;
   description: string;
+  summary: string;
 }
 
 export interface ILand {
