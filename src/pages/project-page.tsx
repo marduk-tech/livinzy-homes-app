@@ -4,7 +4,7 @@ import AskLiv from "../components/ask-liv";
 import { Loader } from "../components/common/loader";
 import { useFetchProjectById } from "../hooks/use-project";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { IAmenities, IMedia, IMetadata } from "../types/Project";
+import { IAmenities, IMedia, IMetadata, IUi } from "../types/Project";
 import {
   AmenityGenIcon,
   ClubhouseIcon,
@@ -19,7 +19,9 @@ import {
 
 const dummyProjectData: any = {
   metadata: {
-    name: "Oasis Delight",
+    name: "Oasis Delight"
+  },
+  ui: {
     one_liner: "Farmland · Coffee Plantation · Sakleshpur",
     summary: {
       plots: "5000 to 20000 sq ft plots with coffee/pepper plantation & villa",
@@ -75,19 +77,19 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => (
   </div>
 );
 
-const Header: React.FC<{ metadata: IMetadata }> = ({ metadata }) => (
+const Header: React.FC<{ metadata: IMetadata, ui: IUi }> = ({ metadata, ui }) => (
   <Flex vertical gap={8} style={{ marginBottom: 16 }}>
     <Typography.Title style={{ margin: 0 }}>{metadata.name}</Typography.Title>
     <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
-      {metadata.oneLiner}
+      {ui.oneLiner}
     </Typography.Text>
   </Flex>
 );
 
-const ProjectSummary: React.FC<{ metadata: IMetadata }> = ({ metadata }) => {
-  const summary = metadata.summary
-    ? JSON.parse(metadata.summary)
-    : dummyProjectData.metadata.summary;
+const ProjectSummary: React.FC<{ ui: IUi }> = ({ ui }) => {
+  const summary = ui.summary
+    ? JSON.parse(ui.summary)
+    : dummyProjectData.ui.summary;
   return (
     <Flex vertical gap={16}>
       <Typography.Title level={3} style={{ margin: 0 }}>
@@ -139,7 +141,7 @@ const ProjectSummary: React.FC<{ metadata: IMetadata }> = ({ metadata }) => {
         </Flex>
       </Flex>
       <Typography.Text style={{ marginTop: 16, fontSize: 18 }}>
-        {metadata.description}
+        {ui.description}
       </Typography.Text>
     </Flex>
   );
@@ -233,8 +235,8 @@ const ProjectPage: React.FC = () => {
       <Gallery media={projectData.media} />
       <Flex style={{ marginTop: 16 }}>
         <Flex style={{ width: "66%", marginRight: "4%" }} vertical gap={24}>
-          <Header metadata={projectData.metadata} />
-          <ProjectSummary metadata={projectData.metadata} />
+          <Header metadata={projectData.metadata} ui={projectData.ui} />
+          <ProjectSummary ui={projectData.ui} />
           <Divider style={{ margin: 0 }}></Divider>
           <ProjectAmenities amenities={projectData.amenities} />
           {/* <Divider style={{ margin: 0 }}></Divider>
