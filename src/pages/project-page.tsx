@@ -4,13 +4,16 @@ import AskLiv from "../components/ask-liv";
 import { Loader } from "../components/common/loader";
 import { useFetchProjectById } from "../hooks/use-project";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { IAmenities, IMetadata } from "../types/Project";
+import { IAmenities, IMedia, IMetadata } from "../types/Project";
 import {
   AmenityGenIcon,
   ClubhouseIcon,
   KidsIcon,
+  LandIcon,
   OutdoorsIcon,
   ParkingIcon,
+  RupeeIcon,
+  ServicesIcon,
   SwimmingIcon,
 } from "../libs/icons";
 
@@ -18,12 +21,13 @@ const dummyProjectData: any = {
   metadata: {
     name: "Oasis Delight",
     one_liner: "Farmland · Coffee Plantation · Sakleshpur",
-    plots_summary:
-      "5000 to 20000 sq ft plots with coffee/pepper plantation & villa",
-    cost_summary:
-      "₹1000-1500 per sq  depending on the location and plot configuration",
-    services_summary:
-      "Clubhouse with amenities along with property management services",
+    summary: {
+      plots: "5000 to 20000 sq ft plots with coffee/pepper plantation & villa",
+      costing:
+        "₹1000-1500 per sq  depending on the location and plot configuration",
+      services:
+        "Clubhouse with amenities along with property management services",
+    },
     description:
       "Nestled across 112 acres, this farmland project offers a unique blend of natural beauty and modern amenities, featuring mango, timber, and ashok trees, with custom planting options based on soil. The land is equipped with drip irrigation, a lake with a scenic boulevard, and electric and water supply to each plot. Situated next to the protected Jawalgiri forest, the project ensures security with electric fencing, CCTV, and guards. Recreational amenities include a 10,000 sq.ft. clubhouse, sports facilities, zen gardens, picnic spots, and a 22-room resort, making it an ideal escape with ample parking for each plot.",
   },
@@ -48,7 +52,7 @@ const dummyProjectData: any = {
   },
 };
 
-const Gallery: React.FC = () => (
+const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => (
   <div
     style={{
       height: 500,
@@ -58,7 +62,7 @@ const Gallery: React.FC = () => (
       scrollbarWidth: "none",
     }}
   >
-    {dummyProjectData.media.map((img: any, index: number) => (
+    {(media ? media : dummyProjectData.media).map((img: any, index: number) => (
       <img
         key={index}
         src={img.url}
@@ -72,7 +76,7 @@ const Gallery: React.FC = () => (
 );
 
 const Header: React.FC<{ metadata: IMetadata }> = ({ metadata }) => (
-  <Flex vertical gap={8}>
+  <Flex vertical gap={8} style={{ marginBottom: 16 }}>
     <Typography.Title style={{ margin: 0 }}>{metadata.name}</Typography.Title>
     <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
       {metadata.oneLiner}
@@ -80,47 +84,66 @@ const Header: React.FC<{ metadata: IMetadata }> = ({ metadata }) => (
   </Flex>
 );
 
-const ProjectSummary: React.FC<{ metadata: IMetadata }> = ({ metadata }) => (
-  <Flex vertical gap={16}>
-    <Typography.Title level={3}>What are you Buying ?</Typography.Title>
-    <Flex align="center" gap={16}>
-      <Image height={40} width={40} src="../../images/plot.png"></Image>
-      <Flex vertical>
-        <Typography.Text style={{ fontSize: 18, color: COLORS.textColorLight }}>
-          Plots
-        </Typography.Text>
-        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
-          {dummyProjectData.metadata.plots_summary}
-        </Typography.Text>
+const ProjectSummary: React.FC<{ metadata: IMetadata }> = ({ metadata }) => {
+  const summary = metadata.summary
+    ? JSON.parse(metadata.summary)
+    : dummyProjectData.metadata.summary;
+  return (
+    <Flex vertical gap={16}>
+      <Typography.Title level={3} style={{ margin: 0 }}>
+        What are you Buying ?
+      </Typography.Title>
+      <Flex align="center" gap={8}>
+        <LandIcon></LandIcon>
+        <Flex vertical>
+          <Typography.Text
+            style={{ fontSize: 18, color: COLORS.textColorLight }}
+          >
+            Plots
+          </Typography.Text>
+          <Typography.Text
+            style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
+          >
+            {summary.plots}
+          </Typography.Text>
+        </Flex>
       </Flex>
-    </Flex>
-    <Flex align="center" gap={16}>
-      <Image height={40} width={40} src="../../images/rupee.png"></Image>
-      <Flex vertical>
-        <Typography.Text style={{ fontSize: 18, color: COLORS.textColorLight }}>
-          Costing
-        </Typography.Text>
-        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
-          {dummyProjectData.metadata.cost_summary}
-        </Typography.Text>
+      <Flex align="center" gap={8}>
+        <RupeeIcon></RupeeIcon>
+        <Flex vertical>
+          <Typography.Text
+            style={{ fontSize: 18, color: COLORS.textColorLight }}
+          >
+            Costing
+          </Typography.Text>
+          <Typography.Text
+            style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
+          >
+            {summary.costing}
+          </Typography.Text>
+        </Flex>
       </Flex>
-    </Flex>
-    <Flex align="center" gap={16}>
-      <Image height={40} width={40} src="../../images/rupee.png"></Image>
-      <Flex vertical>
-        <Typography.Text style={{ fontSize: 18, color: COLORS.textColorLight }}>
-          Services
-        </Typography.Text>
-        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
-          {dummyProjectData.metadata.services_summary}
-        </Typography.Text>
+      <Flex align="center" gap={8}>
+        <ServicesIcon></ServicesIcon>
+        <Flex vertical>
+          <Typography.Text
+            style={{ fontSize: 18, color: COLORS.textColorLight }}
+          >
+            Services
+          </Typography.Text>
+          <Typography.Text
+            style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
+          >
+            {summary.services}
+          </Typography.Text>
+        </Flex>
       </Flex>
+      <Typography.Text style={{ marginTop: 16, fontSize: 18 }}>
+        {metadata.description}
+      </Typography.Text>
     </Flex>
-    <Typography.Text style={{ marginTop: 16, fontSize: 18 }}>
-      {metadata.description}
-    </Typography.Text>
-  </Flex>
-);
+  );
+};
 
 const getAmenityIconAndLabel = (amenity: string) => {
   switch (amenity) {
@@ -161,7 +184,9 @@ const ProjectAmenities: React.FC<{ amenities: IAmenities }> = ({
   amenities,
 }) => (
   <Flex vertical gap={16}>
-    <Typography.Title level={3}>Amenities Offered</Typography.Title>
+    <Typography.Title level={3} style={{ margin: 0 }}>
+      Amenities Offered
+    </Typography.Title>
     {Object.entries(amenities)
       .filter((am: any) => am[0] !== "_id")
       .map(([amenity, description]) => {
@@ -170,7 +195,9 @@ const ProjectAmenities: React.FC<{ amenities: IAmenities }> = ({
           <Flex key={amenity} align="center" gap={8}>
             {labelAndIcon.icon}
             <Flex vertical>
-              <Typography.Text style={{color: COLORS.textColorLight}}>{labelAndIcon.label}</Typography.Text>
+              <Typography.Text style={{ color: COLORS.textColorLight }}>
+                {labelAndIcon.label}
+              </Typography.Text>
               <Typography.Text>{description as string}</Typography.Text>
             </Flex>
           </Flex>
@@ -203,13 +230,9 @@ const ProjectPage: React.FC = () => {
 
   return (
     <Flex vertical>
-      <Gallery />
-      <Flex>
-        <Flex
-          style={{ width: "66%", marginTop: 16, marginRight: "4%" }}
-          vertical
-          gap={24}
-        >
+      <Gallery media={projectData.media} />
+      <Flex style={{ marginTop: 16 }}>
+        <Flex style={{ width: "66%", marginRight: "4%" }} vertical gap={24}>
           <Header metadata={projectData.metadata} />
           <ProjectSummary metadata={projectData.metadata} />
           <Divider style={{ margin: 0 }}></Divider>
