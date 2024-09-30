@@ -9,9 +9,19 @@ export interface IMetadata {
   name: string;
   location: string;
   website: string;
+}
+
+export interface IUi {
   oneLiner?: string;
   description: string;
   summary: string;
+}
+
+
+export interface IStatus {
+  launchDate: string;
+  committedEndDate: string;
+  constructionStatus: string;
 }
 
 export interface ILand {
@@ -30,7 +40,7 @@ export interface IPlots {
   shape_mix: string;
   plots_list: string;
   villa: string;
-  cost_range: string;
+  cost_details: string;
   others: string;
 }
 
@@ -83,6 +93,8 @@ export interface Project {
   _id: string;
   metadata: IMetadata;
   land: ILand;
+  ui: IUi;
+  status: IStatus;
   plots: IPlots;
   media: IMedia[];
   connectivity: IConnectivity;
