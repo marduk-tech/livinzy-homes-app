@@ -9,19 +9,9 @@ export interface IMetadata {
   name: string;
   location: string;
   website: string;
-}
-
-export interface IUi {
   oneLiner?: string;
   description: string;
   summary: string;
-}
-
-
-export interface IStatus {
-  launchDate: string;
-  committedEndDate: string;
-  constructionStatus: string;
 }
 
 export interface ILand {
@@ -40,7 +30,7 @@ export interface IPlots {
   shape_mix: string;
   plots_list: string;
   villa: string;
-  cost_details: string;
+  cost_range: string;
   others: string;
 }
 
@@ -89,12 +79,18 @@ export interface ITeam {
   others: string;
 }
 
+export interface IUI {
+  summary: string;
+  description: string;
+  oneLiner: string;
+  highlights: string;
+  costSummary: string;
+}
+
 export interface Project {
   _id: string;
   metadata: IMetadata;
   land: ILand;
-  ui: IUi;
-  status: IStatus;
   plots: IPlots;
   media: IMedia[];
   connectivity: IConnectivity;
@@ -102,6 +98,28 @@ export interface Project {
   basic_infra: IBasicInfra;
   amenities: IAmenities;
   team: ITeam;
+  ui: IUI;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ProjectField {
+  dbField: string;
+  fieldDisplayName: string;
+  fieldDescription: string;
+  mustHave?: boolean;
+  hide?: boolean;
+}
+
+export interface ProjectStructure {
+  metadata: ProjectField[];
+  ui: ProjectField[];
+  land: ProjectField[];
+  plots: ProjectField[];
+  connectivity: ProjectField[];
+  status: ProjectField[];
+  basic_infra: ProjectField[];
+  amenities: ProjectField[];
+  clickToAction: ProjectField[];
+  team: ProjectField[];
 }
