@@ -348,33 +348,64 @@ const AmenityCard: React.FC<AmenityCardProps> = ({
   iconSrc,
   title,
   description,
-}) => (
-  <Flex vertical align="center" gap={10}>
-    <Image src={iconSrc} width={34} height={34} preview={false} />
-    <Typography.Text
-      style={{
-        margin: 0,
-        fontSize: FONT_SIZE.subHeading,
-        fontWeight: "bold",
-      }}
-    >
-      {title}
-    </Typography.Text>
-    <Typography.Paragraph
-      ellipsis={{
-        rows: 3,
-      }}
-      style={{
-        margin: 0,
-        fontSize: FONT_SIZE.default,
-        textAlign: "center",
-        cursor: "pointer",
-      }}
-    >
-      {description}
-    </Typography.Paragraph>
-  </Flex>
-);
+}) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+  return (
+    <>
+      <Flex vertical align="center" gap={10}>
+        <Image src={iconSrc} width={34} height={34} preview={false} />
+        <Typography.Text
+          style={{
+            margin: 0,
+            fontSize: FONT_SIZE.subHeading,
+            fontWeight: "bold",
+          }}
+        >
+          {title}
+        </Typography.Text>
+        <Typography.Paragraph
+          onClick={() => setIsModalOpen(true)}
+          ellipsis={{
+            rows: 3,
+            expandable: false,
+          }}
+          style={{
+            margin: 0,
+            fontSize: FONT_SIZE.default,
+            textAlign: "center",
+            cursor: "pointer",
+          }}
+        >
+          {description}
+        </Typography.Paragraph>
+      </Flex>
+
+      <Modal
+        title={title || ""}
+        open={isModalOpen}
+        onCancel={handleCancel}
+        footer={[
+          <Button size="small" key="back" onClick={handleCancel}>
+            Okay
+          </Button>,
+        ]}
+      >
+        <Typography.Text
+          style={{
+            margin: 0,
+            fontSize: FONT_SIZE.default,
+          }}
+        >
+          {description}
+        </Typography.Text>
+      </Modal>
+    </>
+  );
+};
 
 const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
   const amenities = project.amenities;
