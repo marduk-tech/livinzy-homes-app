@@ -2,13 +2,17 @@ import { Flex, Image, Layout } from "antd";
 import React from "react";
 import { Link, Outlet, useParams } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
-// import { UserDropDown } from "../components/common/user-dropdown";
+import { UserDropDown } from "../components/common/user-dropdown";
+import { LoginForm } from "../components/login-form";
 import { useDevice } from "../hooks/use-device";
+import { useUser } from "../hooks/use-user";
 
 const { Header, Content } = Layout;
 
 export const DashboardLayout: React.FC = () => {
   const { isMobile } = useDevice();
+
+  const { user, isLoading, isError } = useUser();
 
   return (
     <CustomErrorBoundary>
@@ -24,7 +28,11 @@ export const DashboardLayout: React.FC = () => {
                 ></Image>
               </Link>
 
-              {/* <UserDropDown /> */}
+              {user && !isLoading && !isError ? (
+                <UserDropDown />
+              ) : (
+                <LoginForm />
+              )}
             </Flex>
           </Header>
           <Content style={{ margin: isMobile ? 24 : 48 }}>

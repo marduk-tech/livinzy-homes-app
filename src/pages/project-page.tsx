@@ -1,10 +1,19 @@
-import { Divider, Flex, Image, Typography } from "antd";
+import { HeartOutlined, SendOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Col,
+  Divider,
+  Flex,
+  Image,
+  Modal,
+  Row,
+  Typography,
+} from "antd";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import AskLiv from "../components/ask-liv";
 import { Loader } from "../components/common/loader";
 import { useFetchProjectById } from "../hooks/use-project";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { IAmenities, IMedia, IMetadata, IUi } from "../types/Project";
 import {
   AmenityGenIcon,
   ClubhouseIcon,
@@ -16,10 +25,12 @@ import {
   ServicesIcon,
   SwimmingIcon,
 } from "../libs/icons";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { IAmenities, IMedia, IMetadata, IUI, Project } from "../types/Project";
 
 const dummyProjectData: any = {
   metadata: {
-    name: "Oasis Delight"
+    name: "Oasis Delight",
   },
   ui: {
     one_liner: "Farmland · Coffee Plantation · Sakleshpur",
@@ -77,8 +88,11 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => (
   </div>
 );
 
-const Header: React.FC<{ metadata: IMetadata, ui: IUi }> = ({ metadata, ui }) => (
-  <Flex vertical gap={8} style={{ marginBottom: 16 }}>
+const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
+  metadata,
+  ui,
+}) => (
+  <Flex vertical gap={8}>
     <Typography.Title style={{ margin: 0 }}>{metadata.name}</Typography.Title>
     <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
       {ui.oneLiner}
@@ -86,64 +100,202 @@ const Header: React.FC<{ metadata: IMetadata, ui: IUi }> = ({ metadata, ui }) =>
   </Flex>
 );
 
-const ProjectSummary: React.FC<{ ui: IUi }> = ({ ui }) => {
+const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
+  const constSummery = JSON.parse(project.ui.costSummary);
+
+  return (
+    <Flex align="center" justify="space-between">
+      <Flex gap={8} align="center">
+        <Typography.Text
+          style={{
+            margin: 0,
+            fontSize: FONT_SIZE.subHeading + 5,
+            fontWeight: "bold",
+          }}
+        >
+          {constSummery.cost}
+        </Typography.Text>
+
+        <Typography.Text
+          style={{ margin: 0, fontSize: FONT_SIZE.subHeading + 5 }}
+        >
+          /
+        </Typography.Text>
+
+        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
+          {constSummery.size}
+        </Typography.Text>
+      </Flex>
+
+      <Flex gap={10}>
+        <Button size="small" icon={<SendOutlined />}>
+          Follow Up
+        </Button>
+        <Button size="small" icon={<HeartOutlined />}>
+          Save
+        </Button>
+      </Flex>
+    </Flex>
+  );
+};
+
+const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
+  const highlights = JSON.parse(project.ui.highlights);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedHighlight, setSelectedHighlight] = useState<any>();
+
+  const handleCancel = () => {
+    setSelectedHighlight(undefined);
+    setIsModalOpen(false);
+  };
+  return (
+    <>
+      <Row
+        gutter={[16, 36]}
+        style={{
+          padding: "20px 30px",
+          backgroundColor: "#F7F7F7",
+          borderRadius: 10,
+        }}
+        align="middle"
+      >
+        {highlights.map((highlight: any, i: number) => (
+          <Col span={8} key={i}>
+            <Flex
+              align="center"
+              gap={10}
+              style={{
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                if (highlight.description) {
+                  setSelectedHighlight(highlight);
+                  setIsModalOpen(true);
+                }
+              }}
+            >
+              <Image
+                src={`/images/highlights-icons/${highlight.icon}`}
+                width={34}
+                height={34}
+                preview={false}
+              />
+              <Typography.Text
+                style={{
+                  margin: 0,
+                  fontSize: FONT_SIZE.default,
+                  fontWeight: "bold",
+                }}
+              >
+                {highlight.title}
+              </Typography.Text>
+            </Flex>
+          </Col>
+        ))}
+      </Row>
+
+      <Modal
+        title={selectedHighlight?.title || ""}
+        open={isModalOpen}
+        onCancel={handleCancel}
+        footer={[
+          <Button size="small" key="back" onClick={handleCancel}>
+            Okay
+          </Button>,
+        ]}
+      >
+        <Typography.Text
+          style={{
+            margin: 0,
+            fontSize: FONT_SIZE.default,
+          }}
+        >
+          {selectedHighlight?.description}
+        </Typography.Text>
+      </Modal>
+    </>
+  );
+};
+
+const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
   const summary = ui.summary
     ? JSON.parse(ui.summary)
     : dummyProjectData.ui.summary;
   return (
-    <Flex vertical gap={16}>
-      <Typography.Title level={3} style={{ margin: 0 }}>
-        What are you Buying ?
-      </Typography.Title>
-      <Flex align="center" gap={8}>
+    <Flex vertical gap={30}>
+      <Flex gap={20}>
         <LandIcon></LandIcon>
-        <Flex vertical>
-          <Typography.Text
-            style={{ fontSize: 18, color: COLORS.textColorLight }}
-          >
-            Plots
-          </Typography.Text>
-          <Typography.Text
-            style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
-          >
-            {summary.plots}
-          </Typography.Text>
-        </Flex>
+        <Typography.Title level={3} style={{ margin: 0 }}>
+          What are you Buying ?
+        </Typography.Title>
       </Flex>
-      <Flex align="center" gap={8}>
-        <RupeeIcon></RupeeIcon>
-        <Flex vertical>
-          <Typography.Text
-            style={{ fontSize: 18, color: COLORS.textColorLight }}
-          >
-            Costing
-          </Typography.Text>
-          <Typography.Text
-            style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
-          >
-            {summary.costing}
-          </Typography.Text>
+
+      <Row
+        style={{
+          padding: "20px 30px",
+          backgroundColor: "#F7F7F7",
+          borderRadius: 10,
+        }}
+        align="middle"
+      >
+        <Flex vertical gap={40}>
+          <Flex align="center" gap={8}>
+            <LandIcon></LandIcon>
+            <Flex vertical>
+              <Typography.Text
+                style={{ fontSize: 18, color: COLORS.textColorLight }}
+              >
+                Plots
+              </Typography.Text>
+              <Typography.Text
+                style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
+              >
+                {summary.plots}
+              </Typography.Text>
+            </Flex>
+          </Flex>
+          <Flex align="center" gap={8}>
+            <RupeeIcon></RupeeIcon>
+            <Flex vertical>
+              <Typography.Text
+                style={{ fontSize: 18, color: COLORS.textColorLight }}
+              >
+                Costing
+              </Typography.Text>
+              <Typography.Text
+                style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
+              >
+                {summary.costing}
+              </Typography.Text>
+            </Flex>
+          </Flex>
+          <Flex align="center" gap={8}>
+            <ServicesIcon></ServicesIcon>
+            <Flex vertical>
+              <Typography.Text
+                style={{ fontSize: 18, color: COLORS.textColorLight }}
+              >
+                Services
+              </Typography.Text>
+              <Typography.Text
+                style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
+              >
+                {summary.services}
+              </Typography.Text>
+            </Flex>
+          </Flex>
         </Flex>
-      </Flex>
-      <Flex align="center" gap={8}>
-        <ServicesIcon></ServicesIcon>
-        <Flex vertical>
-          <Typography.Text
-            style={{ fontSize: 18, color: COLORS.textColorLight }}
-          >
-            Services
-          </Typography.Text>
-          <Typography.Text
-            style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
-          >
-            {summary.services}
-          </Typography.Text>
-        </Flex>
-      </Flex>
-      <Typography.Text style={{ marginTop: 16, fontSize: 18 }}>
-        {ui.description}
-      </Typography.Text>
+      </Row>
     </Flex>
+  );
+};
+
+const ProjectDescription: React.FC<{ project: Project }> = ({ project }) => {
+  return (
+    <Typography.Text style={{ fontSize: 18 }}>
+      {project.ui.description}
+    </Typography.Text>
   );
 };
 
@@ -152,61 +304,177 @@ const getAmenityIconAndLabel = (amenity: string) => {
     case "sports_external":
       return {
         label: "Outdoor Sports",
-        icon: <OutdoorsIcon></OutdoorsIcon>,
+        iconSrc: "/images/amenities-icons/others.png",
       };
     case "clubhouse":
       return {
         label: "Clubhouse",
-        icon: <ClubhouseIcon></ClubhouseIcon>,
+        iconSrc: "/images/amenities-icons/clubhouse.png",
       };
     case "kids":
       return {
         label: "Kids Activity",
-        icon: <KidsIcon></KidsIcon>,
+        iconSrc: "/images/amenities-icons/kids.png",
       };
     case "parking":
       return {
         label: "Parking",
-        icon: <ParkingIcon></ParkingIcon>,
+        iconSrc: "/images/amenities-icons/parks.png",
+      };
+    case "parks":
+      return {
+        label: "Parking",
+        iconSrc: "/images/amenities-icons/parks.png",
       };
     case "swimming_pool":
       return {
         label: "Swimming",
-        icon: <SwimmingIcon></SwimmingIcon>,
+        iconSrc: "/images/amenities-icons/swimming-pool.png",
       };
     default:
       return {
-        label: "Also",
-        icon: <AmenityGenIcon></AmenityGenIcon>,
+        label: "Others",
+        iconSrc: "/images/amenities-icons/others.png",
       };
   }
 };
 
-const ProjectAmenities: React.FC<{ amenities: IAmenities }> = ({
-  amenities,
-}) => (
-  <Flex vertical gap={16}>
-    <Typography.Title level={3} style={{ margin: 0 }}>
-      Amenities Offered
-    </Typography.Title>
-    {Object.entries(amenities)
-      .filter((am: any) => am[0] !== "_id")
-      .map(([amenity, description]) => {
-        const labelAndIcon = getAmenityIconAndLabel(amenity);
-        return (
-          <Flex key={amenity} align="center" gap={8}>
-            {labelAndIcon.icon}
-            <Flex vertical>
-              <Typography.Text style={{ color: COLORS.textColorLight }}>
-                {labelAndIcon.label}
-              </Typography.Text>
-              <Typography.Text>{description as string}</Typography.Text>
-            </Flex>
-          </Flex>
-        );
-      })}
-  </Flex>
-);
+interface AmenityCardProps {
+  iconSrc: string;
+  title: string;
+  description: string;
+}
+const AmenityCard: React.FC<AmenityCardProps> = ({
+  iconSrc,
+  title,
+  description,
+}) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+  return (
+    <>
+      <Flex vertical align="center" gap={10}>
+        <Image src={iconSrc} width={34} height={34} preview={false} />
+        <Typography.Text
+          style={{
+            margin: 0,
+            fontSize: FONT_SIZE.subHeading,
+            fontWeight: "bold",
+          }}
+        >
+          {title}
+        </Typography.Text>
+        <Typography.Paragraph
+          onClick={() => setIsModalOpen(true)}
+          ellipsis={{
+            rows: 3,
+            expandable: false,
+          }}
+          style={{
+            margin: 0,
+            fontSize: FONT_SIZE.default,
+            textAlign: "center",
+            cursor: "pointer",
+          }}
+        >
+          {description}
+        </Typography.Paragraph>
+      </Flex>
+
+      <Modal
+        title={title || ""}
+        open={isModalOpen}
+        onCancel={handleCancel}
+        footer={[
+          <Button size="small" key="back" onClick={handleCancel}>
+            Okay
+          </Button>,
+        ]}
+      >
+        <Typography.Text
+          style={{
+            margin: 0,
+            fontSize: FONT_SIZE.default,
+          }}
+        >
+          {description}
+        </Typography.Text>
+      </Modal>
+    </>
+  );
+};
+
+const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
+  const amenities = project.amenities;
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedHighlight, setSelectedHighlight] = useState<any>();
+
+  const handleCancel = () => {
+    setSelectedHighlight(undefined);
+    setIsModalOpen(false);
+  };
+  return (
+    <Flex vertical gap={30}>
+      <Flex gap={20}>
+        <LandIcon></LandIcon>
+        <Typography.Title level={3} style={{ margin: 0 }}>
+          Amenities Offered
+        </Typography.Title>
+      </Flex>
+      <Row
+        gutter={[16, 36]}
+        style={{
+          padding: "20px 30px",
+          backgroundColor: "#F7F7F7",
+          borderRadius: 10,
+        }}
+        align="middle"
+      >
+        {Object.entries(amenities)
+          .filter((am: any) => am[0] !== "_id")
+          .map(([amenity, description]) => {
+            console.log(amenity);
+            console.log(description);
+
+            const labelAndIcon = getAmenityIconAndLabel(amenity);
+            return (
+              <Col span={8}>
+                <AmenityCard
+                  description={description}
+                  iconSrc={labelAndIcon.iconSrc}
+                  title={labelAndIcon.label}
+                />
+              </Col>
+            );
+          })}
+      </Row>
+
+      <Modal
+        title={selectedHighlight?.title || ""}
+        open={isModalOpen}
+        onCancel={handleCancel}
+        footer={[
+          <Button size="small" key="back" onClick={handleCancel}>
+            Okay
+          </Button>,
+        ]}
+      >
+        <Typography.Text
+          style={{
+            margin: 0,
+            fontSize: FONT_SIZE.default,
+          }}
+        >
+          {selectedHighlight?.description}
+        </Typography.Text>
+      </Modal>
+    </Flex>
+  );
+};
 
 const ProjectInfra: React.FC = () => (
   <Flex vertical>
@@ -233,12 +501,18 @@ const ProjectPage: React.FC = () => {
   return (
     <Flex vertical>
       <Gallery media={projectData.media} />
-      <Flex style={{ marginTop: 16 }}>
-        <Flex style={{ width: "66%", marginRight: "4%" }} vertical gap={24}>
+      <Flex style={{ marginTop: 24 }}>
+        <Flex style={{ width: "66%", marginRight: "4%" }} vertical gap={50}>
           <Header metadata={projectData.metadata} ui={projectData.ui} />
+          <CostSummery project={projectData} />
+
+          <ProjectHighlights project={projectData} />
+
+          <ProjectDescription project={projectData} />
+
           <ProjectSummary ui={projectData.ui} />
-          <Divider style={{ margin: 0 }}></Divider>
-          <ProjectAmenities amenities={projectData.amenities} />
+
+          <ProjectAmenities project={projectData} />
           {/* <Divider style={{ margin: 0 }}></Divider>
           <ProjectInfra />
           <Divider style={{ margin: 0 }}></Divider>
