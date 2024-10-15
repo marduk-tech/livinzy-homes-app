@@ -10,9 +10,11 @@ import {
   Typography,
 } from "antd";
 import { useState } from "react";
+import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import AskLiv from "../components/ask-liv";
 import { Loader } from "../components/common/loader";
+import { useDevice } from "../hooks/use-device";
 import { useFetchProjectById } from "../hooks/use-project";
 import {
   AmenityGenIcon,
@@ -91,51 +93,89 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => (
 const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
   metadata,
   ui,
-}) => (
-  <Flex vertical gap={8}>
-    <Typography.Title style={{ margin: 0 }}>{metadata.name}</Typography.Title>
-    <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
-      {ui.oneLiner}
-    </Typography.Text>
-  </Flex>
-);
-
-const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
-  const constSummery = JSON.parse(project.ui.costSummary);
+}) => {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 576px)",
+  });
 
   return (
-    <Flex align="center" justify="space-between">
-      <Flex gap={8} align="center">
-        <Typography.Text
-          style={{
-            margin: 0,
-            fontSize: FONT_SIZE.subHeading + 5,
-            fontWeight: "bold",
-          }}
-        >
-          {constSummery.cost}
-        </Typography.Text>
+    <Flex vertical gap={8}>
+      <Typography.Title level={isMobile ? 2 : 1} style={{ margin: 0 }}>
+        {metadata.name}
+      </Typography.Title>
 
-        <Typography.Text
-          style={{ margin: 0, fontSize: FONT_SIZE.subHeading + 5 }}
-        >
-          /
-        </Typography.Text>
-
-        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}>
-          {constSummery.size}
-        </Typography.Text>
-      </Flex>
-
-      <Flex gap={10}>
-        <Button size="small" icon={<SendOutlined />}>
-          Follow Up
-        </Button>
-        <Button size="small" icon={<HeartOutlined />}>
-          Save
-        </Button>
-      </Flex>
+      <Typography.Text
+        style={{ margin: 0, fontSize: isMobile ? 16 : FONT_SIZE.subHeading }}
+      >
+        {ui.oneLiner}
+      </Typography.Text>
     </Flex>
+  );
+};
+
+const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
+  const costSummary = JSON.parse(project.ui.costSummary);
+
+  const isMobile = useMediaQuery({
+    query: "(max-width: 576px)",
+  });
+
+  return (
+    <Row gutter={[16, 16]} align="middle" justify="space-between">
+      <Col xs={24} md={12}>
+        <Row align="middle">
+          <Typography.Text
+            style={{
+              margin: 0,
+              fontSize: isMobile ? 22 : 25,
+              fontWeight: "bold",
+            }}
+          >
+            {costSummary.cost}
+          </Typography.Text>
+
+          <Typography.Text
+            style={{
+              margin: "0 8px",
+              fontSize: isMobile ? FONT_SIZE.subHeading * 0.7 : 25,
+            }}
+          >
+            /
+          </Typography.Text>
+
+          <Typography.Text
+            style={{
+              margin: 0,
+              fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+            }}
+          >
+            {costSummary.size}
+          </Typography.Text>
+        </Row>
+      </Col>
+
+      {/* Buttons: Follow Up and Save */}
+      <Col xs={24} md={12}>
+        <Row justify={isMobile ? "start" : "end"} gutter={10}>
+          <Col>
+            <Button
+              size={isMobile ? "small" : "middle"}
+              icon={<SendOutlined />}
+            >
+              Follow Up
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              size={isMobile ? "small" : "middle"}
+              icon={<HeartOutlined />}
+            >
+              Save
+            </Button>
+          </Col>
+        </Row>
+      </Col>
+    </Row>
   );
 };
 
@@ -149,19 +189,23 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
     setSelectedHighlight(undefined);
     setIsModalOpen(false);
   };
+
+  const isMobile = useMediaQuery({
+    query: "(max-width: 576px)",
+  });
+
   return (
     <>
       <Row
-        gutter={[16, 36]}
+        gutter={[16, isMobile ? 28 : 16]}
         style={{
           padding: "20px 30px",
           backgroundColor: "#F7F7F7",
           borderRadius: 10,
         }}
-        align="middle"
       >
         {highlights.map((highlight: any, i: number) => (
-          <Col span={8} key={i}>
+          <Col xs={24} sm={12} md={8} key={i}>
             <Flex
               align="center"
               gap={10}
@@ -177,15 +221,15 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
             >
               <Image
                 src={`/images/highlights-icons/${highlight.icon}`}
-                width={34}
-                height={34}
+                width={isMobile ? 24 : 34}
+                height={isMobile ? 24 : 34}
                 preview={false}
               />
               <Typography.Text
                 style={{
                   margin: 0,
                   fontSize: FONT_SIZE.default,
-                  fontWeight: "bold",
+                  fontWeight: isMobile ? "normal" : " bold",
                 }}
               >
                 {highlight.title}
@@ -222,11 +266,20 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
   const summary = ui.summary
     ? JSON.parse(ui.summary)
     : dummyProjectData.ui.summary;
+
+  const isMobile = useMediaQuery({
+    query: "(max-width: 576px)",
+  });
+
   return (
     <Flex vertical gap={30}>
-      <Flex gap={20}>
-        <LandIcon></LandIcon>
-        <Typography.Title level={3} style={{ margin: 0 }}>
+      <Flex gap={isMobile ? 10 : 20}>
+        <LandIcon
+          width={isMobile ? 30 : 40}
+          height={isMobile ? 30 : 40}
+        ></LandIcon>
+
+        <Typography.Title level={isMobile ? 4 : 3} style={{ margin: 0 }}>
           What are you Buying ?
         </Typography.Title>
       </Flex>
@@ -241,45 +294,79 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
       >
         <Flex vertical gap={40}>
           <Flex align="center" gap={8}>
-            <LandIcon></LandIcon>
+            <div style={{ flexShrink: 0 }}>
+              <LandIcon
+                width={isMobile ? 20 : 40}
+                height={isMobile ? 20 : 40}
+              ></LandIcon>
+            </div>
             <Flex vertical>
               <Typography.Text
-                style={{ fontSize: 18, color: COLORS.textColorLight }}
+                style={{
+                  fontSize: isMobile ? 14 : 18,
+                  color: COLORS.textColorLight,
+                }}
               >
                 Plots
               </Typography.Text>
               <Typography.Text
-                style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
+                style={{
+                  margin: 0,
+                  fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                }}
               >
                 {summary.plots}
               </Typography.Text>
             </Flex>
           </Flex>
           <Flex align="center" gap={8}>
-            <RupeeIcon></RupeeIcon>
+            <div style={{ flexShrink: 0 }}>
+              <RupeeIcon
+                width={isMobile ? 20 : 40}
+                height={isMobile ? 20 : 40}
+              ></RupeeIcon>
+            </div>
             <Flex vertical>
               <Typography.Text
-                style={{ fontSize: 18, color: COLORS.textColorLight }}
+                style={{
+                  fontSize: isMobile ? 14 : 18,
+                  color: COLORS.textColorLight,
+                }}
               >
                 Costing
               </Typography.Text>
               <Typography.Text
-                style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
+                style={{
+                  margin: 0,
+                  fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                }}
               >
                 {summary.costing}
               </Typography.Text>
             </Flex>
           </Flex>
           <Flex align="center" gap={8}>
-            <ServicesIcon></ServicesIcon>
+            <div style={{ flexShrink: 0 }}>
+              <ServicesIcon
+                width={isMobile ? 20 : 40}
+                height={isMobile ? 20 : 40}
+              ></ServicesIcon>
+            </div>
+
             <Flex vertical>
               <Typography.Text
-                style={{ fontSize: 18, color: COLORS.textColorLight }}
+                style={{
+                  fontSize: isMobile ? 14 : 18,
+                  color: COLORS.textColorLight,
+                }}
               >
                 Services
               </Typography.Text>
               <Typography.Text
-                style={{ margin: 0, fontSize: FONT_SIZE.subHeading }}
+                style={{
+                  margin: 0,
+                  fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                }}
               >
                 {summary.services}
               </Typography.Text>
@@ -292,8 +379,12 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
 };
 
 const ProjectDescription: React.FC<{ project: Project }> = ({ project }) => {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 576px)",
+  });
+
   return (
-    <Typography.Text style={{ fontSize: 18 }}>
+    <Typography.Text style={{ fontSize: isMobile ? 16 : 18 }}>
       {project.ui.description}
     </Typography.Text>
   );
@@ -354,34 +445,48 @@ const AmenityCard: React.FC<AmenityCardProps> = ({
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
+  const isMobile = useMediaQuery({
+    query: "(max-width: 576px)",
+  });
+
   return (
     <>
       <Flex vertical align="center" gap={10}>
-        <Image src={iconSrc} width={34} height={34} preview={false} />
-        <Typography.Text
-          style={{
-            margin: 0,
-            fontSize: FONT_SIZE.subHeading,
-            fontWeight: "bold",
-          }}
-        >
-          {title}
-        </Typography.Text>
-        <Typography.Paragraph
-          onClick={() => setIsModalOpen(true)}
-          ellipsis={{
-            rows: 3,
-            expandable: false,
-          }}
-          style={{
-            margin: 0,
-            fontSize: FONT_SIZE.default,
-            textAlign: "center",
-            cursor: "pointer",
-          }}
-        >
-          {description}
-        </Typography.Paragraph>
+        <Image
+          src={iconSrc}
+          width={isMobile ? 25 : 34}
+          height={isMobile ? 25 : 34}
+          preview={false}
+        />
+
+        <Flex vertical justify="center">
+          <Typography.Text
+            style={{
+              margin: 0,
+              fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+              fontWeight: "bold",
+              textAlign: "center",
+            }}
+          >
+            {title}
+          </Typography.Text>
+          <Typography.Paragraph
+            onClick={() => setIsModalOpen(true)}
+            ellipsis={{
+              rows: 3,
+              expandable: false,
+            }}
+            style={{
+              margin: 0,
+              fontSize: isMobile ? 14 : FONT_SIZE.default,
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+          >
+            {description}
+          </Typography.Paragraph>{" "}
+        </Flex>
       </Flex>
 
       <Modal
@@ -417,11 +522,19 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
     setSelectedHighlight(undefined);
     setIsModalOpen(false);
   };
+
+  const isMobile = useMediaQuery({
+    query: "(max-width: 576px)",
+  });
+
   return (
     <Flex vertical gap={30}>
-      <Flex gap={20}>
-        <LandIcon></LandIcon>
-        <Typography.Title level={3} style={{ margin: 0 }}>
+      <Flex gap={isMobile ? 10 : 20}>
+        <LandIcon
+          width={isMobile ? 30 : 40}
+          height={isMobile ? 30 : 40}
+        ></LandIcon>
+        <Typography.Title level={isMobile ? 4 : 3} style={{ margin: 0 }}>
           Amenities Offered
         </Typography.Title>
       </Flex>
@@ -442,7 +555,7 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
 
             const labelAndIcon = getAmenityIconAndLabel(amenity);
             return (
-              <Col span={8}>
+              <Col xs={12} md={8} key={amenity}>
                 <AmenityCard
                   description={description}
                   iconSrc={labelAndIcon.iconSrc}
@@ -494,6 +607,10 @@ const ProjectPage: React.FC = () => {
   const { data: projectData, isLoading: projectDataLoading } =
     useFetchProjectById(projectId!);
 
+  const isMobile = useMediaQuery({
+    query: "(max-width: 576px)",
+  });
+
   if (!projectData) {
     return <Loader></Loader>;
   }
@@ -501,36 +618,38 @@ const ProjectPage: React.FC = () => {
   return (
     <Flex vertical>
       <Gallery media={projectData.media} />
-      <Flex style={{ marginTop: 24 }}>
-        <Flex style={{ width: "66%", marginRight: "4%" }} vertical gap={50}>
-          <Header metadata={projectData.metadata} ui={projectData.ui} />
-          <CostSummery project={projectData} />
+      <Row gutter={16} style={{ marginTop: 24 }}>
+        <Col xs={24} md={16} style={{ marginBottom: 24 }}>
+          <Flex vertical gap={isMobile ? 35 : 50}>
+            <Header metadata={projectData.metadata} ui={projectData.ui} />
 
-          <ProjectHighlights project={projectData} />
+            <CostSummery project={projectData} />
 
-          <ProjectDescription project={projectData} />
+            <ProjectHighlights project={projectData} />
 
-          <ProjectSummary ui={projectData.ui} />
+            <ProjectDescription project={projectData} />
 
-          <ProjectAmenities project={projectData} />
-          {/* <Divider style={{ margin: 0 }}></Divider>
-          <ProjectInfra />
-          <Divider style={{ margin: 0 }}></Divider>
-          <ProjectPlots /> */}
-        </Flex>
-        <Flex
-          style={{
-            width: "30%",
-            height: 800,
-            border: "1px solid",
-            borderRadius: 16,
-            borderColor: COLORS.borderColorDark,
-            overflow: "hidden",
-          }}
-        >
-          <AskLiv projectName={projectData.metadata.name} />
-        </Flex>
-      </Flex>
+            <ProjectSummary ui={projectData.ui} />
+
+            <ProjectAmenities project={projectData} />
+          </Flex>
+        </Col>
+
+        {/* Hide this column on mobile and tablet */}
+        <Col xs={0} md={8}>
+          <Flex
+            style={{
+              height: 800,
+              border: "1px solid",
+              borderRadius: 16,
+              borderColor: COLORS.borderColorDark,
+              overflow: "hidden",
+            }}
+          >
+            <AskLiv projectName={projectData.metadata.name} />
+          </Flex>
+        </Col>
+      </Row>
     </Flex>
   );
 };

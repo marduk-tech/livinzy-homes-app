@@ -112,11 +112,17 @@ const AmenityGenIcon = () => (
     <path d="M12 2a7 7 0 1 0 10 10" />
   </svg>
 );
-const ServicesIcon = () => (
+const ServicesIcon = ({
+  width = 40,
+  height = 40,
+}: {
+  width?: number;
+  height?: number;
+}) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="40"
-    height="40"
+    width={width}
+    height={height}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -134,11 +140,17 @@ const ServicesIcon = () => (
   </svg>
 );
 
-const RupeeIcon = () => (
+const RupeeIcon = ({
+  width = 40,
+  height = 40,
+}: {
+  width?: number;
+  height?: number;
+}) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="40"
-    height="40"
+    width={width}
+    height={height}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -154,11 +166,17 @@ const RupeeIcon = () => (
   </svg>
 );
 
-const LandIcon = () => (
+const LandIcon = ({
+  width = 40,
+  height = 40,
+}: {
+  width?: number;
+  height?: number;
+}) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="40"
-    height="40"
+    width={width}
+    height={height}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -175,13 +193,13 @@ const LandIcon = () => (
 );
 
 export {
-  OutdoorsIcon,
-  SwimmingIcon,
+  AmenityGenIcon,
   ClubhouseIcon,
   KidsIcon,
+  LandIcon,
+  OutdoorsIcon,
   ParkingIcon,
-  AmenityGenIcon,
-  ServicesIcon,
   RupeeIcon,
-  LandIcon
+  ServicesIcon,
+  SwimmingIcon,
 };
