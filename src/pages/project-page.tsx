@@ -1,8 +1,15 @@
-import { HeartOutlined, SendOutlined } from "@ant-design/icons";
+import {
+  ArrowUpOutlined,
+  CloseOutlined,
+  HeartOutlined,
+  RobotFilled,
+  SendOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Col,
   Divider,
+  Drawer,
   Flex,
   Image,
   Modal,
@@ -601,6 +608,76 @@ const ProjectPlots: React.FC = () => (
   </Flex>
 );
 
+const MobileAskLiv: React.FC<{ projectName: string }> = ({ projectName }) => {
+  const [open, setOpen] = useState(false);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <button
+        onClick={showDrawer}
+        style={{
+          width: "100%",
+          border: "none",
+          backgroundColor: "white",
+          borderTop: "1px solid",
+          padding: "15px 20px",
+          borderColor: COLORS.borderColor,
+          cursor: "pointer",
+        }}
+      >
+        <Flex justify="space-between" align="center">
+          <Flex gap={10} align="center">
+            <Image
+              src="/images/img-plchlder.png"
+              width={25}
+              height={25}
+              style={{ borderRadius: 100 }}
+            />
+
+            <Typography.Text>Got questions? Ask away!</Typography.Text>
+          </Flex>
+
+          <ArrowUpOutlined
+            style={{
+              color: COLORS.textColorDark,
+            }}
+          />
+        </Flex>
+      </button>
+
+      <Drawer
+        title={
+          <Flex align="center" justify="space-between">
+            <Typography.Text>Ask Liv</Typography.Text>
+            <Button type="text" icon={<CloseOutlined />} onClick={onClose} />
+          </Flex>
+        }
+        styles={{
+          header: {
+            paddingTop: "5px",
+            paddingBottom: "5px",
+          },
+        }}
+        placement="bottom"
+        closable={false}
+        onClose={onClose}
+        open={open}
+        height="100%"
+      >
+        <AskLiv projectName={projectName} />
+      </Drawer>
+    </>
+  );
+};
+
 const ProjectPage: React.FC = () => {
   const { projectId } = useParams();
 
@@ -611,6 +688,10 @@ const ProjectPage: React.FC = () => {
     query: "(max-width: 576px)",
   });
 
+  const hideAskLiv = useMediaQuery({
+    query: "(max-width: 1118px)",
+  });
+
   if (!projectData) {
     return <Loader></Loader>;
   }
@@ -618,8 +699,8 @@ const ProjectPage: React.FC = () => {
   return (
     <Flex vertical>
       <Gallery media={projectData.media} />
-      <Row gutter={16} style={{ marginTop: 24 }}>
-        <Col xs={24} md={16} style={{ marginBottom: 24 }}>
+      <Row gutter={30} style={{ marginTop: isMobile ? 24 : 40 }}>
+        <Col xs={24} md={hideAskLiv ? 24 : 16} style={{ marginBottom: 24 }}>
           <Flex vertical gap={isMobile ? 35 : 50}>
             <Header metadata={projectData.metadata} ui={projectData.ui} />
 
@@ -635,20 +716,27 @@ const ProjectPage: React.FC = () => {
           </Flex>
         </Col>
 
-        {/* Hide this column on mobile and tablet */}
-        <Col xs={0} md={8}>
-          <Flex
-            style={{
-              height: 800,
-              border: "1px solid",
-              borderRadius: 16,
-              borderColor: COLORS.borderColorDark,
-              overflow: "hidden",
-            }}
+        {hideAskLiv ? (
+          <div
+            style={{ width: "100%", position: "sticky", bottom: 0, left: 0 }}
           >
-            <AskLiv projectName={projectData.metadata.name} />
-          </Flex>
-        </Col>
+            <MobileAskLiv projectName={projectData.metadata.name} />
+          </div>
+        ) : (
+          <Col xs={0} md={8}>
+            <Flex
+              style={{
+                height: 800,
+                border: "1px solid",
+                borderRadius: 16,
+                borderColor: COLORS.borderColorDark,
+                overflow: "hidden",
+              }}
+            >
+              <AskLiv projectName={projectData.metadata.name} />
+            </Flex>
+          </Col>
+        )}
       </Row>
     </Flex>
   );
