@@ -6,7 +6,7 @@ import { useFetchProjects } from "../hooks/use-project";
 import { Project } from "../types/Project";
 
 import { useState } from "react";
-import { ProjectsMapView } from "../components/projects-map-view";
+import { ProjectsMapView } from "../components/map-view/projects-map-view";
 
 export function HomePage() {
   const { isMobile } = useDevice();

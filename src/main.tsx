@@ -7,12 +7,7 @@ import { App } from "./app";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <LoadScriptNext
-        libraries={["places", "drawing"]}
-        googleMapsApiKey={"AIzaSyADagII4pmkrk8R1VVsEzbz0qws3evTYfQ"}
-      >
-        <App />
-      </LoadScriptNext>
+      <App />
     </BrowserRouter>
   </StrictMode>
 );
