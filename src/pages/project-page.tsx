@@ -36,6 +36,11 @@ import {
 } from "../libs/icons";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IAmenities, IMedia, IMetadata, IUI, Project } from "../types/Project";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
+
+import { GiPayMoney } from "react-icons/gi";
+import { HiCurrencyRupee } from "react-icons/hi2";
+import { GiReceiveMoney } from "react-icons/gi";
 
 const dummyProjectData: any = {
   metadata: {
@@ -214,8 +219,8 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
         {highlights.map((highlight: any, i: number) => (
           <Col xs={24} sm={12} md={8} key={i}>
             <Flex
-              align="center"
-              gap={10}
+              align="flex-start"
+              gap={10} 
               style={{
                 cursor: "pointer",
               }}
@@ -226,21 +231,21 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
                 }
               }}
             >
-              <Image
-                src={`/images/highlights-icons/${highlight.icon}`}
-                width={isMobile ? 24 : 34}
-                height={isMobile ? 24 : 34}
-                preview={false}
-              />
-              <Typography.Text
-                style={{
-                  margin: 0,
-                  fontSize: FONT_SIZE.default,
-                  fontWeight: isMobile ? "normal" : " bold",
-                }}
-              >
-                {highlight.title}
-              </Typography.Text>
+              {highlight.iconSet ? (
+                <DynamicReactIcon
+                  iconName={highlight.icon}
+                  iconSet={highlight.iconSet}
+                ></DynamicReactIcon>
+              ) : (
+                <Image
+                  src={`/images/highlights-icons/${highlight.icon}`}
+                  width={isMobile ? 24 : 34}
+                  height={isMobile ? 24 : 34}
+                  preview={false}
+                />
+              )}
+
+              <Typography.Title style={{margin: 0}} level={4}>{highlight.title}</Typography.Title>
             </Flex>
           </Col>
         ))}
@@ -367,7 +372,7 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
                   color: COLORS.textColorLight,
                 }}
               >
-                Services
+                Income
               </Typography.Text>
               <Typography.Text
                 style={{
@@ -375,7 +380,7 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
                   fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
                 }}
               >
-                {summary.services}
+                {summary.income}
               </Typography.Text>
             </Flex>
           </Flex>
