@@ -2,40 +2,20 @@ import {
   ArrowUpOutlined,
   CloseOutlined,
   HeartOutlined,
-  RobotFilled,
   SendOutlined,
 } from "@ant-design/icons";
-import {
-  Button,
-  Col,
-  Divider,
-  Drawer,
-  Flex,
-  Image,
-  Modal,
-  Row,
-  Typography,
-} from "antd";
+import { Button, Col, Drawer, Flex, Image, Modal, Row, Typography } from "antd";
 import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import AskLiv from "../components/ask-liv";
 import { Loader } from "../components/common/loader";
-import { useDevice } from "../hooks/use-device";
 import { useFetchProjectById } from "../hooks/use-project";
-import {
-  AmenityGenIcon,
-  ClubhouseIcon,
-  KidsIcon,
-  LandIcon,
-  OutdoorsIcon,
-  ParkingIcon,
-  RupeeIcon,
-  ServicesIcon,
-  SwimmingIcon,
-} from "../libs/icons";
+import { LandIcon, RupeeIcon, ServicesIcon } from "../libs/icons";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { IAmenities, IMedia, IMetadata, IUI, Project } from "../types/Project";
+import { IMedia, IMetadata, IUI, Project } from "../types/Project";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
+import { rupeeAmountFormat } from "../libs/lvnzy-helper";
 
 const dummyProjectData: any = {
   metadata: {
@@ -138,7 +118,7 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
               fontWeight: "bold",
             }}
           >
-            {costSummary.cost}
+            {rupeeAmountFormat(costSummary.cost)}
           </Typography.Text>
 
           <Typography.Text
@@ -214,7 +194,7 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
         {highlights.map((highlight: any, i: number) => (
           <Col xs={24} sm={12} md={8} key={i}>
             <Flex
-              align="center"
+              align="flex-start"
               gap={10}
               style={{
                 cursor: "pointer",
@@ -226,21 +206,23 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
                 }
               }}
             >
-              <Image
-                src={`/images/highlights-icons/${highlight.icon}`}
-                width={isMobile ? 24 : 34}
-                height={isMobile ? 24 : 34}
-                preview={false}
-              />
-              <Typography.Text
-                style={{
-                  margin: 0,
-                  fontSize: FONT_SIZE.default,
-                  fontWeight: isMobile ? "normal" : " bold",
-                }}
-              >
+              {highlight.iconSet ? (
+                <DynamicReactIcon
+                  iconName={highlight.icon}
+                  iconSet={highlight.iconSet}
+                ></DynamicReactIcon>
+              ) : (
+                <Image
+                  src={`/images/highlights-icons/${highlight.icon}`}
+                  width={isMobile ? 24 : 34}
+                  height={isMobile ? 24 : 34}
+                  preview={false}
+                />
+              )}
+
+              <Typography.Title style={{ margin: 0 }} level={4}>
                 {highlight.title}
-              </Typography.Text>
+              </Typography.Title>
             </Flex>
           </Col>
         ))}
@@ -367,7 +349,7 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
                   color: COLORS.textColorLight,
                 }}
               >
-                Services
+                Income
               </Typography.Text>
               <Typography.Text
                 style={{
@@ -375,7 +357,7 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
                   fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
                 }}
               >
-                {summary.services}
+                {summary.income}
               </Typography.Text>
             </Flex>
           </Flex>

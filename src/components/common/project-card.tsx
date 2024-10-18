@@ -1,7 +1,8 @@
 import { Flex, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
-import { COLORS } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { Project } from "../../types/Project";
+import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
 
 interface ProjectCardProps {
   project: Project;
@@ -12,6 +13,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
   const randomPrice = (Math.random() * (15 - 8) + 8).toFixed(1);
 
+  const costSummary =
+    project.ui && project.ui.costSummary
+      ? JSON.parse(project.ui.costSummary)
+      : undefined;
   return (
     <Flex
       vertical
@@ -31,7 +36,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         style={{
           width: "100%",
           borderRadius: 16,
-          height: 225,
+          height: 300,
           border: "1px solid",
           borderColor: COLORS.borderColor,
 
@@ -48,9 +53,33 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         style={{ width: "100%", marginTop: 15, padding: "0px 10px" }}
         vertical
       >
-        <Typography.Title level={5} style={{ margin: 0 }}>
+        <Typography.Text
+          style={{
+            margin: 0,
+            fontSize: FONT_SIZE.subHeading,
+            fontWeight: "bold",
+          }}
+        >
           {project.metadata.name}
-        </Typography.Title>
+        </Typography.Text>
+        {project.ui && project.ui.oneLiner ? (
+          <Typography.Text style={{ color: COLORS.textColorLight }}>
+            {project.ui.oneLiner}
+          </Typography.Text>
+        ) : null}
+        {costSummary ? (
+          <Flex>
+            <Typography.Text
+              style={{
+                display: "inline",
+                fontSize: FONT_SIZE.subText,
+                marginTop: 8,
+              }}
+            >
+              {rupeeAmountFormat(costSummary.cost)} / {costSummary.size}
+            </Typography.Text>
+          </Flex>
+        ) : null}
 
         {/* <Flex gap={7} color={COLORS.textColorLight} align="center">
      
