@@ -59,15 +59,19 @@ export function HomePage() {
 
           {toggleMapView ? (
             <Row>
-              <ProjectsMapView projects={projects} />
+              <ProjectsMapView
+                projects={projects.filter((p) => p.ui && p.ui.oneLiner)}
+              />
             </Row>
           ) : (
             <Row gutter={[35, 30]} style={{ width: "100%" }}>
-              {projects.map((project) => (
-                <Col key={project._id} xs={24} md={12} lg={6}>
-                  <ProjectCard project={project} key={project._id} />
-                </Col>
-              ))}
+              {projects
+                .filter((p) => p.ui && p.ui.oneLiner)
+                .map((project) => (
+                  <Col key={project._id} xs={24} md={12} lg={6}>
+                    <ProjectCard project={project} key={project._id} />
+                  </Col>
+                ))}
             </Row>
           )}
         </Flex>
