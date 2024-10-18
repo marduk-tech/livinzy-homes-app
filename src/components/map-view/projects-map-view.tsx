@@ -1,4 +1,4 @@
-import { ArrowRightOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, CloseOutlined } from "@ant-design/icons";
 import {
   AdvancedMarker,
   AdvancedMarkerAnchorPoint,
@@ -41,6 +41,12 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
   }, []);
 
   const [anchorPoint, setAnchorPoint] = useState("BOTTOM" as AnchorPointName);
+
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const handleCardExpand = useCallback((id: string) => {
+    setExpandedId((prevId) => (prevId === id ? null : id));
+  }, []);
 
   if (data && projects) {
     return (
@@ -87,7 +93,11 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
                     })`,
                   }}
                 >
-                  <ProjectCard project={project} />
+                  <ProjectCard
+                    project={project}
+                    isExpanded={expandedId === id}
+                    onExpand={() => handleCardExpand(id)}
+                  />
                 </AdvancedMarkerWithRef>
 
                 <AdvancedMarkerWithRef
@@ -118,12 +128,20 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
   }
 };
 
-export const ProjectCard = ({ project }: { project: Project }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
+export const ProjectCard = ({
+  project,
+  isExpanded,
+  onExpand,
+}: {
+  project: Project;
+  isExpanded: boolean;
+  onExpand: () => void;
+}) => {
   const handleClick = () => {
-    setIsExpanded(!isExpanded);
+    onExpand();
   };
+
+  const imageSrc = project.media[0]?.url || "/images/img-plchlder.png";
 
   return (
     <div
@@ -143,16 +161,31 @@ export const ProjectCard = ({ project }: { project: Project }) => {
       }}
     >
       {isExpanded && (
-        <div>
-          <Image
-            style={{
-              borderRadius: "10px",
+        <>
+          <CloseButton
+            onClick={(e) => {
+              e.stopPropagation();
+              onExpand();
             }}
-            preview={false}
-            src={project.media[0].url}
-            alt={project.metadata.name}
           />
-        </div>
+          <div
+            style={{
+              overflow: "hidden",
+            }}
+          >
+            <Image
+              style={{
+                borderRadius: "10px",
+                objectFit: "cover",
+              }}
+              width={300}
+              height={200}
+              preview={false}
+              src={imageSrc}
+              alt={project.metadata?.name}
+            />
+          </div>
+        </>
       )}
       <div style={{ marginTop: isExpanded ? "24px" : "0px" }}>
         <Flex justify="space-between" align="center">
@@ -200,5 +233,32 @@ export const AdvancedMarkerWithRef = (
     >
       {children}
     </AdvancedMarker>
+  );
+};
+
+export const CloseButton: React.FC<{ onClick: (e: any) => void }> = ({
+  onClick,
+}) => {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: "18px",
+        right: "18px",
+        fontSize: "14px",
+        cursor: "pointer",
+        zIndex: 1,
+        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        width: "24px",
+        height: "24px",
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      onClick={onClick}
+    >
+      <CloseOutlined />
+    </div>
   );
 };
