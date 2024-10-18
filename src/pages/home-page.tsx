@@ -3,10 +3,10 @@ import { Loader } from "../components/common/loader";
 import { ProjectCard } from "../components/common/project-card";
 import { useDevice } from "../hooks/use-device";
 import { useFetchProjects } from "../hooks/use-project";
-import { Project } from "../types/Project";
 
 import { useState } from "react";
 import { ProjectsMapView } from "../components/map-view/projects-map-view";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
 
 export function HomePage() {
   const { isMobile } = useDevice();
@@ -34,10 +34,26 @@ export function HomePage() {
         >
           <Flex justify="end">
             <Button
+              icon={
+                !toggleMapView ? (
+                  <DynamicReactIcon
+                    iconName="FaMap"
+                    color="primary"
+                    iconSet="fa"
+                  ></DynamicReactIcon>
+                ) : (
+                  <DynamicReactIcon
+                    iconName="FaRegListAlt"
+                    iconSet="fa"
+                    color="primary"
+                  ></DynamicReactIcon>
+                )
+              }
+              style={{ padding: 16, borderRadius: 12, cursor: "pointer" }}
               onClick={() => setToggleMapView(!toggleMapView)}
               size="small"
             >
-              {toggleMapView ? "Show List" : "Show Map"}
+              {toggleMapView ? "List View" : "Map View"}
             </Button>
           </Flex>
 

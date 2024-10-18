@@ -2,45 +2,20 @@ import {
   ArrowUpOutlined,
   CloseOutlined,
   HeartOutlined,
-  RobotFilled,
   SendOutlined,
 } from "@ant-design/icons";
-import {
-  Button,
-  Col,
-  Divider,
-  Drawer,
-  Flex,
-  Image,
-  Modal,
-  Row,
-  Typography,
-} from "antd";
+import { Button, Col, Drawer, Flex, Image, Modal, Row, Typography } from "antd";
 import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import AskLiv from "../components/ask-liv";
 import { Loader } from "../components/common/loader";
-import { useDevice } from "../hooks/use-device";
 import { useFetchProjectById } from "../hooks/use-project";
-import {
-  AmenityGenIcon,
-  ClubhouseIcon,
-  KidsIcon,
-  LandIcon,
-  OutdoorsIcon,
-  ParkingIcon,
-  RupeeIcon,
-  ServicesIcon,
-  SwimmingIcon,
-} from "../libs/icons";
+import { LandIcon, RupeeIcon, ServicesIcon } from "../libs/icons";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { IAmenities, IMedia, IMetadata, IUI, Project } from "../types/Project";
+import { IMedia, IMetadata, IUI, Project } from "../types/Project";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
-
-import { GiPayMoney } from "react-icons/gi";
-import { HiCurrencyRupee } from "react-icons/hi2";
-import { GiReceiveMoney } from "react-icons/gi";
+import { rupeeAmountFormat } from "../libs/lvnzy-helper";
 
 const dummyProjectData: any = {
   metadata: {
@@ -143,7 +118,7 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
               fontWeight: "bold",
             }}
           >
-            {costSummary.cost}
+            {rupeeAmountFormat(costSummary.cost)}
           </Typography.Text>
 
           <Typography.Text
@@ -220,7 +195,7 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
           <Col xs={24} sm={12} md={8} key={i}>
             <Flex
               align="flex-start"
-              gap={10} 
+              gap={10}
               style={{
                 cursor: "pointer",
               }}
@@ -245,7 +220,9 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
                 />
               )}
 
-              <Typography.Title style={{margin: 0}} level={4}>{highlight.title}</Typography.Title>
+              <Typography.Title style={{ margin: 0 }} level={4}>
+                {highlight.title}
+              </Typography.Title>
             </Flex>
           </Col>
         ))}

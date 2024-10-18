@@ -12,17 +12,16 @@ export const COLORS = {
   textColorLight: "#999",
 };
 
-
 export const FONTS = {
-  primary: "DM Sans",
-  regular: "DM Sans",
-  bold: "DM Sans"
+  primary: "Helvetica Neue",
+  regular: "Helvetica Neue",
+  bold: "Helvetica Neue",
 };
 
-export const FONT_SIZE= {
+export const FONT_SIZE = {
   default: 16,
+  subText: 18,
   heading: 42,
   title: 28,
-  subHeading: 20,
-  
+  subHeading: 22,
 };
