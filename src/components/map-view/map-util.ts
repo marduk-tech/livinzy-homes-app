@@ -24,17 +24,16 @@ export function getData({ projects }: { projects: Project[] }) {
   const data: MarkerData = [];
 
   projects.forEach((project, index) => {
-    if (googleMapsUrlRegex.test(project.metadata.location)) {
-      const latlng = extractLatLong(project.metadata.location);
-
-      if (latlng && latlng.latitude && latlng.longitude) {
-        data.push({
-          id: String(index),
-          position: { lat: latlng.latitude, lng: latlng.longitude },
-          zIndex: index,
-          project: project,
-        });
-      }
+    if (project.metadata?.location?.lat && project.metadata?.location?.lng) {
+      data.push({
+        id: String(index),
+        position: {
+          lat: project.metadata.location.lat,
+          lng: project.metadata.location.lng,
+        },
+        zIndex: index,
+        project: project,
+      });
     }
   });
 

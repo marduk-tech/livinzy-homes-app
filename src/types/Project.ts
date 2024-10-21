@@ -4,10 +4,16 @@ export interface IMedia {
   tags: string[];
 }
 
+export interface ILocation {
+  mapLink: string;
+  lat: number;
+  lng: number;
+}
+
 export interface IMetadata {
   _id: string;
   name: string;
-  location: string;
+  location: ILocation;
   website: string;
   oneLiner?: string;
   description: string;
