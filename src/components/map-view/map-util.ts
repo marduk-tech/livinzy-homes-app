@@ -24,7 +24,7 @@ export function getData({ projects }: { projects: Project[] }) {
   const data: MarkerData = [];
 
   projects.forEach((project, index) => {
-    if (project.metadata.location.lat && project.metadata.location.lng) {
+    if (project.metadata?.location?.lat && project.metadata?.location?.lng) {
       data.push({
         id: String(index),
         position: {
