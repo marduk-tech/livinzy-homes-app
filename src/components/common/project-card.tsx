@@ -1,8 +1,8 @@
 import { Flex, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
+import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { Project } from "../../types/Project";
-import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
 
 interface ProjectCardProps {
   project: Project;
@@ -41,7 +41,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           borderColor: COLORS.borderColor,
 
           backgroundImage: `url(${
-            project?.media[0]?.url || "/images/img-plchlder.png"
+            project.media.find((m) => m.type === "image")?.image?.url ||
+            "/images/img-plchlder.png"
           })`,
           backgroundPosition: "center",
           backgroundSize: "cover",
