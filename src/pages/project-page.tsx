@@ -9,13 +9,13 @@ import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import AskLiv from "../components/ask-liv";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { Loader } from "../components/common/loader";
 import { useFetchProjectById } from "../hooks/use-project";
 import { LandIcon, RupeeIcon, ServicesIcon } from "../libs/icons";
+import { rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia, IMetadata, IUI, Project } from "../types/Project";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
-import { rupeeAmountFormat } from "../libs/lvnzy-helper";
 
 const dummyProjectData: any = {
   metadata: {
@@ -64,16 +64,18 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => (
       scrollbarWidth: "none",
     }}
   >
-    {(media ? media : dummyProjectData.media).map((img: any, index: number) => (
-      <img
-        key={index}
-        src={img.url}
-        height="100%"
-        width="auto"
-        style={{ borderRadius: 8, marginRight: 8 }}
-        alt={`Project image ${index + 1}`}
-      />
-    ))}
+    {(media ? media : dummyProjectData.media)
+      .filter((item: IMedia) => item.type === "image" && item.image)
+      .map((img: IMedia, index: number) => (
+        <img
+          key={index}
+          src={img.image!.url}
+          height="100%"
+          width="auto"
+          style={{ borderRadius: 8, marginRight: 8 }}
+          alt={img.image!.caption || `Project image ${index + 1}`}
+        />
+      ))}
   </div>
 );
 
