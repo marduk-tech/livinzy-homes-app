@@ -2,7 +2,6 @@ import { ProChat } from "@ant-design/pro-chat";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
-import { COLORS } from "../theme/style-constants";
 
 export default function AskLiv({ projectName }: { projectName?: string }) {
   const [sessionIdIsLoading, setSessionIdIsLoading] = useState(false);
@@ -119,6 +118,16 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
         style={{ height: "100%" }}
         request={handleRequest}
         locale="en-US"
+        userMeta={{
+          avatar:
+            "https://cdn.pixabay.com/photo/2021/07/02/04/48/user-6380868_640.png",
+          title: "You",
+        }}
+        assistantMeta={{
+          avatar: "https://livinzy.com/d9811e2e2ee94a81eb99c3c985fddcc8.png",
+          title: "Liv",
+          backgroundColor: "#67dedd",
+        }}
         helloMessage="Hello! I am Liv, I can answer any question you might have about this project?"
         placeholder="Type your question here..."
         initialChats={initialChats}

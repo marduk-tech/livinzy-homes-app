@@ -4,8 +4,10 @@ import * as MdIcons from "react-icons/md";
 import * as GiIcons from "react-icons/gi";
 import * as AiIcons from "react-icons/ai";
 import * as IoIcons from "react-icons/io";
+import * as TbIcons from "react-icons/tb";
+import * as SiIcons from "react-icons/si";
 
-type IconSetKey = "fa" | "md" | "gi" | "ai" | "io";
+type IconSetKey = "fa" | "md" | "gi" | "ai" | "io" | "tb" | "si";
 
 interface IconProps {
   iconSet: IconSetKey;
@@ -21,6 +23,8 @@ const iconSets = {
   gi: GiIcons,
   ai: AiIcons,
   io: IoIcons,
+  tb: TbIcons,
+  si: SiIcons,
 };
 
 const DynamicReactIcon: React.FC<IconProps> = ({
@@ -29,6 +33,9 @@ const DynamicReactIcon: React.FC<IconProps> = ({
   size = 24,
   color = "black",
 }) => {
+  if (!iconSet || !iconSets[iconSet]) {
+    return;
+  }
   // Retrieve the correct icon component and cast it to a valid React component type
   const IconComponent = iconSets[iconSet][
     iconName as keyof (typeof iconSets)[IconSetKey]

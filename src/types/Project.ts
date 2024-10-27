@@ -6,6 +6,7 @@ export interface IMedia {
     tags: string[];
     caption?: string;
   };
+  isPreview: boolean;
   video?: {
     url: string;
     tags: string[];
@@ -107,6 +108,7 @@ export interface IUI {
   oneLiner: string;
   highlights: string;
   costSummary: string;
+  amenitiesSummary: string;
 }
 
 export interface Project {
@@ -123,6 +125,7 @@ export interface Project {
   ui: IUI;
   createdAt: string;
   updatedAt: string;
+  livestment: ILivestment;
 }
 
 export interface ProjectField {
@@ -131,6 +134,32 @@ export interface ProjectField {
   fieldDescription: string;
   mustHave?: boolean;
   hide?: boolean;
+}
+
+export interface IPlace {
+  name?: string;
+  totalReviews?: number;
+  latLng?: string;
+  type:
+    | "hospital"
+    | "school"
+    | "project"
+    | "metro"
+    | "tier2"
+    | "tourist"
+    | "roads";
+  icon: { name: string; set: any };
+}
+
+export interface ISubLivestment {
+  score: number;
+  placesList: [IPlace];
+}
+
+export interface ILivestment {
+  livestmentScore: number;
+  schools: ISubLivestment;
+  hospitals: ISubLivestment;
 }
 
 export interface ProjectStructure {
