@@ -6,8 +6,10 @@ import * as AiIcons from "react-icons/ai";
 import * as IoIcons from "react-icons/io";
 import * as TbIcons from "react-icons/tb";
 import * as SiIcons from "react-icons/si";
+import * as RiIcons from "react-icons/ri";
+import * as FiIcons from "react-icons/fi";
 
-type IconSetKey = "fa" | "md" | "gi" | "ai" | "io" | "tb" | "si";
+type IconSetKey = "fa" | "md" | "gi" | "ai" | "io" | "tb" | "si" | "ri" | "fi";
 
 interface IconProps {
   iconSet: IconSetKey;
@@ -25,6 +27,8 @@ const iconSets = {
   io: IoIcons,
   tb: TbIcons,
   si: SiIcons,
+  ri: RiIcons,
+  fi: FiIcons,
 };
 
 const DynamicReactIcon: React.FC<IconProps> = ({
