@@ -141,7 +141,7 @@ export const ProjectCard = ({
     onExpand();
   };
 
-  const imageSrc = project.media[0]?.url || "/images/img-plchlder.png";
+  const imageSrc = project.media.find((m) => m.type === "image")?.image?.url;
 
   return (
     <div
@@ -181,7 +181,7 @@ export const ProjectCard = ({
               width={300}
               height={200}
               preview={false}
-              src={imageSrc}
+              src={imageSrc || ""}
               alt={project.metadata?.name}
             />
           </div>

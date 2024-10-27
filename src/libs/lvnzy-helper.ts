@@ -12,6 +12,10 @@ export const nestedPropertyAccessor = (
   }
 };
 
+export const capitalize = (input: string) => {
+  return input.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
 export const rupeeAmountFormat = (amt: string) => {
   const amtNum = parseInt(amt);
   if (!amtNum || isNaN(amtNum)) {

@@ -13,15 +13,15 @@ export const COLORS = {
 };
 
 export const FONTS = {
-  primary: "Helvetica Neue",
-  regular: "Helvetica Neue",
-  bold: "Helvetica Neue",
+  primary: "DM Sans",
+  regular: "DM Sans",
+  bold: "DM Sans",
 };
 
 export const FONT_SIZE = {
   default: 16,
   subText: 18,
   heading: 42,
-  title: 28,
+  title: 32,
   subHeading: 22,
 };

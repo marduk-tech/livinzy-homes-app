@@ -1,8 +1,8 @@
 import { Flex, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { Project } from "../../types/Project";
 import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { IMedia, Project } from "../../types/Project";
 
 interface ProjectCardProps {
   project: Project;
@@ -17,16 +17,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     project.ui && project.ui.costSummary
       ? JSON.parse(project.ui.costSummary)
       : undefined;
+
+  let previewImage: any = project.media.find((m: IMedia) => m.isPreview);
+  previewImage = previewImage?.image?.url;
   return (
     <Flex
       vertical
       style={{
         width: "100%",
         cursor: "pointer",
-        backgroundColor: "white",
-        boxShadow: "0 0 4px #ddd",
         borderRadius: 16,
-        padding: 8,
       }}
       onClick={() => {
         navigate(`/project/${project._id}`);
@@ -39,10 +39,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           height: 300,
           border: "1px solid",
           borderColor: COLORS.borderColor,
-
-          backgroundImage: `url(${
-            project?.media[0]?.url || "/images/img-plchlder.png"
-          })`,
+          backgroundImage: `url(${previewImage || "/images/img-plchlder.png"})`,
           backgroundPosition: "center",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
@@ -50,7 +47,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       ></div>
 
       <Flex
-        style={{ width: "100%", marginTop: 15, padding: "0px 10px" }}
+        style={{ width: "100%", marginTop: 8, padding: "0px 10px" }}
         vertical
       >
         <Typography.Text
@@ -73,7 +70,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
               style={{
                 display: "inline",
                 fontSize: FONT_SIZE.subText,
-                marginTop: 8,
               }}
             >
               {rupeeAmountFormat(costSummary.cost)} / {costSummary.size}

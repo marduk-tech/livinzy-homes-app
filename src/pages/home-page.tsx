@@ -64,7 +64,7 @@ export function HomePage() {
               />
             </Row>
           ) : (
-            <Row gutter={[35, 30]} style={{ width: "100%" }}>
+            <Row gutter={[60, 60]} style={{ width: "100%", margin: 0 }}>
               {projects
                 .filter((p) => p.ui && p.ui.oneLiner)
                 .map((project) => (

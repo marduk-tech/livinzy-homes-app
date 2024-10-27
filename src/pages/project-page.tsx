@@ -5,17 +5,21 @@ import {
   SendOutlined,
 } from "@ant-design/icons";
 import { Button, Col, Drawer, Flex, Image, Modal, Row, Typography } from "antd";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import AskLiv from "../components/ask-liv";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { Loader } from "../components/common/loader";
 import { useFetchProjectById } from "../hooks/use-project";
 import { LandIcon, RupeeIcon, ServicesIcon } from "../libs/icons";
+import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia, IMetadata, IUI, Project } from "../types/Project";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
-import { rupeeAmountFormat } from "../libs/lvnzy-helper";
+import { LivestmentView } from "../components/map-view/livestment-view";
+import { useDevice } from "../hooks/use-device";
+import { LivestIndexConfig } from "../libs/constants";
+import LivestIndexRange from "../components/common/livest-index-range";
 
 const dummyProjectData: any = {
   metadata: {
@@ -64,16 +68,18 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => (
       scrollbarWidth: "none",
     }}
   >
-    {(media ? media : dummyProjectData.media).map((img: any, index: number) => (
-      <img
-        key={index}
-        src={img.url}
-        height="100%"
-        width="auto"
-        style={{ borderRadius: 8, marginRight: 8 }}
-        alt={`Project image ${index + 1}`}
-      />
-    ))}
+    {(media ? media : dummyProjectData.media)
+      .filter((item: IMedia) => item.type === "image" && item.image)
+      .map((img: IMedia, index: number) => (
+        <img
+          key={index}
+          src={img.image!.url}
+          height="100%"
+          width="auto"
+          style={{ borderRadius: 8, marginRight: 8 }}
+          alt={img.image!.caption || `Project image ${index + 1}`}
+        />
+      ))}
   </div>
 );
 
@@ -87,12 +93,16 @@ const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
 
   return (
     <Flex vertical gap={8}>
-      <Typography.Title level={isMobile ? 2 : 1} style={{ margin: 0 }}>
+      <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.heading }}>
         {metadata.name}
-      </Typography.Title>
+      </Typography.Text>
 
       <Typography.Text
-        style={{ margin: 0, fontSize: isMobile ? 16 : FONT_SIZE.subHeading }}
+        style={{
+          margin: 0,
+          fontSize: FONT_SIZE.subHeading,
+          color: COLORS.textColorLight,
+        }}
       >
         {ui.oneLiner}
       </Typography.Text>
@@ -108,61 +118,50 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
   });
 
   return (
-    <Row gutter={[16, 16]} align="middle" justify="space-between">
-      <Col xs={24} md={12}>
-        <Row align="middle">
-          <Typography.Text
-            style={{
-              margin: 0,
-              fontSize: isMobile ? 22 : 25,
-              fontWeight: "bold",
-            }}
-          >
-            {rupeeAmountFormat(costSummary.cost)}
-          </Typography.Text>
+    <Flex>
+      <Flex align="flex-end">
+        <Typography.Text
+          style={{
+            margin: 0,
+            fontSize: FONT_SIZE.title,
+            lineHeight: "100%",
+          }}
+        >
+          {rupeeAmountFormat(costSummary.cost)}
+        </Typography.Text>
 
-          <Typography.Text
-            style={{
-              margin: "0 8px",
-              fontSize: isMobile ? FONT_SIZE.subHeading * 0.7 : 25,
-            }}
-          >
-            /
-          </Typography.Text>
+        <Typography.Text
+          style={{
+            margin: "0 8px",
+            lineHeight: "100%",
+            fontSize: isMobile ? FONT_SIZE.subHeading * 0.7 : 25,
+          }}
+        >
+          /
+        </Typography.Text>
 
-          <Typography.Text
-            style={{
-              margin: 0,
-              fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
-            }}
-          >
-            {costSummary.size}
-          </Typography.Text>
-        </Row>
-      </Col>
+        <Typography.Text
+          style={{
+            margin: 0,
+            lineHeight: "100%",
+            color: COLORS.textColorLight,
+            fontSize: FONT_SIZE.subHeading,
+          }}
+        >
+          {costSummary.size}
+        </Typography.Text>
+      </Flex>
 
       {/* Buttons: Follow Up and Save */}
-      <Col xs={24} md={12}>
-        <Row justify={isMobile ? "start" : "end"} gutter={10}>
-          <Col>
-            <Button
-              size={isMobile ? "small" : "middle"}
-              icon={<SendOutlined />}
-            >
-              Follow Up
-            </Button>
-          </Col>
-          <Col>
-            <Button
-              size={isMobile ? "small" : "middle"}
-              icon={<HeartOutlined />}
-            >
-              Save
-            </Button>
-          </Col>
-        </Row>
-      </Col>
-    </Row>
+      <Flex style={{ marginLeft: "auto" }} gap={8}>
+        <Button size={isMobile ? "small" : "middle"} icon={<SendOutlined />}>
+          Follow Up
+        </Button>
+        <Button size={isMobile ? "small" : "middle"} icon={<HeartOutlined />}>
+          Save
+        </Button>
+      </Flex>
+    </Flex>
   );
 };
 
@@ -183,50 +182,54 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
 
   return (
     <>
-      <Row
-        gutter={[16, isMobile ? 28 : 16]}
+      <Flex
+        vertical
+        gap={32}
         style={{
-          padding: "20px 30px",
-          backgroundColor: "#F7F7F7",
-          borderRadius: 10,
+          padding: "32px 0",
+          borderTop: "2px solid",
+          borderBottom: "2px solid",
+          borderColor: COLORS.borderColor,
         }}
       >
         {highlights.map((highlight: any, i: number) => (
-          <Col xs={24} sm={12} md={8} key={i}>
-            <Flex
-              align="flex-start"
-              gap={10}
-              style={{
-                cursor: "pointer",
-              }}
-              onClick={() => {
-                if (highlight.description) {
-                  setSelectedHighlight(highlight);
-                  setIsModalOpen(true);
-                }
-              }}
-            >
-              {highlight.iconSet ? (
-                <DynamicReactIcon
-                  iconName={highlight.icon}
-                  iconSet={highlight.iconSet}
-                ></DynamicReactIcon>
-              ) : (
-                <Image
-                  src={`/images/highlights-icons/${highlight.icon}`}
-                  width={isMobile ? 24 : 34}
-                  height={isMobile ? 24 : 34}
-                  preview={false}
-                />
-              )}
-
-              <Typography.Title style={{ margin: 0 }} level={4}>
+          <Flex
+            gap={10}
+            style={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              if (highlight.description) {
+                setSelectedHighlight(highlight);
+                setIsModalOpen(true);
+              }
+            }}
+          >
+            {highlight.iconSet ? (
+              <DynamicReactIcon
+                size={24}
+                iconName={highlight.icon}
+                iconSet={highlight.iconSet}
+              ></DynamicReactIcon>
+            ) : (
+              <Image
+                src={`/images/highlights-icons/${highlight.icon}`}
+                width={24}
+                height={24}
+                preview={false}
+              />
+            )}
+            <Flex vertical>
+              <Typography.Text
+                style={{ fontSize: FONT_SIZE.subHeading, lineHeight: "100%" }}
+              >
                 {highlight.title}
-              </Typography.Title>
+              </Typography.Text>
+              <Typography.Text>{highlight.description}</Typography.Text>
             </Flex>
-          </Col>
+          </Flex>
         ))}
-      </Row>
+      </Flex>
 
       <Modal
         title={selectedHighlight?.title || ""}
@@ -261,39 +264,32 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
   });
 
   return (
-    <Flex vertical gap={30}>
-      <Flex gap={isMobile ? 10 : 20}>
-        <LandIcon
-          width={isMobile ? 30 : 40}
-          height={isMobile ? 30 : 40}
-        ></LandIcon>
-
-        <Typography.Title level={isMobile ? 4 : 3} style={{ margin: 0 }}>
+    <Flex vertical gap={24} style={{ marginTop: 24 }}>
+      <Flex>
+        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.title }}>
           What are you Buying ?
-        </Typography.Title>
+        </Typography.Text>
       </Flex>
 
       <Row
         style={{
-          padding: "20px 30px",
+          padding: 24,
           backgroundColor: "#F7F7F7",
           borderRadius: 10,
         }}
         align="middle"
       >
         <Flex vertical gap={40}>
-          <Flex align="center" gap={8}>
+          <Flex align="flex-start" gap={8}>
             <div style={{ flexShrink: 0 }}>
-              <LandIcon
-                width={isMobile ? 20 : 40}
-                height={isMobile ? 20 : 40}
-              ></LandIcon>
+              <LandIcon width={24} height={24}></LandIcon>
             </div>
             <Flex vertical>
               <Typography.Text
                 style={{
                   fontSize: isMobile ? 14 : 18,
                   color: COLORS.textColorLight,
+                  lineHeight: "100%",
                 }}
               >
                 Plots
@@ -302,22 +298,21 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
                 style={{
                   margin: 0,
                   fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                  lineHeight: "100%",
                 }}
               >
                 {summary.plots}
               </Typography.Text>
             </Flex>
           </Flex>
-          <Flex align="center" gap={8}>
+          <Flex align="flex-start" gap={8}>
             <div style={{ flexShrink: 0 }}>
-              <RupeeIcon
-                width={isMobile ? 20 : 40}
-                height={isMobile ? 20 : 40}
-              ></RupeeIcon>
+              <RupeeIcon width={24} height={24}></RupeeIcon>
             </div>
             <Flex vertical>
               <Typography.Text
                 style={{
+                  lineHeight: "100%",
                   fontSize: isMobile ? 14 : 18,
                   color: COLORS.textColorLight,
                 }}
@@ -327,6 +322,7 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
               <Typography.Text
                 style={{
                   margin: 0,
+                  lineHeight: "100%",
                   fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
                 }}
               >
@@ -334,17 +330,15 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
               </Typography.Text>
             </Flex>
           </Flex>
-          <Flex align="center" gap={8}>
+          <Flex align="flex-start" gap={8}>
             <div style={{ flexShrink: 0 }}>
-              <ServicesIcon
-                width={isMobile ? 20 : 40}
-                height={isMobile ? 20 : 40}
-              ></ServicesIcon>
+              <ServicesIcon width={24} height={24}></ServicesIcon>
             </div>
 
             <Flex vertical>
               <Typography.Text
                 style={{
+                  lineHeight: "100%",
                   fontSize: isMobile ? 14 : 18,
                   color: COLORS.textColorLight,
                 }}
@@ -354,6 +348,7 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
               <Typography.Text
                 style={{
                   margin: 0,
+                  lineHeight: "100%",
                   fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
                 }}
               >
@@ -368,12 +363,8 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
 };
 
 const ProjectDescription: React.FC<{ project: Project }> = ({ project }) => {
-  const isMobile = useMediaQuery({
-    query: "(max-width: 576px)",
-  });
-
   return (
-    <Typography.Text style={{ fontSize: isMobile ? 16 : 18 }}>
+    <Typography.Text style={{ fontSize: FONT_SIZE.subText }}>
       {project.ui.description}
     </Typography.Text>
   );
@@ -419,16 +410,10 @@ const getAmenityIconAndLabel = (amenity: string) => {
   }
 };
 
-interface AmenityCardProps {
-  iconSrc: string;
-  title: string;
-  description: string;
-}
-const AmenityCard: React.FC<AmenityCardProps> = ({
-  iconSrc,
-  title,
-  description,
-}) => {
+const AmenityCard: React.FC<any> = ({ amenity }) => {
+  if (!amenity) {
+    return;
+  }
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCancel = () => {
@@ -441,26 +426,23 @@ const AmenityCard: React.FC<AmenityCardProps> = ({
 
   return (
     <>
-      <Flex vertical align="center" gap={10}>
-        <Image
-          src={iconSrc}
-          width={isMobile ? 25 : 34}
-          height={isMobile ? 25 : 34}
-          preview={false}
-        />
+      <Flex align="center" gap={10} style={{ padding: 8 }}>
+        <DynamicReactIcon
+          iconName={amenity.icon}
+          iconSet={amenity.iconSet}
+        ></DynamicReactIcon>
 
         <Flex vertical justify="center">
           <Typography.Text
             style={{
               margin: 0,
-              fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
-              fontWeight: "bold",
+              fontSize: FONT_SIZE.subHeading,
               textAlign: "center",
             }}
           >
-            {title}
+            {amenity.title}
           </Typography.Text>
-          <Typography.Paragraph
+          {/* <Typography.Paragraph
             onClick={() => setIsModalOpen(true)}
             ellipsis={{
               rows: 3,
@@ -468,18 +450,19 @@ const AmenityCard: React.FC<AmenityCardProps> = ({
             }}
             style={{
               margin: 0,
+              whiteSpace: "wrap",
               fontSize: isMobile ? 14 : FONT_SIZE.default,
               textAlign: "center",
               cursor: "pointer",
             }}
           >
-            {description}
-          </Typography.Paragraph>{" "}
+            {amenity.description}
+          </Typography.Paragraph>{" "} */}
         </Flex>
       </Flex>
 
       <Modal
-        title={title || ""}
+        title={amenity.title || ""}
         open={isModalOpen}
         onCancel={handleCancel}
         footer={[
@@ -494,7 +477,7 @@ const AmenityCard: React.FC<AmenityCardProps> = ({
             fontSize: FONT_SIZE.default,
           }}
         >
-          {description}
+          {amenity.description}
         </Typography.Text>
       </Modal>
     </>
@@ -502,7 +485,15 @@ const AmenityCard: React.FC<AmenityCardProps> = ({
 };
 
 const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
-  const amenities = project.amenities;
+  let amenities;
+  try {
+    amenities = JSON.parse(project.ui.amenitiesSummary);
+  } catch (err) {
+    console.log("amenities not rightly structuered");
+  }
+  if (!amenities) {
+    return;
+  }
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedHighlight, setSelectedHighlight] = useState<any>();
@@ -517,43 +508,26 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
   });
 
   return (
-    <Flex vertical gap={30}>
-      <Flex gap={isMobile ? 10 : 20}>
-        <LandIcon
-          width={isMobile ? 30 : 40}
-          height={isMobile ? 30 : 40}
-        ></LandIcon>
-        <Typography.Title level={isMobile ? 4 : 3} style={{ margin: 0 }}>
+    <Flex vertical gap={24} style={{ marginTop: 32 }}>
+      <Flex>
+        <Typography.Text style={{ fontSize: FONT_SIZE.title }}>
           Amenities Offered
-        </Typography.Title>
+        </Typography.Text>
       </Flex>
-      <Row
-        gutter={[16, 36]}
-        style={{
-          padding: "20px 30px",
-          backgroundColor: "#F7F7F7",
-          borderRadius: 10,
-        }}
-        align="middle"
-      >
-        {Object.entries(amenities)
-          .filter((am: any) => am[0] !== "_id")
-          .map(([amenity, description]) => {
-            console.log(amenity);
-            console.log(description);
-
-            const labelAndIcon = getAmenityIconAndLabel(amenity);
-            return (
-              <Col xs={12} md={8} key={amenity}>
-                <AmenityCard
-                  description={description}
-                  iconSrc={labelAndIcon.iconSrc}
-                  title={labelAndIcon.label}
-                />
-              </Col>
-            );
+      <Flex>
+        <Flex vertical>
+          {amenities.slice(0, 5).map((amenity: any) => {
+            return <AmenityCard amenity={amenity} />;
           })}
-      </Row>
+        </Flex>
+        {amenities.length > 5 ? (
+          <Flex vertical>
+            {amenities.slice(5, 10).map((amenity: any) => {
+              return <AmenityCard amenity={amenity} />;
+            })}
+          </Flex>
+        ) : null}
+      </Flex>
 
       <Modal
         title={selectedHighlight?.title || ""}
@@ -574,6 +548,69 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
           {selectedHighlight?.description}
         </Typography.Text>
       </Modal>
+    </Flex>
+  );
+};
+
+const Livestment: React.FC<{ project: Project }> = ({ project }) => {
+  const { isMobile } = useDevice();
+  const livestIndexConfig = LivestIndexConfig;
+
+  return (
+    <Flex vertical style={{ marginTop: 32 }}>
+      <Flex gap={isMobile ? 10 : 20}>
+        <Typography.Text style={{ fontSize: FONT_SIZE.title }}>
+          Livest Index
+        </Typography.Text>
+      </Flex>
+      <Flex gap={16} style={{ height: 400, marginTop: 16 }}>
+        <Flex
+          gap={16}
+          vertical
+          style={{
+            width: "30%",
+            height: "100%",
+            overflowY: "scroll",
+            scrollbarWidth: "none",
+          }}
+        >
+          <LivestIndexRange
+            value={project.livestment.livestmentScore}
+          ></LivestIndexRange>
+          {livestIndexConfig.map((config: any) => {
+            const subLiv = (project.livestment as any)[config.key];
+            return subLiv && subLiv.score && config.key !== "roads" ? (
+              <Flex
+                vertical
+                style={{
+                  padding: 16,
+                  backgroundColor: "white",
+                  borderRadius: 16,
+                  border: "1px solid",
+                  borderColor: COLORS.borderColor,
+                }}
+              >
+                <Typography.Text style={{ color: COLORS.textColorLight }}>
+                  {config.heading}
+                </Typography.Text>
+                <Typography.Paragraph
+                  ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
+                  style={{ margin: 0 }}
+                >
+                  Proximity to {config.heading.toLowerCase()} like{" "}
+                  {subLiv.placesList
+                    .map((p: any) => capitalize(p.name))
+                    .join(", ")}
+                  .
+                </Typography.Paragraph>
+              </Flex>
+            ) : null;
+          })}
+        </Flex>
+        <Flex vertical style={{ borderRadius: 32, height: 400, width: "70%" }}>
+          <LivestmentView project={project}></LivestmentView>
+        </Flex>
+      </Flex>
     </Flex>
   );
 };
@@ -683,7 +720,7 @@ const ProjectPage: React.FC = () => {
       <Gallery media={projectData.media} />
       <Row gutter={30} style={{ marginTop: isMobile ? 24 : 40 }}>
         <Col xs={24} md={hideAskLiv ? 24 : 16} style={{ marginBottom: 24 }}>
-          <Flex vertical gap={isMobile ? 35 : 50}>
+          <Flex vertical gap={32}>
             <Header metadata={projectData.metadata} ui={projectData.ui} />
 
             <CostSummery project={projectData} />
@@ -695,6 +732,8 @@ const ProjectPage: React.FC = () => {
             <ProjectSummary ui={projectData.ui} />
 
             <ProjectAmenities project={projectData} />
+
+            <Livestment project={projectData} />
           </Flex>
         </Col>
 
@@ -709,9 +748,6 @@ const ProjectPage: React.FC = () => {
             <Flex
               style={{
                 height: 800,
-                border: "1px solid",
-                borderRadius: 16,
-                borderColor: COLORS.borderColorDark,
                 overflow: "hidden",
               }}
             >
