@@ -63,11 +63,12 @@ const LivestIndexRange: React.FC<LivestIndexRangeProps> = ({ value }) => {
           borderColor: COLORS.borderColorDark,
           borderRadius: 8,
           backgroundColor: "white",
-          width: 50,
           height: 50,
+          width: 100,
+          padding: "0 16px",
         }}
       >
-        <Tooltip title={`Score: ${value.toFixed(2)} - Grade: ${grade.label}`}>
+        <Tooltip title={`Grade ${grade.label}`}>
           <Typography.Text
             style={{
               fontSize: FONT_SIZE.heading,
@@ -79,7 +80,7 @@ const LivestIndexRange: React.FC<LivestIndexRangeProps> = ({ value }) => {
       </Flex>
       <div
         style={{
-          width: "100%",
+          minWidth: "calc(100% - 100px)",
           height: "50px",
           background: gradient,
           position: "relative",
