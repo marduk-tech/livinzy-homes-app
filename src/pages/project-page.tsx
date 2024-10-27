@@ -12,7 +12,6 @@ import AskLiv from "../components/ask-liv";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { Loader } from "../components/common/loader";
 import { useFetchProjectById } from "../hooks/use-project";
-import { LandIcon, RupeeIcon, ServicesIcon } from "../libs/icons";
 import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia, IMetadata, IUI, Project } from "../types/Project";
@@ -281,10 +280,11 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
       >
         <Flex vertical gap={40}>
           <Flex align="flex-start" gap={8}>
-            <div style={{ flexShrink: 0 }}>
-              <LandIcon width={24} height={24}></LandIcon>
-            </div>
-            <Flex vertical>
+            <DynamicReactIcon
+              iconName="GiIsland"
+              iconSet="gi"
+            ></DynamicReactIcon>
+            <Flex vertical gap={4}>
               <Typography.Text
                 style={{
                   fontSize: isMobile ? 14 : 18,
@@ -306,10 +306,11 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
             </Flex>
           </Flex>
           <Flex align="flex-start" gap={8}>
-            <div style={{ flexShrink: 0 }}>
-              <RupeeIcon width={24} height={24}></RupeeIcon>
-            </div>
-            <Flex vertical>
+            <DynamicReactIcon
+              iconName="HiCurrencyRupee"
+              iconSet="hi"
+            ></DynamicReactIcon>
+            <Flex vertical gap={4}>
               <Typography.Text
                 style={{
                   lineHeight: "100%",
@@ -331,11 +332,12 @@ const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
             </Flex>
           </Flex>
           <Flex align="flex-start" gap={8}>
-            <div style={{ flexShrink: 0 }}>
-              <ServicesIcon width={24} height={24}></ServicesIcon>
-            </div>
+            <DynamicReactIcon
+              iconName="GiReceiveMoney"
+              iconSet="gi"
+            ></DynamicReactIcon>
 
-            <Flex vertical>
+            <Flex vertical gap={4}>
               <Typography.Text
                 style={{
                   lineHeight: "100%",
@@ -514,7 +516,7 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
           Amenities Offered
         </Typography.Text>
       </Flex>
-      <Flex>
+      <Flex gap={100}>
         <Flex vertical>
           {amenities.slice(0, 5).map((amenity: any) => {
             return <AmenityCard amenity={amenity} />;

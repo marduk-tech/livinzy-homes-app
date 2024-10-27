@@ -1,4 +1,4 @@
-import { Button, Col, Flex, Row } from "antd";
+import { Button, Col, Flex, Row, Typography } from "antd";
 import { Loader } from "../components/common/loader";
 import { ProjectCard } from "../components/common/project-card";
 import { useDevice } from "../hooks/use-device";
@@ -7,6 +7,8 @@ import { useFetchProjects } from "../hooks/use-project";
 import { useState } from "react";
 import { ProjectsMapView } from "../components/map-view/projects-map-view";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
+import { ProjectCategories } from "../libs/constants";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 
 export function HomePage() {
   const { isMobile } = useDevice();
@@ -32,7 +34,35 @@ export function HomePage() {
           }}
           gap={40}
         >
-          <Flex justify="end">
+          <Flex
+            align="center"
+            style={{
+              width: "calc(100% - 60px)",
+              padding: "24px",
+              margin: "0 30px",
+              borderRadius: 24,
+              backgroundColor: "white",
+              border: "1px solid",
+              borderColor: COLORS.borderColor,
+            }}
+          >
+            <Flex gap={42}>
+              {ProjectCategories.map((cat: any) => {
+                return (
+                  <Flex vertical align="center">
+                    <DynamicReactIcon
+                      size={28}
+                      color={COLORS.bgColorDark}
+                      iconName={cat.icon.name}
+                      iconSet={cat.icon.set}
+                    ></DynamicReactIcon>
+                    <Typography.Text style={{ fontSize: FONT_SIZE.subText }}>
+                      {cat.label}
+                    </Typography.Text>
+                  </Flex>
+                );
+              })}
+            </Flex>
             <Button
               icon={
                 !toggleMapView ? (
@@ -49,7 +79,12 @@ export function HomePage() {
                   ></DynamicReactIcon>
                 )
               }
-              style={{ padding: 16, borderRadius: 12, cursor: "pointer" }}
+              style={{
+                padding: 16,
+                borderRadius: 12,
+                cursor: "pointer",
+                marginLeft: "auto",
+              }}
               onClick={() => setToggleMapView(!toggleMapView)}
               size="small"
             >

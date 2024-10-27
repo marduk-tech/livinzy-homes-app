@@ -62,3 +62,62 @@ export const LivestIndexConfig = [
     icon: { name: "FaRoad", set: "fa" },
   },
 ];
+
+export const ProjectCategories = [
+  {
+    key: "bo",
+    label: "Bangalore Outskirts",
+    icon: {
+      name: "FaMountainCity",
+      set: "fa6",
+    },
+  },
+  {
+    key: "hh",
+    label: "Holiday Homes",
+    icon: {
+      name: "FaPersonWalkingLuggage",
+      set: "fa6",
+    },
+  },
+  {
+    key: "lf",
+    label: "Luxury Farmhouses",
+    icon: {
+      name: "RiMoneyCnyCircleFill",
+      set: "ri",
+    },
+  },
+  {
+    key: "he",
+    label: "Harvest & Earn",
+    icon: {
+      name: "GiPlantSeed",
+      set: "gi",
+    },
+  },
+  {
+    key: "tp",
+    label: "Themed Projects",
+    icon: {
+      name: "GiLockedFortress",
+      set: "gi",
+    },
+  },
+  {
+    key: "bl",
+    label: "Bigger Lands",
+    icon: {
+      name: "PiFarm",
+      set: "pi",
+    },
+  },
+  {
+    key: "pf",
+    label: "Pocket Friendly",
+    icon: {
+      name: "GiTakeMyMoney",
+      set: "gi",
+    },
+  },
+];
