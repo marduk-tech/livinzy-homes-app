@@ -67,7 +67,7 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
       line.coordinates.map(
         (coords) =>
           new google.maps.Polyline({
-            path: coords,
+            path: coords as any,
             strokeColor: line.strokeColor,
             strokeOpacity: line.strokeOpacity,
             strokeWeight: line.strokeWeight,
