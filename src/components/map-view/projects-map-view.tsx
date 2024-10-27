@@ -22,7 +22,7 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
   console.log(projects);
 
   const data = getData({ projects: projects })
-    .sort((a, b) => b.position.lat - a.position.lat)
+    .sort((a, b) => b.position!.lat - a.position!.lat)
     .map((dataItem, index) => ({ ...dataItem, zIndex: index }));
 
   const Z_INDEX_SELECTED = data.length;
