@@ -10,15 +10,15 @@ import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import AskLiv from "../components/ask-liv";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
+import LivestIndexRange from "../components/common/livest-index-range";
 import { Loader } from "../components/common/loader";
+import { LivestmentView } from "../components/map-view/livestment-view";
+import { useDevice } from "../hooks/use-device";
 import { useFetchProjectById } from "../hooks/use-project";
+import { LivestIndexConfig } from "../libs/constants";
 import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia, IMetadata, IUI, Project } from "../types/Project";
-import { LivestmentView } from "../components/map-view/livestment-view";
-import { useDevice } from "../hooks/use-device";
-import { LivestIndexConfig } from "../libs/constants";
-import LivestIndexRange from "../components/common/livest-index-range";
 
 const dummyProjectData: any = {
   metadata: {
@@ -413,18 +413,14 @@ const getAmenityIconAndLabel = (amenity: string) => {
 };
 
 const AmenityCard: React.FC<any> = ({ amenity }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   if (!amenity) {
     return;
   }
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-
-  const isMobile = useMediaQuery({
-    query: "(max-width: 576px)",
-  });
 
   return (
     <>
@@ -487,6 +483,9 @@ const AmenityCard: React.FC<any> = ({ amenity }) => {
 };
 
 const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedHighlight, setSelectedHighlight] = useState<any>();
+
   let amenities;
   try {
     amenities = JSON.parse(project.ui.amenitiesSummary);
@@ -497,17 +496,10 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
     return;
   }
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedHighlight, setSelectedHighlight] = useState<any>();
-
   const handleCancel = () => {
     setSelectedHighlight(undefined);
     setIsModalOpen(false);
   };
-
-  const isMobile = useMediaQuery({
-    query: "(max-width: 576px)",
-  });
 
   return (
     <Flex vertical gap={24} style={{ marginTop: 32 }}>
