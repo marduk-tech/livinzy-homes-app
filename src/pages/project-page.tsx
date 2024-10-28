@@ -17,6 +17,7 @@ import { useDevice } from "../hooks/use-device";
 import { useFetchProjectById } from "../hooks/use-project";
 import { LivestIndexConfig } from "../libs/constants";
 import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
+import { sortedMedia } from "../libs/utils";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia, IMetadata, IUI, Project } from "../types/Project";
 
@@ -709,9 +710,13 @@ const ProjectPage: React.FC = () => {
     return <Loader></Loader>;
   }
 
+  const sortedMediaArray = sortedMedia({
+    media: projectData.media,
+  });
+
   return (
     <Flex vertical>
-      <Gallery media={projectData.media} />
+      <Gallery media={sortedMediaArray} />
       <Row gutter={30} style={{ marginTop: isMobile ? 24 : 40 }}>
         <Col xs={24} md={hideAskLiv ? 24 : 16} style={{ marginBottom: 24 }}>
           <Flex vertical gap={32}>
