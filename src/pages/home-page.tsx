@@ -4,24 +4,46 @@ import { ProjectCard } from "../components/common/project-card";
 import { useDevice } from "../hooks/use-device";
 import { useFetchProjects } from "../hooks/use-project";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProjectsMapView } from "../components/map-view/projects-map-view";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { ProjectCategories } from "../libs/constants";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { Project } from "../types/Project";
 
 export function HomePage() {
   const { isMobile } = useDevice();
+  const [categoryFilter, setCategoryFilter] = useState();
 
   const [toggleMapView, setToggleMapView] = useState(false);
 
   const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
 
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>();
+
+  useEffect(() => {
+    if (!projects) {
+      return;
+    }
+    if (!categoryFilter) {
+      setFilteredProjects(projects);
+    } else {
+      setFilteredProjects(
+        projects?.filter(
+          (p: Project) =>
+            p.ui &&
+            p.ui.categories &&
+            p.ui.categories.find((c) => c == categoryFilter)
+        )
+      );
+    }
+  }, [categoryFilter, projects]);
+
   if (projectIsLoading) {
     return <Loader />;
   }
 
-  if (projects) {
+  if (filteredProjects) {
     return (
       <>
         <Flex
@@ -49,14 +71,33 @@ export function HomePage() {
             <Flex gap={42}>
               {ProjectCategories.map((cat: any) => {
                 return (
-                  <Flex vertical align="center">
+                  <Flex
+                    vertical
+                    align="center"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      setCategoryFilter(cat.key);
+                    }}
+                  >
                     <DynamicReactIcon
                       size={28}
-                      color={COLORS.bgColorDark}
+                      color={
+                        categoryFilter && categoryFilter == cat.key
+                          ? COLORS.primaryColor
+                          : COLORS.bgColorDark
+                      }
                       iconName={cat.icon.name}
                       iconSet={cat.icon.set}
                     ></DynamicReactIcon>
-                    <Typography.Text style={{ fontSize: FONT_SIZE.subText }}>
+                    <Typography.Text
+                      style={{
+                        fontSize: FONT_SIZE.subText,
+                        color:
+                          categoryFilter && categoryFilter == cat.key
+                            ? COLORS.primaryColor
+                            : COLORS.textColorDark,
+                      }}
+                    >
                       {cat.label}
                     </Typography.Text>
                   </Flex>
@@ -95,12 +136,12 @@ export function HomePage() {
           {toggleMapView ? (
             <Row>
               <ProjectsMapView
-                projects={projects.filter((p) => p.ui && p.ui.oneLiner)}
+                projects={filteredProjects.filter((p) => p.ui && p.ui.oneLiner)}
               />
             </Row>
           ) : (
             <Row gutter={[60, 60]} style={{ width: "100%", margin: 0 }}>
-              {projects
+              {filteredProjects
                 .filter((p) => p.ui && p.ui.oneLiner)
                 .map((project) => (
                   <Col key={project._id} xs={24} md={12} lg={6}>
