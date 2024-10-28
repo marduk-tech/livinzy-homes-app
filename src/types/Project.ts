@@ -109,6 +109,7 @@ export interface IUI {
   highlights: string;
   costSummary: string;
   amenitiesSummary: string;
+  categories: string[];
 }
 
 export interface Project {
