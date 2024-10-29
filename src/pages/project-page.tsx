@@ -92,7 +92,7 @@ const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
   });
 
   return (
-    <Flex vertical gap={8}>
+    <Flex vertical>
       <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.heading }}>
         {metadata.name}
       </Typography.Text>
@@ -119,37 +119,43 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
 
   return (
     <Flex>
-      <Flex align="flex-end">
-        <Typography.Text
-          style={{
-            margin: 0,
-            fontSize: FONT_SIZE.title,
-            lineHeight: "100%",
-          }}
-        >
-          {rupeeAmountFormat(costSummary.cost)}
-        </Typography.Text>
+      <Flex vertical>
+        <Flex align="flex-end">
+          <Typography.Text
+            style={{
+              margin: 0,
+              fontSize: FONT_SIZE.title,
+              lineHeight: "100%",
+            }}
+          >
+            ₹{rupeeAmountFormat(costSummary.cost)}
+          </Typography.Text>
 
-        <Typography.Text
-          style={{
-            margin: "0 8px",
-            lineHeight: "100%",
-            fontSize: isMobile ? FONT_SIZE.subHeading * 0.7 : 25,
-          }}
-        >
-          /
-        </Typography.Text>
+          <Typography.Text
+            style={{
+              margin: "0 8px",
+              lineHeight: "100%",
+              fontSize: FONT_SIZE.subHeading,
+            }}
+          >
+            /
+          </Typography.Text>
 
-        <Typography.Text
-          style={{
-            margin: 0,
-            lineHeight: "100%",
-            color: COLORS.textColorLight,
-            fontSize: FONT_SIZE.subHeading,
-          }}
-        >
-          {costSummary.size}
-        </Typography.Text>
+          <Typography.Text
+            style={{
+              margin: 0,
+              lineHeight: "100%",
+              fontSize: FONT_SIZE.subHeading,
+            }}
+          >
+            {costSummary.size}
+          </Typography.Text>
+        </Flex>
+        {costSummary.sqftRate ? (
+          <Typography.Text style={{ color: COLORS.textColorLight }}>
+            ₹{costSummary.sqftRate} per sqft
+          </Typography.Text>
+        ) : null}
       </Flex>
 
       {/* Buttons: Follow Up and Save */}
@@ -555,7 +561,7 @@ const Livestment: React.FC<{ project: Project }> = ({ project }) => {
     <Flex vertical style={{ marginTop: 32 }}>
       <Flex gap={isMobile ? 10 : 20}>
         <Typography.Text style={{ fontSize: FONT_SIZE.title }}>
-          Livest Index
+          LivIndex
         </Typography.Text>
       </Flex>
       <Flex gap={16} style={{ height: 400, marginTop: 16 }}>

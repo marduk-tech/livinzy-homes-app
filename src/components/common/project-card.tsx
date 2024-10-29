@@ -36,7 +36,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         style={{
           width: "100%",
           borderRadius: 16,
-          height: 300,
+          height: 250,
           border: "1px solid",
           borderColor: COLORS.borderColor,
           backgroundImage: `url(${previewImage || "/images/img-plchlder.png"})`,

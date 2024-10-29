@@ -59,16 +59,15 @@ export function HomePage() {
           <Flex
             align="center"
             style={{
-              width: "calc(100% - 60px)",
+              width: "calc(100% - 32px)",
               padding: "24px",
-              margin: "0 30px",
               borderRadius: 24,
               backgroundColor: "white",
               border: "1px solid",
               borderColor: COLORS.borderColor,
             }}
           >
-            <Flex gap={42}>
+            <Flex gap={32}>
               {ProjectCategories.map((cat: any) => {
                 return (
                   <Flex
@@ -140,7 +139,7 @@ export function HomePage() {
               />
             </Row>
           ) : (
-            <Row gutter={[60, 60]} style={{ width: "100%", margin: 0 }}>
+            <Row gutter={[32, 32]} style={{ width: "100%", margin: 0 }}>
               {filteredProjects
                 .filter((p) => p.ui && p.ui.oneLiner)
                 .map((project) => (

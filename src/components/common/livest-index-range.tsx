@@ -6,6 +6,7 @@ interface Grade {
   label: string;
   min: number;
   color: string;
+  description: string;
 }
 
 interface LivestIndexRangeProps {
@@ -15,22 +16,92 @@ interface LivestIndexRangeProps {
 const LivestIndexRange: React.FC<LivestIndexRangeProps> = ({ value }) => {
   // Define the grade labels and corresponding color stops
   const grades: Grade[] = [
-    { label: "A+", min: 0.55, color: "#00ff00" },
-    { label: "A", min: 0.5, color: "#33ff00" },
-    { label: "A-", min: 0.45, color: "#66ff00" },
-    { label: "B+", min: 0.4, color: "#99ff00" },
-    { label: "B", min: 0.35, color: "#ccff00" },
-    { label: "B-", min: 0.3, color: "#E6FF1A" },
-    { label: "C+", min: 0.25, color: "#FFFF33" },
-    { label: "C", min: 0.2, color: "#FFFF99" },
-    { label: "C-", min: 0.15, color: "#FFE57F" },
-    { label: "D+", min: 0.1, color: "#FFCC66" },
-    { label: "D", min: 0.05, color: "#FF9933" },
-    { label: "D-", min: 0.01, color: "#ff6600" },
+    {
+      label: "A+",
+      min: 0.45,
+      color: "#00ff00",
+      description:
+        "Exceptional investment potential with robust returns and low risk.",
+    },
+    {
+      label: "A",
+      min: 0.4,
+      color: "#33ff00",
+      description: "Strong investment with high returns and stable growth.",
+    },
+    {
+      label: "A-",
+      min: 0.35,
+      color: "#66ff00",
+      description:
+        "Reliable investment offering solid returns with minimal risk.",
+    },
+    {
+      label: "B+",
+      min: 0.3,
+      color: "#99ff00",
+      description:
+        "Good investment with above-average returns and stable outlook.",
+    },
+    {
+      label: "B",
+      min: 0.25,
+      color: "#ccff00",
+      description:
+        "Moderate investment potential, with reasonable returns and growth.",
+    },
+    {
+      label: "B-",
+      min: 0.2,
+      color: "#E6FF1A",
+      description:
+        "Decent investment, showing modest returns with manageable risk.",
+    },
+    {
+      label: "C+",
+      min: 0.16,
+      color: "#FFFF33",
+      description:
+        "Average investment with acceptable returns and some variability in growth.",
+    },
+    {
+      label: "C",
+      min: 0.13,
+      color: "#FFFF99",
+      description:
+        "Basic investment with potential for steady growth, though subject to fluctuations.",
+    },
+    {
+      label: "C-",
+      min: 0.1,
+      color: "#FFE57F",
+      description:
+        "Stable option with limited growth prospects, but potential for gradual gains.",
+    },
+    {
+      label: "D+",
+      min: 0.07,
+      color: "#FFCC66",
+      description:
+        "Investment with growth potential, though returns may be slower and less predictable.",
+    },
+    {
+      label: "D",
+      min: 0.04,
+      color: "#FF9933",
+      description:
+        "Entry-level investment with uncertain growth, better for cautious investors.",
+    },
+    {
+      label: "D-",
+      min: 0.01,
+      color: "#ff6600",
+      description:
+        "Speculative investment with minimal growth prospects, ideal for those open to high risk and variable returns.",
+    },
   ];
-
   // Calculate the marker position in percentage
-  const positionPercentage: number = ((value - 0.1) * 100) / (0.7 - 0.1);
+  const positionPercentage: number = ((value - 0.01) * 100) / (0.45 - 0.01);
 
   // Define the explicit gradient background with each color stop percentage
   const gradient = `
@@ -54,34 +125,41 @@ const LivestIndexRange: React.FC<LivestIndexRangeProps> = ({ value }) => {
     grades.find((g) => value >= g.min) || grades[grades.length - 1];
 
   return (
-    <Flex style={{ width: "100%" }} gap={8} align="center">
-      <Flex
-        align="center"
-        justify="center"
-        style={{
-          border: "2px solid",
-          borderColor: COLORS.borderColorDark,
-          borderRadius: 8,
-          backgroundColor: "white",
-          height: 50,
-          width: 100,
-          padding: "0 16px",
-        }}
-      >
-        <Tooltip title={`Grade ${grade.label}`}>
-          <Typography.Text
-            style={{
-              fontSize: FONT_SIZE.heading,
-            }}
-          >
-            {grade.label}
-          </Typography.Text>
-        </Tooltip>
+    <Flex vertical style={{ width: "100%", marginBottom: 16 }} gap={8}>
+      <Flex gap={8}>
+        <Flex
+          align="center"
+          justify="center"
+          style={{
+            border: "2px solid",
+            borderColor: COLORS.borderColorDark,
+            borderRadius: 8,
+            backgroundColor: "white",
+            height: 50,
+            whiteSpace: "nowrap",
+            padding: "0 16px",
+          }}
+        >
+          <Tooltip title={`Grade ${grade.label}`}>
+            <Typography.Text
+              style={{
+                fontSize: FONT_SIZE.title,
+              }}
+            >
+              {grade.label}
+            </Typography.Text>
+          </Tooltip>
+        </Flex>
+        <Typography.Text
+          style={{ lineHeight: "100%", color: COLORS.textColorLight }}
+        >
+          {grade.description}
+        </Typography.Text>
       </Flex>
       <div
         style={{
           minWidth: "calc(100% - 100px)",
-          height: "50px",
+          height: "15px",
           background: gradient,
           position: "relative",
           borderRadius: "4px",
@@ -92,11 +170,11 @@ const LivestIndexRange: React.FC<LivestIndexRangeProps> = ({ value }) => {
           style={{
             position: "absolute",
             left: `${positionPercentage}%`,
-            top: "-20px",
+            top: "0",
             transform: "translateX(-50%)",
-            width: "2px",
-            height: "70px",
-            backgroundColor: "black",
+            width: "5px",
+            height: "15px",
+            backgroundColor: COLORS.primaryColor,
             borderRadius: "2px",
           }}
         />
