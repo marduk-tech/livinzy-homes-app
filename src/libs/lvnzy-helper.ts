@@ -13,6 +13,9 @@ export const nestedPropertyAccessor = (
 };
 
 export const capitalize = (input: string) => {
+  if (!input) {
+    return "";
+  }
   return input.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
