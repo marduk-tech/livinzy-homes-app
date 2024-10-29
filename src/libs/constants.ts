@@ -121,3 +121,9 @@ export const ProjectCategories = [
     },
   },
 ];
+
+export const LivIQPredefinedQuestions = [
+  "Tell me about the team behind this project",
+  "Any idea about the plot availability?",
+  "What about the water supply?",
+];

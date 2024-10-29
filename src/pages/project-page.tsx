@@ -585,7 +585,7 @@ const Livestment: React.FC<{ project: Project }> = ({ project }) => {
           iconName="PiRanking"
           iconSet="pi"
           size={36}
-          color={COLORS.textColorDark}
+          color={COLORS.primaryColor}
         ></DynamicReactIcon>
         <Typography.Text style={{ fontSize: FONT_SIZE.title }}>
           LivIndex

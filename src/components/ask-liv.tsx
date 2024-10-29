@@ -1,11 +1,12 @@
-import { ChatItemProps, ProChat } from "@ant-design/pro-chat";
-import { ReactNode, useEffect, useState } from "react";
+import { ChatItemProps, ProChat, ProChatInstance } from "@ant-design/pro-chat";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
-import { Flex, Typography } from "antd";
+import { Button, Flex, Typography } from "antd";
 import { useDevice } from "../hooks/use-device";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import DynamicReactIcon from "./common/dynamic-react-icon";
+import { LivIQPredefinedQuestions } from "../libs/constants";
 
 export default function AskLiv({ projectName }: { projectName?: string }) {
   const [sessionIdIsLoading, setSessionIdIsLoading] = useState(false);
@@ -15,6 +16,7 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
   const { projectId } = useParams();
 
   const { isMobile } = useDevice();
+  const proChatRef = useRef<ProChatInstance>();
 
   useEffect(() => {
     const fetchSessionId = async () => {
@@ -75,9 +77,9 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
         } else {
           setInitialChats([
             {
-              id: `p-chat-2`,
+              id: `p-chat-1`,
               content:
-                "LivIQ has the full upto date knowledge about this project and other insights about the location, team etc. Have a question ? Just ask here and LivIQ will help you navigate through your doubts in the best possible way.",
+                "LivIQ has the full upto date knowledge about this project and other insights about the location, team etc. See questions people are already asking about this project",
               role: "assistant",
               updateAt: Date.now(),
               createAt: Date.now(),
@@ -168,6 +170,7 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
           style={{ height: isMobile ? "80vh" : 500 }}
           request={handleRequest}
           locale="en-US"
+          chatRef={proChatRef}
           userMeta={{
             avatar:
               "https://cdn.pixabay.com/photo/2021/07/02/04/48/user-6380868_640.png",
@@ -197,13 +200,44 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
             },
             contentRender: (props: ChatItemProps, node: ReactNode) => {
               return (
-                <Typography.Text
-                  style={{
-                    fontSize: FONT_SIZE.subText,
-                  }}
-                >
-                  {props.message}
-                </Typography.Text>
+                <Flex vertical>
+                  <Typography.Text
+                    style={{
+                      fontSize: FONT_SIZE.subText,
+                    }}
+                  >
+                    {props.message}
+                  </Typography.Text>
+                  {(props as any)["data-id"] == "p-chat-1" ? (
+                    <Flex vertical gap={8} style={{ marginTop: 16 }}>
+                      {LivIQPredefinedQuestions.map((q: string) => {
+                        return (
+                          <Button
+                            type="primary"
+                            style={{
+                              backgroundColor: COLORS.bgColorDark,
+                              color: "white",
+                              cursor: "pointer",
+                              borderRadius: 12,
+                              border: "0px",
+                              height: 32,
+                              fontSize: FONT_SIZE.default,
+                              width: "max-content",
+                            }}
+                            onClick={() => {
+                              if (!proChatRef) {
+                                return;
+                              }
+                              proChatRef.current?.sendMessage(q);
+                            }}
+                          >
+                            {q}
+                          </Button>
+                        );
+                      })}
+                    </Flex>
+                  ) : null}
+                </Flex>
               );
             },
           }}
