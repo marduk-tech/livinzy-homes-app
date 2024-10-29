@@ -40,7 +40,7 @@ export const DashboardLayout: React.FC = () => {
               )}
             </Flex>
           </Header>
-          <Content style={{ margin: isMobile ? 16 : 48 }}>
+          <Content style={{ margin: isMobile ? 16 : 48, marginTop: 0 }}>
             {/* <Menu mode="horizontal" items={menuItems} /> */}
             <CustomErrorBoundary>
               <Outlet />
