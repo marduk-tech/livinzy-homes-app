@@ -141,7 +141,6 @@ export const ProjectMarker = ({
   const handleClick = () => {
     onExpand();
   };
-
   const imageSrc = project.media.find((m) => m.isPreview)?.image?.url;
 
   return (
@@ -160,6 +159,11 @@ export const ProjectMarker = ({
     >
       {isExpanded ? (
         <Flex style={{ width: 250, height: 300 }}>
+          <CloseButton
+            onClick={() => {
+              isExpanded = false;
+            }}
+          ></CloseButton>
           <ProjectCard project={project}></ProjectCard>
         </Flex>
       ) : (
