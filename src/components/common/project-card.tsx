@@ -47,7 +47,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       ></div>
 
       <Flex
-        style={{ width: "100%", marginTop: 8, padding: "0px 10px" }}
+        style={{ width: "100%", marginTop: 8, padding: "0px 4px" }}
         vertical
       >
         <Typography.Text
@@ -60,7 +60,14 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           {project.metadata.name}
         </Typography.Text>
         {project.ui && project.ui.oneLiner ? (
-          <Typography.Text style={{ color: COLORS.textColorLight }}>
+          <Typography.Text
+            style={{
+              color: COLORS.textColorLight,
+              whiteSpace: "wrap",
+              lineHeight: "110%",
+              marginBottom: 8,
+            }}
+          >
             {project.ui.oneLiner}
           </Typography.Text>
         ) : null}

@@ -7,12 +7,13 @@ import {
   Map,
   useAdvancedMarkerRef,
 } from "@vis.gl/react-google-maps";
-import { Button, Flex, Image, Typography } from "antd";
+import { Button, Flex, Typography } from "antd";
 import React, { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { FONT_SIZE } from "../../theme/style-constants";
 import { Project } from "../../types/Project";
 import { getData } from "./map-util";
+import { ProjectCard } from "../common/project-card";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -93,7 +94,7 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
                     })`,
                   }}
                 >
-                  <ProjectCard
+                  <ProjectMarker
                     project={project}
                     isExpanded={expandedId === id}
                     onExpand={() => handleCardExpand(id)}
@@ -128,7 +129,7 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
   }
 };
 
-export const ProjectCard = ({
+export const ProjectMarker = ({
   project,
   isExpanded,
   onExpand,
@@ -141,7 +142,7 @@ export const ProjectCard = ({
     onExpand();
   };
 
-  const imageSrc = project.media.find((m) => m.type === "image")?.image?.url;
+  const imageSrc = project.media.find((m) => m.isPreview)?.image?.url;
 
   return (
     <div
@@ -151,64 +152,39 @@ export const ProjectCard = ({
         borderRadius: 10,
         padding: "10px",
         whiteSpace: "nowrap",
-        minWidth: isExpanded ? "300px" : "max-content",
-        width: isExpanded ? "300px" : "auto",
-        height: isExpanded ? "auto" : "auto",
         border: "1px solid #ccc",
         cursor: "pointer",
         overflow: "hidden",
         position: "relative",
       }}
     >
-      {isExpanded && (
-        <>
-          <CloseButton
-            onClick={(e) => {
-              e.stopPropagation();
-              onExpand();
-            }}
-          />
-          <div
-            style={{
-              overflow: "hidden",
-            }}
-          >
-            <Image
-              style={{
-                borderRadius: "10px",
-                objectFit: "cover",
-              }}
-              width={300}
-              height={200}
-              preview={false}
-              src={imageSrc || ""}
-              alt={project.metadata?.name}
-            />
-          </div>
-        </>
-      )}
-      <div style={{ marginTop: isExpanded ? "24px" : "0px" }}>
-        <Flex justify="space-between" align="center">
-          <Typography.Text
-            style={{
-              fontSize: isExpanded ? FONT_SIZE.subHeading : "16px",
-              fontWeight: "medium",
-            }}
-          >
-            {project.metadata.name}
-          </Typography.Text>
-
-          {isExpanded && (
-            <Link to={`/project/${project._id}`}>
-              <Button
-                variant="outlined"
-                icon={<ArrowRightOutlined />}
-                size="small"
-              ></Button>
-            </Link>
-          )}
+      {isExpanded ? (
+        <Flex style={{ width: 250, height: 300 }}>
+          <ProjectCard project={project}></ProjectCard>
         </Flex>
-      </div>
+      ) : (
+        <div style={{ marginTop: isExpanded ? "24px" : "0px" }}>
+          <Flex justify="space-between" align="center">
+            <Typography.Text
+              style={{
+                fontSize: isExpanded ? FONT_SIZE.subHeading : "16px",
+                fontWeight: "medium",
+              }}
+            >
+              {project.metadata.name}
+            </Typography.Text>
+            {isExpanded && (
+              <Link to={`/project/${project._id}`}>
+                <Button
+                  variant="outlined"
+                  icon={<ArrowRightOutlined />}
+                  size="small"
+                ></Button>
+              </Link>
+            )}
+          </Flex>
+        </div>
+      )}
     </div>
   );
 };
