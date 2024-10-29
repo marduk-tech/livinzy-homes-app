@@ -10,6 +10,7 @@ export const COLORS = {
   borderColorDark: "#ddd",
   textColorDark: "#2D3F4E",
   textColorLight: "#999",
+  textColorVeryLight: "#e1e1e1",
 };
 
 export const FONTS = {
@@ -22,6 +23,6 @@ export const FONT_SIZE = {
   default: 12,
   subText: 14,
   heading: 38,
-  title: 28,
+  title: 30,
   subHeading: 18,
 };

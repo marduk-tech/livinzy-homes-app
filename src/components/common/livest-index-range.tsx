@@ -150,35 +150,35 @@ const LivestIndexRange: React.FC<LivestIndexRangeProps> = ({ value }) => {
             </Typography.Text>
           </Tooltip>
         </Flex>
-        <Typography.Text
-          style={{ lineHeight: "100%", color: COLORS.textColorLight }}
-        >
-          {grade.description}
-        </Typography.Text>
-      </Flex>
-      <div
-        style={{
-          minWidth: "calc(100% - 100px)",
-          height: "15px",
-          background: gradient,
-          position: "relative",
-          borderRadius: "4px",
-        }}
-      >
-        {" "}
         <div
           style={{
-            position: "absolute",
-            left: `${positionPercentage}%`,
-            top: "0",
-            transform: "translateX(-50%)",
-            width: "5px",
-            height: "15px",
-            backgroundColor: COLORS.primaryColor,
-            borderRadius: "2px",
+            minWidth: "calc(100% - 70px)",
+            height: "50px",
+            background: gradient,
+            position: "relative",
+            borderRadius: "4px",
           }}
-        />
-      </div>
+        >
+          {" "}
+          <div
+            style={{
+              position: "absolute",
+              left: `${positionPercentage}%`,
+              top: "0",
+              transform: "translateX(-50%)",
+              width: "5px",
+              height: "50px",
+              backgroundColor: COLORS.primaryColor,
+              borderRadius: "2px",
+            }}
+          />
+        </div>
+      </Flex>
+      <Typography.Text
+        style={{ lineHeight: "120%", color: COLORS.textColorLight }}
+      >
+        {grade.description}
+      </Typography.Text>
     </Flex>
   );
 };

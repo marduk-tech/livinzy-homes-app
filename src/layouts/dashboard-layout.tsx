@@ -1,6 +1,6 @@
 import { Flex, Image, Layout } from "antd";
 import React from "react";
-import { Link, Outlet, useParams } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
 import { UserDropDown } from "../components/common/user-dropdown";
 import { LoginForm } from "../components/login-form";
@@ -18,7 +18,12 @@ export const DashboardLayout: React.FC = () => {
     <CustomErrorBoundary>
       <Layout style={{ minHeight: "100vh", backgroundColor: "transparent" }}>
         <Layout style={{ backgroundColor: "transparent" }}>
-          <Header style={{ padding: "8px 24px", background: "transparent" }}>
+          <Header
+            style={{
+              padding: isMobile ? 8 : "8px 24px",
+              background: "transparent",
+            }}
+          >
             <Flex align="center" justify="space-between">
               <Link to="/">
                 <Image
@@ -35,7 +40,7 @@ export const DashboardLayout: React.FC = () => {
               )}
             </Flex>
           </Header>
-          <Content style={{ margin: isMobile ? 24 : 48 }}>
+          <Content style={{ margin: isMobile ? 16 : 48 }}>
             {/* <Menu mode="horizontal" items={menuItems} /> */}
             <CustomErrorBoundary>
               <Outlet />

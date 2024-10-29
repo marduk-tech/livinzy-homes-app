@@ -161,8 +161,7 @@ export const PlaceCard = ({
       align="center"
       justify="center"
       style={{
-        backgroundColor:
-          place.type == "project" ? COLORS.primaryColor : "white",
+        backgroundColor: place.type == "project" ? COLORS.bgColorDark : "white",
         borderRadius: isExpanded ? 10 : "50%",
         whiteSpace: "nowrap",
         padding: isExpanded ? 8 : 0,

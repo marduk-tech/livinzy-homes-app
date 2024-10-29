@@ -1,7 +1,12 @@
-import { ProChat } from "@ant-design/pro-chat";
-import { useEffect, useState } from "react";
+import { ChatItemProps, ProChat, ProChatInstance } from "@ant-design/pro-chat";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
+import { Button, Flex, Typography } from "antd";
+import { useDevice } from "../hooks/use-device";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import DynamicReactIcon from "./common/dynamic-react-icon";
+import { LivIQPredefinedQuestions } from "../libs/constants";
 
 export default function AskLiv({ projectName }: { projectName?: string }) {
   const [sessionIdIsLoading, setSessionIdIsLoading] = useState(false);
@@ -9,6 +14,9 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
   const [initialChats, setInitialChats] = useState<any[] | undefined>();
 
   const { projectId } = useParams();
+
+  const { isMobile } = useDevice();
+  const proChatRef = useRef<ProChatInstance>();
 
   useEffect(() => {
     const fetchSessionId = async () => {
@@ -44,7 +52,9 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
   useEffect(() => {
     // Fetch chat history once sessionId is available
     const fetchChatHistory = async () => {
-      if (!sessionId) return;
+      if (!sessionId) {
+        return;
+      }
 
       try {
         setSessionIdIsLoading(true);
@@ -52,10 +62,10 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
           sessionId,
         });
 
-        if (response.data && response.data.data) {
+        if (response.data && response.data.data && response.data.data.length) {
           const formattedChats = response.data.data.map(
             (message: any, index: number) => ({
-              id: `chat-${index}`,
+              id: `i-chat-${index}`,
               content: message.kwargs.content,
               role: message.id.includes("HumanMessage") ? "user" : "assistant",
               updateAt: Date.now(),
@@ -64,6 +74,17 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
           );
 
           setInitialChats(formattedChats);
+        } else {
+          setInitialChats([
+            {
+              id: `p-chat-1`,
+              content:
+                "LivIQ has the full upto date knowledge about this project and other insights about the location, team etc. See questions people are already asking about this project",
+              role: "assistant",
+              updateAt: Date.now(),
+              createAt: Date.now(),
+            },
+          ]);
         }
       } catch (error) {
         console.error("Error fetching chat history:", error);
@@ -113,25 +134,128 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
 
   if (!sessionIdIsLoading && sessionId && initialChats) {
     return (
-      <ProChat
-        onResetMessage={clearSession}
-        style={{ height: "100%" }}
-        request={handleRequest}
-        locale="en-US"
-        userMeta={{
-          avatar:
-            "https://cdn.pixabay.com/photo/2021/07/02/04/48/user-6380868_640.png",
-          title: "You",
+      <Flex
+        vertical
+        style={{
+          border: "1px solid",
+          padding: 0,
+          borderRadius: 8,
+          borderColor: COLORS.borderColor,
         }}
-        assistantMeta={{
-          avatar: "https://livinzy.com/d9811e2e2ee94a81eb99c3c985fddcc8.png",
-          title: "Liv",
-          backgroundColor: "#67dedd",
-        }}
-        helloMessage="Hello! I am Liv, I can answer any question you might have about this project?"
-        placeholder="Type your question here..."
-        initialChats={initialChats}
-      />
+      >
+        <Flex
+          align="center"
+          gap={8}
+          justify="center"
+          style={{
+            padding: "16px 0",
+            borderBottom: "1px solid",
+            borderColor: COLORS.borderColorDark,
+          }}
+        >
+          <DynamicReactIcon
+            iconSet="gi"
+            color={COLORS.primaryColor}
+            size={20}
+            iconName="GiOilySpiral"
+          ></DynamicReactIcon>
+          <Typography.Text
+            style={{ fontSize: FONT_SIZE.subHeading, fontWeight: "bold" }}
+          >
+            LivIQ
+          </Typography.Text>
+        </Flex>
+        <ProChat
+          onResetMessage={clearSession}
+          style={{ height: isMobile ? "80vh" : 500 }}
+          request={handleRequest}
+          locale="en-US"
+          chatRef={proChatRef}
+          userMeta={{
+            avatar:
+              "https://cdn.pixabay.com/photo/2021/07/02/04/48/user-6380868_640.png",
+            title: "You",
+          }}
+          chatItemRenderConfig={{
+            actionsRender: false,
+            avatarRender: (props: ChatItemProps, node: ReactNode) => {
+              return (
+                <Flex style={{ alignSelf: "flex-start" }}>
+                  {props.originData && props.originData.role == "user" ? (
+                    <DynamicReactIcon
+                      iconSet="fa"
+                      size={20}
+                      iconName="FaRegUserCircle"
+                    ></DynamicReactIcon>
+                  ) : (
+                    <DynamicReactIcon
+                      iconSet="gi"
+                      color={COLORS.primaryColor}
+                      size={20}
+                      iconName="GiOilySpiral"
+                    ></DynamicReactIcon>
+                  )}
+                </Flex>
+              );
+            },
+            contentRender: (props: ChatItemProps, node: ReactNode) => {
+              return (
+                <Flex vertical>
+                  <Typography.Text
+                    style={{
+                      fontSize: FONT_SIZE.subText,
+                    }}
+                  >
+                    {props.message}
+                  </Typography.Text>
+                  {(props as any)["data-id"] == "p-chat-1" ? (
+                    <Flex vertical gap={8} style={{ marginTop: 16 }}>
+                      {LivIQPredefinedQuestions.map((q: string) => {
+                        return (
+                          <Button
+                            type="primary"
+                            style={{
+                              backgroundColor: COLORS.bgColorDark,
+                              color: "white",
+                              cursor: "pointer",
+                              borderRadius: 12,
+                              border: "0px",
+                              height: 32,
+                              fontSize: FONT_SIZE.default,
+                              width: "max-content",
+                            }}
+                            onClick={() => {
+                              if (!proChatRef) {
+                                return;
+                              }
+                              proChatRef.current?.sendMessage(q);
+                            }}
+                          >
+                            {q}
+                          </Button>
+                        );
+                      })}
+                    </Flex>
+                  ) : null}
+                </Flex>
+              );
+            },
+          }}
+          inputAreaProps={{
+            style: {
+              border: "1px solid",
+              borderColor: COLORS.primaryColor,
+              boxShadow: "none",
+            },
+          }}
+          assistantMeta={{
+            avatar: "https://livinzy.com/d9811e2e2ee94a81eb99c3c985fddcc8.png",
+            title: "Liv",
+          }}
+          placeholder="Type your question here..."
+          initialChats={initialChats}
+        />
+      </Flex>
     );
   }
 }

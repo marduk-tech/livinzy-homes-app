@@ -2,9 +2,17 @@ import {
   ArrowUpOutlined,
   CloseOutlined,
   HeartOutlined,
-  SendOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Drawer, Flex, Image, Modal, Row, Typography } from "antd";
+import {
+  Button,
+  Drawer,
+  Flex,
+  FloatButton,
+  Image,
+  Modal,
+  Row,
+  Typography,
+} from "antd";
 import React, { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
@@ -21,53 +29,59 @@ import { sortedMedia } from "../libs/utils";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia, IMetadata, IUI, Project } from "../types/Project";
 
-const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => (
-  <Flex
-    style={{
-      height: 500,
-      width: "100%",
-      overflowX: "scroll",
-      whiteSpace: "nowrap",
-      scrollbarWidth: "none",
-    }}
-  >
-    {media
-      .filter((item: IMedia) => item.type === "image" && item.image)
-      .map((img: IMedia, index: number) => (
-        <div style={{ width: "100%", position: "relative" }}>
-          <img
-            key={index}
-            src={img.image!.url}
-            height="100%"
-            width="auto"
-            style={{
-              borderRadius: 8,
-              minWidth: 200,
-              marginRight: 8,
-              filter: "brightness(1.1) contrast(1.1) saturate(1.1)  sepia(0.3)",
-            }}
-            alt={img.image!.caption || `Project image ${index + 1}`}
-          />
-          {img.image!.caption || (img.image?.tags && img.image.tags.length) ? (
-            <Typography.Text
+const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
+  const { isMobile } = useDevice();
+  return (
+    <Flex
+      style={{
+        height: isMobile ? 300 : 500,
+        width: "100%",
+        overflowX: "scroll",
+        whiteSpace: "nowrap",
+        scrollbarWidth: "none",
+      }}
+    >
+      {media
+        .filter((item: IMedia) => item.type === "image" && item.image)
+        .map((img: IMedia, index: number) => (
+          <div style={{ position: "relative" }}>
+            <img
+              key={index}
+              src={img.image!.url}
+              height="100%"
+              width="auto"
               style={{
-                position: "absolute",
-                left: 0,
-                bottom: 0,
-                color: "white",
-                textTransform: "capitalize",
-                borderTopRightRadius: 8,
-                padding: "8px 16px",
-                backgroundColor: "rgba(0,0,0,0.3)",
+                borderRadius: 8,
+                minWidth: 200,
+                marginRight: 8,
+                position: "relative",
+                filter:
+                  "brightness(1.1) contrast(1.1) saturate(1.1)  sepia(0.3)",
               }}
-            >
-              {img.image!.caption || img.image!.tags}
-            </Typography.Text>
-          ) : null}
-        </div>
-      ))}
-  </Flex>
-);
+              alt={img.image!.caption || `Project image ${index + 1}`}
+            />
+            {img.image!.caption ||
+            (img.image?.tags && img.image.tags.length) ? (
+              <Typography.Text
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  bottom: 0,
+                  color: "white",
+                  textTransform: "capitalize",
+                  borderTopRightRadius: 8,
+                  padding: "8px 16px",
+                  backgroundColor: "rgba(0,0,0,0.3)",
+                }}
+              >
+                {img.image!.caption || img.image!.tags}
+              </Typography.Text>
+            ) : null}
+          </div>
+        ))}
+    </Flex>
+  );
+};
 
 const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
   metadata,
@@ -94,17 +108,11 @@ const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
 
 const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
   const costSummary = JSON.parse(project.ui.costSummary);
-
-  const isMobile = useMediaQuery({
-    query: "(max-width: 576px)",
-  });
+  const { isMobile } = useDevice();
 
   return (
-    <Flex>
+    <Flex style={{ marginRight: isMobile ? 16 : 0 }}>
       <Flex vertical>
-        <Typography.Text
-          style={{ color: COLORS.textColorLight }}
-        ></Typography.Text>
         <Flex align="flex-end">
           <Typography.Text
             style={{
@@ -145,11 +153,11 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
 
       {/* Buttons: Follow Up and Save */}
       <Flex style={{ marginLeft: "auto" }} gap={8}>
-        <Button size={isMobile ? "small" : "middle"} icon={<SendOutlined />}>
+        {/* <Button size={isMobile ? "small" : "middle"} icon={<SendOutlined />}>
           Follow Up
-        </Button>
+        </Button> */}
         <Button size={isMobile ? "small" : "middle"} icon={<HeartOutlined />}>
-          Save
+          {isMobile ? "" : "Save"}
         </Button>
       </Flex>
     </Flex>
@@ -255,13 +263,16 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
     query: "(max-width: 576px)",
   });
 
+  const layoutImages = media.filter(
+    (m: IMedia) => m.type == "image" && m.image!.tags.includes("layout")
+  );
+
   return (
     <Flex
       vertical
       gap={24}
       style={{
-        marginTop: 24,
-        paddingBottom: 64,
+        paddingBottom: 48,
         borderBottom: "1px solid",
         borderBottomColor: COLORS.borderColor,
       }}
@@ -279,12 +290,24 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
           width: "100%",
           scrollbarWidth: "none",
         }}
+        gap={8}
       >
-        <Flex>
+        <Flex
+          style={{
+            padding: 24,
+            backgroundColor: COLORS.bgColorDark,
+            borderRadius: 8,
+            width: "100%",
+          }}
+        >
           <Row
             style={{
               borderRadius: 10,
-              maxWidth: 800,
+              width: isMobile
+                ? layoutImages && layoutImages.length
+                  ? "calc(100vw - 100px)"
+                  : "100vw"
+                : 700,
               textWrap: "wrap",
             }}
             align="middle"
@@ -294,13 +317,16 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                 <DynamicReactIcon
                   iconName="GiIsland"
                   iconSet="gi"
+                  color="white"
+                  size={32}
                 ></DynamicReactIcon>
                 <Flex vertical gap={4}>
                   <Typography.Text
                     style={{
-                      fontSize: isMobile ? 14 : 18,
-                      color: COLORS.textColorLight,
+                      fontSize: FONT_SIZE.subText,
+                      color: COLORS.textColorVeryLight,
                       lineHeight: "100%",
+                      textTransform: "uppercase",
                     }}
                   >
                     Plots
@@ -308,7 +334,8 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                   <Typography.Text
                     style={{
                       margin: 0,
-                      fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                      color: "white",
+                      fontSize: FONT_SIZE.subHeading,
                       lineHeight: "100%",
                     }}
                   >
@@ -320,13 +347,16 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                 <DynamicReactIcon
                   iconName="HiCurrencyRupee"
                   iconSet="hi"
+                  color="white"
+                  size={32}
                 ></DynamicReactIcon>
                 <Flex vertical gap={4}>
                   <Typography.Text
                     style={{
                       lineHeight: "100%",
-                      fontSize: isMobile ? 14 : 18,
-                      color: COLORS.textColorLight,
+                      fontSize: FONT_SIZE.subText,
+                      textTransform: "uppercase",
+                      color: COLORS.textColorVeryLight,
                     }}
                   >
                     Costing
@@ -336,6 +366,7 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                       margin: 0,
                       lineHeight: "100%",
                       fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                      color: "white",
                     }}
                   >
                     {summary.costing}
@@ -346,14 +377,17 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                 <DynamicReactIcon
                   iconName="GiReceiveMoney"
                   iconSet="gi"
+                  color="white"
+                  size={32}
                 ></DynamicReactIcon>
 
                 <Flex vertical gap={4}>
                   <Typography.Text
                     style={{
                       lineHeight: "100%",
-                      fontSize: isMobile ? 14 : 18,
-                      color: COLORS.textColorLight,
+                      fontSize: FONT_SIZE.subText,
+                      textTransform: "uppercase",
+                      color: COLORS.textColorVeryLight,
                     }}
                   >
                     Income
@@ -363,6 +397,7 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                       margin: 0,
                       lineHeight: "100%",
                       fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                      color: "white",
                     }}
                   >
                     {summary.income}
@@ -372,24 +407,20 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
             </Flex>
           </Row>
         </Flex>
-        {media
-          .filter(
-            (m: IMedia) => m.type == "image" && m.image!.tags.includes("layout")
-          )
-          .map((m: IMedia) => {
-            return (
-              <Image
-                src={m.image?.url}
-                style={{
-                  maxHeight: 250,
-                  width: "auto",
-                  border: "4px solid",
-                  borderRadius: 8,
-                  borderColor: COLORS.primaryColor,
-                }}
-              ></Image>
-            );
-          })}
+        {layoutImages.map((m: IMedia) => {
+          return (
+            <Image
+              src={m.image?.url}
+              style={{
+                height: 300,
+                width: "auto",
+                border: "4px solid",
+                borderRadius: 8,
+                borderColor: COLORS.primaryColor,
+              }}
+            ></Image>
+          );
+        })}
       </Flex>
     </Flex>
   );
@@ -477,6 +508,8 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedHighlight, setSelectedHighlight] = useState<any>();
 
+  const { isMobile } = useDevice();
+
   let amenities;
   try {
     amenities = JSON.parse(project.ui.amenitiesSummary);
@@ -500,7 +533,8 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
         </Typography.Text>
       </Flex>
       <Flex
-        gap={100}
+        gap={isMobile ? 0 : 100}
+        vertical={isMobile}
         style={{ backgroundColor: "white", padding: 16, borderRadius: 16 }}
       >
         <Flex vertical>
@@ -546,17 +580,27 @@ const Livestment: React.FC<{ project: Project }> = ({ project }) => {
 
   return (
     <Flex vertical style={{ marginTop: 32 }}>
-      <Flex gap={isMobile ? 10 : 20}>
+      <Flex align="center" gap={8}>
+        <DynamicReactIcon
+          iconName="PiRanking"
+          iconSet="pi"
+          size={36}
+          color={COLORS.primaryColor}
+        ></DynamicReactIcon>
         <Typography.Text style={{ fontSize: FONT_SIZE.title }}>
           LivIndex
         </Typography.Text>
       </Flex>
-      <Flex gap={16} style={{ height: 400, marginTop: 16 }}>
+      <Flex
+        vertical={isMobile ? true : false}
+        gap={16}
+        style={{ height: isMobile ? "auto" : 400, marginTop: 16 }}
+      >
         <Flex
           gap={16}
           vertical
           style={{
-            width: "30%",
+            width: isMobile ? "100%" : "30%",
             height: "100%",
             overflowY: "scroll",
             scrollbarWidth: "none",
@@ -571,9 +615,9 @@ const Livestment: React.FC<{ project: Project }> = ({ project }) => {
               <Flex
                 vertical
                 style={{
-                  padding: 16,
+                  padding: 8,
                   backgroundColor: "white",
-                  borderRadius: 16,
+                  borderRadius: 8,
                   border: "1px solid",
                   borderColor: COLORS.borderColor,
                 }}
@@ -595,7 +639,14 @@ const Livestment: React.FC<{ project: Project }> = ({ project }) => {
             ) : null;
           })}
         </Flex>
-        <Flex vertical style={{ borderRadius: 32, height: 400, width: "70%" }}>
+        <Flex
+          vertical
+          style={{
+            borderRadius: 32,
+            height: 400,
+            width: isMobile ? "100%" : "70%",
+          }}
+        >
           <LivestmentView project={project}></LivestmentView>
         </Flex>
       </Flex>
@@ -635,21 +686,32 @@ const MobileAskLiv: React.FC<{ projectName: string }> = ({ projectName }) => {
           border: "none",
           backgroundColor: "white",
           borderTop: "1px solid",
-          padding: "15px 20px",
           borderColor: COLORS.borderColor,
           cursor: "pointer",
         }}
       >
         <Flex justify="space-between" align="center">
-          <Flex gap={10} align="center">
-            <Image
-              src="/images/img-plchlder.png"
-              width={25}
-              height={25}
-              style={{ borderRadius: 100 }}
-            />
-
-            <Typography.Text>Got questions? Ask away!</Typography.Text>
+          <Flex
+            align="center"
+            justify="flex-end"
+            gap={8}
+            style={{
+              padding: "16px 0",
+              paddingLeft: 16,
+              width: "100%",
+            }}
+          >
+            <DynamicReactIcon
+              iconSet="gi"
+              color={COLORS.primaryColor}
+              size={20}
+              iconName="GiOilySpiral"
+            ></DynamicReactIcon>
+            <Typography.Text
+              style={{ fontSize: FONT_SIZE.subHeading, fontWeight: "bold" }}
+            >
+              LivIQ
+            </Typography.Text>
           </Flex>
 
           <ArrowUpOutlined
@@ -659,28 +721,6 @@ const MobileAskLiv: React.FC<{ projectName: string }> = ({ projectName }) => {
           />
         </Flex>
       </button>
-
-      <Drawer
-        title={
-          <Flex align="center" justify="space-between">
-            <Typography.Text>Ask Liv</Typography.Text>
-            <Button type="text" icon={<CloseOutlined />} onClick={onClose} />
-          </Flex>
-        }
-        styles={{
-          header: {
-            paddingTop: "5px",
-            paddingBottom: "5px",
-          },
-        }}
-        placement="bottom"
-        closable={false}
-        onClose={onClose}
-        open={open}
-        height="100%"
-      >
-        <AskLiv projectName={projectName} />
-      </Drawer>
     </>
   );
 };
@@ -691,13 +731,9 @@ const ProjectPage: React.FC = () => {
   const { data: projectData, isLoading: projectDataLoading } =
     useFetchProjectById(projectId!);
 
-  const isMobile = useMediaQuery({
-    query: "(max-width: 576px)",
-  });
+  const [livIQOpen, setLivIQOpen] = useState(false);
 
-  const hideAskLiv = useMediaQuery({
-    query: "(max-width: 1118px)",
-  });
+  const { isMobile } = useDevice();
 
   if (!projectData) {
     return <Loader></Loader>;
@@ -709,11 +745,34 @@ const ProjectPage: React.FC = () => {
   });
 
   return (
-    <Flex vertical>
-      <Gallery media={sortedMediaArray} />
-      <Row gutter={30} style={{ marginTop: isMobile ? 24 : 40 }}>
-        <Col xs={24} md={hideAskLiv ? 24 : 16} style={{ marginBottom: 24 }}>
-          <Flex vertical gap={32}>
+    <>
+      {!livIQOpen && (
+        <FloatButton
+          icon={
+            <DynamicReactIcon
+              iconName="GiOilySpiral"
+              iconSet="gi"
+              color={COLORS.primaryColor}
+            ></DynamicReactIcon>
+          }
+          onClick={() => {
+            setLivIQOpen(true);
+          }}
+        ></FloatButton>
+      )}
+      <Flex vertical>
+        <Gallery media={sortedMediaArray} />
+        <Flex
+          gap={40}
+          style={{ marginTop: isMobile ? 24 : 40, position: "relative" }}
+          align="flex-start"
+          vertical={isMobile}
+        >
+          <Flex
+            vertical
+            gap={32}
+            style={{ width: isMobile ? "100%" : "calc(100% - 415px)" }}
+          >
             <Header metadata={projectData.metadata} ui={projectData.ui} />
 
             <CostSummery project={projectData} />
@@ -728,28 +787,50 @@ const ProjectPage: React.FC = () => {
 
             <Livestment project={projectData} />
           </Flex>
-        </Col>
 
-        {hideAskLiv ? (
-          <div
-            style={{ width: "100%", position: "sticky", bottom: 0, left: 0 }}
-          >
-            <MobileAskLiv projectName={projectData.metadata.name} />
-          </div>
-        ) : (
-          <Col xs={0} md={8}>
-            <Flex
-              style={{
-                height: 800,
-                overflow: "hidden",
+          {isMobile ? (
+            <Drawer
+              title={
+                <Flex align="center" justify="space-between">
+                  <Button
+                    type="text"
+                    style={{ marginLeft: "auto" }}
+                    icon={<CloseOutlined />}
+                    onClick={() => {
+                      setLivIQOpen(false);
+                    }}
+                  />
+                </Flex>
+              }
+              styles={{
+                header: {
+                  padding: 0,
+                },
               }}
+              placement="bottom"
+              closable={false}
+              onClose={() => {
+                setLivIQOpen(false);
+              }}
+              open={livIQOpen}
+              height="100%"
             >
               <AskLiv projectName={projectData.metadata.name} />
+            </Drawer>
+          ) : (
+            <Flex style={{ width: 375, backgroundColor: "white" }}>
+              <Flex
+                style={{
+                  overflow: "hidden",
+                }}
+              >
+                <AskLiv projectName={projectData.metadata.name} />
+              </Flex>
             </Flex>
-          </Col>
-        )}
-      </Row>
-    </Flex>
+          )}
+        </Flex>
+      </Flex>
+    </>
   );
 };
 
