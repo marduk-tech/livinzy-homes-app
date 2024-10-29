@@ -91,12 +91,12 @@ export function HomePage() {
             }}
           >
             <Flex
-              gap={40}
+              gap={32}
+              justify="center"
               style={{
                 borderRadius: 16,
                 overflowX: "scroll",
                 whiteSpace: "nowrap",
-                padding: "16px",
                 width: "100%",
                 scrollbarWidth: "none",
               }}
