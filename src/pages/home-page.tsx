@@ -1,4 +1,4 @@
-import { Button, Col, Flex, Row, Typography } from "antd";
+import { Col, Flex, FloatButton, Row, Typography } from "antd";
 import { Loader } from "../components/common/loader";
 import { ProjectCard } from "../components/common/project-card";
 import { useDevice } from "../hooks/use-device";
@@ -46,28 +46,61 @@ export function HomePage() {
   if (filteredProjects) {
     return (
       <>
+        <FloatButton
+          icon={
+            !toggleMapView ? (
+              <DynamicReactIcon
+                iconName="FaMap"
+                color="primary"
+                iconSet="fa"
+              ></DynamicReactIcon>
+            ) : (
+              <DynamicReactIcon
+                iconName="FaRegListAlt"
+                iconSet="fa"
+                color="primary"
+              ></DynamicReactIcon>
+            )
+          }
+          style={{
+            padding: 16,
+            marginTop: 16,
+            borderRadius: 12,
+            cursor: "pointer",
+            marginLeft: "auto",
+          }}
+          onClick={() => setToggleMapView(!toggleMapView)}
+        >
+          {isMobile ? null : toggleMapView ? "List View" : "Map View"}
+        </FloatButton>
         <Flex
           justify="center"
           vertical
           style={{
             width: "100%",
             marginTop: 16,
-            padding: `16px ${isMobile ? "20px" : "40px"}`,
           }}
-          gap={40}
+          gap={16}
         >
           <Flex
-            align="center"
+            align={isMobile ? "flex-start" : "center"}
+            vertical
             style={{
-              width: "calc(100% - 32px)",
-              padding: "24px",
-              borderRadius: 24,
-              backgroundColor: "white",
-              border: "1px solid",
-              borderColor: COLORS.borderColor,
+              marginLeft: 8,
+              padding: 0,
             }}
           >
-            <Flex gap={32}>
+            <Flex
+              gap={40}
+              style={{
+                borderRadius: 16,
+                overflowX: "scroll",
+                whiteSpace: "nowrap",
+                padding: "16px",
+                width: "100%",
+                scrollbarWidth: "none",
+              }}
+            >
               {ProjectCategories.map((cat: any) => {
                 return (
                   <Flex
@@ -103,33 +136,6 @@ export function HomePage() {
                 );
               })}
             </Flex>
-            <Button
-              icon={
-                !toggleMapView ? (
-                  <DynamicReactIcon
-                    iconName="FaMap"
-                    color="primary"
-                    iconSet="fa"
-                  ></DynamicReactIcon>
-                ) : (
-                  <DynamicReactIcon
-                    iconName="FaRegListAlt"
-                    iconSet="fa"
-                    color="primary"
-                  ></DynamicReactIcon>
-                )
-              }
-              style={{
-                padding: 16,
-                borderRadius: 12,
-                cursor: "pointer",
-                marginLeft: "auto",
-              }}
-              onClick={() => setToggleMapView(!toggleMapView)}
-              size="small"
-            >
-              {toggleMapView ? "List View" : "Map View"}
-            </Button>
           </Flex>
 
           {toggleMapView ? (
@@ -143,7 +149,13 @@ export function HomePage() {
               {filteredProjects
                 .filter((p) => p.ui && p.ui.oneLiner)
                 .map((project) => (
-                  <Col key={project._id} xs={24} md={12} lg={6}>
+                  <Col
+                    key={project._id}
+                    xs={24}
+                    md={12}
+                    lg={6}
+                    style={{ padding: isMobile ? 0 : 16 }}
+                  >
                     <ProjectCard project={project} key={project._id} />
                   </Col>
                 ))}
