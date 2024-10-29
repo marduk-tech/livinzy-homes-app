@@ -280,11 +280,11 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
           scrollbarWidth: "none",
         }}
       >
-        <Flex>
+        <Flex style={{}}>
           <Row
             style={{
               borderRadius: 10,
-              maxWidth: 800,
+              width: 700,
               textWrap: "wrap",
             }}
             align="middle"
