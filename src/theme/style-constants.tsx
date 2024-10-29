@@ -19,9 +19,9 @@ export const FONTS = {
 };
 
 export const FONT_SIZE = {
-  default: 16,
-  subText: 18,
-  heading: 42,
-  title: 32,
-  subHeading: 22,
+  default: 12,
+  subText: 14,
+  heading: 38,
+  title: 28,
+  subHeading: 18,
 };

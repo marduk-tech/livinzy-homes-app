@@ -10,15 +10,16 @@ import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import AskLiv from "../components/ask-liv";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
+import LivestIndexRange from "../components/common/livest-index-range";
 import { Loader } from "../components/common/loader";
-import { useFetchProjectById } from "../hooks/use-project";
-import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { IMedia, IMetadata, IUI, Project } from "../types/Project";
 import { LivestmentView } from "../components/map-view/livestment-view";
 import { useDevice } from "../hooks/use-device";
+import { useFetchProjectById } from "../hooks/use-project";
 import { LivestIndexConfig } from "../libs/constants";
-import LivestIndexRange from "../components/common/livest-index-range";
+import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
+import { sortedMedia } from "../libs/utils";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { IMedia, IMetadata, IUI, Project } from "../types/Project";
 
 const dummyProjectData: any = {
   metadata: {
@@ -91,7 +92,7 @@ const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
   });
 
   return (
-    <Flex vertical gap={8}>
+    <Flex vertical>
       <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.heading }}>
         {metadata.name}
       </Typography.Text>
@@ -118,37 +119,43 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
 
   return (
     <Flex>
-      <Flex align="flex-end">
-        <Typography.Text
-          style={{
-            margin: 0,
-            fontSize: FONT_SIZE.title,
-            lineHeight: "100%",
-          }}
-        >
-          {rupeeAmountFormat(costSummary.cost)}
-        </Typography.Text>
+      <Flex vertical>
+        <Flex align="flex-end">
+          <Typography.Text
+            style={{
+              margin: 0,
+              fontSize: FONT_SIZE.title,
+              lineHeight: "100%",
+            }}
+          >
+            ₹{rupeeAmountFormat(costSummary.cost)}
+          </Typography.Text>
 
-        <Typography.Text
-          style={{
-            margin: "0 8px",
-            lineHeight: "100%",
-            fontSize: isMobile ? FONT_SIZE.subHeading * 0.7 : 25,
-          }}
-        >
-          /
-        </Typography.Text>
+          <Typography.Text
+            style={{
+              margin: "0 8px",
+              lineHeight: "100%",
+              fontSize: FONT_SIZE.subHeading,
+            }}
+          >
+            /
+          </Typography.Text>
 
-        <Typography.Text
-          style={{
-            margin: 0,
-            lineHeight: "100%",
-            color: COLORS.textColorLight,
-            fontSize: FONT_SIZE.subHeading,
-          }}
-        >
-          {costSummary.size}
-        </Typography.Text>
+          <Typography.Text
+            style={{
+              margin: 0,
+              lineHeight: "100%",
+              fontSize: FONT_SIZE.subHeading,
+            }}
+          >
+            {costSummary.size}
+          </Typography.Text>
+        </Flex>
+        {costSummary.sqftRate ? (
+          <Typography.Text style={{ color: COLORS.textColorLight }}>
+            ₹{costSummary.sqftRate} per sqft
+          </Typography.Text>
+        ) : null}
       </Flex>
 
       {/* Buttons: Follow Up and Save */}
@@ -413,18 +420,14 @@ const getAmenityIconAndLabel = (amenity: string) => {
 };
 
 const AmenityCard: React.FC<any> = ({ amenity }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   if (!amenity) {
     return;
   }
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-
-  const isMobile = useMediaQuery({
-    query: "(max-width: 576px)",
-  });
 
   return (
     <>
@@ -487,6 +490,9 @@ const AmenityCard: React.FC<any> = ({ amenity }) => {
 };
 
 const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedHighlight, setSelectedHighlight] = useState<any>();
+
   let amenities;
   try {
     amenities = JSON.parse(project.ui.amenitiesSummary);
@@ -497,17 +503,10 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
     return;
   }
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedHighlight, setSelectedHighlight] = useState<any>();
-
   const handleCancel = () => {
     setSelectedHighlight(undefined);
     setIsModalOpen(false);
   };
-
-  const isMobile = useMediaQuery({
-    query: "(max-width: 576px)",
-  });
 
   return (
     <Flex vertical gap={24} style={{ marginTop: 32 }}>
@@ -562,7 +561,7 @@ const Livestment: React.FC<{ project: Project }> = ({ project }) => {
     <Flex vertical style={{ marginTop: 32 }}>
       <Flex gap={isMobile ? 10 : 20}>
         <Typography.Text style={{ fontSize: FONT_SIZE.title }}>
-          Livest Index
+          LivIndex
         </Typography.Text>
       </Flex>
       <Flex gap={16} style={{ height: 400, marginTop: 16 }}>
@@ -717,9 +716,13 @@ const ProjectPage: React.FC = () => {
     return <Loader></Loader>;
   }
 
+  const sortedMediaArray = sortedMedia({
+    media: projectData.media,
+  });
+
   return (
     <Flex vertical>
-      <Gallery media={projectData.media} />
+      <Gallery media={sortedMediaArray} />
       <Row gutter={30} style={{ marginTop: isMobile ? 24 : 40 }}>
         <Col xs={24} md={hideAskLiv ? 24 : 16} style={{ marginBottom: 24 }}>
           <Flex vertical gap={32}>
