@@ -21,45 +21,8 @@ import { sortedMedia } from "../libs/utils";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia, IMetadata, IUI, Project } from "../types/Project";
 
-const dummyProjectData: any = {
-  metadata: {
-    name: "Oasis Delight",
-  },
-  ui: {
-    one_liner: "Farmland · Coffee Plantation · Sakleshpur",
-    summary: {
-      plots: "5000 to 20000 sq ft plots with coffee/pepper plantation & villa",
-      costing:
-        "₹1000-1500 per sq  depending on the location and plot configuration",
-      services:
-        "Clubhouse with amenities along with property management services",
-    },
-    description:
-      "Nestled across 112 acres, this farmland project offers a unique blend of natural beauty and modern amenities, featuring mango, timber, and ashok trees, with custom planting options based on soil. The land is equipped with drip irrigation, a lake with a scenic boulevard, and electric and water supply to each plot. Situated next to the protected Jawalgiri forest, the project ensures security with electric fencing, CCTV, and guards. Recreational amenities include a 10,000 sq.ft. clubhouse, sports facilities, zen gardens, picnic spots, and a 22-room resort, making it an ideal escape with ample parking for each plot.",
-  },
-  media: [
-    {
-      url: "https://cdn.pixabay.com/photo/2016/11/18/17/46/house-1836070_1280.jpg",
-    },
-    {
-      url: "https://cdn.pixabay.com/photo/2013/08/28/00/54/field-176602_1280.jpg",
-    },
-    {
-      url: "https://cdn.pixabay.com/photo/2018/09/17/21/35/clubhouse-3684847_1280.jpg",
-    },
-  ],
-  amenities: {
-    external_sports: "Football, volleyball",
-    clubhouse:
-      "overlooking a 50,000 sq ft man-made lake, the club house has state-of-the-art facilities, managed by fully trained staff & completely backed by solar power.",
-    swimming_pool:
-      "Temperature controlled infinity pool facing the lake with Jaccuzi and 15 seater spa",
-    kids: "Table tennis, PS-5, kayaking in the lake, seperate kids zone in the property",
-  },
-};
-
 const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => (
-  <div
+  <Flex
     style={{
       height: 500,
       width: "100%",
@@ -68,29 +31,48 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => (
       scrollbarWidth: "none",
     }}
   >
-    {(media ? media : dummyProjectData.media)
+    {media
       .filter((item: IMedia) => item.type === "image" && item.image)
       .map((img: IMedia, index: number) => (
-        <img
-          key={index}
-          src={img.image!.url}
-          height="100%"
-          width="auto"
-          style={{ borderRadius: 8, marginRight: 8 }}
-          alt={img.image!.caption || `Project image ${index + 1}`}
-        />
+        <div style={{ width: "100%", position: "relative" }}>
+          <img
+            key={index}
+            src={img.image!.url}
+            height="100%"
+            width="auto"
+            style={{
+              borderRadius: 8,
+              minWidth: 200,
+              marginRight: 8,
+              filter: "brightness(1.1) contrast(1.1) saturate(1.1)  sepia(0.3)",
+            }}
+            alt={img.image!.caption || `Project image ${index + 1}`}
+          />
+          {img.image!.caption || (img.image?.tags && img.image.tags.length) ? (
+            <Typography.Text
+              style={{
+                position: "absolute",
+                left: 0,
+                bottom: 0,
+                color: "white",
+                textTransform: "capitalize",
+                borderTopRightRadius: 8,
+                padding: "8px 16px",
+                backgroundColor: "rgba(0,0,0,0.3)",
+              }}
+            >
+              {img.image!.caption || img.image!.tags}
+            </Typography.Text>
+          ) : null}
+        </div>
       ))}
-  </div>
+  </Flex>
 );
 
 const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
   metadata,
   ui,
 }) => {
-  const isMobile = useMediaQuery({
-    query: "(max-width: 576px)",
-  });
-
   return (
     <Flex vertical>
       <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.heading }}>
@@ -120,6 +102,9 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
   return (
     <Flex>
       <Flex vertical>
+        <Typography.Text
+          style={{ color: COLORS.textColorLight }}
+        ></Typography.Text>
         <Flex align="flex-end">
           <Typography.Text
             style={{
@@ -260,113 +245,152 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
   );
 };
 
-const ProjectSummary: React.FC<{ ui: IUI }> = ({ ui }) => {
-  const summary = ui.summary
-    ? JSON.parse(ui.summary)
-    : dummyProjectData.ui.summary;
+const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
+  ui,
+  media,
+}) => {
+  const summary = JSON.parse(ui.summary);
 
   const isMobile = useMediaQuery({
     query: "(max-width: 576px)",
   });
 
   return (
-    <Flex vertical gap={24} style={{ marginTop: 24 }}>
+    <Flex
+      vertical
+      gap={24}
+      style={{
+        marginTop: 24,
+        paddingBottom: 64,
+        borderBottom: "1px solid",
+        borderBottomColor: COLORS.borderColor,
+      }}
+    >
       <Flex>
         <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.title }}>
           What are you Buying ?
         </Typography.Text>
       </Flex>
 
-      <Row
+      <Flex
         style={{
-          padding: 24,
-          backgroundColor: "#F7F7F7",
-          borderRadius: 10,
+          overflowX: "scroll",
+          whiteSpace: "nowrap",
+          width: "100%",
+          scrollbarWidth: "none",
         }}
-        align="middle"
       >
-        <Flex vertical gap={40}>
-          <Flex align="flex-start" gap={8}>
-            <DynamicReactIcon
-              iconName="GiIsland"
-              iconSet="gi"
-            ></DynamicReactIcon>
-            <Flex vertical gap={4}>
-              <Typography.Text
-                style={{
-                  fontSize: isMobile ? 14 : 18,
-                  color: COLORS.textColorLight,
-                  lineHeight: "100%",
-                }}
-              >
-                Plots
-              </Typography.Text>
-              <Typography.Text
-                style={{
-                  margin: 0,
-                  fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
-                  lineHeight: "100%",
-                }}
-              >
-                {summary.plots}
-              </Typography.Text>
-            </Flex>
-          </Flex>
-          <Flex align="flex-start" gap={8}>
-            <DynamicReactIcon
-              iconName="HiCurrencyRupee"
-              iconSet="hi"
-            ></DynamicReactIcon>
-            <Flex vertical gap={4}>
-              <Typography.Text
-                style={{
-                  lineHeight: "100%",
-                  fontSize: isMobile ? 14 : 18,
-                  color: COLORS.textColorLight,
-                }}
-              >
-                Costing
-              </Typography.Text>
-              <Typography.Text
-                style={{
-                  margin: 0,
-                  lineHeight: "100%",
-                  fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
-                }}
-              >
-                {summary.costing}
-              </Typography.Text>
-            </Flex>
-          </Flex>
-          <Flex align="flex-start" gap={8}>
-            <DynamicReactIcon
-              iconName="GiReceiveMoney"
-              iconSet="gi"
-            ></DynamicReactIcon>
+        <Flex>
+          <Row
+            style={{
+              borderRadius: 10,
+              maxWidth: 800,
+              textWrap: "wrap",
+            }}
+            align="middle"
+          >
+            <Flex vertical gap={40}>
+              <Flex align="flex-start" gap={8}>
+                <DynamicReactIcon
+                  iconName="GiIsland"
+                  iconSet="gi"
+                ></DynamicReactIcon>
+                <Flex vertical gap={4}>
+                  <Typography.Text
+                    style={{
+                      fontSize: isMobile ? 14 : 18,
+                      color: COLORS.textColorLight,
+                      lineHeight: "100%",
+                    }}
+                  >
+                    Plots
+                  </Typography.Text>
+                  <Typography.Text
+                    style={{
+                      margin: 0,
+                      fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                      lineHeight: "100%",
+                    }}
+                  >
+                    {summary.plots}
+                  </Typography.Text>
+                </Flex>
+              </Flex>
+              <Flex align="flex-start" gap={8}>
+                <DynamicReactIcon
+                  iconName="HiCurrencyRupee"
+                  iconSet="hi"
+                ></DynamicReactIcon>
+                <Flex vertical gap={4}>
+                  <Typography.Text
+                    style={{
+                      lineHeight: "100%",
+                      fontSize: isMobile ? 14 : 18,
+                      color: COLORS.textColorLight,
+                    }}
+                  >
+                    Costing
+                  </Typography.Text>
+                  <Typography.Text
+                    style={{
+                      margin: 0,
+                      lineHeight: "100%",
+                      fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                    }}
+                  >
+                    {summary.costing}
+                  </Typography.Text>
+                </Flex>
+              </Flex>
+              <Flex align="flex-start" gap={8}>
+                <DynamicReactIcon
+                  iconName="GiReceiveMoney"
+                  iconSet="gi"
+                ></DynamicReactIcon>
 
-            <Flex vertical gap={4}>
-              <Typography.Text
-                style={{
-                  lineHeight: "100%",
-                  fontSize: isMobile ? 14 : 18,
-                  color: COLORS.textColorLight,
-                }}
-              >
-                Income
-              </Typography.Text>
-              <Typography.Text
-                style={{
-                  margin: 0,
-                  lineHeight: "100%",
-                  fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
-                }}
-              >
-                {summary.income}
-              </Typography.Text>
+                <Flex vertical gap={4}>
+                  <Typography.Text
+                    style={{
+                      lineHeight: "100%",
+                      fontSize: isMobile ? 14 : 18,
+                      color: COLORS.textColorLight,
+                    }}
+                  >
+                    Income
+                  </Typography.Text>
+                  <Typography.Text
+                    style={{
+                      margin: 0,
+                      lineHeight: "100%",
+                      fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                    }}
+                  >
+                    {summary.income}
+                  </Typography.Text>
+                </Flex>
+              </Flex>
             </Flex>
-          </Flex>
+          </Row>
         </Flex>
-      </Row>
+        {media
+          .filter(
+            (m: IMedia) => m.type == "image" && m.image!.tags.includes("layout")
+          )
+          .map((m: IMedia) => {
+            return (
+              <Image
+                src={m.image?.url}
+                style={{
+                  maxHeight: 250,
+                  width: "auto",
+                  border: "4px solid",
+                  borderRadius: 8,
+                  borderColor: COLORS.primaryColor,
+                }}
+              ></Image>
+            );
+          })}
+      </Flex>
     </Flex>
   );
 };
@@ -377,46 +401,6 @@ const ProjectDescription: React.FC<{ project: Project }> = ({ project }) => {
       {project.ui.description}
     </Typography.Text>
   );
-};
-
-const getAmenityIconAndLabel = (amenity: string) => {
-  switch (amenity) {
-    case "sports_external":
-      return {
-        label: "Outdoor Sports",
-        iconSrc: "/images/amenities-icons/others.png",
-      };
-    case "clubhouse":
-      return {
-        label: "Clubhouse",
-        iconSrc: "/images/amenities-icons/clubhouse.png",
-      };
-    case "kids":
-      return {
-        label: "Kids Activity",
-        iconSrc: "/images/amenities-icons/kids.png",
-      };
-    case "parking":
-      return {
-        label: "Parking",
-        iconSrc: "/images/amenities-icons/parks.png",
-      };
-    case "parks":
-      return {
-        label: "Parking",
-        iconSrc: "/images/amenities-icons/parks.png",
-      };
-    case "swimming_pool":
-      return {
-        label: "Swimming",
-        iconSrc: "/images/amenities-icons/swimming-pool.png",
-      };
-    default:
-      return {
-        label: "Others",
-        iconSrc: "/images/amenities-icons/others.png",
-      };
-  }
 };
 
 const AmenityCard: React.FC<any> = ({ amenity }) => {
@@ -509,13 +493,16 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
   };
 
   return (
-    <Flex vertical gap={24} style={{ marginTop: 32 }}>
+    <Flex vertical gap={24}>
       <Flex>
         <Typography.Text style={{ fontSize: FONT_SIZE.title }}>
           Amenities Offered
         </Typography.Text>
       </Flex>
-      <Flex gap={100}>
+      <Flex
+        gap={100}
+        style={{ backgroundColor: "white", padding: 16, borderRadius: 16 }}
+      >
         <Flex vertical>
           {amenities.slice(0, 5).map((amenity: any) => {
             return <AmenityCard amenity={amenity} />;
@@ -718,6 +705,7 @@ const ProjectPage: React.FC = () => {
 
   const sortedMediaArray = sortedMedia({
     media: projectData.media,
+    setPreviewInFirstPlace: true,
   });
 
   return (
@@ -734,7 +722,7 @@ const ProjectPage: React.FC = () => {
 
             <ProjectDescription project={projectData} />
 
-            <ProjectSummary ui={projectData.ui} />
+            <ProjectSummary ui={projectData.ui} media={projectData.media} />
 
             <ProjectAmenities project={projectData} />
 
