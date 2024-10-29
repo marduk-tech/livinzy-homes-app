@@ -10,6 +10,7 @@ export const COLORS = {
   borderColorDark: "#ddd",
   textColorDark: "#2D3F4E",
   textColorLight: "#999",
+  textColorVeryLight: "#e1e1e1",
 };
 
 export const FONTS = {

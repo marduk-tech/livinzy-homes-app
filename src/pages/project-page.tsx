@@ -318,13 +318,15 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                   iconName="GiIsland"
                   iconSet="gi"
                   color="white"
+                  size={32}
                 ></DynamicReactIcon>
                 <Flex vertical gap={4}>
                   <Typography.Text
                     style={{
-                      fontSize: isMobile ? 14 : 18,
-                      color: "white",
+                      fontSize: FONT_SIZE.subText,
+                      color: COLORS.textColorVeryLight,
                       lineHeight: "100%",
+                      textTransform: "uppercase",
                     }}
                   >
                     Plots
@@ -333,7 +335,7 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                     style={{
                       margin: 0,
                       color: "white",
-                      fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                      fontSize: FONT_SIZE.subHeading,
                       lineHeight: "100%",
                     }}
                   >
@@ -346,13 +348,15 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                   iconName="HiCurrencyRupee"
                   iconSet="hi"
                   color="white"
+                  size={32}
                 ></DynamicReactIcon>
                 <Flex vertical gap={4}>
                   <Typography.Text
                     style={{
                       lineHeight: "100%",
-                      fontSize: isMobile ? 14 : 18,
-                      color: "white",
+                      fontSize: FONT_SIZE.subText,
+                      textTransform: "uppercase",
+                      color: COLORS.textColorVeryLight,
                     }}
                   >
                     Costing
@@ -374,14 +378,16 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                   iconName="GiReceiveMoney"
                   iconSet="gi"
                   color="white"
+                  size={32}
                 ></DynamicReactIcon>
 
                 <Flex vertical gap={4}>
                   <Typography.Text
                     style={{
                       lineHeight: "100%",
-                      fontSize: isMobile ? 14 : 18,
-                      color: "white",
+                      fontSize: FONT_SIZE.subText,
+                      textTransform: "uppercase",
+                      color: COLORS.textColorVeryLight,
                     }}
                   >
                     Income
@@ -609,9 +615,9 @@ const Livestment: React.FC<{ project: Project }> = ({ project }) => {
               <Flex
                 vertical
                 style={{
-                  padding: 16,
+                  padding: 8,
                   backgroundColor: "white",
-                  borderRadius: 16,
+                  borderRadius: 8,
                   border: "1px solid",
                   borderColor: COLORS.borderColor,
                 }}
