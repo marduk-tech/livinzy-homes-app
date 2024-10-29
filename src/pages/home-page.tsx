@@ -92,9 +92,8 @@ export function HomePage() {
           >
             <Flex
               gap={32}
-              justify="center"
+              justify={isMobile ? "flex-start" : "center"}
               style={{
-                borderRadius: 16,
                 overflowX: "scroll",
                 whiteSpace: "nowrap",
                 width: "100%",
@@ -124,6 +123,10 @@ export function HomePage() {
                     <Typography.Text
                       style={{
                         fontSize: FONT_SIZE.subText,
+                        fontWeight:
+                          categoryFilter && categoryFilter == cat.key
+                            ? "bold"
+                            : "normal",
                         color:
                           categoryFilter && categoryFilter == cat.key
                             ? COLORS.primaryColor
