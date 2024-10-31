@@ -1,6 +1,7 @@
 import {
   ArrowUpOutlined,
   CloseOutlined,
+  HeartFilled,
   HeartOutlined,
 } from "@ant-design/icons";
 import {
@@ -10,6 +11,7 @@ import {
   FloatButton,
   Image,
   Modal,
+  notification,
   Row,
   Typography,
 } from "antd";
@@ -23,6 +25,8 @@ import { Loader } from "../components/common/loader";
 import { LivestmentView } from "../components/map-view/livestment-view";
 import { useDevice } from "../hooks/use-device";
 import { useFetchProjectById } from "../hooks/use-project";
+import { useUser } from "../hooks/use-user";
+import { useUpdateUserMutation } from "../hooks/user-hooks";
 import { LivestIndexConfig } from "../libs/constants";
 import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { sortedMedia } from "../libs/utils";
@@ -109,6 +113,41 @@ const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
 const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
   const costSummary = JSON.parse(project.ui.costSummary);
   const { isMobile } = useDevice();
+  const { projectId } = useParams();
+
+  const { user } = useUser();
+  const updateUser = useUpdateUserMutation({
+    userId: user?._id as string,
+    enableToasts: false,
+  });
+
+  const handleSave = () => {
+    if (user) {
+      const updatedProjects = user.savedProjects || [];
+
+      // Toggle projectId: remove if exists, add if not
+      const projectExists = updatedProjects.includes(projectId as string);
+      console.log(projectExists);
+
+      const newProjects = projectExists
+        ? updatedProjects.filter((id) => id !== projectId)
+        : [...updatedProjects, projectId];
+
+      const uniqueProjects = Array.from(new Set(newProjects));
+
+      updateUser.mutate({
+        userData: {
+          savedProjects: uniqueProjects as string[],
+        },
+      });
+    } else {
+      notification.error({
+        message: "Please login first",
+      });
+    }
+  };
+
+  const isSaved = user?.savedProjects.includes(projectId as string);
 
   return (
     <Flex style={{ marginRight: isMobile ? 16 : 0 }}>
@@ -156,8 +195,14 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
         {/* <Button size={isMobile ? "small" : "middle"} icon={<SendOutlined />}>
           Follow Up
         </Button> */}
-        <Button size={isMobile ? "small" : "middle"} icon={<HeartOutlined />}>
-          {isMobile ? "" : "Save"}
+        <Button
+          loading={updateUser.isPending}
+          onClick={handleSave}
+          size={isMobile ? "small" : "middle"}
+          icon={isSaved ? <HeartFilled /> : <HeartOutlined />}
+          type={isSaved ? "primary" : "default"}
+        >
+          {isMobile ? "" : `${isSaved ? "Saved" : "Save"}`}
         </Button>
       </Flex>
     </Flex>
