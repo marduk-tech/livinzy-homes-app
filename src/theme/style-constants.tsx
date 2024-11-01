@@ -19,10 +19,11 @@ export const FONTS = {
   bold: "DM Sans",
 };
 
+const isMobile = !!window.matchMedia("((max-width: 576px))").matches;
 export const FONT_SIZE = {
   default: 12,
   subText: 14,
-  heading: 38,
-  title: 30,
+  title: isMobile ? 32 : 32,
+  heading: isMobile ? 22 : 24,
   subHeading: 18,
 };
