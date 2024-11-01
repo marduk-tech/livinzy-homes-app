@@ -143,7 +143,7 @@ const LivestIndexRange: React.FC<LivestIndexRangeProps> = ({ value }) => {
           <Tooltip title={`Grade ${grade.label}`}>
             <Typography.Text
               style={{
-                fontSize: FONT_SIZE.title,
+                fontSize: FONT_SIZE.heading,
               }}
             >
               {grade.label}

@@ -1,22 +1,19 @@
-import { Button, Form, Input, InputNumber, message, Modal } from "antd";
+import {
+  Button,
+  Divider,
+  Flex,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Typography,
+} from "antd";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 
 export function LoginForm() {
   // modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
 
   // auth
   const {
@@ -66,26 +63,43 @@ export function LoginForm() {
         mobile: values.mobileNumber,
         code: values.otp,
       });
-
-      setIsModalOpen(false);
     } catch (error) {
-      message.error("Invalid OTP");
+      message.error("Invalid OTP. Please try again.");
       form.resetFields(["otp"]);
     }
   };
 
   return (
     <>
-      <Button type="primary" size="small" onClick={showModal}>
-        Login
-      </Button>
-      <Modal
-        title="Login"
-        open={isModalOpen}
-        onCancel={handleCancel}
-        footer={[]}
+      <div
+        style={{
+          margin: "auto",
+          marginTop: "30px",
+          backgroundColor: "rgba(255,255,255,0.95)",
+          padding: 24,
+          borderRadius: 4,
+          width: 500,
+          boxShadow: "0 0 4px",
+        }}
       >
-        <div style={{ margin: "auto", marginTop: "30px" }}>
+        <Flex vertical>
+          <Typography.Text
+            style={{ fontSize: FONT_SIZE.title, fontWeight: "bold" }}
+          >
+            Welcome To Livinzy
+          </Typography.Text>
+          <Typography.Text
+            style={{
+              fontSize: FONT_SIZE.subText,
+              color: COLORS.textColorLight,
+            }}
+          >
+            Login with your mobile number to continue.
+          </Typography.Text>
+        </Flex>
+        <Divider />
+
+        <Flex>
           <Form
             form={form}
             layout="vertical"
@@ -93,7 +107,7 @@ export function LoginForm() {
               loginStatus === "OTP_SENT" ? handleLogin : handleGenerateOtp
             }
           >
-            <Form.Item noStyle shouldUpdate>
+            <Form.Item noStyle shouldUpdate style={{ width: "100%" }}>
               {({ getFieldValue, resetFields }) => {
                 return (
                   <>
@@ -124,11 +138,21 @@ export function LoginForm() {
                       style={{ marginBottom: 0 }}
                     >
                       <InputNumber
-                        style={{ width: "100%" }}
+                        style={{ fontSize: FONT_SIZE.heading, width: "100%" }}
                         placeholder="Enter your mobile number"
                         disabled={loginStatus === "OTP_SENT"}
+                        type="tel"
                       />
                     </Form.Item>
+                    <Typography.Text
+                      style={{
+                        fontSize: FONT_SIZE.default,
+                        color: COLORS.textColorLight,
+                        width: "100%",
+                      }}
+                    >
+                      By signing up, you agree to the terms & conditions.
+                    </Typography.Text>
 
                     {loginStatus === "OTP_SENT" && (
                       <Button
@@ -163,7 +187,10 @@ export function LoginForm() {
                           style={{ marginBottom: 0, marginTop: 20 }}
                         >
                           <Input
-                            style={{ width: "100%" }}
+                            style={{
+                              width: "100%",
+                              fontSize: FONT_SIZE.heading,
+                            }}
                             placeholder="Enter the OTP"
                             maxLength={6}
                           />
@@ -171,7 +198,13 @@ export function LoginForm() {
 
                         <Button
                           disabled={resendTimer > 0}
-                          style={{ padding: 0 }}
+                          style={{
+                            padding: 0,
+                            color:
+                              resendTimer > 0
+                                ? COLORS.textColorLight
+                                : COLORS.textColorDark,
+                          }}
                           type="link"
                           onClick={() =>
                             generateOtp({
@@ -193,13 +226,19 @@ export function LoginForm() {
               }}
             </Form.Item>
             <Form.Item style={{ marginTop: 20 }}>
-              <Button type="primary" htmlType="submit">
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={
+                  generateOtpMutation.isPending || loginMutation.isPending
+                }
+              >
                 {loginStatus === "OTP_SENT" ? "Verify OTP" : "Send OTP"}
               </Button>
             </Form.Item>
           </Form>
-        </div>
-      </Modal>
+        </Flex>
+      </div>
     </>
   );
 }

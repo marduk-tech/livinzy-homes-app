@@ -89,7 +89,7 @@ const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
 }) => {
   return (
     <Flex vertical>
-      <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.heading }}>
+      <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.title }}>
         {metadata.name}
       </Typography.Text>
 
@@ -117,7 +117,7 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
           <Typography.Text
             style={{
               margin: 0,
-              fontSize: FONT_SIZE.title,
+              fontSize: FONT_SIZE.heading,
               lineHeight: "100%",
             }}
           >
@@ -278,7 +278,7 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
       }}
     >
       <Flex>
-        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.title }}>
+        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.heading }}>
           What are you Buying ?
         </Typography.Text>
       </Flex>
@@ -528,7 +528,7 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
   return (
     <Flex vertical gap={24}>
       <Flex>
-        <Typography.Text style={{ fontSize: FONT_SIZE.title }}>
+        <Typography.Text style={{ fontSize: FONT_SIZE.heading }}>
           Amenities Offered
         </Typography.Text>
       </Flex>
@@ -587,7 +587,7 @@ const Livestment: React.FC<{ project: Project }> = ({ project }) => {
           size={36}
           color={COLORS.primaryColor}
         ></DynamicReactIcon>
-        <Typography.Text style={{ fontSize: FONT_SIZE.title }}>
+        <Typography.Text style={{ fontSize: FONT_SIZE.heading }}>
           LivIndex
         </Typography.Text>
       </Flex>

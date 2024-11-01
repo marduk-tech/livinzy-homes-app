@@ -32,8 +32,7 @@ export const sortedMedia = ({
 
   const sortedArray: IMedia[] = Object.keys(grouped)
     .sort()
-    .reduce((acc, tag) => acc.concat(grouped[tag]), [] as IMedia[])
-    .concat(grouped["untagged"] || []);
+    .reduce((acc, tag) => acc.concat(grouped[tag]), [] as IMedia[]);
 
   // If setPreviewInFirstPlace, prepend previews; otherwise, interleave previews based on tags
   if (setPreviewInFirstPlace) {
