@@ -101,18 +101,19 @@ export function LoginForm() {
 
         <Flex>
           <Form
+            style={{ width: "100%" }}
             form={form}
             layout="vertical"
             onFinish={
               loginStatus === "OTP_SENT" ? handleLogin : handleGenerateOtp
             }
           >
-            <Form.Item noStyle shouldUpdate style={{ width: "100%" }}>
+            <Form.Item noStyle shouldUpdate>
               {({ getFieldValue, resetFields }) => {
                 return (
                   <>
                     <Form.Item
-                      label="Mobile Number"
+                      label=""
                       name="mobileNumber"
                       validateTrigger="onSubmit"
                       rules={[
@@ -138,7 +139,10 @@ export function LoginForm() {
                       style={{ marginBottom: 0 }}
                     >
                       <InputNumber
-                        style={{ fontSize: FONT_SIZE.heading, width: "100%" }}
+                        style={{
+                          fontSize: FONT_SIZE.subHeading,
+                          width: "100%",
+                        }}
                         placeholder="Enter your mobile number"
                         disabled={loginStatus === "OTP_SENT"}
                         type="tel"
@@ -189,7 +193,7 @@ export function LoginForm() {
                           <Input
                             style={{
                               width: "100%",
-                              fontSize: FONT_SIZE.heading,
+                              fontSize: FONT_SIZE.subHeading,
                             }}
                             placeholder="Enter the OTP"
                             maxLength={6}

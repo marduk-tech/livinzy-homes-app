@@ -23,7 +23,7 @@ const isMobile = !!window.matchMedia("((max-width: 576px))").matches;
 export const FONT_SIZE = {
   default: 12,
   subText: 14,
-  title: isMobile ? 32 : 38,
-  heading: isMobile ? 22 : 28,
+  title: isMobile ? 32 : 32,
+  heading: isMobile ? 22 : 24,
   subHeading: 18,
 };

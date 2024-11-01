@@ -1,4 +1,4 @@
-import { Drawer, Flex, Image, Layout, Typography } from "antd";
+import { Button, Drawer, Flex, Image, Layout, Typography } from "antd";
 import React, { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
@@ -6,11 +6,15 @@ import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import confirm from "antd/es/modal/confirm";
+import { ExclamationCircleFilled, LogoutOutlined } from "@ant-design/icons";
+import { useAuth } from "../hooks/use-auth";
 
 const { Header, Content } = Layout;
 
 export const DashboardLayout: React.FC = () => {
   const { isMobile } = useDevice();
+  const { logout } = useAuth();
 
   const { user, isLoading, isError } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -23,6 +27,23 @@ export const DashboardLayout: React.FC = () => {
       icon: { name: "FaRegUserCircle", set: "fa" },
     },
   ];
+  const showConfirm = () => {
+    confirm({
+      title: "Logout",
+      icon: <ExclamationCircleFilled />,
+      content: "Are you sure you want to logout ?",
+      okText: "Logout",
+      okType: "danger",
+      cancelButtonProps: {
+        type: "default",
+        shape: "default",
+      },
+      onOk() {
+        logout.mutate();
+        window.location.reload();
+      },
+    });
+  };
 
   const renderNavLinks = () => {
     return navLinks.map((l: any) => {
@@ -101,8 +122,28 @@ export const DashboardLayout: React.FC = () => {
             }}
             open={sidebarOpen}
           >
-            <Flex vertical gap={16}>
+            <Flex
+              vertical
+              gap={16}
+              style={{ position: "relative", height: "100%" }}
+            >
               {renderNavLinks()}
+              <Button
+                icon={<LogoutOutlined />}
+                type="link"
+                onClick={showConfirm}
+                style={{
+                  padding: 0,
+                  height: 32,
+                  textAlign: "left",
+                  position: "absolute",
+                  bottom: 16,
+                  left: 0,
+                  width: "auto",
+                }}
+              >
+                Logout
+              </Button>
             </Flex>
           </Drawer>
           <Content style={{ margin: isMobile ? 16 : 48, marginTop: 0 }}>
