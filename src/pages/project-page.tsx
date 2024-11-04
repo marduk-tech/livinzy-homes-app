@@ -83,6 +83,26 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
             ) : null}
           </div>
         ))}
+
+      {media
+        .filter((item: IMedia) => item.type === "video" && item.video)
+        .map((media: IMedia, index: number) => (
+          <div style={{ position: "relative", paddingTop: "56.25%" }}>
+            <iframe
+              src={`https://iframe.mediadelivery.net/embed/330257/${media.video?.bunnyVideoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true`}
+              loading="lazy"
+              style={{
+                border: "0",
+                position: "absolute",
+                top: "0",
+                height: "100%",
+                width: "100%",
+              }}
+              allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        ))}
     </Flex>
   );
 };
@@ -789,6 +809,12 @@ const ProjectPage: React.FC = () => {
     setPreviewInFirstPlace: true,
   });
 
+  const videoMedia = projectData.media.filter(
+    (media) => media.type === "video"
+  );
+
+  console.log(videoMedia);
+
   return (
     <>
       {!livIQOpen && (
@@ -806,7 +832,7 @@ const ProjectPage: React.FC = () => {
         ></FloatButton>
       )}
       <Flex vertical>
-        <Gallery media={sortedMediaArray} />
+        <Gallery media={[...sortedMediaArray, ...videoMedia]} />
         <Flex
           gap={40}
           style={{ marginTop: isMobile ? 24 : 40, position: "relative" }}
