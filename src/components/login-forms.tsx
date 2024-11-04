@@ -94,6 +94,8 @@ export function LoginForm() {
               color: COLORS.textColorLight,
             }}
           >
+            Livinzy is only available for private access right now.
+            <br></br>
             Login with your mobile number to continue.
           </Typography.Text>
         </Flex>
