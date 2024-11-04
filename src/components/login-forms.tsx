@@ -1,6 +1,5 @@
 import {
   Button,
-  Divider,
   Flex,
   Form,
   Input,
@@ -91,13 +90,21 @@ export function LoginForm() {
           <Typography.Text
             style={{
               fontSize: FONT_SIZE.subText,
-              color: COLORS.textColorLight,
+              marginBottom: 24,
             }}
           >
-            Login with your mobile number to continue.
+            Livinzy is only available for private access right now.
           </Typography.Text>
+          {/* <Typography.Text
+style={{
+fontSize: FONT_SIZE.subText,
+color: COLORS.textColorLight,
+}}
+>
+Login with your mobile number to continue.
+</Typography.Text> */}
         </Flex>
-        <Divider />
+        {/* <Divider style={{ marginTop: 8, marginBottom: 32 }} /> */}
 
         <Flex>
           <Form
@@ -143,20 +150,20 @@ export function LoginForm() {
                           fontSize: FONT_SIZE.subHeading,
                           width: "100%",
                         }}
-                        placeholder="Enter your mobile number"
+                        placeholder="Login with your mobile number"
                         disabled={loginStatus === "OTP_SENT"}
                         type="tel"
                       />
                     </Form.Item>
-                    <Typography.Text
-                      style={{
-                        fontSize: FONT_SIZE.default,
-                        color: COLORS.textColorLight,
-                        width: "100%",
-                      }}
-                    >
-                      By signing up, you agree to the terms & conditions.
-                    </Typography.Text>
+                    {/* <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.default,
+                    color: COLORS.textColorLight,
+                    width: "100%",
+                  }}
+                >
+                  By signing up, you agree to the terms & conditions.
+                </Typography.Text> */}
 
                     {loginStatus === "OTP_SENT" && (
                       <Button
