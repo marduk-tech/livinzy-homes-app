@@ -16,6 +16,7 @@ export function useAuth() {
   const navigate = useNavigate();
 
   const [loginStatus, setLoginStatus] = useState<LoginStatus>("EDIT_MOBILE");
+  const [verificationId, setVerificationId] = useState<string | undefined>();
 
   const generateOtp = useMutation({
     mutationFn: ({ mobile }: { mobile: string }) => {
@@ -24,9 +25,11 @@ export function useAuth() {
       });
     },
     onSuccess: async ({ data }) => {
+      setVerificationId(data.verificationId);
       setLoginStatus("OTP_SENT");
     },
     onError: (error) => {
+      setVerificationId(undefined);
       console.log(error.message);
     },
   });
@@ -34,7 +37,7 @@ export function useAuth() {
   const login = useMutation({
     mutationFn: ({ mobile, code }: { mobile: string; code: number }) => {
       return axiosApiInstance.post(`/auth/otp/login`, {
-        mobile: mobile.toString(),
+        verificationId: verificationId,
         code: code,
       });
     },
@@ -46,6 +49,7 @@ export function useAuth() {
         queryKey: [queryKeys.user],
       });
 
+      setVerificationId(undefined);
       return navigate("/");
     },
 
