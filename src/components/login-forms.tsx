@@ -190,8 +190,8 @@ Login with your mobile number to continue.
                               message: "Please input the OTP!",
                             },
                             {
-                              pattern: /^\d{6}$/,
-                              message: "OTP must be exactly 6 digits long!",
+                              pattern: /^\d{4}$/,
+                              message: "OTP must be exactly 4 digits long!",
                             },
                           ]}
                           validateTrigger="onSubmit"
