@@ -1,14 +1,14 @@
+import { ExclamationCircleFilled, LogoutOutlined } from "@ant-design/icons";
 import { Button, Drawer, Flex, Image, Layout, Typography } from "antd";
+import confirm from "antd/es/modal/confirm";
 import React, { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
+import { useAuth } from "../hooks/use-auth";
 import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import confirm from "antd/es/modal/confirm";
-import { ExclamationCircleFilled, LogoutOutlined } from "@ant-design/icons";
-import { useAuth } from "../hooks/use-auth";
 
 const { Header, Content } = Layout;
 
@@ -23,7 +23,7 @@ export const DashboardLayout: React.FC = () => {
     { title: "FAQ", link: "", icon: { name: "FaQuoteLeft", set: "fa" } },
     {
       title: "Profile",
-      link: "",
+      link: "/profile",
       icon: { name: "FaRegUserCircle", set: "fa" },
     },
   ];
@@ -48,17 +48,20 @@ export const DashboardLayout: React.FC = () => {
   const renderNavLinks = () => {
     return navLinks.map((l: any) => {
       return (
-        <Flex align="center" gap={8}>
-          <DynamicReactIcon
-            iconName={l.icon.name}
-            iconSet={l.icon.set}
-            size={18}
-            color={COLORS.textColorDark}
-          ></DynamicReactIcon>
-          <Typography.Text style={{ fontSize: FONT_SIZE.subHeading }}>
-            {l.title}
-          </Typography.Text>
-        </Flex>
+        <Link to={l.link ? l.link : "#"}>
+          <Flex align="center" gap={8}>
+            <DynamicReactIcon
+              iconName={l.icon.name}
+              iconSet={l.icon.set}
+              size={18}
+              color={COLORS.textColorDark}
+            ></DynamicReactIcon>
+
+            <Typography.Text style={{ fontSize: FONT_SIZE.subHeading }}>
+              {l.title}
+            </Typography.Text>
+          </Flex>
+        </Link>
       );
     });
   };
@@ -100,7 +103,7 @@ export const DashboardLayout: React.FC = () => {
                   style={{ height: 35, width: "auto" }}
                 ></Image>
               </Link>
-              `{" "}
+
               <Flex
                 onClick={() => {
                   setSidebarOpen(true);
@@ -128,6 +131,7 @@ export const DashboardLayout: React.FC = () => {
               style={{ position: "relative", height: "100%" }}
             >
               {renderNavLinks()}
+
               <Button
                 icon={<LogoutOutlined />}
                 type="link"
