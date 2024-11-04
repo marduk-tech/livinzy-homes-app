@@ -155,15 +155,15 @@ Login with your mobile number to continue.
                         type="tel"
                       />
                     </Form.Item>
-                    <Typography.Text
-                      style={{
-                        fontSize: FONT_SIZE.default,
-                        color: COLORS.textColorLight,
-                        width: "100%",
-                      }}
-                    >
-                      By signing up, you agree to the terms & conditions.
-                    </Typography.Text>
+                    {/* <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.default,
+                    color: COLORS.textColorLight,
+                    width: "100%",
+                  }}
+                >
+                  By signing up, you agree to the terms & conditions.
+                </Typography.Text> */}
 
                     {loginStatus === "OTP_SENT" && (
                       <Button
