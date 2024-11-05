@@ -5,7 +5,7 @@ import { ProjectCard } from "../components/common/project-card";
 import { useDevice } from "../hooks/use-device";
 import { useFetchProjects } from "../hooks/use-project";
 import { useUser } from "../hooks/use-user";
-import { COLORS } from "../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 
 export function ProfilePage() {
   const { isMobile } = useDevice();
@@ -26,52 +26,100 @@ export function ProfilePage() {
     return (
       <Flex vertical gap={40}>
         <Flex vertical>
-          <Typography.Title level={4}>Your Phone Number</Typography.Title>
-          <Typography.Text
+          <Typography.Title level={4}>Your Profile</Typography.Title>
+          <Flex
+            vertical
+            gap={24}
             style={{
-              fontSize: 18,
-              color: COLORS.textColorLight,
+              padding: 16,
+              backgroundColor: "white",
+              borderRadius: 8,
             }}
           >
-            {user?.mobile}
-          </Typography.Text>
+            <Flex vertical>
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.default,
+                  color: COLORS.textColorLight,
+                }}
+              >
+                Name
+              </Typography.Text>
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.subHeading,
+                }}
+              >
+                Aseem Agarwal
+              </Typography.Text>
+            </Flex>
+            <Flex vertical>
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.default,
+                  color: COLORS.textColorLight,
+                }}
+              >
+                Mobile Number
+              </Typography.Text>
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.subHeading,
+                }}
+              >
+                {user?.mobile}
+              </Typography.Text>
 
-          <Typography.Text
-            style={{ marginTop: 20, color: COLORS.textColorLight }}
-          >
-            * Login with different mobile number to update your number
-          </Typography.Text>
+              <Typography.Text
+                style={{
+                  color: COLORS.textColorLight,
+                  fontSize: FONT_SIZE.default,
+                }}
+              >
+                * Login again to update your number
+              </Typography.Text>
+            </Flex>
+          </Flex>
         </Flex>
 
         <Flex vertical>
           <Typography.Title level={4}>Saved Projects</Typography.Title>
 
-          {user?.savedProjects.length === 0 ? (
-            <Typography.Text
-              style={{
-                fontSize: 18,
-                color: COLORS.textColorLight,
-              }}
-            >
-              Click on <HeartOutlined /> icon to save a project in your profile
-            </Typography.Text>
-          ) : (
-            <>
-              <Row gutter={[32, 32]} style={{ width: "100%", margin: 0 }}>
-                {savedProjects.map((project) => (
-                  <Col
-                    key={project._id}
-                    xs={24}
-                    md={12}
-                    lg={6}
-                    style={{ padding: isMobile ? 0 : 16 }}
-                  >
-                    <ProjectCard project={project} key={project._id} />
-                  </Col>
-                ))}
-              </Row>
-            </>
-          )}
+          <Flex
+            style={{
+              padding: 16,
+              backgroundColor: "white",
+              borderRadius: 8,
+            }}
+          >
+            {user?.savedProjects.length === 0 ? (
+              <Typography.Text
+                style={{
+                  fontSize: 18,
+                  color: COLORS.textColorLight,
+                }}
+              >
+                Click on <HeartOutlined /> icon to save a project in your
+                profile
+              </Typography.Text>
+            ) : (
+              <>
+                <Row gutter={[32, 32]} style={{ width: "100%", margin: 0 }}>
+                  {savedProjects.map((project) => (
+                    <Col
+                      key={project._id}
+                      xs={24}
+                      md={12}
+                      lg={6}
+                      style={{ padding: isMobile ? 0 : 16 }}
+                    >
+                      <ProjectCard project={project} key={project._id} />
+                    </Col>
+                  ))}
+                </Row>
+              </>
+            )}
+          </Flex>
         </Flex>
       </Flex>
     );

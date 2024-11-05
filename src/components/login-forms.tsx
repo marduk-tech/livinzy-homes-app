@@ -73,12 +73,9 @@ export function LoginForm() {
       <div
         style={{
           margin: "auto",
-          marginTop: "30px",
           backgroundColor: "rgba(255,255,255,0.95)",
-          padding: 24,
+          padding: 8,
           borderRadius: 4,
-          width: 500,
-          boxShadow: "0 0 4px",
         }}
       >
         <Flex vertical>
@@ -156,14 +153,14 @@ Login with your mobile number to continue.
                       />
                     </Form.Item>
                     {/* <Typography.Text
-                  style={{
-                    fontSize: FONT_SIZE.default,
-                    color: COLORS.textColorLight,
-                    width: "100%",
-                  }}
-                >
-                  By signing up, you agree to the terms & conditions.
-                </Typography.Text> */}
+  style={{
+    fontSize: FONT_SIZE.default,
+    color: COLORS.textColorLight,
+    width: "100%",
+  }}
+>
+  By signing up, you agree to the terms & conditions.
+</Typography.Text> */}
 
                     {loginStatus === "OTP_SENT" && (
                       <Button
