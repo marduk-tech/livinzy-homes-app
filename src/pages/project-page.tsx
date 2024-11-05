@@ -3,6 +3,7 @@ import {
   CloseOutlined,
   HeartFilled,
   HeartOutlined,
+  SendOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -212,9 +213,9 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
 
       {/* Buttons: Follow Up and Save */}
       <Flex style={{ marginLeft: "auto" }} gap={8}>
-        {/* <Button size={isMobile ? "small" : "middle"} icon={<SendOutlined />}>
-          Follow Up
-        </Button> */}
+        <Button size={isMobile ? "small" : "middle"} icon={<SendOutlined />}>
+          Schedule Callback
+        </Button>
         <Button
           loading={updateUser.isPending}
           onClick={handleSave}

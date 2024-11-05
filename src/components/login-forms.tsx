@@ -44,8 +44,17 @@ export function LoginForm() {
       message.success("OTP sent");
       setLoginStatus("OTP_SENT");
       setResendTimer(45);
-    } catch (error) {
-      message.error("Failed to send OTP");
+    } catch (error: any) {
+      if (
+        error &&
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        message.error(error.response.data.message);
+      } else {
+        message.error("Failed to send OTP. Please try again.");
+      }
     }
   };
 
@@ -153,13 +162,13 @@ Login with your mobile number to continue.
                       />
                     </Form.Item>
                     {/* <Typography.Text
-  style={{
-    fontSize: FONT_SIZE.default,
-    color: COLORS.textColorLight,
-    width: "100%",
-  }}
+style={{
+fontSize: FONT_SIZE.default,
+color: COLORS.textColorLight,
+width: "100%",
+}}
 >
-  By signing up, you agree to the terms & conditions.
+By signing up, you agree to the terms & conditions.
 </Typography.Text> */}
 
                     {loginStatus === "OTP_SENT" && (
