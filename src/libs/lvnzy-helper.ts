@@ -1,3 +1,6 @@
+import posthog from "posthog-js";
+import { env } from "./constants";
+
 export const nestedPropertyAccessor = (
   record: any,
   keys: string | string[]
@@ -28,4 +31,10 @@ export const rupeeAmountFormat = (amt: string) => {
   if (val >= 10000000) return `${(amtNum / 10000000).toFixed(2)} Crs`;
   if (val >= 100000) return `${(amtNum / 100000).toFixed(2)} Lacs`;
   return amtNum;
+};
+
+export const captureAnalyticsEvent = (event: string, props: any) => {
+  if (env == "production") {
+    posthog.capture(event, props || {});
+  }
 };
