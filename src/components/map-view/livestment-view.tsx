@@ -131,11 +131,6 @@ export const LivestmentView = ({ project }: { project: Project }) => {
               }
             }
           )}
-          {/* {Object.keys(RoadsData as any).map((roadName: string) => {
-            return (
-              <RoadInfra roadData={(RoadsData as any)[roadName]}></RoadInfra>
-            );
-          })} */}
         </Map>
       </APIProvider>
     );

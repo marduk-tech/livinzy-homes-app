@@ -1,14 +1,15 @@
-import { Button, Drawer, Flex, Image, Layout, Typography } from "antd";
-import React, { useState } from "react";
+import { ExclamationCircleFilled, LogoutOutlined } from "@ant-design/icons";
+import { Button, Drawer, Flex, Image, Layout, Modal, Typography } from "antd";
+import confirm from "antd/es/modal/confirm";
+import React, { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
+import { useAuth } from "../hooks/use-auth";
 import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import confirm from "antd/es/modal/confirm";
-import { ExclamationCircleFilled, LogoutOutlined } from "@ant-design/icons";
-import { useAuth } from "../hooks/use-auth";
+import { LoginForm } from "../components/login-forms";
 
 const { Header, Content } = Layout;
 
@@ -18,12 +19,17 @@ export const DashboardLayout: React.FC = () => {
 
   const { user, isLoading, isError } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+
+  useEffect(() => {
+    setLoginModalOpen(!user);
+  }, [user]);
 
   const navLinks = [
     { title: "FAQ", link: "", icon: { name: "FaQuoteLeft", set: "fa" } },
     {
       title: "Profile",
-      link: "",
+      link: "/profile",
       icon: { name: "FaRegUserCircle", set: "fa" },
     },
   ];
@@ -48,37 +54,44 @@ export const DashboardLayout: React.FC = () => {
   const renderNavLinks = () => {
     return navLinks.map((l: any) => {
       return (
-        <Flex align="center" gap={8}>
-          <DynamicReactIcon
-            iconName={l.icon.name}
-            iconSet={l.icon.set}
-            size={18}
-            color={COLORS.textColorDark}
-          ></DynamicReactIcon>
-          <Typography.Text style={{ fontSize: FONT_SIZE.subHeading }}>
-            {l.title}
-          </Typography.Text>
-        </Flex>
+        <Link to={l.link ? l.link : "#"}>
+          <Flex align="center" gap={8}>
+            <DynamicReactIcon
+              iconName={l.icon.name}
+              iconSet={l.icon.set}
+              size={18}
+              color={COLORS.textColorDark}
+            ></DynamicReactIcon>
+
+            <Typography.Text style={{ fontSize: FONT_SIZE.subHeading }}>
+              {l.title}
+            </Typography.Text>
+          </Flex>
+        </Link>
       );
     });
   };
 
-  const bgImage = user
-    ? {}
-    : {
-        backgroundImage: `url(https://avillionfarms.com/wp-content/uploads/2022/09/Entrance-Swing-of-Avillion-Farm-2.png)`,
-        backgroundPosition: "center",
-        height: 700,
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-      };
   return (
     <CustomErrorBoundary>
+      <Modal
+        open={loginModalOpen}
+        closable={false}
+        footer={null}
+        style={{ padding: 0 }}
+        styles={{
+          mask: {
+            backgroundColor: "rgba(0,0,0,0.4)",
+            backdropFilter: "blur(8px)",
+          },
+        }}
+      >
+        <LoginForm></LoginForm>
+      </Modal>
       <Layout
         style={{
           minHeight: "100vh",
           backgroundColor: "transparent",
-          ...bgImage,
         }}
       >
         <Layout
@@ -100,7 +113,7 @@ export const DashboardLayout: React.FC = () => {
                   style={{ height: 35, width: "auto" }}
                 ></Image>
               </Link>
-              `{" "}
+
               <Flex
                 onClick={() => {
                   setSidebarOpen(true);
@@ -128,22 +141,25 @@ export const DashboardLayout: React.FC = () => {
               style={{ position: "relative", height: "100%" }}
             >
               {renderNavLinks()}
-              <Button
-                icon={<LogoutOutlined />}
-                type="link"
-                onClick={showConfirm}
-                style={{
-                  padding: 0,
-                  height: 32,
-                  textAlign: "left",
-                  position: "absolute",
-                  bottom: 16,
-                  left: 0,
-                  width: "auto",
-                }}
-              >
-                Logout
-              </Button>
+
+              {user ? (
+                <Button
+                  icon={<LogoutOutlined />}
+                  type="link"
+                  onClick={showConfirm}
+                  style={{
+                    padding: 0,
+                    height: 32,
+                    textAlign: "left",
+                    position: "absolute",
+                    bottom: 16,
+                    left: 0,
+                    width: "auto",
+                  }}
+                >
+                  Logout
+                </Button>
+              ) : null}
             </Flex>
           </Drawer>
           <Content style={{ margin: isMobile ? 16 : 48, marginTop: 0 }}>

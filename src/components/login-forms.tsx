@@ -44,8 +44,17 @@ export function LoginForm() {
       message.success("OTP sent");
       setLoginStatus("OTP_SENT");
       setResendTimer(45);
-    } catch (error) {
-      message.error("Failed to send OTP");
+    } catch (error: any) {
+      if (
+        error &&
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        message.error(error.response.data.message);
+      } else {
+        message.error("Failed to send OTP. Please try again.");
+      }
     }
   };
 
@@ -73,12 +82,9 @@ export function LoginForm() {
       <div
         style={{
           margin: "auto",
-          marginTop: "30px",
           backgroundColor: "rgba(255,255,255,0.95)",
-          padding: 24,
+          padding: 8,
           borderRadius: 4,
-          width: 500,
-          boxShadow: "0 0 4px",
         }}
       >
         <Flex vertical>
@@ -156,14 +162,14 @@ Login with your mobile number to continue.
                       />
                     </Form.Item>
                     {/* <Typography.Text
-                  style={{
-                    fontSize: FONT_SIZE.default,
-                    color: COLORS.textColorLight,
-                    width: "100%",
-                  }}
-                >
-                  By signing up, you agree to the terms & conditions.
-                </Typography.Text> */}
+style={{
+fontSize: FONT_SIZE.default,
+color: COLORS.textColorLight,
+width: "100%",
+}}
+>
+By signing up, you agree to the terms & conditions.
+</Typography.Text> */}
 
                     {loginStatus === "OTP_SENT" && (
                       <Button
@@ -190,8 +196,8 @@ Login with your mobile number to continue.
                               message: "Please input the OTP!",
                             },
                             {
-                              pattern: /^\d{6}$/,
-                              message: "OTP must be exactly 6 digits long!",
+                              pattern: /^\d{4}$/,
+                              message: "OTP must be exactly 4 digits long!",
                             },
                           ]}
                           validateTrigger="onSubmit"

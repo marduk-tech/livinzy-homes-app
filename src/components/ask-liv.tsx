@@ -7,6 +7,7 @@ import { useDevice } from "../hooks/use-device";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import DynamicReactIcon from "./common/dynamic-react-icon";
 import { LivIQPredefinedQuestions } from "../libs/constants";
+import Markdown from "react-markdown";
 
 export default function AskLiv({ projectName }: { projectName?: string }) {
   const [sessionIdIsLoading, setSessionIdIsLoading] = useState(false);
@@ -206,7 +207,7 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
                       fontSize: FONT_SIZE.subText,
                     }}
                   >
-                    {props.message}
+                    <Markdown>{props.message?.toString()}</Markdown>
                   </Typography.Text>
                   {(props as any)["data-id"] == "p-chat-1" ? (
                     <Flex vertical gap={8} style={{ marginTop: 16 }}>
