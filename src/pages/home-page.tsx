@@ -10,6 +10,7 @@ import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { ProjectCategories } from "../libs/constants";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { Project } from "../types/Project";
+import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 
 export function HomePage() {
   const { isMobile } = useDevice();
@@ -25,6 +26,8 @@ export function HomePage() {
     if (!projects) {
       return;
     }
+    captureAnalyticsEvent("app-homepage-open", {});
+
     if (!categoryFilter) {
       setFilteredProjects(projects);
     } else {
