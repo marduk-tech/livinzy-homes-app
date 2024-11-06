@@ -5,11 +5,12 @@ import React, { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
+import { LoginForm } from "../components/login-forms";
 import { useAuth } from "../hooks/use-auth";
 import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { LoginForm } from "../components/login-forms";
+import { NavLink } from "../types/Common";
 
 const { Header, Content } = Layout;
 
@@ -25,7 +26,7 @@ export const DashboardLayout: React.FC = () => {
     setLoginModalOpen(!user);
   }, [user]);
 
-  const navLinks = [
+  const navLinks: NavLink[] = [
     { title: "FAQ", link: "", icon: { name: "FaQuoteLeft", set: "fa" } },
     {
       title: "Profile",
@@ -51,25 +52,32 @@ export const DashboardLayout: React.FC = () => {
     });
   };
 
-  const renderNavLinks = () => {
-    return navLinks.map((l: any) => {
-      return (
-        <Link to={l.link ? l.link : "#"}>
-          <Flex align="center" gap={8}>
-            <DynamicReactIcon
-              iconName={l.icon.name}
-              iconSet={l.icon.set}
-              size={18}
-              color={COLORS.textColorDark}
-            ></DynamicReactIcon>
-
-            <Typography.Text style={{ fontSize: FONT_SIZE.subHeading }}>
-              {l.title}
-            </Typography.Text>
-          </Flex>
-        </Link>
-      );
-    });
+  const NavLinks = ({ navLinks }: { navLinks: NavLink[] }) => {
+    return (
+      <>
+        {navLinks.map((link) => (
+          <Link
+            key={link.title}
+            to={link.link || "#"}
+            onClick={() => {
+              setSidebarOpen(false);
+            }}
+          >
+            <Flex align="center" gap={8}>
+              <DynamicReactIcon
+                iconName={link.icon.name}
+                iconSet={link.icon.set as any}
+                size={18}
+                color={COLORS.textColorDark}
+              />
+              <Typography.Text style={{ fontSize: FONT_SIZE.subHeading }}>
+                {link.title}
+              </Typography.Text>
+            </Flex>
+          </Link>
+        ))}
+      </>
+    );
   };
 
   return (
@@ -118,7 +126,7 @@ export const DashboardLayout: React.FC = () => {
                 onClick={() => {
                   setSidebarOpen(true);
                 }}
-                style={{ marginLeft: "auto" }}
+                style={{ marginLeft: "auto", cursor: "pointer" }}
               >
                 <DynamicReactIcon
                   iconName="HiOutlineMenuAlt3"
@@ -140,7 +148,7 @@ export const DashboardLayout: React.FC = () => {
               gap={16}
               style={{ position: "relative", height: "100%" }}
             >
-              {renderNavLinks()}
+              <NavLinks navLinks={navLinks} />
 
               {user ? (
                 <Button
