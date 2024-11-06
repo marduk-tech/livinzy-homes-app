@@ -50,7 +50,7 @@ export function ProfilePage() {
                   fontSize: FONT_SIZE.subHeading,
                 }}
               >
-                Aseem Agarwal
+                {user.profile?.name}
               </Typography.Text>
             </Flex>
             <Flex vertical>

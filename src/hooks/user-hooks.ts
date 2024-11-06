@@ -27,7 +27,7 @@ export function useUpdateUserMutation({
     onSuccess: () => {
       if (enableToasts) {
         notification.success({
-          message: `User updated successfully!`,
+          message: `Profile updated successfully!`,
         });
       }
     },

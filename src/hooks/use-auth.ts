@@ -35,7 +35,7 @@ export function useAuth() {
   });
 
   const login = useMutation({
-    mutationFn: ({ mobile, code }: { mobile: string; code: number }) => {
+    mutationFn: ({ code }: { code: number }) => {
       return axiosApiInstance.post(`/auth/otp/login`, {
         verificationId: verificationId,
         code: code,
@@ -49,8 +49,7 @@ export function useAuth() {
         queryKey: [queryKeys.user],
       });
 
-      setVerificationId(undefined);
-      return navigate("/");
+      return setVerificationId(undefined);
     },
 
     onError: (error) => {

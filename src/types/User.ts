@@ -6,4 +6,12 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   savedProjects: string[];
+  profile: Profile;
+}
+
+interface Profile {
+  name?: string;
+  email?: string;
+  city?: string;
+  source?: string;
 }

@@ -35,7 +35,7 @@ export function useUser() {
     if (isError) {
       logout.mutate();
     }
-  }, [isError, error]);
+  }, [isError, error, logout]);
 
   return { user: data, isLoading, isError, error, refetch };
 }

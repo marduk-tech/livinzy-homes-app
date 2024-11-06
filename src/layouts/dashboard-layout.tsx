@@ -18,12 +18,16 @@ export const DashboardLayout: React.FC = () => {
   const { isMobile } = useDevice();
   const { logout } = useAuth();
 
-  const { user, isLoading, isError } = useUser();
+  const { user,  } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   useEffect(() => {
-    setLoginModalOpen(!user);
+    if (!user || (user && !user.profile?.name)) {
+      setLoginModalOpen(true);
+    } else {
+      setLoginModalOpen(false);
+    }
   }, [user]);
 
   const navLinks: NavLink[] = [
@@ -122,17 +126,20 @@ export const DashboardLayout: React.FC = () => {
                 ></Image>
               </Link>
 
-              <Flex
-                onClick={() => {
-                  setSidebarOpen(true);
-                }}
-                style={{ marginLeft: "auto", cursor: "pointer" }}
-              >
-                <DynamicReactIcon
-                  iconName="HiOutlineMenuAlt3"
-                  iconSet="hi"
-                ></DynamicReactIcon>
-              </Flex>
+              {user && (
+                <Flex
+                  onClick={() => {
+                    setSidebarOpen(true);
+                  }}
+                  style={{ marginLeft: "auto", cursor: "pointer" }}
+                >
+                  <DynamicReactIcon
+                    iconName="HiOutlineMenuAlt3"
+                    iconSet="hi"
+                  ></DynamicReactIcon>
+                </Flex>
+              )}
+
               {/* {user && !isLoading && !isError ? <UserDropDown /> : null} */}
             </Flex>
           </Header>
