@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Input, Select, Table } from "antd";
+import { Input, Select, Table, Typography } from "antd";
+import { FONT_SIZE } from "../../theme/style-constants";
 
 const { Option } = Select;
 
@@ -95,12 +96,26 @@ const LandMeasurementConvertor = () => {
         type="number"
         value={inputValue}
         onChange={handleInputChange}
-        style={{ width: "60%", marginRight: "8px" }}
+        style={{
+          width: "15%",
+          marginRight: "8px",
+          fontSize: FONT_SIZE.subHeading,
+          fontWeight: "bold",
+        }}
       />
       <Select
         defaultValue="acre"
         onChange={handleUnitChange}
-        style={{ width: "35%" }}
+        labelRender={(labelProps) => {
+          return (
+            <Typography.Text
+              style={{ fontSize: FONT_SIZE.subHeading, fontWeight: "bold" }}
+            >
+              {labelProps.label}
+            </Typography.Text>
+          );
+        }}
+        style={{ width: "84%" }}
       >
         {units.map((unit) => (
           <Option key={unit.value} value={unit.value}>
