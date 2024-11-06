@@ -9,21 +9,41 @@ const conversionRates = {
   sq_ft: 43560,
   sq_yd: 4840,
   guntha: 40,
-  bigha: 0.625,
   cent: 100,
   hectare: 0.4047,
-  gaz: 4840, // equivalent to sq_yd
 };
 
 const units = [
-  { label: "Acre", value: "acre" },
-  { label: "Square Foot", value: "sq_ft" },
-  { label: "Square Yard", value: "sq_yd" },
-  { label: "Guntha", value: "guntha" },
-  { label: "Bigha", value: "bigha" },
-  { label: "Cent", value: "cent" },
-  { label: "Hectare", value: "hectare" },
-  { label: "Gaz", value: "gaz" },
+  {
+    label: "Square Foot",
+    value: "sq_ft",
+    description: "About the size of a large dining table.",
+  },
+  {
+    label: "Square Yard or Gaz",
+    value: "sq_yd",
+    description: "Similar to a small bathroom.",
+  },
+  {
+    label: "Cent",
+    value: "cent",
+    description: "Roughly the size of two large parking spaces.",
+  },
+  {
+    label: "Guntha",
+    value: "guntha",
+    description: "About the area of a standard basketball half-court.",
+  },
+  {
+    label: "Acre",
+    value: "acre",
+    description: "A little more than your average football field.",
+  },
+  {
+    label: "Hectare",
+    value: "hectare",
+    description: "Roughly the area of two football fields.",
+  },
 ];
 
 const LandMeasurementConvertor = () => {
@@ -36,6 +56,7 @@ const LandMeasurementConvertor = () => {
       inputValue / (conversionRates as any)[selectedUnit];
     return units.map((unit) => ({
       unit: unit.label,
+      description: unit.description || "",
       value: (baseValueInAcres * (conversionRates as any)[unit.value]).toFixed(
         4
       ),
@@ -57,6 +78,11 @@ const LandMeasurementConvertor = () => {
       key: "unit",
     },
     {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
       title: "Converted Value",
       dataIndex: "value",
       key: "value",
@@ -64,7 +90,7 @@ const LandMeasurementConvertor = () => {
   ];
 
   return (
-    <div style={{ maxWidth: 400, margin: "0 auto", padding: "20px" }}>
+    <div style={{ maxWidth: 800, margin: "0 auto", padding: "20px" }}>
       <Input
         type="number"
         value={inputValue}
