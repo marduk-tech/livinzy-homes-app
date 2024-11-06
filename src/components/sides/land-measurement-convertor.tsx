@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Input, Select, Table, Typography } from "antd";
 import { FONT_SIZE } from "../../theme/style-constants";
+import { useDevice } from "../../hooks/use-device";
 
 const { Option } = Select;
 
@@ -48,6 +49,7 @@ const units = [
 ];
 
 const LandMeasurementConvertor = () => {
+  const { isMobile } = useDevice();
   const [inputValue, setInputValue] = useState(1);
   const [selectedUnit, setSelectedUnit] = useState("acre");
 
@@ -78,11 +80,15 @@ const LandMeasurementConvertor = () => {
       dataIndex: "unit",
       key: "unit",
     },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-    },
+    ...(!isMobile
+      ? [
+          {
+            title: "Description",
+            dataIndex: "description",
+            key: "description",
+          },
+        ]
+      : []),
     {
       title: "Converted Value",
       dataIndex: "value",
@@ -115,7 +121,7 @@ const LandMeasurementConvertor = () => {
             </Typography.Text>
           );
         }}
-        style={{ width: "84%" }}
+        style={{ width: "82%" }}
       >
         {units.map((unit) => (
           <Option key={unit.value} value={unit.value}>
