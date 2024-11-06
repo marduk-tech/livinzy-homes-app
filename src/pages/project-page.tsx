@@ -20,6 +20,7 @@ import React, { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import AskLiv from "../components/ask-liv";
+import { CalendlyPopup } from "../components/calendly-popup";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import LivestIndexRange from "../components/common/livest-index-range";
 import { Loader } from "../components/common/loader";
@@ -170,6 +171,8 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
 
   const isSaved = user?.savedProjects.includes(projectId as string);
 
+  const [showCalendlyPopup, setShowCalendlyPopup] = useState(false);
+
   return (
     <Flex style={{ marginRight: isMobile ? 16 : 0 }}>
       <Flex vertical>
@@ -213,7 +216,15 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
 
       {/* Buttons: Follow Up and Save */}
       <Flex style={{ marginLeft: "auto" }} gap={8}>
-        <Button size={isMobile ? "small" : "middle"} icon={<SendOutlined />}>
+        <CalendlyPopup
+          open={showCalendlyPopup}
+          onCancel={() => setShowCalendlyPopup(false)}
+        />
+        <Button
+          onClick={() => setShowCalendlyPopup(true)}
+          size={isMobile ? "small" : "middle"}
+          icon={<SendOutlined />}
+        >
           Schedule Callback
         </Button>
         <Button
