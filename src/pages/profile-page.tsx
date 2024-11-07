@@ -1,5 +1,5 @@
 import { HeartOutlined } from "@ant-design/icons";
-import { Col, Flex, Row, Typography } from "antd";
+import { Button, Col, Flex, Row, Typography } from "antd";
 import { Loader } from "../components/common/loader";
 import { ProjectCard } from "../components/common/project-card";
 import { useDevice } from "../hooks/use-device";
@@ -28,32 +28,13 @@ export function ProfilePage() {
         <Flex vertical>
           <Typography.Title level={4}>Your Profile</Typography.Title>
           <Flex
-            vertical
-            gap={24}
             style={{
               padding: 16,
               backgroundColor: "white",
               borderRadius: 8,
             }}
           >
-            <Flex vertical>
-              <Typography.Text
-                style={{
-                  fontSize: FONT_SIZE.default,
-                  color: COLORS.textColorLight,
-                }}
-              >
-                Name
-              </Typography.Text>
-              <Typography.Text
-                style={{
-                  fontSize: FONT_SIZE.subHeading,
-                }}
-              >
-                {user.profile?.name}
-              </Typography.Text>
-            </Flex>
-            {user.profile.email ? (
+            <Flex vertical gap={24}>
               <Flex vertical>
                 <Typography.Text
                   style={{
@@ -61,44 +42,69 @@ export function ProfilePage() {
                     color: COLORS.textColorLight,
                   }}
                 >
-                  Email
+                  Name
                 </Typography.Text>
                 <Typography.Text
                   style={{
                     fontSize: FONT_SIZE.subHeading,
                   }}
                 >
-                  {user.profile?.email}
+                  {user.profile?.name}
                 </Typography.Text>
               </Flex>
-            ) : null}
+              {user.profile.email ? (
+                <Flex vertical>
+                  <Typography.Text
+                    style={{
+                      fontSize: FONT_SIZE.default,
+                      color: COLORS.textColorLight,
+                    }}
+                  >
+                    Email
+                  </Typography.Text>
+                  <Typography.Text
+                    style={{
+                      fontSize: FONT_SIZE.subHeading,
+                    }}
+                  >
+                    {user.profile?.email}
+                  </Typography.Text>
+                </Flex>
+              ) : null}
 
-            <Flex vertical>
-              <Typography.Text
-                style={{
-                  fontSize: FONT_SIZE.default,
-                  color: COLORS.textColorLight,
-                }}
-              >
-                Mobile Number
-              </Typography.Text>
-              <Typography.Text
-                style={{
-                  fontSize: FONT_SIZE.subHeading,
-                }}
-              >
-                {user?.mobile}
-              </Typography.Text>
+              <Flex vertical>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.default,
+                    color: COLORS.textColorLight,
+                  }}
+                >
+                  Mobile Number
+                </Typography.Text>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.subHeading,
+                  }}
+                >
+                  {user?.mobile}
+                </Typography.Text>
 
-              <Typography.Text
-                style={{
-                  color: COLORS.textColorLight,
-                  fontSize: FONT_SIZE.default,
-                }}
-              >
-                * Login again to update your number
-              </Typography.Text>
+                <Typography.Text
+                  style={{
+                    color: COLORS.textColorLight,
+                    fontSize: FONT_SIZE.default,
+                  }}
+                >
+                  * Login again to update your number
+                </Typography.Text>
+              </Flex>
             </Flex>
+            <Button
+              type="link"
+              style={{ width: 40, padding: 0, marginLeft: "auto" }}
+            >
+              Edit
+            </Button>
           </Flex>
         </Flex>
 
