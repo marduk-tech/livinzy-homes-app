@@ -53,6 +53,26 @@ export function ProfilePage() {
                 {user.profile?.name}
               </Typography.Text>
             </Flex>
+            {user.profile.email ? (
+              <Flex vertical>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.default,
+                    color: COLORS.textColorLight,
+                  }}
+                >
+                  Email
+                </Typography.Text>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.subHeading,
+                  }}
+                >
+                  {user.profile?.email}
+                </Typography.Text>
+              </Flex>
+            ) : null}
+
             <Flex vertical>
               <Typography.Text
                 style={{
