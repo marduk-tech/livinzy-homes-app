@@ -11,7 +11,6 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useUser } from "../hooks/use-user";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { User } from "../types/User";
 import { UserDetailsForm } from "./user-details-form";
 
 export function LoginForm() {
@@ -115,7 +114,9 @@ export function LoginForm() {
               marginBottom: 24,
             }}
           >
-            Livinzy is only available for private access right now.
+            {showUserDetailsForm
+              ? "Please update your basic details"
+              : "Livinzy is only available for private access right now."}
           </Typography.Text>
           {/* <Typography.Text
 style={{
@@ -183,14 +184,14 @@ Login with your mobile number to continue.
                         />
                       </Form.Item>
                       {/* <Typography.Text
-  style={{
-  fontSize: FONT_SIZE.default,
-  color: COLORS.textColorLight,
-  width: "100%",
-  }}
-  >
-  By signing up, you agree to the terms & conditions.
-  </Typography.Text> */}
+style={{
+fontSize: FONT_SIZE.default,
+color: COLORS.textColorLight,
+width: "100%",
+}}
+>
+By signing up, you agree to the terms & conditions.
+</Typography.Text> */}
 
                       {loginStatus === "OTP_SENT" && (
                         <Button

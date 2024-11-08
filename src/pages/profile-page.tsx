@@ -1,4 +1,9 @@
-import { HeartOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  ExclamationCircleFilled,
+  HeartOutlined,
+  LogoutOutlined,
+} from "@ant-design/icons";
 import { Button, Col, Flex, Row, Typography } from "antd";
 import { Loader } from "../components/common/loader";
 import { ProjectCard } from "../components/common/project-card";
@@ -6,12 +11,33 @@ import { useDevice } from "../hooks/use-device";
 import { useFetchProjects } from "../hooks/use-project";
 import { useUser } from "../hooks/use-user";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import confirm from "antd/es/modal/confirm";
+import { useAuth } from "../hooks/use-auth";
 
 export function ProfilePage() {
   const { isMobile } = useDevice();
   const { user, isLoading } = useUser();
 
   const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
+  const { logout } = useAuth();
+
+  const showConfirm = () => {
+    confirm({
+      title: "Logout",
+      icon: <ExclamationCircleFilled />,
+      content: "Are you sure you want to logout ?",
+      okText: "Logout",
+      okType: "danger",
+      cancelButtonProps: {
+        type: "default",
+        shape: "default",
+      },
+      onOk() {
+        logout.mutate();
+        window.location.href = "/";
+      },
+    });
+  };
 
   if (isLoading || projectIsLoading) {
     return <Loader />;
@@ -33,6 +59,7 @@ export function ProfilePage() {
               backgroundColor: "white",
               borderRadius: 8,
             }}
+            vertical
           >
             <Flex vertical gap={24}>
               <Flex vertical>
@@ -99,12 +126,25 @@ export function ProfilePage() {
                 </Typography.Text>
               </Flex>
             </Flex>
-            <Button
-              type="link"
-              style={{ width: 40, padding: 0, marginLeft: "auto" }}
-            >
-              Edit
-            </Button>
+            <Flex gap={16} style={{ marginTop: 24 }}>
+              <Button
+                type="link"
+                icon={<EditOutlined></EditOutlined>}
+                style={{ padding: 0 }}
+              >
+                Edit
+              </Button>
+              <Button
+                icon={<LogoutOutlined />}
+                type="link"
+                onClick={showConfirm}
+                style={{
+                  padding: 0,
+                }}
+              >
+                Logout
+              </Button>
+            </Flex>
           </Flex>
         </Flex>
 
