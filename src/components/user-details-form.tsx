@@ -14,7 +14,13 @@ const sourceOptions = [
   { label: "Other", value: "Other" },
 ];
 
-export function UserDetailsForm() {
+export function UserDetailsForm({
+  ignoreSource = false,
+  ignoreCity = false,
+}: {
+  ignoreSource?: boolean;
+  ignoreCity?: boolean;
+}) {
   const [form] = Form.useForm();
 
   const { user } = useUser();
@@ -28,7 +34,10 @@ export function UserDetailsForm() {
 
     updateUserMutation.mutate({
       userData: {
-        profile: values,
+        profile: {
+          ...user?.profile,
+          ...values,
+        },
       },
     });
   };
@@ -83,37 +92,41 @@ export function UserDetailsForm() {
           />
         </Form.Item>
 
-        <Form.Item
-          label="Current City Location"
-          name="city"
-          style={{ marginBottom: 0, marginTop: 20 }}
-        >
-          <Input
-            style={{
-              width: "100%",
-              fontSize: FONT_SIZE.subHeading,
-            }}
-            placeholder="Enter your city"
-          />
-        </Form.Item>
-
-        <Form.Item
-          label="How did you get to know about Livinzy?"
-          name="source"
-          style={{ marginBottom: 0, marginTop: 20 }}
-        >
-          <Select
-            placeholder="Select an option"
-            style={{ width: "100%", fontSize: FONT_SIZE.subHeading }}
-            allowClear
+        {!ignoreCity && (
+          <Form.Item
+            label="Current City Location"
+            name="city"
+            style={{ marginBottom: 0, marginTop: 20 }}
           >
-            {sourceOptions.map((option) => (
-              <Select.Option key={option.value} value={option.value}>
-                {option.label}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
+            <Input
+              style={{
+                width: "100%",
+                fontSize: FONT_SIZE.subHeading,
+              }}
+              placeholder="Enter your city"
+            />
+          </Form.Item>
+        )}
+
+        {!ignoreSource && (
+          <Form.Item
+            label="How did you get to know about Livinzy?"
+            name="source"
+            style={{ marginBottom: 0, marginTop: 20 }}
+          >
+            <Select
+              placeholder="Select an option"
+              style={{ width: "100%", fontSize: FONT_SIZE.subHeading }}
+              allowClear
+            >
+              {sourceOptions.map((option) => (
+                <Select.Option key={option.value} value={option.value}>
+                  {option.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
 
         <Form.Item style={{ marginTop: 30 }}>
           <Button

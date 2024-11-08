@@ -5,14 +5,16 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import { Button, Col, Flex, Row, Typography } from "antd";
+import confirm from "antd/es/modal/confirm";
+import { useState } from "react";
 import { Loader } from "../components/common/loader";
 import { ProjectCard } from "../components/common/project-card";
+import { ProfileEditModal } from "../components/profile-edit-modal";
+import { useAuth } from "../hooks/use-auth";
 import { useDevice } from "../hooks/use-device";
 import { useFetchProjects } from "../hooks/use-project";
 import { useUser } from "../hooks/use-user";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import confirm from "antd/es/modal/confirm";
-import { useAuth } from "../hooks/use-auth";
 
 export function ProfilePage() {
   const { isMobile } = useDevice();
@@ -38,6 +40,8 @@ export function ProfilePage() {
       },
     });
   };
+
+  const [showProfileEditForm, setShowProfileEditForm] = useState(false);
 
   if (isLoading || projectIsLoading) {
     return <Loader />;
@@ -127,10 +131,15 @@ export function ProfilePage() {
               </Flex>
             </Flex>
             <Flex gap={16} style={{ marginTop: 24 }}>
+              <ProfileEditModal
+                open={showProfileEditForm}
+                onCancel={() => setShowProfileEditForm(false)}
+              />
               <Button
                 type="link"
                 icon={<EditOutlined></EditOutlined>}
                 style={{ padding: 0 }}
+                onClick={() => setShowProfileEditForm(true)}
               >
                 Edit
               </Button>
