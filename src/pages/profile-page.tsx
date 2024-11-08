@@ -1,7 +1,16 @@
-import { HeartOutlined } from "@ant-design/icons";
-import { Col, Flex, Row, Typography } from "antd";
+import {
+  EditOutlined,
+  ExclamationCircleFilled,
+  HeartOutlined,
+  LogoutOutlined,
+} from "@ant-design/icons";
+import { Button, Col, Flex, Row, Typography } from "antd";
+import confirm from "antd/es/modal/confirm";
+import { useState } from "react";
 import { Loader } from "../components/common/loader";
 import { ProjectCard } from "../components/common/project-card";
+import { ProfileEditModal } from "../components/profile-edit-modal";
+import { useAuth } from "../hooks/use-auth";
 import { useDevice } from "../hooks/use-device";
 import { useFetchProjects } from "../hooks/use-project";
 import { useUser } from "../hooks/use-user";
@@ -12,6 +21,27 @@ export function ProfilePage() {
   const { user, isLoading } = useUser();
 
   const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
+  const { logout } = useAuth();
+
+  const showConfirm = () => {
+    confirm({
+      title: "Logout",
+      icon: <ExclamationCircleFilled />,
+      content: "Are you sure you want to logout ?",
+      okText: "Logout",
+      okType: "danger",
+      cancelButtonProps: {
+        type: "default",
+        shape: "default",
+      },
+      onOk() {
+        logout.mutate();
+        window.location.href = "/";
+      },
+    });
+  };
+
+  const [showProfileEditForm, setShowProfileEditForm] = useState(false);
 
   if (isLoading || projectIsLoading) {
     return <Loader />;
@@ -28,56 +58,101 @@ export function ProfilePage() {
         <Flex vertical>
           <Typography.Title level={4}>Your Profile</Typography.Title>
           <Flex
-            vertical
-            gap={24}
             style={{
               padding: 16,
               backgroundColor: "white",
               borderRadius: 8,
             }}
+            vertical
           >
-            <Flex vertical>
-              <Typography.Text
-                style={{
-                  fontSize: FONT_SIZE.default,
-                  color: COLORS.textColorLight,
-                }}
-              >
-                Name
-              </Typography.Text>
-              <Typography.Text
-                style={{
-                  fontSize: FONT_SIZE.subHeading,
-                }}
-              >
-                Aseem Agarwal
-              </Typography.Text>
-            </Flex>
-            <Flex vertical>
-              <Typography.Text
-                style={{
-                  fontSize: FONT_SIZE.default,
-                  color: COLORS.textColorLight,
-                }}
-              >
-                Mobile Number
-              </Typography.Text>
-              <Typography.Text
-                style={{
-                  fontSize: FONT_SIZE.subHeading,
-                }}
-              >
-                {user?.mobile}
-              </Typography.Text>
+            <Flex vertical gap={24}>
+              <Flex vertical>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.default,
+                    color: COLORS.textColorLight,
+                  }}
+                >
+                  Name
+                </Typography.Text>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.subHeading,
+                  }}
+                >
+                  {user.profile?.name}
+                </Typography.Text>
+              </Flex>
+              {user.profile.email ? (
+                <Flex vertical>
+                  <Typography.Text
+                    style={{
+                      fontSize: FONT_SIZE.default,
+                      color: COLORS.textColorLight,
+                    }}
+                  >
+                    Email
+                  </Typography.Text>
+                  <Typography.Text
+                    style={{
+                      fontSize: FONT_SIZE.subHeading,
+                    }}
+                  >
+                    {user.profile?.email}
+                  </Typography.Text>
+                </Flex>
+              ) : null}
 
-              <Typography.Text
+              <Flex vertical>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.default,
+                    color: COLORS.textColorLight,
+                  }}
+                >
+                  Mobile Number
+                </Typography.Text>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.subHeading,
+                  }}
+                >
+                  {user?.mobile}
+                </Typography.Text>
+
+                <Typography.Text
+                  style={{
+                    color: COLORS.textColorLight,
+                    fontSize: FONT_SIZE.default,
+                  }}
+                >
+                  * Login again to update your number
+                </Typography.Text>
+              </Flex>
+            </Flex>
+            <Flex gap={16} style={{ marginTop: 24 }}>
+              <ProfileEditModal
+                open={showProfileEditForm}
+                onCancel={() => setShowProfileEditForm(false)}
+              />
+              <Button
+                type="link"
+                icon={<EditOutlined></EditOutlined>}
+                style={{ padding: 0 }}
+                onClick={() => setShowProfileEditForm(true)}
+              >
+                Edit
+              </Button>
+              <Button
+                icon={<LogoutOutlined />}
+                type="link"
+                onClick={showConfirm}
                 style={{
-                  color: COLORS.textColorLight,
-                  fontSize: FONT_SIZE.default,
+                  padding: 0,
                 }}
               >
-                * Login again to update your number
-              </Typography.Text>
+                Logout
+              </Button>
             </Flex>
           </Flex>
         </Flex>

@@ -20,6 +20,7 @@ import React, { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import AskLiv from "../components/ask-liv";
+import { CalendlyPopup } from "../components/calendly-popup";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import LivestIndexRange from "../components/common/livest-index-range";
 import { Loader } from "../components/common/loader";
@@ -31,80 +32,112 @@ import { useUpdateUserMutation } from "../hooks/user-hooks";
 import { LivestIndexConfig } from "../libs/constants";
 import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { sortedMedia } from "../libs/utils";
+import "../theme/scroll-bar.css";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia, IMetadata, IUI, Project } from "../types/Project";
 
 const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
   const { isMobile } = useDevice();
   return (
-    <Flex
-      style={{
-        height: isMobile ? 300 : 500,
-        width: "100%",
-        overflowX: "scroll",
-        whiteSpace: "nowrap",
-        scrollbarWidth: "none",
-      }}
-    >
-      {media
-        .filter((item: IMedia) => item.type === "image" && item.image)
-        .map((img: IMedia, index: number) => (
-          <div style={{ position: "relative" }}>
-            <img
-              key={index}
-              src={img.image!.url}
-              height="100%"
-              width="auto"
-              style={{
-                borderRadius: 8,
-                minWidth: 200,
-                marginRight: 8,
-                position: "relative",
-                filter:
-                  "brightness(1.1) contrast(1.1) saturate(1.1)  sepia(0.3)",
-              }}
-              alt={img.image!.caption || `Project image ${index + 1}`}
-            />
-            {img.image!.caption ||
-            (img.image?.tags && img.image.tags.length) ? (
-              <Typography.Text
+    <div className="scrollbar-wrapper">
+      <Flex
+        className="custom-scrollbar"
+        style={{
+          height: isMobile ? 320 : 520,
+          width: "100%",
+          overflowX: "scroll",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {media
+          .filter((item: IMedia) => item.type === "image" && item.image)
+          .map((img: IMedia, index: number) => (
+            <div style={{ position: "relative" }}>
+              <img
+                key={index}
+                src={img.image!.url}
+                height="100%"
+                width="auto"
                 style={{
-                  position: "absolute",
-                  left: 0,
-                  bottom: 0,
-                  color: "white",
-                  textTransform: "capitalize",
-                  borderTopRightRadius: 8,
-                  padding: "8px 16px",
-                  backgroundColor: "rgba(0,0,0,0.3)",
+                  overflow: "hidden",
+                  borderRadius: 8,
+                  minWidth: 200,
+                  marginRight: 8,
+                  position: "relative",
+                  filter:
+                    "brightness(1.1) contrast(1.1) saturate(1.1)  sepia(0.3)",
                 }}
-              >
-                {img.image!.caption || img.image!.tags}
-              </Typography.Text>
-            ) : null}
-          </div>
-        ))}
+                alt={img.image!.caption || `Project image ${index + 1}`}
+              />
+              {img.image!.caption ||
+              (img.image?.tags && img.image.tags.length) ? (
+                <Typography.Text
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    bottom: 0,
+                    color: "white",
+                    textTransform: "capitalize",
+                    borderTopRightRadius: 8,
+                    borderBottomLeftRadius: 8,
 
-      {media
-        .filter((item: IMedia) => item.type === "video" && item.video)
-        .map((media: IMedia, index: number) => (
-          <div style={{ position: "relative", paddingTop: "56.25%" }}>
-            <iframe
-              src={`https://iframe.mediadelivery.net/embed/330257/${media.video?.bunnyVideoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true`}
-              loading="lazy"
+                    padding: "8px 16px",
+                    backgroundColor: "rgba(0,0,0,0.3)",
+                  }}
+                >
+                  {img.image!.caption || img.image!.tags}
+                </Typography.Text>
+              ) : null}
+            </div>
+          ))}
+
+        {media
+          .filter((item: IMedia) => item.type === "video" && item.video)
+          .map((media: IMedia, index: number) => (
+            <div
               style={{
-                border: "0",
-                position: "absolute",
-                top: "0",
                 height: "100%",
-                width: "100%",
+                width: isMobile ? "100%" : "49%",
+                borderRadius: 8,
+                overflow: "hidden",
+                flexShrink: 0,
+                marginRight: 8,
+
+                position: "relative",
               }}
-              allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
-        ))}
-    </Flex>
+            >
+              <iframe
+                src={`https://iframe.mediadelivery.net/embed/330257/${media.video?.bunnyVideoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true`}
+                loading="lazy"
+                style={{
+                  height: "100%",
+                  width: "100%",
+                  border: "none",
+                }}
+                allow="accelerometer;gyroscope;encrypted-media;picture-in-picture;"
+              ></iframe>
+
+              {media.video!.caption ||
+              (media.video?.tags && media.video.tags.length) ? (
+                <Typography.Text
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    top: 0,
+                    color: "white",
+                    textTransform: "capitalize",
+                    borderBottomLeftRadius: 8,
+                    padding: "8px 16px",
+                    backgroundColor: "rgba(0,0,0,0.3)",
+                  }}
+                >
+                  {media.video!.caption || media.video!.tags}
+                </Typography.Text>
+              ) : null}
+            </div>
+          ))}
+      </Flex>
+    </div>
   );
 };
 
@@ -170,6 +203,8 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
 
   const isSaved = user?.savedProjects.includes(projectId as string);
 
+  const [showCalendlyPopup, setShowCalendlyPopup] = useState(false);
+
   return (
     <Flex style={{ marginRight: isMobile ? 16 : 0 }}>
       <Flex vertical>
@@ -213,7 +248,15 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
 
       {/* Buttons: Follow Up and Save */}
       <Flex style={{ marginLeft: "auto" }} gap={8}>
-        <Button size={isMobile ? "small" : "middle"} icon={<SendOutlined />}>
+        <CalendlyPopup
+          open={showCalendlyPopup}
+          onCancel={() => setShowCalendlyPopup(false)}
+        />
+        <Button
+          onClick={() => setShowCalendlyPopup(true)}
+          size={isMobile ? "small" : "middle"}
+          icon={<SendOutlined />}
+        >
           Schedule Callback
         </Button>
         <Button

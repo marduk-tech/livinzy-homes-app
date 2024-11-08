@@ -1,75 +1,91 @@
-import { ExclamationCircleFilled, LogoutOutlined } from "@ant-design/icons";
-import { Button, Drawer, Flex, Image, Layout, Modal, Typography } from "antd";
-import confirm from "antd/es/modal/confirm";
+import { Drawer, Flex, Image, Layout, Modal, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
-import { useAuth } from "../hooks/use-auth";
+import { LoginForm } from "../components/login-forms";
 import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { LoginForm } from "../components/login-forms";
+import { NavLink } from "../types/Common";
+import { LocalStorageKeys } from "../libs/constants";
 
 const { Header, Content } = Layout;
 
 export const DashboardLayout: React.FC = () => {
   const { isMobile } = useDevice();
-  const { logout } = useAuth();
 
-  const { user, isLoading, isError } = useUser();
+  const { user } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   useEffect(() => {
-    setLoginModalOpen(!user);
+    const userItem = localStorage.getItem(LocalStorageKeys.user);
+    const user = userItem ? JSON.parse(userItem) : null;
+    if (user) {
+      return;
+    } else {
+      setLoginModalOpen(true);
+    }
+  });
+
+  useEffect(() => {
+    if (user) {
+      setLoginModalOpen(false);
+    }
   }, [user]);
 
-  const navLinks = [
-    { title: "FAQ", link: "", icon: { name: "FaQuoteLeft", set: "fa" } },
+  const navLinks: NavLink[] = [
     {
       title: "Profile",
       link: "/profile",
       icon: { name: "FaRegUserCircle", set: "fa" },
     },
+    {
+      title: "Learn",
+      link: "https://livology.hashnode.dev/",
+      icon: { name: "IoMdBook", set: "io" },
+    },
+    {
+      title: "Buying a Farmland",
+      link: "https://livology.hashnode.dev/faqs-buying-agricultural-land-karnataka",
+      icon: { name: "TbPhotoQuestion", set: "tb" },
+    },
+    {
+      title: "About Us",
+      link: "https://livinzy.com/about",
+      icon: { name: "RiProfileLine", set: "ri" },
+      alignBottom: true,
+    },
   ];
-  const showConfirm = () => {
-    confirm({
-      title: "Logout",
-      icon: <ExclamationCircleFilled />,
-      content: "Are you sure you want to logout ?",
-      okText: "Logout",
-      okType: "danger",
-      cancelButtonProps: {
-        type: "default",
-        shape: "default",
-      },
-      onOk() {
-        logout.mutate();
-        window.location.reload();
-      },
-    });
-  };
 
-  const renderNavLinks = () => {
-    return navLinks.map((l: any) => {
-      return (
-        <Link to={l.link ? l.link : "#"}>
-          <Flex align="center" gap={8}>
-            <DynamicReactIcon
-              iconName={l.icon.name}
-              iconSet={l.icon.set}
-              size={18}
-              color={COLORS.textColorDark}
-            ></DynamicReactIcon>
-
-            <Typography.Text style={{ fontSize: FONT_SIZE.subHeading }}>
-              {l.title}
-            </Typography.Text>
-          </Flex>
-        </Link>
-      );
-    });
+  const NavLinks = ({ navLinks }: { navLinks: NavLink[] }) => {
+    return (
+      <>
+        {navLinks.map((link) => (
+          <Link
+            key={link.title}
+            to={link.link || "#"}
+            onClick={() => {
+              setSidebarOpen(false);
+            }}
+            style={{ marginTop: link.alignBottom ? "auto" : "initial" }}
+          >
+            <Flex align="center" gap={8}>
+              <DynamicReactIcon
+                iconName={link.icon.name}
+                iconSet={link.icon.set as any}
+                size={16}
+                color={COLORS.textColorDark}
+              />
+              <Typography.Text style={{ fontSize: FONT_SIZE.subHeading }}>
+                {link.title}
+              </Typography.Text>
+            </Flex>
+          </Link>
+        ))}
+      </>
+    );
   };
 
   return (
@@ -114,17 +130,20 @@ export const DashboardLayout: React.FC = () => {
                 ></Image>
               </Link>
 
-              <Flex
-                onClick={() => {
-                  setSidebarOpen(true);
-                }}
-                style={{ marginLeft: "auto" }}
-              >
-                <DynamicReactIcon
-                  iconName="HiOutlineMenuAlt3"
-                  iconSet="hi"
-                ></DynamicReactIcon>
-              </Flex>
+              {user && (
+                <Flex
+                  onClick={() => {
+                    setSidebarOpen(true);
+                  }}
+                  style={{ marginLeft: "auto", cursor: "pointer" }}
+                >
+                  <DynamicReactIcon
+                    iconName="HiOutlineMenuAlt3"
+                    iconSet="hi"
+                  ></DynamicReactIcon>
+                </Flex>
+              )}
+
               {/* {user && !isLoading && !isError ? <UserDropDown /> : null} */}
             </Flex>
           </Header>
@@ -138,28 +157,18 @@ export const DashboardLayout: React.FC = () => {
             <Flex
               vertical
               gap={16}
+              align="flex-start"
               style={{ position: "relative", height: "100%" }}
             >
-              {renderNavLinks()}
-
-              {user ? (
-                <Button
-                  icon={<LogoutOutlined />}
-                  type="link"
-                  onClick={showConfirm}
-                  style={{
-                    padding: 0,
-                    height: 32,
-                    textAlign: "left",
-                    position: "absolute",
-                    bottom: 16,
-                    left: 0,
-                    width: "auto",
-                  }}
-                >
-                  Logout
-                </Button>
-              ) : null}
+              <NavLinks navLinks={navLinks} />
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.default,
+                  color: COLORS.textColorLight,
+                }}
+              >
+                Copyright @Marduk Technologies Private Ltd
+              </Typography.Text>
             </Flex>
           </Drawer>
           <Content style={{ margin: isMobile ? 16 : 48, marginTop: 0 }}>

@@ -9,12 +9,17 @@ import AskPage from "../pages/ask-page";
 import { HomePage } from "../pages/home-page";
 import ProjectPage from "../pages/project-page";
 import { ProfilePage } from "../pages/profile-page";
+import LandMeasurementConvertor from "../components/sides/land-measurement-convertor";
 
 export const Router = () => {
   const { user, isError } = useUser();
 
   return (
     <Routes>
+      <Route
+        path="/sides/unit-connvertor"
+        element={<LandMeasurementConvertor />}
+      />
       <Route element={<DashboardLayout />}>
         <Route path="/" element={<HomePage></HomePage>} />
         <Route path="/project/:projectId" element={<ProjectPage />} />
