@@ -102,7 +102,6 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
                 overflow: "hidden",
                 flexShrink: 0,
                 marginRight: 8,
-
                 position: "relative",
               }}
             >
@@ -116,7 +115,7 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
                 }}
                 allow="accelerometer;gyroscope;encrypted-media;picture-in-picture;"
               ></iframe>
-
+              //{" "}
               {media.video!.caption ||
               (media.video?.tags && media.video.tags.length) ? (
                 <Typography.Text
@@ -849,7 +848,7 @@ const ProjectPage: React.FC = () => {
   }
 
   const sortedMediaArray = sortedMedia({
-    media: projectData.media,
+    media: projectData.media.filter((m) => m.type == "image"),
     setPreviewInFirstPlace: true,
   });
 
