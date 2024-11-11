@@ -849,7 +849,7 @@ const ProjectPage: React.FC = () => {
 
   const sortedMediaArray = sortedMedia({
     media: projectData.media.filter((m) => m.type == "image"),
-    setPreviewInFirstPlace: true,
+    setPreviewInFirstPlace: false,
   });
 
   const videoMedia = projectData.media.filter(
