@@ -9,5 +9,11 @@ export const antTheme: ThemeConfig = {
     controlHeight: 50,
     fontFamily: FONTS.primary,
     fontSize: 16,
-  }
+  },
+  components: {
+    Button: {
+      defaultBorderColor: COLORS.primaryColor,
+      defaultColor: COLORS.primaryColor,
+    },
+  },
 };

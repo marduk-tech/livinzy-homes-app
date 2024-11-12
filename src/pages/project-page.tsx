@@ -102,7 +102,6 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
                 overflow: "hidden",
                 flexShrink: 0,
                 marginRight: 8,
-
                 position: "relative",
               }}
             >
@@ -116,7 +115,7 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
                 }}
                 allow="accelerometer;gyroscope;encrypted-media;picture-in-picture;"
               ></iframe>
-
+              //{" "}
               {media.video!.caption ||
               (media.video?.tags && media.video.tags.length) ? (
                 <Typography.Text
@@ -206,7 +205,7 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
   const [showCalendlyPopup, setShowCalendlyPopup] = useState(false);
 
   return (
-    <Flex style={{ marginRight: isMobile ? 16 : 0 }}>
+    <Flex vertical={isMobile} style={{ marginRight: isMobile ? 16 : 0 }}>
       <Flex vertical>
         <Flex align="flex-end">
           <Typography.Text
@@ -241,18 +240,26 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
         </Flex>
         {costSummary.sqftRate ? (
           <Typography.Text style={{ color: COLORS.textColorLight }}>
-            ₹{costSummary.sqftRate} per sqft
+            Priced at ₹{costSummary.sqftRate} per sqft.{" "}
+            {costSummary.details ? costSummary.details : ""}
           </Typography.Text>
         ) : null}
       </Flex>
 
       {/* Buttons: Follow Up and Save */}
-      <Flex style={{ marginLeft: "auto" }} gap={8}>
+      <Flex
+        style={{
+          marginLeft: isMobile ? 0 : "auto",
+          marginTop: isMobile ? 24 : 0,
+        }}
+        gap={8}
+      >
         <CalendlyPopup
           open={showCalendlyPopup}
           onCancel={() => setShowCalendlyPopup(false)}
         />
         <Button
+          type="default"
           onClick={() => setShowCalendlyPopup(true)}
           size={isMobile ? "small" : "middle"}
           icon={<SendOutlined />}
@@ -352,10 +359,10 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
         <Typography.Text
           style={{
             margin: 0,
-            fontSize: FONT_SIZE.default,
+            fontSize: FONT_SIZE.subText,
           }}
         >
-          {selectedHighlight?.description}
+          {selectedHighlight?.details || selectedHighlight?.description}
         </Typography.Text>
       </Modal>
     </>
@@ -849,8 +856,8 @@ const ProjectPage: React.FC = () => {
   }
 
   const sortedMediaArray = sortedMedia({
-    media: projectData.media,
-    setPreviewInFirstPlace: true,
+    media: projectData.media.filter((m) => m.type == "image"),
+    setPreviewInFirstPlace: false,
   });
 
   const videoMedia = projectData.media.filter(

@@ -43,8 +43,8 @@ export const DashboardLayout: React.FC = () => {
     },
     {
       title: "Learn",
-      link: "https://livology.hashnode.dev/",
-      icon: { name: "IoMdBook", set: "io" },
+      link: "https://learn.livinzy.com/",
+      icon: { src: "./images/livology-icon.png" },
     },
     {
       title: "Buying a Farmland",
@@ -72,12 +72,17 @@ export const DashboardLayout: React.FC = () => {
             style={{ marginTop: link.alignBottom ? "auto" : "initial" }}
           >
             <Flex align="center" gap={8}>
-              <DynamicReactIcon
-                iconName={link.icon.name}
-                iconSet={link.icon.set as any}
-                size={16}
-                color={COLORS.textColorDark}
-              />
+              {link.icon.name ? (
+                <DynamicReactIcon
+                  iconName={link.icon.name}
+                  iconSet={link.icon.set as any}
+                  size={16}
+                  color={COLORS.textColorDark}
+                />
+              ) : (
+                <Image width={16} src={link.icon.src}></Image>
+              )}
+
               <Typography.Text style={{ fontSize: FONT_SIZE.subHeading }}>
                 {link.title}
               </Typography.Text>

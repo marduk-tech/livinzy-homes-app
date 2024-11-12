@@ -4,12 +4,13 @@ import { Route, Routes } from "react-router-dom";
 import { DashboardLayout } from "../layouts/dashboard-layout";
 
 // Pages
+import LandMeasurementConvertor from "../components/sides/land-measurement-convertor";
 import { useUser } from "../hooks/use-user";
 import AskPage from "../pages/ask-page";
 import { HomePage } from "../pages/home-page";
-import ProjectPage from "../pages/project-page";
 import { ProfilePage } from "../pages/profile-page";
-import LandMeasurementConvertor from "../components/sides/land-measurement-convertor";
+import ProjectPage from "../pages/project-page";
+import { SignUpForm } from "../pages/signup";
 
 export const Router = () => {
   const { user, isError } = useUser();
@@ -27,6 +28,7 @@ export const Router = () => {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/*" element={<div>404</div>} />{" "}
       </Route>
+      <Route path="/sign-up" element={<SignUpForm />} />
     </Routes>
   );
 };
