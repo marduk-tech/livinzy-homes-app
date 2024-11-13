@@ -1,11 +1,11 @@
-import { Button, Form, Input, message, Typography } from "antd";
+import { Button, Flex, Form, Input, message, Typography } from "antd";
 import PhoneInput from "antd-phone-input";
 import { useDevice } from "../hooks/use-device";
 
 import { useState } from "react";
 import { useCreateUserMutation } from "../hooks/user-hooks";
 import { getUserByMobile } from "../libs/api/user";
-import { COLORS } from "../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 
 export function SignUpForm() {
   const [form] = Form.useForm();
@@ -59,44 +59,99 @@ export function SignUpForm() {
 
   return (
     <>
-      <div style={{ display: "flex", minHeight: "100vh" }}>
+      <Flex
+        vertical={isTabletOrMobile}
+        style={{
+          minHeight: "100vh",
+          width: "100%",
+          overflowX: "hidden",
+        }}
+      >
+        <Flex
+          vertical
+          style={{
+            width: isTabletOrMobile ? "calc(100% - 64px)" : "calc(50% - 64px)",
+            padding: "0 32px",
+            backgroundColor: COLORS.bgColorDark,
+          }}
+        >
+          <img
+            src="./logo-name.png"
+            style={{
+              width: 100,
+              marginBottom: 16,
+              marginTop: 24,
+              marginLeft: -8,
+            }}
+          ></img>
+          <div
+            style={{
+              display: "flex",
+              overflowX: "scroll",
+              margin: "auto",
+              justifyContent: isTabletOrMobile ? "flex-start" : "center",
+              scrollbarWidth: "none",
+            }}
+          >
+            <img
+              src="./images/home-demo.png"
+              style={{ width: isTabletOrMobile ? 400 : 600 }}
+            ></img>
+          </div>
+        </Flex>
         <div
           style={{
-            width: !isTabletOrMobile ? "50%" : "100%",
-            padding: !isTabletOrMobile ? "40px 100px" : "40px",
+            width: isTabletOrMobile
+              ? "calc(100vw - 64px)"
+              : "calc(50% - 128px)",
+            padding: isTabletOrMobile ? "32px" : "40px 64px",
           }}
         >
           {signUpStatus === "EXISTS" ? (
-            <>
+            <Flex vertical style={{ marginTop: 100 }}>
               <Typography.Title level={2}>Thank You!</Typography.Title>
 
-              <Typography.Title level={4} style={{ fontWeight: "normal" }}>
-                You have already registered with us.
+              <Typography.Title
+                level={4}
+                style={{ fontWeight: "normal", marginTop: 0 }}
+              >
+                You have already registered. Please check your email for details
+                on how to login.
               </Typography.Title>
-            </>
+            </Flex>
           ) : signUpStatus === "NEW" ? (
-            <>
+            <Flex vertical justify="center" style={{ height: "100%" }}>
               <Typography.Title level={2}>Thank You!</Typography.Title>
 
-              <Typography.Title level={4} style={{ fontWeight: "normal" }}>
-                We will soon send the additional details over email.
+              <Typography.Title
+                level={4}
+                style={{ fontWeight: "normal", margin: 0 }}
+              >
+                Please check your email for details on how to login.
               </Typography.Title>
-            </>
+            </Flex>
           ) : (
             <>
-              <Typography.Title level={2}>
-                Sign Up for exclusive access
-              </Typography.Title>
+              <Flex vertical style={{ marginBottom: 24 }}>
+                <Typography.Text
+                  style={{ fontSize: FONT_SIZE.heading, fontWeight: "bold" }}
+                >
+                  Explore Farmlands For Sale Near Bangalore
+                </Typography.Text>
+                <Typography.Text>
+                  Sign Up for Exclusive Access to Livinzy
+                </Typography.Text>
+              </Flex>
               <Form
                 form={form}
                 layout="vertical"
                 onFinish={handleOnSubmit}
                 style={{
-                  marginTop: 40,
-                  maxWidth: "500px",
+                  marginTop: 16,
+                  maxWidth: "400px",
                   display: "flex",
                   flexDirection: "column",
-                  gap: 10,
+                  gap: 0,
                 }}
               >
                 <Form.Item
@@ -159,20 +214,7 @@ export function SignUpForm() {
             </>
           )}
         </div>
-
-        {!isTabletOrMobile && (
-          <div
-            style={{
-              width: "50%",
-              backgroundColor: COLORS.bgColorDark,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          ></div>
-        )}
-      </div>
+      </Flex>
     </>
   );
 }
