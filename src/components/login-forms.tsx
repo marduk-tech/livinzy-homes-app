@@ -100,6 +100,7 @@ export function LoginForm() {
       await loginMutation
         .mutateAsync({
           code: values.otp,
+          countryCode: values.mobileNumber.countryCode,
         })
         .then((user: any) => {
           if (!user.profile?.name) {
