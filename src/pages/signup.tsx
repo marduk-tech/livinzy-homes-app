@@ -1,108 +1,220 @@
-import { Button, Col, Form, Input, Row, Typography } from "antd";
+import { Button, Flex, Form, Input, message, Typography } from "antd";
+import PhoneInput from "antd-phone-input";
 import { useDevice } from "../hooks/use-device";
-import { useSubmitSubmissionMutation } from "../hooks/use-submission";
-import { COLORS } from "../theme/style-constants";
+
+import { useState } from "react";
+import { useCreateUserMutation } from "../hooks/user-hooks";
+import { getUserByMobile } from "../libs/api/user";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 
 export function SignUpForm() {
   const [form] = Form.useForm();
 
   const { isTabletOrMobile } = useDevice();
 
-  const submitMutation = useSubmitSubmissionMutation({});
+  const createUserMutation = useCreateUserMutation({ enableToasts: false });
+
+  const [signUpStatus, setSignUpStatus] = useState<"EXISTS" | "NEW">();
 
   const handleOnSubmit = async () => {
     const values = await form.validateFields();
 
-    submitMutation.mutateAsync({ body: values }).then(() => {
+    let phoneNumber;
+    let countryCode;
+
+    if (values.mobile) {
+      phoneNumber =
+        values.mobile.countryCode +
+        values.mobile.areaCode +
+        values.mobile.phoneNumber;
+
+      countryCode = values.mobile.countryCode;
+    }
+
+    const userAlreadyExists = await getUserByMobile(phoneNumber);
+
+    if (userAlreadyExists) {
+      setSignUpStatus("EXISTS");
       form.resetFields();
-    });
+    } else {
+      await createUserMutation
+        .mutateAsync({
+          userData: {
+            mobile: phoneNumber,
+            countryCode: countryCode,
+            profile: {
+              ...values,
+            },
+          },
+        })
+        .then((data) => {
+          setSignUpStatus("NEW");
+          form.resetFields();
+        })
+        .catch((err) => {
+          message.error("Please try again later");
+        });
+    }
   };
 
   return (
     <>
-      <div style={{ display: "flex", minHeight: "100vh" }}>
-        <div
+      <Flex
+        vertical={isTabletOrMobile}
+        style={{
+          minHeight: "100vh",
+          width: "100%",
+          overflowX: "hidden",
+        }}
+      >
+        <Flex
+          vertical
           style={{
-            width: !isTabletOrMobile ? "50%" : "100%",
-            padding: !isTabletOrMobile ? "40px 100px" : "40px",
+            width: isTabletOrMobile ? "calc(100% - 64px)" : "calc(50% - 64px)",
+            padding: "0 32px",
+            backgroundColor: COLORS.bgColorDark,
           }}
         >
-          <Typography.Title level={2}>
-            Sign Up for exclusive access
-          </Typography.Title>
-
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleOnSubmit}
+          <img
+            src="./logo-name.png"
             style={{
-              marginTop: 40,
-              maxWidth: "500px",
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
+              width: 100,
+              marginBottom: 16,
+              marginTop: 24,
+              marginLeft: -8,
             }}
-          >
-            <Form.Item
-              label="Your Name"
-              name="name"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              label="Your Email"
-              name="email"
-              rules={[
-                { required: true },
-                { type: "email", message: "Please enter a valid email" },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              label="Your Linkedin Profile"
-              name="linkedin"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              label="Your current city & country"
-              name="location"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                loading={submitMutation.isPending}
-                type="primary"
-                htmlType="submit"
-              >
-                Submit
-              </Button>
-            </Form.Item>
-          </Form>
-        </div>
-
-        {!isTabletOrMobile && (
+          ></img>
           <div
             style={{
-              width: "50%",
-              backgroundColor: COLORS.bgColorDark,
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
+              overflowX: "scroll",
+              margin: "auto",
+              justifyContent: isTabletOrMobile ? "flex-start" : "center",
+              scrollbarWidth: "none",
             }}
-          ></div>
-        )}
-      </div>
+          >
+            <img
+              src="./images/home-demo.png"
+              style={{ width: isTabletOrMobile ? 400 : 600 }}
+            ></img>
+          </div>
+        </Flex>
+        <div
+          style={{
+            width: isTabletOrMobile
+              ? "calc(100vw - 64px)"
+              : "calc(50% - 128px)",
+            padding: isTabletOrMobile ? "32px" : "40px 64px",
+          }}
+        >
+          {signUpStatus === "EXISTS" ? (
+            <Flex vertical style={{ marginTop: 100 }}>
+              <Typography.Title level={2}>Thank You!</Typography.Title>
+
+              <Typography.Title
+                level={4}
+                style={{ fontWeight: "normal", marginTop: 0 }}
+              >
+                You have already registered. Please check your email for details
+                on how to login.
+              </Typography.Title>
+            </Flex>
+          ) : signUpStatus === "NEW" ? (
+            <Flex vertical justify="center" style={{ height: "100%" }}>
+              <Typography.Title level={2}>Thank You!</Typography.Title>
+
+              <Typography.Title
+                level={4}
+                style={{ fontWeight: "normal", margin: 0 }}
+              >
+                Please check your email for details on how to login.
+              </Typography.Title>
+            </Flex>
+          ) : (
+            <>
+              <Flex vertical style={{ marginBottom: 24 }}>
+                <Typography.Text
+                  style={{ fontSize: FONT_SIZE.heading, fontWeight: "bold" }}
+                >
+                  Explore Farmlands For Sale Near Bangalore
+                </Typography.Text>
+                <Typography.Text>
+                  Sign Up for Exclusive Access to Livinzy
+                </Typography.Text>
+              </Flex>
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleOnSubmit}
+                style={{
+                  marginTop: 16,
+                  maxWidth: "400px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 0,
+                }}
+              >
+                <Form.Item
+                  label="Your Name"
+                  name="name"
+                  rules={[{ required: true }]}
+                >
+                  <Input />
+                </Form.Item>
+
+                <Form.Item
+                  label="Your Email"
+                  name="email"
+                  rules={[
+                    { required: true },
+                    { type: "email", message: "Please enter a valid email" },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+
+                <Form.Item
+                  label="Your Linkedin Profile"
+                  name="linkedin"
+                  rules={[{ required: true }]}
+                >
+                  <Input />
+                </Form.Item>
+
+                <Form.Item
+                  label="Your Current City & Country"
+                  name="city"
+                  rules={[{ required: true }]}
+                >
+                  <Input />
+                </Form.Item>
+
+                <Form.Item
+                  label="Your Mobile Number"
+                  name="mobile"
+                  rules={[{ required: true }]}
+                  initialValue={{
+                    countryCode: 91,
+                    isoCode: "in",
+                  }}
+                >
+                  <PhoneInput enableArrow enableSearch disableParentheses />
+                </Form.Item>
+
+                <Form.Item>
+                  <Button
+                    loading={createUserMutation.isPending}
+                    type="primary"
+                    htmlType="submit"
+                  >
+                    Submit
+                  </Button>
+                </Form.Item>
+              </Form>
+            </>
+          )}
+        </div>
+      </Flex>
     </>
   );
 }

@@ -1,6 +1,7 @@
 export interface User {
   _id: string;
   mobile: string;
+  countryCode: string;
   name?: string;
   email?: string;
   createdAt: Date;
