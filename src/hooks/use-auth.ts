@@ -19,9 +19,16 @@ export function useAuth() {
   const [verificationId, setVerificationId] = useState<string | undefined>();
 
   const generateOtp = useMutation({
-    mutationFn: ({ mobile }: { mobile: string }) => {
+    mutationFn: ({
+      mobile,
+      countryCode,
+    }: {
+      mobile: string;
+      countryCode: string;
+    }) => {
       return axiosApiInstance.post(`/auth/otp/generate`, {
         mobile: mobile,
+        countryCode: countryCode,
       });
     },
     onSuccess: async ({ data }) => {

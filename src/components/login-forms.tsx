@@ -7,6 +7,7 @@ import {
   message,
   Typography,
 } from "antd";
+import PhoneInput from "antd-phone-input";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useUser } from "../hooks/use-user";
@@ -45,10 +46,17 @@ export function LoginForm() {
     }
   }, [userLoading, user]);
 
-  const generateOtp = async ({ mobile }: { mobile: string }) => {
+  const generateOtp = async ({
+    mobile,
+    countryCode,
+  }: {
+    mobile: string;
+    countryCode: string;
+  }) => {
     try {
       await generateOtpMutation.mutateAsync({
         mobile: mobile,
+        countryCode: countryCode,
       });
 
       message.success("OTP sent");
@@ -70,7 +78,19 @@ export function LoginForm() {
 
   const handleGenerateOtp = async () => {
     const values = await form.validateFields();
-    generateOtp({ mobile: values.mobileNumber });
+
+    let phoneNumber;
+    let countryCode;
+
+    if (values.mobileNumber) {
+      phoneNumber =
+        values.mobileNumber.countryCode +
+        values.mobileNumber.areaCode +
+        values.mobileNumber.phoneNumber;
+      countryCode = values.mobileNumber.countryCode;
+    }
+
+    generateOtp({ mobile: phoneNumber, countryCode: `${countryCode}` });
   };
 
   const handleLogin = async () => {
@@ -156,31 +176,35 @@ Login with your mobile number to continue.
                             required: true,
                             message: "Please input your mobile number!",
                           },
+
                           {
-                            type: "integer",
-                            message: "Mobile number must be an integer!",
-                          },
-                          {
-                            validator: (_, value) =>
-                              value && value.toString().length === 10
+                            validator: (_, value) => {
+                              const mobile = value.areaCode + value.phoneNumber;
+
+                              console.log(mobile);
+
+                              return value && mobile.length >= 10
                                 ? Promise.resolve()
                                 : Promise.reject(
                                     new Error(
-                                      "Mobile number must be 10 digits long!"
+                                      "Mobile number must be at least 10 digits long!"
                                     )
-                                  ),
+                                  );
+                            },
                           },
                         ]}
                         style={{ marginBottom: 0 }}
+                        initialValue={{
+                          countryCode: 91,
+                          isoCode: "in",
+                        }}
                       >
-                        <InputNumber
-                          style={{
-                            fontSize: FONT_SIZE.subHeading,
-                            width: "100%",
-                          }}
-                          placeholder="Login with your mobile number"
+                        <PhoneInput
                           disabled={loginStatus === "OTP_SENT"}
-                          type="tel"
+                          placeholder="Login with your mobile number"
+                          enableArrow
+                          enableSearch
+                          disableParentheses
                         />
                       </Form.Item>
                       {/* <Typography.Text
@@ -245,11 +269,19 @@ By signing up, you agree to the terms & conditions.
                                   : COLORS.textColorDark,
                             }}
                             type="link"
-                            onClick={() =>
+                            onClick={() => {
+                              const mobile = getFieldValue("mobileNumber");
+
+                              const phoneNumber =
+                                mobile.countryCode +
+                                mobile.areaCode +
+                                mobile.phoneNumber;
+
                               generateOtp({
-                                mobile: getFieldValue("mobileNumber"),
-                              })
-                            }
+                                mobile: phoneNumber,
+                                countryCode: `${mobile.countryCode}`,
+                              });
+                            }}
                             size="small"
                           >
                             {resendTimer > 0 ? (
