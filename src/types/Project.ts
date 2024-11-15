@@ -141,6 +141,7 @@ export interface IPlace {
   name?: string;
   totalReviews?: number;
   latLng?: string;
+  heading?: string;
   type:
     | "hospital"
     | "school"

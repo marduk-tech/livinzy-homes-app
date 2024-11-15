@@ -1,4 +1,4 @@
-export const envMode = import.meta.env.MODE;
+export const envMode = import.meta.env.VITE_ENV;
 
 export const baseApiUrl = import.meta.env.VITE_API_URL;
 
@@ -24,31 +24,31 @@ export const LivestIndexConfig = [
   {
     key: "metroCityScore",
     type: "metro",
-    heading: "Metro City",
+    heading: "Metro",
     icon: { name: "FaCity", set: "fa" },
   },
   {
     key: "tier2CityScore",
     type: "tier2",
-    heading: "Tier 2 Cities",
+    heading: "Town",
     icon: { name: "FaMountainCity", set: "fa" },
   },
   {
     key: "touristCityScore",
     type: "tourist",
-    heading: "Travel Destinations",
+    heading: "Tourist Spot",
     icon: { name: "MdModeOfTravel", set: "md" },
   },
   {
     key: "schoolsScore",
     type: "school",
-    heading: "Schools",
+    heading: "School",
     icon: { name: "IoMdSchool", set: "io" },
   },
   {
     key: "hospitalsScore",
     type: "hospital",
-    heading: "Hospitals",
+    heading: "Hospital",
     icon: { name: "FaRegHospital", set: "fa" },
   },
   {
@@ -59,9 +59,15 @@ export const LivestIndexConfig = [
   },
   {
     key: "roadsScore",
-    heading: "Highways",
+    heading: "Highway",
     type: "roads",
     icon: { name: "FaRoad", set: "fa" },
+  },
+  {
+    key: "futureInfraScore",
+    heading: "Future Infra",
+    type: "futureInfra",
+    icon: { name: "BsBuildingCheck", set: "bs" },
   },
 ];
 

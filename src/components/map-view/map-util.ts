@@ -53,7 +53,7 @@ export function getLivestmentData(project: Project) {
       const subLiv = (project.livestment as any)[sl.key];
       subLiv.placesList.forEach((p: any, index: number) => {
         data.push({
-          id: `s-${Math.round(Math.random() * 1000)}`,
+          id: `r-${Math.round(Math.random() * 1000)}`,
           zIndex: indexOffset + index,
           place: {
             ...sl,
@@ -65,7 +65,7 @@ export function getLivestmentData(project: Project) {
       const subLiv = (project.livestment as any)[sl.key];
       subLiv.placesList.forEach((p: any, index: number) => {
         data.push({
-          id: `s-${String(index)}`,
+          id: `${sl.key}-${String(index)}`,
           position: p.latLng,
           zIndex: index + indexOffset,
           place: {

@@ -108,19 +108,31 @@ export function SignUpForm() {
           }}
         >
           {signUpStatus === "EXISTS" ? (
-            <Flex vertical style={{ marginTop: 100 }}>
+            <Flex vertical style={{ marginTop: 100 }} align="flex-start">
               <Typography.Title level={2}>Thank You!</Typography.Title>
 
               <Typography.Title
                 level={4}
                 style={{ fontWeight: "normal", marginTop: 0 }}
               >
-                You have already registered. Please check your email for details
-                on how to login.
+                You have already registered with us.
               </Typography.Title>
+              <Button
+                style={{ marginTop: 32 }}
+                onClick={() => {
+                  window.location.href = "/";
+                }}
+              >
+                Starting Exploring Projects
+              </Button>
             </Flex>
           ) : signUpStatus === "NEW" ? (
-            <Flex vertical justify="center" style={{ height: "100%" }}>
+            <Flex
+              vertical
+              justify="center"
+              style={{ height: "100%" }}
+              align="flex-start"
+            >
               <Typography.Title level={2}>Thank You!</Typography.Title>
 
               <Typography.Title
@@ -129,6 +141,14 @@ export function SignUpForm() {
               >
                 Please check your email for details on how to login.
               </Typography.Title>
+              <Button
+                style={{ marginTop: 32 }}
+                onClick={() => {
+                  window.location.href = "/";
+                }}
+              >
+                Starting Exploring Projects
+              </Button>
             </Flex>
           ) : (
             <>
@@ -173,13 +193,13 @@ export function SignUpForm() {
                   <Input />
                 </Form.Item>
 
-                <Form.Item
+                {/* <Form.Item
                   label="Your Linkedin Profile"
                   name="linkedin"
                   rules={[{ required: true }]}
                 >
                   <Input />
-                </Form.Item>
+                </Form.Item> */}
 
                 <Form.Item
                   label="Your Current City & Country"

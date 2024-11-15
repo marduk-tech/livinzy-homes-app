@@ -1,6 +1,6 @@
 import React from "react";
-import { Flex, Tooltip, Typography } from "antd";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { Flex, Typography } from "antd";
+import { COLORS } from "../../theme/style-constants";
 
 interface Grade {
   label: string;
@@ -127,7 +127,7 @@ const LivestIndexRange: React.FC<LivestIndexRangeProps> = ({ value }) => {
   return (
     <Flex vertical style={{ width: "100%", marginBottom: 16 }} gap={8}>
       <Flex gap={8}>
-        <Flex
+        {/* <Flex
           align="center"
           justify="center"
           style={{
@@ -149,10 +149,10 @@ const LivestIndexRange: React.FC<LivestIndexRangeProps> = ({ value }) => {
               {grade.label}
             </Typography.Text>
           </Tooltip>
-        </Flex>
+        </Flex> */}
         <div
           style={{
-            minWidth: "calc(100% - 70px)",
+            minWidth: "calc(100%)",
             height: "50px",
             background: gradient,
             position: "relative",

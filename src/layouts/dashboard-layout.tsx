@@ -8,7 +8,7 @@ import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { NavLink } from "../types/Common";
-import { LocalStorageKeys } from "../libs/constants";
+import { envMode, LocalStorageKeys } from "../libs/constants";
 
 const { Header, Content } = Layout;
 
@@ -22,7 +22,7 @@ export const DashboardLayout: React.FC = () => {
   useEffect(() => {
     const userItem = localStorage.getItem(LocalStorageKeys.user);
     const user = userItem ? JSON.parse(userItem) : null;
-    if (user) {
+    if (user || envMode == "dev") {
       return;
     } else {
       setLoginModalOpen(true);

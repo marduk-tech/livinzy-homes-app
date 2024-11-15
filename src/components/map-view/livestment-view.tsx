@@ -7,14 +7,15 @@ import {
   Map,
   useAdvancedMarkerRef,
 } from "@vis.gl/react-google-maps";
-import { Flex, Typography } from "antd";
+import { Flex, Tag, Typography } from "antd";
 import React, { useCallback, useState } from "react";
 import { IPlace, Project } from "../../types/Project";
 import { getLivestmentData } from "./map-util";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { RoadInfra } from "./road-infra";
 import RoadsData from "../../libs/map-data/road-data.json";
-import { COLORS } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { capitalize } from "../../libs/lvnzy-helper";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -106,26 +107,6 @@ export const LivestmentView = ({ project }: { project: Project }) => {
                         onExpand={() => handleCardExpand(id)}
                       />
                     </AdvancedMarkerWithRef>
-
-                    <AdvancedMarkerWithRef
-                      onMarkerClick={(
-                        marker: google.maps.marker.AdvancedMarkerElement
-                      ) => console.log(id, marker)}
-                      zIndex={zIndex}
-                      onMouseEnter={() => onMouseEnter(id)}
-                      onMouseLeave={onMouseLeave}
-                      anchorPoint={AdvancedMarkerAnchorPoint.CENTER}
-                      position={position}
-                    >
-                      <div
-                        style={{
-                          width: "8px",
-                          height: "8px",
-                          background: "#ccc",
-                          borderRadius: "50%",
-                        }}
-                      ></div>
-                    </AdvancedMarkerWithRef>
                   </React.Fragment>
                 );
               }
@@ -154,42 +135,47 @@ export const PlaceCard = ({
     <Flex
       onClick={handleClick}
       align="center"
-      justify="center"
+      justify={isExpanded ? "flex-start" : "center"}
       style={{
-        backgroundColor: place.type == "project" ? COLORS.bgColorDark : "white",
+        backgroundColor:
+          place.type == "project" ? COLORS.primaryColor : "white",
         borderRadius: isExpanded ? 10 : "50%",
-        whiteSpace: "nowrap",
+        whiteSpace: "wrap",
         padding: isExpanded ? 8 : 0,
-        width: isExpanded ? "auto" : 50,
-        height: 50,
+        boxShadow: "0 0 4px",
+        width: isExpanded ? 200 : 50,
+        height: isExpanded ? "auto" : 50,
         cursor: "pointer",
         zIndex: 99,
       }}
     >
       {isExpanded ? (
-        <>
-          {/* <CloseButton
+        <Flex style={{ width: "100%" }}>
+          <Flex gap={8}>
+            <Flex vertical align="flex-start" gap={4}>
+              <Tag style={{ fontSize: FONT_SIZE.default }}>{place.heading}</Tag>
+              <Typography.Text
+                style={{
+                  color: COLORS.textColorDark,
+                  fontSize: FONT_SIZE.subText,
+                }}
+              >
+                {capitalize(place.name || "")}
+              </Typography.Text>
+            </Flex>
+          </Flex>
+          <CloseButton
             onClick={(e) => {
               e.stopPropagation();
               onExpand();
             }}
-          /> */}
-          <Flex align="center" gap={8}>
-            <DynamicReactIcon
-              color={COLORS.primaryColor}
-              iconName={place.icon.name}
-              iconSet={place.icon.set}
-            ></DynamicReactIcon>
-            <Typography.Text style={{ color: COLORS.primaryColor }}>
-              {place.name}
-            </Typography.Text>
-          </Flex>
-        </>
+          />
+        </Flex>
       ) : (
         <DynamicReactIcon
           iconName={place.icon.name}
           iconSet={place.icon.set}
-          color={place.type == "project" ? "white" : COLORS.primaryColor}
+          color={place.type == "project" ? "white" : COLORS.textColorDark}
         ></DynamicReactIcon>
       )}
     </Flex>
@@ -225,19 +211,13 @@ export const CloseButton: React.FC<{ onClick: (e: any) => void }> = ({
   return (
     <div
       style={{
-        position: "absolute",
-        top: "18px",
-        right: "18px",
         fontSize: "14px",
         cursor: "pointer",
-        zIndex: 1,
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
         width: "24px",
         height: "24px",
         borderRadius: "50%",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        marginLeft: "auto",
       }}
       onClick={onClick}
     >
