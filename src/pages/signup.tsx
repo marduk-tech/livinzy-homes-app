@@ -115,7 +115,7 @@ export function SignUpForm() {
                 level={4}
                 style={{ fontWeight: "normal", marginTop: 0 }}
               >
-                You have already registered with us.
+                Click button below & login with your mobile number.
               </Typography.Title>
               <Button
                 style={{ marginTop: 32 }}
@@ -139,7 +139,7 @@ export function SignUpForm() {
                 level={4}
                 style={{ fontWeight: "normal", margin: 0 }}
               >
-                Please check your email for details on how to login.
+                Click button below & login with your mobile number.
               </Typography.Title>
               <Button
                 style={{ marginTop: 32 }}
