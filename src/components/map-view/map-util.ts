@@ -40,6 +40,7 @@ export function getLivestmentData(project: Project) {
     zIndex: indexOffset,
     place: {
       type: "project",
+      name: project.metadata.name,
       icon: {
         name: "FaMapMarkerAlt",
         set: "fa",
