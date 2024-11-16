@@ -153,10 +153,15 @@ export const PlaceCard = ({
         <Flex style={{ width: "100%" }}>
           <Flex gap={8}>
             <Flex vertical align="flex-start" gap={4}>
-              <Tag style={{ fontSize: FONT_SIZE.default }}>{place.heading}</Tag>
+              {place.heading ? (
+                <Tag style={{ fontSize: FONT_SIZE.default }}>
+                  {place.heading}
+                </Tag>
+              ) : null}
               <Typography.Text
                 style={{
-                  color: COLORS.textColorDark,
+                  color:
+                    place.type == "project" ? "white" : COLORS.textColorDark,
                   fontSize: FONT_SIZE.subText,
                 }}
               >
