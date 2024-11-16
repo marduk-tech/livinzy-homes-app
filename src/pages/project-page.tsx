@@ -33,7 +33,6 @@ import { sortedMedia } from "../libs/utils";
 import "../theme/scroll-bar.css";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia, IMetadata, IUI, Project } from "../types/Project";
-import Link from "antd/es/typography/Link";
 
 const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
   const { isMobile } = useDevice();
@@ -547,7 +546,7 @@ const ProjectDescription: React.FC<{ project: Project }> = ({ project }) => {
       <Typography.Text style={{ fontSize: FONT_SIZE.subText }}>
         {project.ui.description}
       </Typography.Text>
-      <Link href={project.metadata.website}>See Website</Link>
+      {/* <Link href={project.metadata.website}>See Website</Link> */}
     </Flex>
   );
 };
