@@ -1,9 +1,4 @@
-import {
-  ArrowUpOutlined,
-  CloseOutlined,
-  HeartFilled,
-  HeartOutlined,
-} from "@ant-design/icons";
+import { CloseOutlined, HeartFilled, HeartOutlined } from "@ant-design/icons";
 import {
   Button,
   Drawer,
@@ -29,7 +24,11 @@ import { useFetchProjectById } from "../hooks/use-project";
 import { useUser } from "../hooks/use-user";
 import { useUpdateUserMutation } from "../hooks/user-hooks";
 import { LivestIndexConfig } from "../libs/constants";
-import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
+import {
+  capitalize,
+  captureAnalyticsEvent,
+  rupeeAmountFormat,
+} from "../libs/lvnzy-helper";
 import { sortedMedia } from "../libs/utils";
 import "../theme/scroll-bar.css";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
@@ -773,77 +772,6 @@ const Livestment: React.FC<{ project: Project }> = ({ project }) => {
   );
 };
 
-const ProjectInfra: React.FC = () => (
-  <Flex vertical>
-    <Typography.Title level={3}>More about Farmland & Infra</Typography.Title>
-  </Flex>
-);
-
-const ProjectPlots: React.FC = () => (
-  <Flex vertical>
-    <Typography.Title level={3}>More about the plots</Typography.Title>
-  </Flex>
-);
-
-const MobileAskLiv: React.FC<{ projectName: string }> = ({ projectName }) => {
-  const [open, setOpen] = useState(false);
-
-  const showDrawer = () => {
-    setOpen(true);
-  };
-
-  const onClose = () => {
-    setOpen(false);
-  };
-
-  return (
-    <>
-      <button
-        onClick={showDrawer}
-        style={{
-          width: "100%",
-          border: "none",
-          backgroundColor: "white",
-          borderTop: "1px solid",
-          borderColor: COLORS.borderColor,
-          cursor: "pointer",
-        }}
-      >
-        <Flex justify="space-between" align="center">
-          <Flex
-            align="center"
-            justify="flex-end"
-            gap={8}
-            style={{
-              padding: "16px 0",
-              paddingLeft: 16,
-              width: "100%",
-            }}
-          >
-            <DynamicReactIcon
-              iconSet="gi"
-              color={COLORS.primaryColor}
-              size={20}
-              iconName="GiOilySpiral"
-            ></DynamicReactIcon>
-            <Typography.Text
-              style={{ fontSize: FONT_SIZE.subHeading, fontWeight: "bold" }}
-            >
-              LivIQ
-            </Typography.Text>
-          </Flex>
-
-          <ArrowUpOutlined
-            style={{
-              color: COLORS.textColorDark,
-            }}
-          />
-        </Flex>
-      </button>
-    </>
-  );
-};
-
 const ProjectPage: React.FC = () => {
   const { projectId } = useParams();
 
@@ -867,7 +795,7 @@ const ProjectPage: React.FC = () => {
     (media) => media.type === "video"
   );
 
-  console.log(videoMedia);
+  captureAnalyticsEvent("app-projectpage-open", { projectId: projectData._id });
 
   return (
     <>
