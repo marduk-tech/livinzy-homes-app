@@ -871,7 +871,7 @@ const ProjectPage: React.FC = () => {
 
   return (
     <>
-      {!livIQOpen && (
+      {!livIQOpen && isMobile ? (
         <FloatButton
           icon={
             <DynamicReactIcon
@@ -884,7 +884,7 @@ const ProjectPage: React.FC = () => {
             setLivIQOpen(true);
           }}
         ></FloatButton>
-      )}
+      ) : null}
       <Flex vertical>
         <Gallery media={[...sortedMediaArray, ...videoMedia]} />
         <Flex
