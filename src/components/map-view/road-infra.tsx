@@ -35,13 +35,21 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
           "stroke-width": strokeWeight = 5,
         } = feature.properties;
 
+        const roadName = feature.properties.name
+          ? feature.properties.name
+          : feature.properties.wikipedia
+          ? feature.properties.wikipedia.startsWith("en:")
+            ? feature.properties.wikipedia.slice(3)
+            : feature.properties.wikipedia
+          : "";
+
         if (feature.geometry.type === "LineString") {
           const coordinates: LatLng[] = feature.geometry.coordinates.map(
             ([lng, lat]: [number, number]) => ({ lat, lng })
           );
 
           return {
-            name: feature.properties.name,
+            name: roadName,
             coordinates: [coordinates],
             strokeColor: stroke,
             strokeOpacity: strokeOpacity,
@@ -53,7 +61,7 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
               line.map(([lng, lat]: [number, number, number]) => ({ lat, lng }))
           );
           return {
-            name: feature.properties.name,
+            name: roadName,
             coordinates,
             strokeColor: stroke,
             strokeOpacity: strokeOpacity,
@@ -98,6 +106,7 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
         polyline.addListener("click", (e: any) => {
           e.stop();
           setSelectedLine(line);
+
           setPopupPosition({
             x: e.domEvent.clientX,
             y: e.domEvent.clientY,
@@ -120,6 +129,19 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
     };
   }, [map, lines]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setSelectedLine(null);
+      setPopupPosition(null);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <>
       <>
@@ -129,7 +151,7 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
               position: "fixed",
               left: popupPosition.x,
               top: popupPosition.y,
-              zIndex: 1000,
+              zIndex: 10,
               boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
               borderRadius: "10px",
               maxWidth: "200px",
