@@ -9,13 +9,13 @@ import {
 } from "@vis.gl/react-google-maps";
 import { Flex, Tag, Typography } from "antd";
 import React, { useCallback, useState } from "react";
-import { IPlace, Project } from "../../types/Project";
-import { getLivestmentData } from "./map-util";
-import DynamicReactIcon from "../common/dynamic-react-icon";
-import { RoadInfra } from "./road-infra";
+import { capitalize, captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import RoadsData from "../../libs/map-data/road-data.json";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { capitalize } from "../../libs/lvnzy-helper";
+import { IPlace, Project } from "../../types/Project";
+import DynamicReactIcon from "../common/dynamic-react-icon";
+import { getLivestmentData } from "./map-util";
+import { RoadInfra } from "./road-infra";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -104,7 +104,13 @@ export const LivestmentView = ({ project }: { project: Project }) => {
                       <PlaceCard
                         place={place}
                         isExpanded={expandedId === id}
-                        onExpand={() => handleCardExpand(id)}
+                        onExpand={() => {
+                          handleCardExpand(id);
+                          captureAnalyticsEvent("click-livindex-marker", {
+                            projectId: project._id,
+                            placeName: place.heading,
+                          });
+                        }}
                       />
                     </AdvancedMarkerWithRef>
                   </React.Fragment>
