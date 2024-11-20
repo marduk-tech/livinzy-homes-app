@@ -1,13 +1,14 @@
 import { ChatItemProps, ProChat, ProChatInstance } from "@ant-design/pro-chat";
-import { ReactNode, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { Button, Flex, Typography } from "antd";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import Markdown from "react-markdown";
+import { useParams } from "react-router-dom";
 import { useDevice } from "../hooks/use-device";
+import { axiosApiInstance } from "../libs/axios-api-Instance";
+import { LivIQPredefinedQuestions } from "../libs/constants";
+import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import DynamicReactIcon from "./common/dynamic-react-icon";
-import { LivIQPredefinedQuestions } from "../libs/constants";
-import Markdown from "react-markdown";
 
 export default function AskLiv({ projectName }: { projectName?: string }) {
   const [sessionIdIsLoading, setSessionIdIsLoading] = useState(false);
@@ -99,7 +100,13 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
 
   const handleRequest = async (messages: any[]) => {
     const latestMessage = messages[messages.length - 1];
+
     try {
+      captureAnalyticsEvent("question-asked", {
+        projectId: projectId,
+        question: latestMessage.content,
+      });
+
       const response = await axiosApiInstance.post("/ai/ask", {
         question: latestMessage.content,
         sessionId: sessionId,

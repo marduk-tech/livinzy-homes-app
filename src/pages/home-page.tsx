@@ -5,12 +5,12 @@ import { useDevice } from "../hooks/use-device";
 import { useFetchProjects } from "../hooks/use-project";
 
 import { useEffect, useState } from "react";
-import { ProjectsMapView } from "../components/map-view/projects-map-view";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
+import { ProjectsMapView } from "../components/map-view/projects-map-view";
 import { ProjectCategories } from "../libs/constants";
+import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { Project } from "../types/Project";
-import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 
 export function HomePage() {
   const { isMobile } = useDevice();
@@ -111,6 +111,9 @@ export function HomePage() {
                     style={{ cursor: "pointer" }}
                     onClick={() => {
                       setCategoryFilter(cat.key);
+                      captureAnalyticsEvent("click-homepage-category", {
+                        categoryName: cat.label,
+                      });
                     }}
                   >
                     <DynamicReactIcon

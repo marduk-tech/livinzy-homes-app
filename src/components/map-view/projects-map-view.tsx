@@ -10,10 +10,11 @@ import {
 import { Button, Flex, Typography } from "antd";
 import React, { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
+import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { FONT_SIZE } from "../../theme/style-constants";
 import { Project } from "../../types/Project";
-import { getData } from "./map-util";
 import { ProjectCard } from "../common/project-card";
+import { getData } from "./map-util";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -51,7 +52,13 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
 
   if (data && projects) {
     return (
-      <APIProvider apiKey={API_KEY} libraries={["marker"]}>
+      <APIProvider
+        apiKey={API_KEY}
+        libraries={["marker"]}
+        onLoad={() => {
+          captureAnalyticsEvent("projects-map-view-loaded", {});
+        }}
+      >
         <Map
           style={{
             width: "100%",
@@ -85,7 +92,9 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
                   zIndex={zIndex}
                   onMarkerClick={(
                     marker: google.maps.marker.AdvancedMarkerElement
-                  ) => console.log(id, marker)}
+                  ) => {
+                    console.log(id, marker);
+                  }}
                   onMouseEnter={() => onMouseEnter(id)}
                   onMouseLeave={onMouseLeave}
                   style={{
@@ -97,7 +106,12 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
                   <ProjectMarker
                     project={project}
                     isExpanded={expandedId === id}
-                    onExpand={() => handleCardExpand(id)}
+                    onExpand={() => {
+                      handleCardExpand(id);
+                      captureAnalyticsEvent("click-project-marker-mapview", {
+                        projectId: project._id,
+                      });
+                    }}
                   />
                 </AdvancedMarkerWithRef>
 

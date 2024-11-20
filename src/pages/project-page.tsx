@@ -173,6 +173,9 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
   });
 
   const handleSave = () => {
+    captureAnalyticsEvent("click-project-save", {
+      projectId: projectId,
+    });
     if (user) {
       const updatedProjects = user.savedProjects || [];
 
@@ -315,6 +318,10 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
               if (highlight.description) {
                 setSelectedHighlight(highlight);
                 setIsModalOpen(true);
+                captureAnalyticsEvent("click-highlight-title", {
+                  projectId: project._id,
+                  highlightTitle: highlight.title,
+                });
               }
             }}
           >
