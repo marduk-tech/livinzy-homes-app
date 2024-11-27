@@ -1,18 +1,4 @@
-import React from "react";
-import * as FaIcons from "react-icons/fa";
-import * as Fa6Icons from "react-icons/fa6";
-
-import * as MdIcons from "react-icons/md";
-import * as GiIcons from "react-icons/gi";
-import * as AiIcons from "react-icons/ai";
-import * as IoIcons from "react-icons/io";
-import * as TbIcons from "react-icons/tb";
-import * as SiIcons from "react-icons/si";
-import * as RiIcons from "react-icons/ri";
-import * as FiIcons from "react-icons/fi";
-import * as HiIcons from "react-icons/hi";
-import * as BsIcons from "react-icons/bs";
-import * as PiIcons from "react-icons/pi";
+import React, { useState, useEffect } from "react";
 
 type IconSetKey =
   | "fa"
@@ -27,7 +13,6 @@ type IconSetKey =
   | "fi"
   | "hi"
   | "bs"
-  | "tb"
   | "pi";
 
 interface IconProps {
@@ -37,21 +22,21 @@ interface IconProps {
   color?: string;
 }
 
-// Mapping for icon sets
-const iconSets = {
-  fa: FaIcons,
-  fa6: Fa6Icons,
-  md: MdIcons,
-  gi: GiIcons,
-  ai: AiIcons,
-  io: IoIcons,
-  tb: TbIcons,
-  si: SiIcons,
-  ri: RiIcons,
-  fi: FiIcons,
-  hi: HiIcons,
-  bs: BsIcons,
-  pi: PiIcons,
+// Mapping for dynamic imports of icon sets
+const dynamicImportMap = {
+  fa: () => import("react-icons/fa"),
+  fa6: () => import("react-icons/fa6"),
+  md: () => import("react-icons/md"),
+  gi: () => import("react-icons/gi"),
+  ai: () => import("react-icons/ai"),
+  io: () => import("react-icons/io"),
+  tb: () => import("react-icons/tb"),
+  si: () => import("react-icons/si"),
+  ri: () => import("react-icons/ri"),
+  fi: () => import("react-icons/fi"),
+  hi: () => import("react-icons/hi"),
+  bs: () => import("react-icons/bs"),
+  pi: () => import("react-icons/pi"),
 };
 
 const DynamicReactIcon: React.FC<IconProps> = ({
@@ -60,19 +45,41 @@ const DynamicReactIcon: React.FC<IconProps> = ({
   size = 24,
   color = "black",
 }) => {
-  if (!iconSet || !iconSets[iconSet]) {
-    return;
-  }
-  // Retrieve the correct icon component and cast it to a valid React component type
-  const IconComponent = iconSets[iconSet][
-    iconName as keyof (typeof iconSets)[IconSetKey]
-  ] as React.ComponentType<{ size?: number; color?: string }>;
+  const [IconComponent, setIconComponent] = useState<React.ComponentType<{
+    size?: number;
+    color?: string;
+  }> | null>(null);
 
-  // Check if the icon exists
-  if (!IconComponent) {
-    console.warn(`Icon ${iconName} from set ${iconSet} not found.`);
-    return null;
-  }
+  useEffect(() => {
+    const loadIcon = async () => {
+      if (!iconSet || !dynamicImportMap[iconSet]) {
+        console.warn(`Icon set ${iconSet} not found.`);
+        return;
+      }
+
+      try {
+        // Dynamically import the icon set
+        const iconSetModule = await dynamicImportMap[iconSet]();
+
+        // Retrieve the specific icon from the module
+        const SelectedIcon = (iconSetModule as any)[iconName];
+        if (SelectedIcon) {
+          setIconComponent(() => SelectedIcon); // Set the icon component dynamically
+        } else {
+          console.warn(`Icon ${iconName} not found in set ${iconSet}.`);
+        }
+      } catch (error) {
+        console.error(
+          `Error loading icon ${iconName} from set ${iconSet}:`,
+          error
+        );
+      }
+    };
+
+    loadIcon();
+  }, [iconSet, iconName]);
+
+  if (!IconComponent) return null; // Render nothing while loading
 
   return <IconComponent size={size} color={color} />;
 };
