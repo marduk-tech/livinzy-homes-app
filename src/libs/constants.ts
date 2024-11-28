@@ -60,7 +60,7 @@ export const LivestIndexConfig = [
   {
     key: "roadsScore",
     heading: "Highway",
-    type: "roads",
+    type: "road",
     icon: { name: "FaRoad", set: "fa" },
   },
   {

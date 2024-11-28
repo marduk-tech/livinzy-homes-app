@@ -149,7 +149,7 @@ export interface IPlace {
     | "metro"
     | "tier2"
     | "tourist"
-    | "roads";
+    | "road";
   icon: { name: string; set: any };
 }
 

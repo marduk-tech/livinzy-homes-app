@@ -66,7 +66,7 @@ export const LivestmentView = ({ project }: { project: Project }) => {
         >
           {livestmentData.map(
             ({ id, zIndex: zIndexDefault, position, place }) => {
-              if (place.type == "roads") {
+              if (place.type == "road") {
                 return (
                   <RoadInfra
                     roadData={(RoadsData as any)[place.name!]}
