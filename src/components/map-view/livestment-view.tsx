@@ -14,7 +14,7 @@ import RoadsData from "../../libs/map-data/road-data.json";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IPlace, Project } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
-import { getLivestmentData } from "./map-util";
+import { getProjectLivestmentData } from "./map-util";
 import { RoadInfra } from "./road-infra";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
@@ -22,10 +22,12 @@ export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 const API_KEY = "AIzaSyADagII4pmkrk8R1VVsEzbz0qws3evTYfQ";
 
 export const LivestmentView = ({ project }: { project: Project }) => {
-  const livestmentData = getLivestmentData(project).map((dataItem, index) => ({
-    ...dataItem,
-    zIndex: index,
-  }));
+  const livestmentData = getProjectLivestmentData(project).map(
+    (dataItem, index) => ({
+      ...dataItem,
+      zIndex: index,
+    })
+  );
 
   const Z_INDEX_SELECTED = livestmentData.length;
   const Z_INDEX_HOVER = livestmentData.length + 1;

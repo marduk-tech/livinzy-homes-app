@@ -26,7 +26,7 @@ function extractLatLong(url: string) {
   }
 }
 
-export function getLivestmentData(project: Project) {
+export function getProjectLivestmentData(project: Project) {
   const data: LivestmentMarkerData = [];
 
   let indexOffset = 1;
