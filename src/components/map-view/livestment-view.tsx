@@ -9,11 +9,12 @@ import {
 } from "@vis.gl/react-google-maps";
 import { Flex, Tag, Typography } from "antd";
 import React, { useCallback, useState } from "react";
+import { useFetchLivindexPlaces } from "../../hooks/use-livindex-places";
 import { capitalize, captureAnalyticsEvent } from "../../libs/lvnzy-helper";
-import RoadsData from "../../libs/map-data/road-data.json";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IPlace, Project } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
+import { Loader } from "../common/loader";
 import { getProjectLivestmentData } from "./map-util";
 import { RoadInfra } from "./road-infra";
 
@@ -28,6 +29,11 @@ export const LivestmentView = ({ project }: { project: Project }) => {
       zIndex: index,
     })
   );
+
+  const { data: livindexRoads, isLoading: livindexRoadsLoading } =
+    useFetchLivindexPlaces({
+      type: "road",
+    });
 
   const Z_INDEX_SELECTED = livestmentData.length;
   const Z_INDEX_HOVER = livestmentData.length + 1;
@@ -50,7 +56,11 @@ export const LivestmentView = ({ project }: { project: Project }) => {
     setExpandedId((prevId) => (prevId === id ? null : id));
   }, []);
 
-  if (livestmentData && project) {
+  if (livindexRoadsLoading) {
+    return <Loader />;
+  }
+
+  if (livestmentData && project && livindexRoads) {
     return (
       <APIProvider apiKey={API_KEY} libraries={["marker"]}>
         <Map
@@ -71,7 +81,9 @@ export const LivestmentView = ({ project }: { project: Project }) => {
               if (place.type == "road") {
                 return (
                   <RoadInfra
-                    roadData={(RoadsData as any)[place.name!]}
+                    roadData={(livindexRoads as any).find(
+                      (road: any) => road._id === place.placeId
+                    )}
                   ></RoadInfra>
                 );
               } else {

@@ -151,6 +151,7 @@ export interface IPlace {
     | "tourist"
     | "road";
   icon: { name: string; set: any };
+  placeId?: string;
 }
 
 export interface ISubLivestment {
