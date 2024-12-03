@@ -26,7 +26,7 @@ function extractLatLong(url: string) {
   }
 }
 
-export function getLivestmentData(project: Project) {
+export function getProjectLivestmentData(project: Project) {
   const data: LivestmentMarkerData = [];
 
   let indexOffset = 1;
@@ -49,9 +49,11 @@ export function getLivestmentData(project: Project) {
   });
 
   const subLivestments = LivestIndexConfig;
+
   subLivestments.forEach((sl: any) => {
-    if (sl.type == "roads") {
+    if (sl.type == "road") {
       const subLiv = (project.livestment as any)[sl.key];
+
       subLiv.placesList.forEach((p: any, index: number) => {
         data.push({
           id: `r-${Math.round(Math.random() * 1000)}`,
@@ -59,6 +61,7 @@ export function getLivestmentData(project: Project) {
           place: {
             ...sl,
             ...p,
+            placeId: p.placeId,
           },
         });
       });
