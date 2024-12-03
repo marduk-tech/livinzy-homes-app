@@ -214,7 +214,9 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
                       fontSize: FONT_SIZE.subText,
                     }}
                   >
-                    <Markdown>{props.message?.toString()}</Markdown>
+                    <Markdown className="liviq-content">
+                      {props.message?.toString()}
+                    </Markdown>
                   </Typography.Text>
                   {(props as any)["data-id"] == "p-chat-1" ? (
                     <Flex vertical gap={8} style={{ marginTop: 16 }}>

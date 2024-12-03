@@ -34,3 +34,9 @@ body {
   background-color: #fafbfb;
   /* Add any other styles you want to reset or modify */
 }
+
+.liviq-content {
+  img {
+    max-width: 250px;
+  }
+}
