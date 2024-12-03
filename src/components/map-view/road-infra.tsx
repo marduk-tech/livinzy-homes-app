@@ -27,50 +27,54 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
   } | null>(null);
 
   useEffect(() => {
-    const extractedLines: LineFeature[] = roadData.features
-      .map((feature: any) => {
-        const {
-          stroke = COLORS.primaryColor,
-          "stroke-opacity": strokeOpacity = 1,
-          "stroke-width": strokeWeight = 5,
-        } = feature.properties;
+    const extractedLines: LineFeature[] =
+      (roadData?.features
+        .map((feature: any) => {
+          const {
+            stroke = COLORS.primaryColor,
+            "stroke-opacity": strokeOpacity = 1,
+            "stroke-width": strokeWeight = 5,
+          } = feature.properties;
 
-        const roadName = feature.properties.name
-          ? feature.properties.name
-          : feature.properties.wikipedia
-          ? feature.properties.wikipedia.startsWith("en:")
-            ? feature.properties.wikipedia.slice(3)
+          const roadName = feature.properties.name
+            ? feature.properties.name
             : feature.properties.wikipedia
-          : "";
+            ? feature.properties.wikipedia.startsWith("en:")
+              ? feature.properties.wikipedia.slice(3)
+              : feature.properties.wikipedia
+            : "";
 
-        if (feature.geometry.type === "LineString") {
-          const coordinates: LatLng[] = feature.geometry.coordinates.map(
-            ([lng, lat]: [number, number]) => ({ lat, lng })
-          );
+          if (feature.geometry.type === "LineString") {
+            const coordinates: LatLng[] = feature.geometry.coordinates.map(
+              ([lng, lat]: [number, number]) => ({ lat, lng })
+            );
 
-          return {
-            name: roadName,
-            coordinates: [coordinates],
-            strokeColor: stroke,
-            strokeOpacity: strokeOpacity,
-            strokeWeight: strokeWeight,
-          };
-        } else if (feature.geometry.type === "MultiLineString") {
-          const coordinates: LatLng[][] = feature.geometry.coordinates.map(
-            (line: [number, number, number][]) =>
-              line.map(([lng, lat]: [number, number, number]) => ({ lat, lng }))
-          );
-          return {
-            name: roadName,
-            coordinates,
-            strokeColor: stroke,
-            strokeOpacity: strokeOpacity,
-            strokeWeight: strokeWeight,
-          };
-        }
-        return null;
-      })
-      .filter(Boolean) as LineFeature[];
+            return {
+              name: roadName,
+              coordinates: [coordinates],
+              strokeColor: stroke,
+              strokeOpacity: strokeOpacity,
+              strokeWeight: strokeWeight,
+            };
+          } else if (feature.geometry.type === "MultiLineString") {
+            const coordinates: LatLng[][] = feature.geometry.coordinates.map(
+              (line: [number, number, number][]) =>
+                line.map(([lng, lat]: [number, number, number]) => ({
+                  lat,
+                  lng,
+                }))
+            );
+            return {
+              name: roadName,
+              coordinates,
+              strokeColor: stroke,
+              strokeOpacity: strokeOpacity,
+              strokeWeight: strokeWeight,
+            };
+          }
+          return null;
+        })
+        .filter(Boolean) as LineFeature[]) || [];
 
     setLines(extractedLines);
   }, []);
