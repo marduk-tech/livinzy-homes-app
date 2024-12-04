@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { queryKeys } from "../libs/constants";
 import { ILivIndexPlaces, PlaceType } from "../types/Common";
+import { IPlace } from "../types/Project";
 
 export const getAllLivIndexPlaces = async ({
   type,
@@ -10,7 +11,7 @@ export const getAllLivIndexPlaces = async ({
 }) => {
   const endpoint = `/livindex-places${type ? `?type=${type}` : ""}`;
   return axiosApiInstance.get(endpoint).then((response) => {
-    return response.data as ILivIndexPlaces[];
+    return response.data as IPlace[];
   });
 };
 

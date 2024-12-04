@@ -8,6 +8,7 @@ import LandMeasurementConvertor from "../components/sides/land-measurement-conve
 import { useUser } from "../hooks/use-user";
 import AskPage from "../pages/ask-page";
 import { HomePage } from "../pages/home-page";
+import { LivindexPlaces } from "../pages/livindex-places";
 import { ProfilePage } from "../pages/profile-page";
 import ProjectPage from "../pages/project-page";
 import { SignUpForm } from "../pages/signup";
@@ -24,6 +25,7 @@ export const Router = () => {
       <Route element={<DashboardLayout />}>
         <Route path="/" element={<HomePage></HomePage>} />
         <Route path="/project/:projectId" element={<ProjectPage />} />
+        <Route path="/livindex-places" element={<LivindexPlaces />} />
         <Route path="/ask" element={<AskPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/*" element={<div>404</div>} />{" "}

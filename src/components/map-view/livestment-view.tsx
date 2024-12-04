@@ -8,32 +8,40 @@ import {
   useAdvancedMarkerRef,
 } from "@vis.gl/react-google-maps";
 import { Flex, Tag, Typography } from "antd";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useFetchLivindexPlaces } from "../../hooks/use-livindex-places";
 import { capitalize, captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IPlace, Project } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { Loader } from "../common/loader";
-import { getProjectLivestmentData } from "./map-util";
+import { getAllLivestmentData, getProjectLivestmentData } from "./map-util";
 import { RoadInfra } from "./road-infra";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
 const API_KEY = "AIzaSyADagII4pmkrk8R1VVsEzbz0qws3evTYfQ";
 
-export const LivestmentView = ({ project }: { project: Project }) => {
-  const livestmentData = getProjectLivestmentData(project).map(
-    (dataItem, index) => ({
-      ...dataItem,
-      zIndex: index,
-    })
-  );
+export const LivestmentView = ({ project }: { project?: Project }) => {
+  const { data: livindexPlaces, isLoading: livindexPlacesLoading } =
+    useFetchLivindexPlaces({});
 
-  const { data: livindexRoads, isLoading: livindexRoadsLoading } =
-    useFetchLivindexPlaces({
-      type: "road",
-    });
+  const [livestmentData, setLivestmentData] = useState<Array<any>>([]);
+
+  useEffect(() => {
+    if (livindexPlaces) {
+      const data = project
+        ? getProjectLivestmentData(project)
+        : getAllLivestmentData(livindexPlaces);
+
+      setLivestmentData(
+        data.map((item, index) => ({
+          ...item,
+          zIndex: index,
+        }))
+      );
+    }
+  }, [project, livindexPlaces]);
 
   const Z_INDEX_SELECTED = livestmentData.length;
   const Z_INDEX_HOVER = livestmentData.length + 1;
@@ -56,11 +64,19 @@ export const LivestmentView = ({ project }: { project: Project }) => {
     setExpandedId((prevId) => (prevId === id ? null : id));
   }, []);
 
-  if (livindexRoadsLoading) {
+  if (livindexPlacesLoading) {
     return <Loader />;
   }
 
-  if (livestmentData && project && livindexRoads) {
+  if (livestmentData.length < 0) {
+    return <p>No Places</p>;
+  }
+
+  if (livestmentData.length > 0 && livindexPlaces) {
+    const livindexRoads = livindexPlaces.filter(
+      (place: any) => place.type === "road"
+    );
+
     return (
       <APIProvider apiKey={API_KEY} libraries={["marker"]}>
         <Map
@@ -69,8 +85,12 @@ export const LivestmentView = ({ project }: { project: Project }) => {
             height: "100%",
           }}
           mapId={"bf51a910020fa25a"}
-          defaultZoom={8.8}
-          defaultCenter={livestmentData[0].position}
+          defaultZoom={project ? 8.8 : 7}
+          defaultCenter={
+            project
+              ? livestmentData[0].position
+              : { lat: 14.5638117, lng: 77.8884163 }
+          }
           gestureHandling={"greedy"}
           onClick={onMapClick}
           clickableIcons={false}
@@ -79,13 +99,13 @@ export const LivestmentView = ({ project }: { project: Project }) => {
           {livestmentData.map(
             ({ id, zIndex: zIndexDefault, position, place }) => {
               if (place.type == "road") {
-                return (
-                  <RoadInfra
-                    roadData={(livindexRoads as any).find(
+                const roadData: any = project
+                  ? livindexRoads.find(
                       (road: any) => road._id === place.placeId
-                    )}
-                  ></RoadInfra>
-                );
+                    )
+                  : place;
+
+                return <RoadInfra roadData={roadData}></RoadInfra>;
               } else {
                 let zIndex = zIndexDefault;
 
@@ -97,12 +117,21 @@ export const LivestmentView = ({ project }: { project: Project }) => {
                   zIndex = Z_INDEX_SELECTED;
                 }
 
+                const coordinates = {
+                  lat: project ? position?.lat : place?.location?.lat,
+                  lng: project ? position?.lng : place?.location?.lng,
+                };
+
+                if (!coordinates.lat || !coordinates.lng) {
+                  return null;
+                }
+
                 return (
                   <React.Fragment key={id}>
                     <AdvancedMarkerWithRef
                       anchorPoint={AdvancedMarkerAnchorPoint[anchorPoint]}
                       className="custom-marker"
-                      position={position}
+                      position={coordinates}
                       zIndex={zIndex}
                       onMarkerClick={(
                         marker: google.maps.marker.AdvancedMarkerElement
@@ -120,10 +149,13 @@ export const LivestmentView = ({ project }: { project: Project }) => {
                         isExpanded={expandedId === id}
                         onExpand={() => {
                           handleCardExpand(id);
-                          captureAnalyticsEvent("click-livindex-marker", {
-                            projectId: project._id,
-                            placeName: place.heading,
-                          });
+
+                          if (project) {
+                            captureAnalyticsEvent("click-livindex-marker", {
+                              projectId: project._id,
+                              placeName: place.heading,
+                            });
+                          }
                         }}
                       />
                     </AdvancedMarkerWithRef>

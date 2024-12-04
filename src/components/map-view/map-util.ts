@@ -26,7 +26,11 @@ function extractLatLong(url: string) {
   }
 }
 
-export function getProjectLivestmentData(project: Project) {
+export function getProjectLivestmentData(project: Project | undefined) {
+  if (!project) {
+    return [];
+  }
+
   const data: LivestmentMarkerData = [];
 
   let indexOffset = 1;
@@ -39,6 +43,7 @@ export function getProjectLivestmentData(project: Project) {
     },
     zIndex: indexOffset,
     place: {
+      _id: project._id,
       type: "project",
       name: project.metadata.name,
       icon: {
@@ -75,6 +80,50 @@ export function getProjectLivestmentData(project: Project) {
           place: {
             ...p,
             ...sl,
+          },
+        });
+        indexOffset += 1;
+      });
+    }
+  });
+
+  return data;
+}
+
+export function getAllLivestmentData(livIndexPlaces: IPlace[]) {
+  const data: LivestmentMarkerData = [];
+
+  let indexOffset = 1;
+
+  const subLivestments = LivestIndexConfig;
+
+  subLivestments.forEach((sl: any) => {
+    if (sl.type == "road") {
+      const subLiv = livIndexPlaces.filter((place) => place.type === sl.type);
+
+      subLiv.forEach((p: any, index: number) => {
+        data.push({
+          id: `r-${Math.round(Math.random() * 1000)}`,
+          zIndex: indexOffset + index,
+          place: {
+            ...sl,
+            ...p,
+            placeId: p.placeId,
+          },
+        });
+      });
+    } else {
+      const subLiv = livIndexPlaces.filter((place) => place.type === sl.type);
+
+      subLiv.forEach((p: any, index: number) => {
+        data.push({
+          id: `${sl.key}-${String(index)}`,
+          position: p.latLng,
+          zIndex: index + indexOffset,
+          place: {
+            ...p,
+            ...sl,
+            placeId: p.placeId,
           },
         });
         indexOffset += 1;

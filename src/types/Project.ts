@@ -138,6 +138,7 @@ export interface ProjectField {
 }
 
 export interface IPlace {
+  _id: string;
   name?: string;
   totalReviews?: number;
   latLng?: string;
