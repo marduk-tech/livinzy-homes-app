@@ -1,7 +1,10 @@
 import { useMap } from "@vis.gl/react-google-maps";
-import { Card, Tag } from "antd";
+import { Tag } from "antd";
 import { useEffect, useState } from "react";
-import { COLORS } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { Typography } from "antd";
+
+const { Paragraph } = Typography;
 
 interface LatLng {
   lat: number;
@@ -44,11 +47,10 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
           //     : feature.properties.wikipedia
           //   : "";
 
-          const roadName = roadData.name.startsWith("en:")
-            ? roadData.name.slice(3)
-            : roadData.name;
-
-          console.log(feature);
+          const roadName =
+            roadData.features.length > 1
+              ? feature.properties.name || roadData.name
+              : roadData.name;
 
           if (feature.geometry.type === "LineString") {
             const coordinates: LatLng[] = feature.geometry.coordinates.map(
@@ -169,26 +171,32 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
             }}
           >
             <div style={{ padding: "8px" }}>
-              <strong>{selectedLine.name}</strong>
+              <strong>{roadData.name}</strong>
 
               {roadData?.features.length > 1 && (
                 <div style={{ marginBottom: "8px", marginTop: "8px" }}>
-                  {roadData.features?.map((feature: any, index: number) => (
-                    <Tag
-                      color="blue"
-                      key={index}
-                      style={{
-                        marginRight: "4px",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      {feature?.properties?.name}
-                    </Tag>
-                  ))}
+                  <Tag
+                    color="blue"
+                    key={selectedLine.name}
+                    style={{
+                      marginRight: "4px",
+                      marginBottom: "4px",
+                    }}
+                  >
+                    {selectedLine.name}
+                  </Tag>
                 </div>
               )}
-
-              <p>{roadData?.description}</p>
+              <Paragraph
+                style={{
+                  height: 90,
+                  overflowY: "scroll",
+                  fontSize: FONT_SIZE.default,
+                }}
+                ellipsis={{ rows: 2, expandable: true, symbol: "more" }}
+              >
+                {roadData?.description}
+              </Paragraph>
             </div>
           </div>
         )}
