@@ -1,5 +1,5 @@
 import { useMap } from "@vis.gl/react-google-maps";
-import { Card } from "antd";
+import { Card, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { COLORS } from "../../theme/style-constants";
 
@@ -36,13 +36,19 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
             "stroke-width": strokeWeight = 5,
           } = feature.properties;
 
-          const roadName = feature.properties.name
-            ? feature.properties.name
-            : feature.properties.wikipedia
-            ? feature.properties.wikipedia.startsWith("en:")
-              ? feature.properties.wikipedia.slice(3)
-              : feature.properties.wikipedia
-            : "";
+          // const roadName = feature.properties.name
+          //   ? feature.properties.name
+          //   : feature.properties.wikipedia
+          //   ? feature.properties.wikipedia.startsWith("en:")
+          //     ? feature.properties.wikipedia.slice(3)
+          //     : feature.properties.wikipedia
+          //   : "";
+
+          const roadName = roadData.name.startsWith("en:")
+            ? roadData.name.slice(3)
+            : roadData.name;
+
+          console.log(feature);
 
           if (feature.geometry.type === "LineString") {
             const coordinates: LatLng[] = feature.geometry.coordinates.map(
@@ -158,12 +164,31 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
               zIndex: 10,
               boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
               borderRadius: "10px",
-              maxWidth: "200px",
+              maxWidth: "300px",
               backgroundColor: "white",
             }}
           >
             <div style={{ padding: "8px" }}>
               <strong>{selectedLine.name}</strong>
+
+              {roadData?.features.length > 1 && (
+                <div style={{ marginBottom: "8px", marginTop: "8px" }}>
+                  {roadData.features?.map((feature: any, index: number) => (
+                    <Tag
+                      color="blue"
+                      key={index}
+                      style={{
+                        marginRight: "4px",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      {feature?.properties?.name}
+                    </Tag>
+                  ))}
+                </div>
+              )}
+
+              <p>{roadData?.description}</p>
             </div>
           </div>
         )}
