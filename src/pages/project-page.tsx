@@ -844,7 +844,10 @@ const ProjectPage: React.FC = () => {
 
             <ProjectAmenities project={projectData} />
 
-            <Livestment project={projectData} />
+            {projectData.livestment &&
+            projectData.livestment.livestmentScore ? (
+              <Livestment project={projectData} />
+            ) : null}
           </Flex>
 
           {isMobile ? (
