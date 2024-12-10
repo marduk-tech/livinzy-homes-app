@@ -141,7 +141,10 @@ export interface IPlace {
   _id: string;
   name?: string;
   totalReviews?: number;
-  latLng?: string;
+  location?: {
+    lat: number;
+    lng: number;
+  };
   heading?: string;
   type:
     | "hospital"

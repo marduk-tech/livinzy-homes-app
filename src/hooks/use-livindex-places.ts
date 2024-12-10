@@ -11,7 +11,7 @@ export const getAllLivIndexPlaces = async ({
 }) => {
   const endpoint = `/livindex-places${type ? `?type=${type}` : ""}`;
   return axiosApiInstance.get(endpoint).then((response) => {
-    return response.data as IPlace[];
+    return response.data as ILivIndexPlaces[];
   });
 };
 

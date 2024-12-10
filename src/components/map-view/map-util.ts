@@ -1,4 +1,5 @@
 import { LivestIndexConfig } from "../../libs/constants";
+import { ILivIndexPlaces } from "../../types/Common";
 import { IPlace, Project } from "../../types/Project";
 
 type MarkerData = Array<{
@@ -90,7 +91,7 @@ export function getProjectLivestmentData(project: Project | undefined) {
   return data;
 }
 
-export function getAllLivestmentData(livIndexPlaces: IPlace[]) {
+export function getAllLivestmentData(livIndexPlaces: ILivIndexPlaces[]) {
   const data: LivestmentMarkerData = [];
 
   let indexOffset = 1;
