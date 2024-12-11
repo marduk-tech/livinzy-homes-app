@@ -8,6 +8,7 @@ import {
   Modal,
   notification,
   Row,
+  Tag,
   Typography,
 } from "antd";
 import React, { useState } from "react";
@@ -18,12 +19,15 @@ import { CalendlyPopup } from "../components/calendly-popup";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import LivestIndexRange from "../components/common/livest-index-range";
 import { Loader } from "../components/common/loader";
-import { LivestmentView } from "../components/map-view/livestment-view";
+import { ProjectLivIndexMapView } from "../components/map-view/project-livindex-map-view";
 import { useDevice } from "../hooks/use-device";
 import { useFetchProjectById } from "../hooks/use-project";
 import { useUser } from "../hooks/use-user";
 import { useUpdateUserMutation } from "../hooks/user-hooks";
-import { LivestIndexConfig } from "../libs/constants";
+import {
+  LivIndexDriversConfig,
+  LivIndexMegaDriverConfig,
+} from "../libs/constants";
 import {
   capitalize,
   captureAnalyticsEvent,
@@ -32,7 +36,15 @@ import {
 import { sortedMedia } from "../libs/utils";
 import "../theme/scroll-bar.css";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { IMedia, IMetadata, IUI, Project } from "../types/Project";
+import {
+  IDriverPlace,
+  IExtrinsicDriver,
+  IMedia,
+  IMetadata,
+  IUI,
+  Project,
+} from "../types/Project";
+import { useFetchAllLivindexPlaces } from "../hooks/use-livindex-places";
 
 const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
   const { isMobile } = useDevice();
@@ -698,9 +710,12 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
   );
 };
 
-const Livestment: React.FC<{ project: Project }> = ({ project }) => {
+const Livestment: React.FC<{
+  project: Project;
+  livIndexPlaces: IDriverPlace[];
+}> = ({ project, livIndexPlaces }) => {
   const { isMobile } = useDevice();
-  const livestIndexConfig = LivestIndexConfig;
+  const livIndexDriverConfig = LivIndexDriversConfig;
 
   return (
     <Flex vertical style={{ marginTop: 32 }}>
@@ -731,37 +746,53 @@ const Livestment: React.FC<{ project: Project }> = ({ project }) => {
           }}
         >
           <LivestIndexRange
-            value={project.livestment.livestmentScore}
+            value={project.livIndexScore.score}
           ></LivestIndexRange>
-          {livestIndexConfig.map((config: any) => {
-            const subLiv = (project.livestment as any)[config.key];
-            return subLiv && subLiv.score && config.key !== "roads" ? (
-              <Flex
-                vertical
-                style={{
-                  padding: 8,
-                  backgroundColor: "white",
-                  borderRadius: 8,
-                  border: "1px solid",
-                  borderColor: COLORS.borderColor,
-                }}
-              >
-                <Typography.Text style={{ color: COLORS.textColorLight }}>
-                  {config.heading}
-                </Typography.Text>
-                <Typography.Paragraph
-                  ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
-                  style={{ margin: 0 }}
-                >
-                  Proximity to {config.heading.toLowerCase()} like{" "}
-                  {subLiv.placesList
-                    .map((p: any) => capitalize(p.name))
-                    .join(", ")}
-                  .
-                </Typography.Paragraph>
-              </Flex>
-            ) : null;
-          })}
+          {project.livIndexScore.extrinsicDrivers.map(
+            (extrinsicDriver: IExtrinsicDriver) => {
+              const originalDriverPlace = livIndexPlaces.find(
+                (p: IDriverPlace) => p._id == extrinsicDriver.placeId
+              );
+              if (originalDriverPlace) {
+                const megaDriverConfig = (LivIndexMegaDriverConfig as any)[
+                  originalDriverPlace.megaDriver
+                ];
+                const driverPlaceConfig = (livIndexDriverConfig as any)[
+                  originalDriverPlace.driver
+                ];
+                return (
+                  <Flex
+                    vertical
+                    style={{
+                      padding: 8,
+                      backgroundColor: "white",
+                      borderRadius: 8,
+                      border: "1px solid",
+                      borderColor: COLORS.borderColor,
+                    }}
+                  >
+                    <Typography.Text style={{ color: COLORS.textColorLight }}>
+                      {driverPlaceConfig.label}
+                    </Typography.Text>
+                    <Tag style={{ width: "auto" }}>
+                      {megaDriverConfig.label}
+                    </Tag>
+                    <Typography.Paragraph
+                      ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
+                      style={{ margin: 0 }}
+                    >
+                      Approximately {Math.round(extrinsicDriver.distance)} kms
+                      from
+                      <>&nbsp;</>
+                      {capitalize(originalDriverPlace.name)}.
+                    </Typography.Paragraph>
+                  </Flex>
+                );
+              } else {
+                return null;
+              }
+            }
+          )}
         </Flex>
         <Flex
           vertical
@@ -771,7 +802,10 @@ const Livestment: React.FC<{ project: Project }> = ({ project }) => {
             width: isMobile ? "100%" : "70%",
           }}
         >
-          <LivestmentView project={project}></LivestmentView>
+          <ProjectLivIndexMapView
+            project={project}
+            livIndexPlaces={livIndexPlaces}
+          ></ProjectLivIndexMapView>
         </Flex>
       </Flex>
     </Flex>
@@ -783,6 +817,9 @@ const ProjectPage: React.FC = () => {
 
   const { data: projectData, isLoading: projectDataLoading } =
     useFetchProjectById(projectId!);
+
+  const { data: allLivIndexPlaces, isLoading: allLivIndexPlacesLoading } =
+    useFetchAllLivindexPlaces({});
 
   const [livIQOpen, setLivIQOpen] = useState(false);
 
@@ -844,9 +881,16 @@ const ProjectPage: React.FC = () => {
 
             <ProjectAmenities project={projectData} />
 
-            {projectData.livestment &&
-            projectData.livestment.livestmentScore ? (
-              <Livestment project={projectData} />
+
+            {allLivIndexPlacesLoading ? (
+              <Loader></Loader>
+            ) : projectData.livIndexScore &&
+              projectData.livIndexScore.score > 0 &&
+              allLivIndexPlaces ? (
+              <Livestment
+                project={projectData}
+                livIndexPlaces={allLivIndexPlaces}
+              />
             ) : null}
           </Flex>
 

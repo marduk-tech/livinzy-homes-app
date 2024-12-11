@@ -21,6 +21,52 @@ export const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
 export const auth0CallbackUrl = import.meta.env.VITE_AUTH0_CALLBACK_URL;
 export const posthogkey = import.meta.env.VITE_POSTHOG_KEY;
 
+export const LivIndexMegaDriverConfig = {
+  macro: { label: "Macro Infra" },
+  connectivity: { label: "Connectivity" },
+  livability: { label: "Livability" },
+};
+
+export const LivIndexDriversConfig = {
+  road: { label: "Road Network", icon: { name: "FaRoad", set: "fa" } },
+  school: { label: "Schools", icon: { name: "IoMdSchool", set: "io" } },
+  hospital: { label: "Hospitals", icon: { name: "FaRegHospital", set: "fa" } },
+  leisure: {
+    label: "Leisure Activity",
+    icon: { name: "FaRegHospital", set: "fa" },
+  },
+  commercial: {
+    label: "Commercial Infra",
+    icon: { name: "RiStore3Fill", set: "ri" },
+  },
+  "industrial-hitech": {
+    label: "Hitech Industrial Parks",
+    icon: { name: "RiStore3Fill", set: "ri" },
+  },
+  "industrial-general": {
+    label: "Industrial Parks",
+    icon: { name: "RiStore3Fill", set: "ri" },
+  },
+  airport: {
+    label: "International Airport",
+    icon: { name: "MdLocalAirport", set: "md" },
+  },
+  transit: { label: "Transit Network" },
+  "tier-1-city": { label: "Tier 1 City", icon: { name: "FaCity", set: "fa" } },
+  "tier-2-city": {
+    label: "Tier 2 City",
+    icon: { name: "FaMountainCity", set: "fa" },
+  },
+  "tourist-city": {
+    label: "Tourist Destination",
+    icon: { name: "MdModeOfTravel", set: "md" },
+  },
+  "satellite-city": {
+    label: "Satellite Towns",
+    icon: { name: "FaCity", set: "fa" },
+  },
+};
+
 export const LivestIndexConfig = [
   {
     key: "metroCityScore",
@@ -128,6 +174,29 @@ export const ProjectCategories = [
       name: "GiTakeMyMoney",
       set: "gi",
     },
+  },
+];
+
+export const LocationFilters = [
+  {
+    value: "chikkaballapur",
+    label: "Chikkaballapur",
+  },
+  {
+    value: "doddaballapura",
+    label: "Doddaballapura",
+  },
+  {
+    value: "sakleshpur",
+    label: "Sakleshpur",
+  },
+  {
+    value: "kanakpura",
+    label: "Kanakpura",
+  },
+  {
+    value: "mysuru",
+    label: "Mysuru",
   },
 ];
 

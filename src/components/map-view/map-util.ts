@@ -1,5 +1,9 @@
-import { LivestIndexConfig } from "../../libs/constants";
-import { IPlace, Project } from "../../types/Project";
+import {
+  IDriverPlace,
+  IMegaDriverScore,
+  IPlace,
+  Project,
+} from "../../types/Project";
 
 type MarkerData = Array<{
   id: string;
@@ -26,63 +30,83 @@ function extractLatLong(url: string) {
   }
 }
 
-export function getProjectLivestmentData(project: Project) {
-  const data: LivestmentMarkerData = [];
+export function getProjectLivestmentDataV2(
+  project: Project | undefined
+): IPlace[] {
+  if (!project) {
+    return [];
+  }
+
+  const data: IPlace[] = [];
 
   let indexOffset = 1;
 
-  data.push({
-    id: `p-${String(indexOffset)}`,
-    position: {
-      lat: project.metadata.location.lat,
-      lng: project.metadata.location.lng,
-    },
-    zIndex: indexOffset,
-    place: {
-      type: "project",
-      name: project.metadata.name,
-      icon: {
-        name: "FaMapMarkerAlt",
-        set: "fa",
-      },
-    },
-  });
+  // data.push({
+  //   id: project._id,
+  //   position: {
+  //     lat: project.metadata.location.lat,
+  //     lng: project.metadata.location.lng,
+  //   },
+  //   zIndex: indexOffset,
+  //   place: {
+  //     _id: project._id,
+  //     driver: "project",
+  //     name: project.metadata.name,
+  //     icon: {
+  //       name: "FaMapMarkerAlt",
+  //       set: "fa",
+  //     },
+  //   },
+  // });
 
-  const subLivestments = LivestIndexConfig;
-
-  subLivestments.forEach((sl: any) => {
-    if (sl.type == "road") {
-      const subLiv = (project.livestment as any)[sl.key];
-
-      subLiv.placesList.forEach((p: any, index: number) => {
-        data.push({
-          id: `r-${Math.round(Math.random() * 1000)}`,
-          zIndex: indexOffset + index,
-          place: {
-            ...sl,
-            ...p,
-            placeId: p.placeId,
-          },
-        });
-      });
-    } else {
-      const subLiv = (project.livestment as any)[sl.key];
-      subLiv.placesList.forEach((p: any, index: number) => {
-        data.push({
-          id: `${sl.key}-${String(index)}`,
-          position: p.latLng,
-          zIndex: index + indexOffset,
-          place: {
-            ...p,
-            ...sl,
-          },
-        });
-        indexOffset += 1;
+  project.livIndexScore.megaDriverScores.forEach(
+    (megaDriverScore: IMegaDriverScore, index: number) => {
+      megaDriverScore.places.forEach((place: IPlace, index2: number) => {
+        data.push(place);
       });
     }
-  });
+  );
 
   return data;
+}
+
+export function getAllLivestmentData(livIndexPlaces: IDriverPlace[]) {
+  // const data: LivestmentMarkerData = [];
+  // let indexOffset = 1;
+  // const subLivestments = LivestIndexConfig;
+  // subLivestments.forEach((sl: any) => {
+  //   if (sl.type == "road") {
+  //     const subLiv = livIndexPlaces.filter((place) => place.driver === sl.type);
+  //     subLiv.forEach((p: any, index: number) => {
+  //       data.push({
+  //         id: `r-${Math.round(Math.random() * 1000)}`,
+  //         zIndex: indexOffset + index,
+  //         place: {
+  //           ...sl,
+  //           ...p,
+  //           placeId: p.placeId,
+  //         },
+  //       });
+  //     });
+  //   } else {
+  //     const subLiv = livIndexPlaces.filter((place) => place.driver === sl.type);
+  //     subLiv.forEach((p: any, index: number) => {
+  //       data.push({
+  //         id: `${sl.key}-${String(index)}`,
+  //         position: p.latLng,
+  //         zIndex: index + indexOffset,
+  //         place: {
+  //           ...p,
+  //           ...sl,
+  //           placeId: p.placeId,
+  //         },
+  //       });
+  //       indexOffset += 1;
+  //     });
+  //   }
+  // });
+  // return data;
+  return [];
 }
 
 export function getData({ projects }: { projects: Project[] }) {
