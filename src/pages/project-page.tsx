@@ -881,6 +881,7 @@ const ProjectPage: React.FC = () => {
 
             <ProjectAmenities project={projectData} />
 
+
             {allLivIndexPlacesLoading ? (
               <Loader></Loader>
             ) : projectData.livIndexScore &&
