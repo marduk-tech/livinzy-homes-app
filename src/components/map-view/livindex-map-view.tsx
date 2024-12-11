@@ -1,8 +1,7 @@
 import { APIProvider, Map } from "@vis.gl/react-google-maps";
 import { FeatureCollection, Point } from "geojson";
 import { useEffect, useState } from "react";
-import { useFetchLivindexPlaces } from "../../hooks/use-livindex-places";
-import { PlaceType } from "../../types/Common";
+import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
 import { Loader } from "../common/loader";
 import { ClusteredMarkers } from "./clustered-markers";
 
@@ -11,7 +10,7 @@ export type CastleFeatureProps = {
   heading?: string;
   description?: string;
   placeId?: string;
-  type?: PlaceType;
+  type?: string;
 };
 
 export type LivIndexPlacesGeoJson = FeatureCollection<
@@ -19,9 +18,9 @@ export type LivIndexPlacesGeoJson = FeatureCollection<
   CastleFeatureProps
 >;
 
-export function AllLivestmentView() {
+export function LivIndexMapView() {
   const { data: livindexPlaces, isLoading: livindexPlacesLoading } =
-    useFetchLivindexPlaces({});
+    useFetchAllLivindexPlaces({});
 
   const [geojson, setGeojson] = useState<LivIndexPlacesGeoJson | null>(null);
   const [numClusters, setNumClusters] = useState(4);
@@ -29,7 +28,7 @@ export function AllLivestmentView() {
   useEffect(() => {
     if (livindexPlaces) {
       const formattedPlaces = livindexPlaces
-        .filter((place) => place.type !== "road")
+        .filter((place) => place.driver !== "road")
         .filter((place) => place.location?.lat && place.location?.lng);
 
       const formattedGeoJson: LivIndexPlacesGeoJson = {
@@ -50,8 +49,8 @@ export function AllLivestmentView() {
             properties: {
               name: place.name || "",
               description: place.description || "",
-              placeId: place.placeId || "",
-              type: place.type,
+              placeId: place._id || "",
+              type: place.driver,
             },
           };
         }),

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { queryKeys } from "../libs/constants";
-import { ILivIndexPlaces, PlaceType } from "../types/Common";
-import { IPlace } from "../types/Project";
+import { PlaceType } from "../types/Common";
+import { IDriverPlace } from "../types/Project";
 
 export const getAllLivIndexPlaces = async ({
   type,
@@ -11,11 +11,11 @@ export const getAllLivIndexPlaces = async ({
 }) => {
   const endpoint = `/livindex-places${type ? `?type=${type}` : ""}`;
   return axiosApiInstance.get(endpoint).then((response) => {
-    return response.data as ILivIndexPlaces[];
+    return response.data as IDriverPlace[];
   });
 };
 
-export function useFetchLivindexPlaces({ type }: { type?: PlaceType }) {
+export function useFetchAllLivindexPlaces({ type }: { type?: PlaceType }) {
   return useQuery({
     queryKey: [queryKeys.getAllPlaces, type],
     queryFn: () => getAllLivIndexPlaces({ type }),

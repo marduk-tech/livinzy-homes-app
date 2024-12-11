@@ -128,6 +128,7 @@ export interface Project {
   createdAt: string;
   updatedAt: string;
   livestment: ILivestment;
+  livIndexScore: ILivIndexScore;
 }
 
 export interface ProjectField {
@@ -138,25 +139,25 @@ export interface ProjectField {
   hide?: boolean;
 }
 
-export interface IPlace {
+export interface IDriverConfig {
+  label?: string;
+  icon: {
+    name: string;
+    set: any;
+  };
+  zIndex: number;
+}
+
+export interface IDriverPlace {
   _id: string;
-  name?: string;
-  totalReviews?: number;
+  name: string;
+  description?: string;
   location?: {
     lat: number;
     lng: number;
   };
-  heading?: string;
-  type:
-    | "hospital"
-    | "school"
-    | "project"
-    | "metro"
-    | "tier2"
-    | "tourist"
-    | "road";
-  icon: { name: string; set: any };
-  placeId?: string;
+  driver: string;
+  megaDriver: string;
 }
 
 export interface ISubLivestment {
@@ -170,6 +171,43 @@ export interface ILivestment {
   hospitals: ISubLivestment;
 }
 
+export interface IPlace {
+  _id: string;
+  placeId: string;
+  distance: number;
+  timeline: string;
+}
+export interface IMegaDriverScore {
+  score: number;
+  megaDriver: string;
+  places: [IPlace];
+}
+
+export interface IExtrinsicDriver {
+  _id: string;
+  placeId: string;
+  distance: number;
+  coefficients: {
+    proximityCoeffecient: Number;
+    countCoeffecient: Number;
+    triggerCoeffecient: Number;
+    timelineCoeffecient: Number;
+  };
+}
+
+export interface IIntrinsicDriver {
+  coefficients: {
+    craftCoeffecient: number;
+    builderCoeffecient: Number;
+  };
+}
+
+export interface ILivIndexScore {
+  score: number;
+  extrinsicDrivers: [IExtrinsicDriver];
+  intrinsicDriver: IIntrinsicDriver;
+}
+
 export interface ProjectStructure {
   metadata: ProjectField[];
   ui: ProjectField[];
@@ -181,4 +219,5 @@ export interface ProjectStructure {
   amenities: ProjectField[];
   clickToAction: ProjectField[];
   team: ProjectField[];
+  livIndexScore: ILivIndexScore;
 }
