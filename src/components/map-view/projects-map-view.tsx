@@ -14,7 +14,7 @@ import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { FONT_SIZE } from "../../theme/style-constants";
 import { Project } from "../../types/Project";
 import { ProjectCard } from "../common/project-card";
-import { getData } from "./map-util";
+import { getProjectsMapData } from "./map-util";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -23,7 +23,7 @@ const API_KEY = "AIzaSyADagII4pmkrk8R1VVsEzbz0qws3evTYfQ";
 export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
   console.log(projects);
 
-  const data = getData({ projects: projects })
+  const data = getProjectsMapData({ projects: projects })
     .sort((a, b) => b.position!.lat - a.position!.lat)
     .map((dataItem, index) => ({ ...dataItem, zIndex: index }));
 
