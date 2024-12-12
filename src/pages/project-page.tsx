@@ -729,61 +729,70 @@ const Livestment: React.FC<{
         gap={16}
         style={{ height: isMobile ? "auto" : 400, marginTop: 16 }}
       >
-        <Flex
-          gap={16}
-          vertical
-          style={{
-            width: isMobile ? "100%" : "40%",
-            height: "100%",
-            overflowY: "scroll",
-            scrollbarWidth: "none",
-          }}
-        >
-          <LivestIndexRange
-            value={project.livIndexScore.score}
-          ></LivestIndexRange>
-          {Object.entries(JSON.parse(project.livIndexScore.summary)).map(
-            ([key, value], index) => {
-              return (
-                <Flex
-                  vertical
-                  style={{
-                    padding: 8,
-                    backgroundColor: "white",
-                    borderRadius: 8,
-                    border: "1px solid",
-                    borderColor: COLORS.borderColor,
-                  }}
-                >
-                  {key == "oneLiner" ? (
-                    <Typography.Text
-                      style={{
-                        lineHeight: "120%",
-                        color: COLORS.textColorLight,
-                      }}
-                    >
-                      {value as any}
-                    </Typography.Text>
-                  ) : value ? (
-                    <Flex vertical>
-                      {" "}
-                      <Typography.Text style={{ color: COLORS.textColorLight }}>
-                        {(LivIndexMegaDriverConfig as any)[key].label}
-                      </Typography.Text>
-                      {/* <Tag style={{ width: "auto" }}>{key}</Tag> */}
-                      <Typography.Paragraph
-                        ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
-                        style={{ margin: 0 }}
+        {project.livIndexScore.summary ? (
+          <Flex
+            gap={16}
+            vertical
+            style={{
+              width: isMobile ? "100%" : "40%",
+              height: "100%",
+              overflowY: "scroll",
+              scrollbarWidth: "none",
+            }}
+          >
+            <LivestIndexRange
+              value={project.livIndexScore.score}
+            ></LivestIndexRange>
+            {Object.entries(JSON.parse(project.livIndexScore.summary)).map(
+              ([key, value], index) => {
+                return (
+                  <Flex
+                    vertical
+                    style={{
+                      padding: 8,
+                      backgroundColor: "white",
+                      borderRadius: 8,
+                      border: "1px solid",
+                      borderColor: COLORS.borderColor,
+                    }}
+                  >
+                    {key == "oneLiner" ? (
+                      <Typography.Text
+                        style={{
+                          lineHeight: "120%",
+                          color: COLORS.textColorLight,
+                        }}
                       >
                         {value as any}
-                      </Typography.Paragraph>
-                    </Flex>
-                  ) : null}
-                </Flex>
-              );
-            }
-          )}
-        </Flex>
+                      </Typography.Text>
+                    ) : value ? (
+                      <Flex vertical>
+                        {" "}
+                        <Typography.Text
+                          style={{ color: COLORS.textColorLight }}
+                        >
+                          {(LivIndexMegaDriverConfig as any)[key].label}
+                        </Typography.Text>
+                        {/* <Tag style={{ width: "auto" }}>{key}</Tag> */}
+                        <Typography.Paragraph
+                          ellipsis={{
+                            rows: 3,
+                            expandable: true,
+                            symbol: "more",
+                          }}
+                          style={{ margin: 0 }}
+                        >
+                          {value as any}
+                        </Typography.Paragraph>
+                      </Flex>
+                    ) : null}
+                  </Flex>
+                );
+              }
+            )}
+          </Flex>
+        ) : null}
+
         <Flex
           vertical
           style={{
