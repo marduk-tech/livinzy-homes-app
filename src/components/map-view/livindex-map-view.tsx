@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
 import { Loader } from "../common/loader";
 import { ClusteredMarkers } from "./clustered-markers";
+import { RoadInfra } from "./road-infra";
 
 export type CastleFeatureProps = {
   name?: string;
@@ -24,12 +25,20 @@ export function LivIndexMapView() {
 
   const [geojson, setGeojson] = useState<LivIndexPlacesGeoJson | null>(null);
   const [numClusters, setNumClusters] = useState(4);
+  const [roadsData, setRoadsData] = useState<any[]>();
 
   useEffect(() => {
     if (livindexPlaces) {
       const formattedPlaces = livindexPlaces
-        .filter((place) => place.driver !== "road")
+        .filter(
+          (place) => place.megaDriver == "macro" || place.driver == "commercial"
+        )
         .filter((place) => place.location?.lat && place.location?.lng);
+
+      const roads = livindexPlaces.filter(
+        (place) => place.driver === "road" || place.driver === "transit"
+      );
+      setRoadsData(roads);
 
       const formattedGeoJson: LivIndexPlacesGeoJson = {
         type: "FeatureCollection",
@@ -56,8 +65,6 @@ export function LivIndexMapView() {
         }),
       };
 
-      console.log(formattedGeoJson);
-
       setGeojson(formattedGeoJson);
     }
   }, [livindexPlaces]);
@@ -82,6 +89,10 @@ export function LivIndexMapView() {
               setNumClusters={setNumClusters}
             />
           )}
+          {roadsData &&
+            roadsData.map((road) => {
+              return <RoadInfra roadData={road}></RoadInfra>;
+            })}
         </Map>
       </APIProvider>
     );

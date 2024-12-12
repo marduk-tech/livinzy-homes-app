@@ -1,8 +1,9 @@
 import { useMap } from "@vis.gl/react-google-maps";
-import { Tag } from "antd";
+import { Flex, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { Typography } from "antd";
+import { PLACE_TIMELINE } from "../../libs/constants";
 
 const { Paragraph } = Typography;
 
@@ -17,6 +18,9 @@ interface LineFeature {
   strokeColor: string;
   strokeOpacity: number;
   strokeWeight: number;
+  dashConfig?: {
+    spacing: number;
+  };
 }
 
 export const RoadInfra: React.FC<any> = ({ roadData }) => {
@@ -33,24 +37,31 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
     const extractedLines: LineFeature[] =
       (roadData?.features
         .map((feature: any) => {
-          const {
-            stroke = COLORS.primaryColor,
-            "stroke-opacity": strokeOpacity = 1,
-            "stroke-width": strokeWeight = 5,
-          } = feature.properties;
-
-          // const roadName = feature.properties.name
-          //   ? feature.properties.name
-          //   : feature.properties.wikipedia
-          //   ? feature.properties.wikipedia.startsWith("en:")
-          //     ? feature.properties.wikipedia.slice(3)
-          //     : feature.properties.wikipedia
-          //   : "";
-
           const roadName =
             roadData.features.length > 1
               ? feature.properties.name || roadData.name
               : roadData.name;
+
+          let customProps = {};
+
+          const status =
+            roadData.features.length == 1
+              ? roadData.status
+              : feature.properties.status || roadData.status;
+          if (
+            status &&
+            ![
+              PLACE_TIMELINE.LAUNCHED,
+              PLACE_TIMELINE.POST_LAUNCH,
+              PLACE_TIMELINE.PARTIAL_LAUNCH,
+            ].includes(status)
+          ) {
+            customProps = {
+              dashConfig: {
+                spacing: 20,
+              },
+            };
+          }
 
           if (feature.geometry.type === "LineString") {
             const coordinates: LatLng[] = feature.geometry.coordinates.map(
@@ -60,9 +71,10 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
             return {
               name: roadName,
               coordinates: [coordinates],
-              strokeColor: stroke,
-              strokeOpacity: strokeOpacity,
-              strokeWeight: strokeWeight,
+              strokeColor:
+                feature.properties.strokeColor || COLORS.textColorLight,
+              strokeWeight: 2,
+              ...customProps,
             };
           } else if (feature.geometry.type === "MultiLineString") {
             const coordinates: LatLng[][] = feature.geometry.coordinates.map(
@@ -75,9 +87,10 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
             return {
               name: roadName,
               coordinates,
-              strokeColor: stroke,
-              strokeOpacity: strokeOpacity,
-              strokeWeight: strokeWeight,
+              strokeColor:
+                feature.properties.strokeColor || COLORS.textColorLight,
+              strokeWeight: 2,
+              ...customProps,
             };
           }
           return null;
@@ -107,13 +120,34 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
 
     const polylineObjects = lines.flatMap((line) =>
       line.coordinates.map((coords) => {
-        const polyline = new google.maps.Polyline({
-          path: coords as any,
-          strokeColor: line.strokeColor,
-          strokeOpacity: line.strokeOpacity,
-          strokeWeight: line.strokeWeight,
-          map: map,
-        });
+        let polyline;
+        if (line.dashConfig) {
+          polyline = new google.maps.Polyline({
+            path: coords as any,
+            strokeOpacity: 0,
+            map: map,
+            icons: [
+              {
+                icon: {
+                  path: "M 0,-1 0,1",
+                  strokeOpacity: 1,
+                  strokeColor: line.strokeColor,
+                  scale: 4,
+                },
+                offset: "0",
+                repeat: `${line.dashConfig.spacing}px`, // Length of dashes
+              },
+            ],
+          });
+        } else {
+          polyline = new google.maps.Polyline({
+            path: coords as any,
+            strokeColor: line.strokeColor,
+            strokeOpacity: line.strokeOpacity,
+            strokeWeight: line.strokeWeight,
+            map: map,
+          });
+        }
 
         polyline.addListener("click", (e: any) => {
           e.stop();
@@ -164,34 +198,58 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
               left: popupPosition.x,
               top: popupPosition.y,
               zIndex: 10,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
               borderRadius: "10px",
               maxWidth: "300px",
-              backgroundColor: "white",
+              backgroundColor: "#4c5b68",
             }}
           >
             <div style={{ padding: "8px" }}>
-              <strong>{roadData.name}</strong>
-
-              {roadData?.features.length > 1 && (
-                <div style={{ marginBottom: "8px", marginTop: "8px" }}>
+              <Typography.Text
+                style={{ color: "white", fontSize: FONT_SIZE.subHeading }}
+              >
+                {roadData.name}
+              </Typography.Text>
+              <Flex
+                style={{ marginBottom: "8px", marginTop: "8px" }}
+                wrap="wrap"
+              >
+                {roadData?.features.length > 1 ? (
                   <Tag
                     color="blue"
                     key={selectedLine.name}
                     style={{
                       marginRight: "4px",
                       marginBottom: "4px",
+                      fontSize: FONT_SIZE.default,
+                      color: "white",
                     }}
                   >
                     {selectedLine.name}
                   </Tag>
-                </div>
-              )}
+                ) : null}
+                <Tag
+                  color={
+                    selectedLine.dashConfig
+                      ? COLORS.yellowIdentifier
+                      : COLORS.greenIdentifier
+                  }
+                  style={{
+                    marginRight: "4px",
+                    marginBottom: "4px",
+                    fontSize: FONT_SIZE.default,
+                  }}
+                >
+                  {selectedLine.dashConfig
+                    ? "Under Construction"
+                    : "Operational"}
+                </Tag>
+              </Flex>
               <Paragraph
                 style={{
                   height: 90,
                   overflowY: "scroll",
                   fontSize: FONT_SIZE.default,
+                  color: "white",
                 }}
                 ellipsis={{ rows: 2, expandable: true, symbol: "more" }}
               >

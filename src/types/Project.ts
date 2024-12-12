@@ -160,6 +160,8 @@ export interface IDriverPlace {
   };
   driver: string;
   megaDriver: string;
+  status: string;
+  distance?: number;
 }
 
 export interface ISubLivestment {
@@ -206,6 +208,7 @@ export interface IIntrinsicDriver {
 
 export interface ILivIndexScore {
   score: number;
+  summary: string;
   extrinsicDrivers: [IExtrinsicDriver];
   intrinsicDriver: IIntrinsicDriver;
 }

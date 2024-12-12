@@ -8,7 +8,6 @@ import {
   Modal,
   notification,
   Row,
-  Tag,
   Typography,
 } from "antd";
 import React, { useState } from "react";
@@ -29,17 +28,12 @@ import {
   LivIndexDriversConfig,
   LivIndexMegaDriverConfig,
 } from "../libs/constants";
-import {
-  capitalize,
-  captureAnalyticsEvent,
-  rupeeAmountFormat,
-} from "../libs/lvnzy-helper";
+import { captureAnalyticsEvent, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { sortedMedia } from "../libs/utils";
 import "../theme/scroll-bar.css";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import {
   IDriverPlace,
-  IExtrinsicDriver,
   IMedia,
   IMetadata,
   IUI,
@@ -739,7 +733,7 @@ const Livestment: React.FC<{
           gap={16}
           vertical
           style={{
-            width: isMobile ? "100%" : "30%",
+            width: isMobile ? "100%" : "40%",
             height: "100%",
             overflowY: "scroll",
             scrollbarWidth: "none",
@@ -748,48 +742,45 @@ const Livestment: React.FC<{
           <LivestIndexRange
             value={project.livIndexScore.score}
           ></LivestIndexRange>
-          {project.livIndexScore.extrinsicDrivers.map(
-            (extrinsicDriver: IExtrinsicDriver) => {
-              const originalDriverPlace = extrinsicDriver.placeId;
-
-              if (originalDriverPlace) {
-                const megaDriverConfig = (LivIndexMegaDriverConfig as any)[
-                  originalDriverPlace.megaDriver
-                ];
-                const driverPlaceConfig = (livIndexDriverConfig as any)[
-                  originalDriverPlace.driver
-                ];
-                return (
-                  <Flex
-                    vertical
-                    style={{
-                      padding: 8,
-                      backgroundColor: "white",
-                      borderRadius: 8,
-                      border: "1px solid",
-                      borderColor: COLORS.borderColor,
-                    }}
-                  >
-                    <Typography.Text style={{ color: COLORS.textColorLight }}>
-                      {driverPlaceConfig.label}
-                    </Typography.Text>
-                    <Tag style={{ width: "auto" }}>
-                      {megaDriverConfig.label}
-                    </Tag>
-                    <Typography.Paragraph
-                      ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
-                      style={{ margin: 0 }}
+          {Object.entries(JSON.parse(project.livIndexScore.summary)).map(
+            ([key, value], index) => {
+              return (
+                <Flex
+                  vertical
+                  style={{
+                    padding: 8,
+                    backgroundColor: "white",
+                    borderRadius: 8,
+                    border: "1px solid",
+                    borderColor: COLORS.borderColor,
+                  }}
+                >
+                  {key == "oneLiner" ? (
+                    <Typography.Text
+                      style={{
+                        lineHeight: "120%",
+                        color: COLORS.textColorLight,
+                      }}
                     >
-                      Approximately {Math.round(extrinsicDriver.distance)} kms
-                      from
-                      <>&nbsp;</>
-                      {capitalize(originalDriverPlace.name)}.
-                    </Typography.Paragraph>
-                  </Flex>
-                );
-              } else {
-                return null;
-              }
+                      {value as any}
+                    </Typography.Text>
+                  ) : value ? (
+                    <Flex vertical>
+                      {" "}
+                      <Typography.Text style={{ color: COLORS.textColorLight }}>
+                        {(LivIndexMegaDriverConfig as any)[key].label}
+                      </Typography.Text>
+                      {/* <Tag style={{ width: "auto" }}>{key}</Tag> */}
+                      <Typography.Paragraph
+                        ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
+                        style={{ margin: 0 }}
+                      >
+                        {value as any}
+                      </Typography.Paragraph>
+                    </Flex>
+                  ) : null}
+                </Flex>
+              );
             }
           )}
         </Flex>
@@ -798,7 +789,7 @@ const Livestment: React.FC<{
           style={{
             borderRadius: 32,
             height: 400,
-            width: isMobile ? "100%" : "70%",
+            width: isMobile ? "100%" : "60%",
           }}
         >
           <ProjectLivIndexMapView

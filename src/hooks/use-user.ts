@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { LocalStorageKeys, queryKeys } from "../libs/constants";

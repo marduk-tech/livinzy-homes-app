@@ -27,6 +27,15 @@ export const LivIndexMegaDriverConfig = {
   livability: { label: "Livability" },
 };
 
+export const enum PLACE_TIMELINE {
+  ANNOUNCED = "announced",
+  PRE_CONSTRUCTION = "pre-construction",
+  CONSTRUCTION = "construction",
+  PARTIAL_LAUNCH = "partial-launch",
+  LAUNCHED = "launched",
+  POST_LAUNCH = "post-launch",
+}
+
 export const LivIndexDriversConfig = {
   road: { label: "Road Network", icon: { name: "FaRoad", set: "fa" } },
   school: { label: "Schools", icon: { name: "IoMdSchool", set: "io" } },
@@ -41,7 +50,7 @@ export const LivIndexDriversConfig = {
   },
   "industrial-hitech": {
     label: "Hitech Industrial Parks",
-    icon: { name: "RiStore3Fill", set: "ri" },
+    icon: { name: "BiSolidFactory", set: "bi" },
   },
   "industrial-general": {
     label: "Industrial Parks",
@@ -52,7 +61,10 @@ export const LivIndexDriversConfig = {
     icon: { name: "MdLocalAirport", set: "md" },
   },
   transit: { label: "Transit Network" },
-  "tier-1-city": { label: "Tier 1 City", icon: { name: "FaCity", set: "fa" } },
+  "tier-1-city": {
+    label: "Tier 1 City",
+    icon: { name: "PiCityBold", set: "pi" },
+  },
   "tier-2-city": {
     label: "Tier 2 City",
     icon: { name: "FaMountainCity", set: "fa" },
@@ -63,7 +75,7 @@ export const LivIndexDriversConfig = {
   },
   "satellite-city": {
     label: "Satellite Towns",
-    icon: { name: "FaCity", set: "fa" },
+    icon: { name: "PiCityBold", set: "pi" },
   },
 };
 
@@ -72,7 +84,7 @@ export const LivestIndexConfig = [
     key: "metroCityScore",
     type: "metro",
     heading: "Metro",
-    icon: { name: "FaCity", set: "fa" },
+    icon: { name: "PiCityBold", set: "fa" },
   },
   {
     key: "tier2CityScore",

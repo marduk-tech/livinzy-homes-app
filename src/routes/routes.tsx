@@ -5,7 +5,6 @@ import { DashboardLayout } from "../layouts/dashboard-layout";
 
 // Pages
 import LandMeasurementConvertor from "../components/sides/land-measurement-convertor";
-import { useUser } from "../hooks/use-user";
 import AskPage from "../pages/ask-page";
 import { HomePage } from "../pages/home-page";
 import { LivindexPlaces } from "../pages/livindex-places";
@@ -14,8 +13,6 @@ import ProjectPage from "../pages/project-page";
 import { SignUpForm } from "../pages/signup";
 
 export const Router = () => {
-  const { user, isError } = useUser();
-
   return (
     <Routes>
       <Route
