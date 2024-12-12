@@ -97,7 +97,7 @@ export const ProjectLivIndexMapView = ({
               const originalLivIndexPlace = extrinsicDriver.placeId;
 
               const driverConfig = (LivIndexDriversConfig as any)[
-                originalLivIndexPlace.driver
+                originalLivIndexPlace!.driver
               ];
 
               if (originalLivIndexPlace!.driver == "road") {
