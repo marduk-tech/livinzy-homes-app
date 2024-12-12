@@ -3,11 +3,13 @@ import {
   AdvancedMarkerAnchorPoint,
   useAdvancedMarkerRef,
 } from "@vis.gl/react-google-maps";
-import { Flex, Tag, Typography } from "antd";
+import { Flex, Tooltip, Typography } from "antd";
 import { FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { useCallback, useEffect, useMemo } from "react";
 import Supercluster, { ClusterProperties } from "supercluster";
 import { useSupercluster } from "../../hooks/use-supercluster";
+import { LivIndexDriversConfig } from "../../libs/constants";
+import DynamicReactIcon from "../common/dynamic-react-icon";
 
 type ClusteredMarkersProps = {
   geojson: FeatureCollection<Point>;
@@ -157,7 +159,10 @@ export const FeatureMarker = ({
 
   const featureName = feature?.properties?.name || "Unknown";
 
-  console.log(feature?.id);
+  let driverConfig;
+  if (feature && feature.properties && feature.properties.type) {
+    driverConfig = (LivIndexDriversConfig as any)[feature.properties.type];
+  }
 
   return (
     <AdvancedMarker
@@ -167,7 +172,23 @@ export const FeatureMarker = ({
       anchorPoint={AdvancedMarkerAnchorPoint.CENTER}
       className={"marker feature"}
     >
-      <Tag>{featureName}</Tag>
+      <Flex>
+        {/* <Tag
+        >
+          {featureName}
+          
+        </Tag> */}
+        <Tooltip title={featureName}>
+          <Flex>
+            <DynamicReactIcon
+              iconName={driverConfig.icon.name}
+              iconSet={driverConfig.icon.set}
+              size={18}
+              color="black"
+            ></DynamicReactIcon>
+          </Flex>
+        </Tooltip>
+      </Flex>
     </AdvancedMarker>
   );
 };

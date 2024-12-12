@@ -7,14 +7,15 @@ import {
   Map,
   useAdvancedMarkerRef,
 } from "@vis.gl/react-google-maps";
-import { Flex, Typography } from "antd";
+import { Flex, Tag, Tooltip, Typography } from "antd";
 import React, { useCallback, useState } from "react";
-import { capitalize, captureAnalyticsEvent } from "../../libs/lvnzy-helper";
+import { LivIndexDriversConfig } from "../../libs/constants";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace, IExtrinsicDriver, Project } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { RoadInfra } from "./road-infra";
-import { LivIndexDriversConfig } from "../../libs/constants";
+import { PLACE_TIMELINE } from "../../libs/constants";
+const { Paragraph } = Typography;
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -31,8 +32,8 @@ export const ProjectLivIndexMapView = ({
     coordinates,
     zIndex,
     markerId,
+    place,
     icon,
-    label,
     isProject,
   }) => {
     return (
@@ -46,21 +47,7 @@ export const ProjectLivIndexMapView = ({
             console.log(markerId, marker)
           }
         >
-          <PlaceCard
-            icon={icon}
-            label={label}
-            isProject={isProject}
-            isExpanded={expandedId === markerId}
-            onExpand={() => {
-              handleCardExpand(markerId);
-              if (project) {
-                captureAnalyticsEvent("click-livindex-marker", {
-                  projectId: project._id,
-                  placeName: label,
-                });
-              }
-            }}
-          />
+          <PlaceCard icon={icon} place={place} isProject={isProject} />
         </AdvancedMarkerWithRef>
       </React.Fragment>
     );
@@ -94,9 +81,8 @@ export const ProjectLivIndexMapView = ({
         >
           {project.livIndexScore.extrinsicDrivers.map(
             (extrinsicDriver: IExtrinsicDriver, index: number) => {
-              const originalLivIndexPlace = livIndexPlaces.find(
-                (p: IDriverPlace) => p._id == extrinsicDriver.placeId
-              );
+              const originalLivIndexPlace = extrinsicDriver.placeId;
+
               const driverConfig = (LivIndexDriversConfig as any)[
                 originalLivIndexPlace!.driver
               ];
@@ -115,7 +101,10 @@ export const ProjectLivIndexMapView = ({
                     coordinates={originalLivIndexPlace!.location}
                     icon={driverConfig.icon}
                     zIndex={project.livIndexScore.extrinsicDrivers.length + 1}
-                    label={originalLivIndexPlace!.name}
+                    place={{
+                      ...originalLivIndexPlace,
+                      distance: extrinsicDriver.distance,
+                    }}
                     markerId={extrinsicDriver._id}
                     isProject={false}
                   ></LivIndexMarker>
@@ -131,7 +120,11 @@ export const ProjectLivIndexMapView = ({
             set: "fa",
           }}
           zIndex={1}
-          label={project?.metadata.name}
+          place={{
+            name: project.metadata.name,
+            status: "launched",
+            description: "",
+          }}
           markerId={project!._id}
           isProject={true}
         ></LivIndexMarker>
@@ -141,79 +134,99 @@ export const ProjectLivIndexMapView = ({
 };
 
 export const PlaceCard = ({
-  label,
+  place,
   icon,
-  isExpanded,
-  onExpand,
   isProject,
 }: {
-  label: string;
+  place: IDriverPlace;
   icon: {
     name: string;
     set: any;
   };
-  isExpanded: boolean;
-  onExpand: () => void;
   isProject: boolean;
 }) => {
-  const handleClick = () => {
-    onExpand();
-  };
-
+  const isUnderConstruction = ![
+    PLACE_TIMELINE.LAUNCHED,
+    PLACE_TIMELINE.POST_LAUNCH,
+  ].includes(place.status as any);
   return (
-    <Flex
-      onClick={handleClick}
-      align="center"
-      justify={isExpanded ? "flex-start" : "center"}
-      style={{
-        backgroundColor: isProject ? COLORS.primaryColor : "white",
-        borderRadius: isExpanded ? 10 : "50%",
-        whiteSpace: "wrap",
-        padding: isExpanded ? 8 : 0,
-        boxShadow: "0 0 4px",
-        width: isExpanded ? 200 : 50,
-        height: isExpanded ? "auto" : 50,
-        cursor: "pointer",
-        zIndex: 99,
-      }}
-    >
-      {isExpanded ? (
-        <Flex style={{ width: "100%" }}>
-          <Flex gap={8} align="flex-start">
-            <Flex style={{ width: 32 }}>
-              <DynamicReactIcon
-                iconName={icon.name}
-                iconSet={icon.set}
-                size={18}
-                color={isProject ? "white" : COLORS.textColorDark}
-              ></DynamicReactIcon>
-            </Flex>
-            <Flex vertical align="flex-start" gap={4}>
-              <Typography.Text
+    <Tooltip
+      style={{ width: 300 }}
+      title={
+        <Flex vertical style={{ padding: 2 }}>
+          <Flex gap={4} style={{ marginTop: 4 }} align="flex-start">
+            <Typography.Text
+              style={{
+                color: "white",
+                fontSize: FONT_SIZE.subHeading,
+                lineHeight: "100%",
+              }}
+            >
+              {place.name}
+            </Typography.Text>
+          </Flex>
+          <Flex style={{ marginTop: 8 }}>
+            {place.distance && (
+              <Tag
                 style={{
-                  color: isProject ? "white" : COLORS.textColorDark,
-                  fontSize: FONT_SIZE.subText,
+                  fontSize: FONT_SIZE.default,
                 }}
               >
-                {capitalize(label || "")}
-              </Typography.Text>
-            </Flex>
+                {Math.round(place.distance)} kms away
+              </Tag>
+            )}
+            {isUnderConstruction ? (
+              <Tag
+                color={COLORS.yellowIdentifier}
+                style={{
+                  fontSize: FONT_SIZE.default,
+                }}
+              >
+                Under Construction
+              </Tag>
+            ) : null}
           </Flex>
-          <CloseButton
-            onClick={(e) => {
-              e.stopPropagation();
-              onExpand();
-            }}
-          />
+
+          {place.description ? (
+            <Paragraph
+              style={{
+                color: "white",
+                height: 130,
+                overflowY: "scroll",
+                marginTop: 8,
+              }}
+              ellipsis={{
+                rows: 4,
+                expandable: true,
+              }}
+            >
+              {place.description}
+            </Paragraph>
+          ) : null}
         </Flex>
-      ) : (
+      }
+      trigger="click"
+    >
+      <Flex
+        style={{
+          backgroundColor: "white",
+          borderRadius: "50%",
+          padding: 8,
+          borderWidth: "2px",
+          borderColor: isUnderConstruction
+            ? COLORS.borderColorDark
+            : COLORS.borderColor,
+          borderStyle: isUnderConstruction ? "dotted" : "solid",
+        }}
+      >
         <DynamicReactIcon
           iconName={icon.name}
           iconSet={icon.set}
-          color={isProject ? "white" : COLORS.textColorDark}
+          size={18}
+          color={isProject ? COLORS.primaryColor : "black"}
         ></DynamicReactIcon>
-      )}
-    </Flex>
+      </Flex>
+    </Tooltip>
   );
 };
 

@@ -8,7 +8,6 @@ import {
   Modal,
   notification,
   Row,
-  Tag,
   Typography,
 } from "antd";
 import React, { useState } from "react";
@@ -21,6 +20,7 @@ import LivestIndexRange from "../components/common/livest-index-range";
 import { Loader } from "../components/common/loader";
 import { ProjectLivIndexMapView } from "../components/map-view/project-livindex-map-view";
 import { useDevice } from "../hooks/use-device";
+import { useFetchAllLivindexPlaces } from "../hooks/use-livindex-places";
 import { useFetchProjectById } from "../hooks/use-project";
 import { useUser } from "../hooks/use-user";
 import { useUpdateUserMutation } from "../hooks/user-hooks";
@@ -28,23 +28,17 @@ import {
   LivIndexDriversConfig,
   LivIndexMegaDriverConfig,
 } from "../libs/constants";
-import {
-  capitalize,
-  captureAnalyticsEvent,
-  rupeeAmountFormat,
-} from "../libs/lvnzy-helper";
+import { captureAnalyticsEvent, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { sortedMedia } from "../libs/utils";
 import "../theme/scroll-bar.css";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import {
   IDriverPlace,
-  IExtrinsicDriver,
   IMedia,
   IMetadata,
   IUI,
   Project,
 } from "../types/Project";
-import { useFetchAllLivindexPlaces } from "../hooks/use-livindex-places";
 
 const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
   const { isMobile } = useDevice();
@@ -735,31 +729,22 @@ const Livestment: React.FC<{
         gap={16}
         style={{ height: isMobile ? "auto" : 400, marginTop: 16 }}
       >
-        <Flex
-          gap={16}
-          vertical
-          style={{
-            width: isMobile ? "100%" : "30%",
-            height: "100%",
-            overflowY: "scroll",
-            scrollbarWidth: "none",
-          }}
-        >
-          <LivestIndexRange
-            value={project.livIndexScore.score}
-          ></LivestIndexRange>
-          {project.livIndexScore.extrinsicDrivers.map(
-            (extrinsicDriver: IExtrinsicDriver) => {
-              const originalDriverPlace = livIndexPlaces.find(
-                (p: IDriverPlace) => p._id == extrinsicDriver.placeId
-              );
-              if (originalDriverPlace) {
-                const megaDriverConfig = (LivIndexMegaDriverConfig as any)[
-                  originalDriverPlace.megaDriver
-                ];
-                const driverPlaceConfig = (livIndexDriverConfig as any)[
-                  originalDriverPlace.driver
-                ];
+        {project.livIndexScore.summary ? (
+          <Flex
+            gap={16}
+            vertical
+            style={{
+              width: isMobile ? "100%" : "40%",
+              height: "100%",
+              overflowY: "scroll",
+              scrollbarWidth: "none",
+            }}
+          >
+            <LivestIndexRange
+              value={project.livIndexScore.score}
+            ></LivestIndexRange>
+            {Object.entries(JSON.parse(project.livIndexScore.summary)).map(
+              ([key, value], index) => {
                 return (
                   <Flex
                     vertical
@@ -771,35 +756,49 @@ const Livestment: React.FC<{
                       borderColor: COLORS.borderColor,
                     }}
                   >
-                    <Typography.Text style={{ color: COLORS.textColorLight }}>
-                      {driverPlaceConfig.label}
-                    </Typography.Text>
-                    <Tag style={{ width: "auto" }}>
-                      {megaDriverConfig.label}
-                    </Tag>
-                    <Typography.Paragraph
-                      ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
-                      style={{ margin: 0 }}
-                    >
-                      Approximately {Math.round(extrinsicDriver.distance)} kms
-                      from
-                      <>&nbsp;</>
-                      {capitalize(originalDriverPlace.name)}.
-                    </Typography.Paragraph>
+                    {key == "oneLiner" ? (
+                      <Typography.Text
+                        style={{
+                          lineHeight: "120%",
+                          color: COLORS.textColorLight,
+                        }}
+                      >
+                        {value as any}
+                      </Typography.Text>
+                    ) : value ? (
+                      <Flex vertical>
+                        {" "}
+                        <Typography.Text
+                          style={{ color: COLORS.textColorLight }}
+                        >
+                          {(LivIndexMegaDriverConfig as any)[key].label}
+                        </Typography.Text>
+                        {/* <Tag style={{ width: "auto" }}>{key}</Tag> */}
+                        <Typography.Paragraph
+                          ellipsis={{
+                            rows: 3,
+                            expandable: true,
+                            symbol: "more",
+                          }}
+                          style={{ margin: 0 }}
+                        >
+                          {value as any}
+                        </Typography.Paragraph>
+                      </Flex>
+                    ) : null}
                   </Flex>
                 );
-              } else {
-                return null;
               }
-            }
-          )}
-        </Flex>
+            )}
+          </Flex>
+        ) : null}
+
         <Flex
           vertical
           style={{
             borderRadius: 32,
             height: 400,
-            width: isMobile ? "100%" : "70%",
+            width: isMobile ? "100%" : "60%",
           }}
         >
           <ProjectLivIndexMapView
@@ -880,7 +879,6 @@ const ProjectPage: React.FC = () => {
             <ProjectSummary ui={projectData.ui} media={projectData.media} />
 
             <ProjectAmenities project={projectData} />
-
 
             {allLivIndexPlacesLoading ? (
               <Loader></Loader>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 
 type IconSetKey =
   | "fa"
+  | "bi"
+  | "fc"
   | "fa6"
   | "md"
   | "gi"
@@ -25,6 +27,8 @@ interface IconProps {
 // Mapping for dynamic imports of icon sets
 const dynamicImportMap = {
   fa: () => import("react-icons/fa"),
+  bi: () => import("react-icons/bi"),
+  fc: () => import("react-icons/fc"),
   fa6: () => import("react-icons/fa6"),
   md: () => import("react-icons/md"),
   gi: () => import("react-icons/gi"),

@@ -1,3 +1,5 @@
+import { ILivIndexPlaces } from "./Common";
+
 export interface IMedia {
   _id: string;
   type: "image" | "video";
@@ -158,6 +160,8 @@ export interface IDriverPlace {
   };
   driver: string;
   megaDriver: string;
+  status: string;
+  distance?: number;
 }
 
 export interface ISubLivestment {
@@ -185,7 +189,7 @@ export interface IMegaDriverScore {
 
 export interface IExtrinsicDriver {
   _id: string;
-  placeId: string;
+  placeId: ILivIndexPlaces;
   distance: number;
   coefficients: {
     proximityCoeffecient: Number;
@@ -204,6 +208,7 @@ export interface IIntrinsicDriver {
 
 export interface ILivIndexScore {
   score: number;
+  summary: string;
   extrinsicDrivers: [IExtrinsicDriver];
   intrinsicDriver: IIntrinsicDriver;
 }

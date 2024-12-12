@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Typography } from "antd";
+import { Flex } from "antd";
 import { COLORS } from "../../theme/style-constants";
 
 interface Grade {
@@ -174,11 +174,6 @@ const LivestIndexRange: React.FC<LivestIndexRangeProps> = ({ value }) => {
           />
         </div>
       </Flex>
-      <Typography.Text
-        style={{ lineHeight: "120%", color: COLORS.textColorLight }}
-      >
-        {grade.description}
-      </Typography.Text>
     </Flex>
   );
 };
