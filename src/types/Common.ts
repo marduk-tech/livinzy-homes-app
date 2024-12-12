@@ -22,7 +22,8 @@ export interface ILivIndexPlaces {
   };
   status?: string;
   features?: any;
-
+  driver: string;
+  megaDriver: string;
   createdAt: Date;
   updatedAt: Date;
 }

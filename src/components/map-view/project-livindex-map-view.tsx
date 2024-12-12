@@ -9,12 +9,12 @@ import {
 } from "@vis.gl/react-google-maps";
 import { Flex, Typography } from "antd";
 import React, { useCallback, useState } from "react";
+import { LivIndexDriversConfig } from "../../libs/constants";
 import { capitalize, captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace, IExtrinsicDriver, Project } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { RoadInfra } from "./road-infra";
-import { LivIndexDriversConfig } from "../../libs/constants";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -94,11 +94,10 @@ export const ProjectLivIndexMapView = ({
         >
           {project.livIndexScore.extrinsicDrivers.map(
             (extrinsicDriver: IExtrinsicDriver, index: number) => {
-              const originalLivIndexPlace = livIndexPlaces.find(
-                (p: IDriverPlace) => p._id == extrinsicDriver.placeId
-              );
+              const originalLivIndexPlace = extrinsicDriver.placeId;
+
               const driverConfig = (LivIndexDriversConfig as any)[
-                originalLivIndexPlace!.driver
+                originalLivIndexPlace.driver
               ];
 
               if (originalLivIndexPlace!.driver == "road") {

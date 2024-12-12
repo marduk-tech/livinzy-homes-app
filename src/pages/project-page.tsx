@@ -21,6 +21,7 @@ import LivestIndexRange from "../components/common/livest-index-range";
 import { Loader } from "../components/common/loader";
 import { ProjectLivIndexMapView } from "../components/map-view/project-livindex-map-view";
 import { useDevice } from "../hooks/use-device";
+import { useFetchAllLivindexPlaces } from "../hooks/use-livindex-places";
 import { useFetchProjectById } from "../hooks/use-project";
 import { useUser } from "../hooks/use-user";
 import { useUpdateUserMutation } from "../hooks/user-hooks";
@@ -44,7 +45,6 @@ import {
   IUI,
   Project,
 } from "../types/Project";
-import { useFetchAllLivindexPlaces } from "../hooks/use-livindex-places";
 
 const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
   const { isMobile } = useDevice();
@@ -750,9 +750,8 @@ const Livestment: React.FC<{
           ></LivestIndexRange>
           {project.livIndexScore.extrinsicDrivers.map(
             (extrinsicDriver: IExtrinsicDriver) => {
-              const originalDriverPlace = livIndexPlaces.find(
-                (p: IDriverPlace) => p._id == extrinsicDriver.placeId
-              );
+              const originalDriverPlace = extrinsicDriver.placeId;
+
               if (originalDriverPlace) {
                 const megaDriverConfig = (LivIndexMegaDriverConfig as any)[
                   originalDriverPlace.megaDriver
@@ -880,7 +879,6 @@ const ProjectPage: React.FC = () => {
             <ProjectSummary ui={projectData.ui} media={projectData.media} />
 
             <ProjectAmenities project={projectData} />
-
 
             {allLivIndexPlacesLoading ? (
               <Loader></Loader>
