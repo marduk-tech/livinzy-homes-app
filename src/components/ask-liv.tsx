@@ -22,9 +22,10 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
 
   useEffect(() => {
     const fetchSessionId = async () => {
-      if (!projectId) return;
+      const sessionKey = projectId
+        ? `sessionId-${projectId}`
+        : `sessionId-liviq-${Math.random().toString(36).substring(7)}`;
 
-      const sessionKey = `sessionId-${projectId}`;
       const storedSessionId = localStorage.getItem(sessionKey);
 
       if (storedSessionId) {
@@ -80,8 +81,9 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
           setInitialChats([
             {
               id: `p-chat-1`,
-              content:
-                "LivIQ has the full upto date knowledge about this project and other insights about the location, team etc. See questions people are already asking about this project",
+              content: projectId
+                ? "LivIQ has the full upto date knowledge about this project and other insights about the location, team etc. See questions people are already asking about this project"
+                : "Hello am LivIQ. How can I help you today?",
               role: "assistant",
               updateAt: Date.now(),
               createAt: Date.now(),
@@ -107,13 +109,16 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
         question: latestMessage.content,
       });
 
-      const response = await axiosApiInstance.post("/ai/ask", {
-        question: latestMessage.content,
-        sessionId: sessionId,
-        project: {
-          name: projectName || "",
-        },
-      });
+      const response = await axiosApiInstance.post(
+        projectId ? "/ai/ask" : "/ai/ask-global",
+        {
+          question: latestMessage.content,
+          sessionId: sessionId,
+          project: {
+            name: projectName || "",
+          },
+        }
+      );
 
       if (response.data && response.data.data) {
         return {
@@ -175,7 +180,7 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
         </Flex>
         <ProChat
           onResetMessage={clearSession}
-          style={{ height: isMobile ? "80vh" : 500 }}
+          style={{ height: isMobile ? "80vh" : projectId ? 500 : "80vh" }}
           request={handleRequest}
           locale="en-US"
           chatRef={proChatRef}
@@ -218,35 +223,42 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
                       {props.message?.toString()}
                     </Markdown>
                   </Typography.Text>
-                  {(props as any)["data-id"] == "p-chat-1" ? (
-                    <Flex vertical gap={8} style={{ marginTop: 16 }}>
-                      {LivIQPredefinedQuestions.map((q: string) => {
-                        return (
-                          <Button
-                            type="primary"
-                            style={{
-                              backgroundColor: COLORS.bgColorDark,
-                              color: "white",
-                              cursor: "pointer",
-                              borderRadius: 12,
-                              border: "0px",
-                              height: 32,
-                              fontSize: FONT_SIZE.default,
-                              width: "max-content",
-                            }}
-                            onClick={() => {
-                              if (!proChatRef) {
-                                return;
-                              }
-                              proChatRef.current?.sendMessage(q);
-                            }}
-                          >
-                            {q}
-                          </Button>
-                        );
-                      })}
-                    </Flex>
-                  ) : null}
+
+                  {projectId ? (
+                    <>
+                      {(props as any)["data-id"] == "p-chat-1" ? (
+                        <Flex vertical gap={8} style={{ marginTop: 16 }}>
+                          {LivIQPredefinedQuestions.map((q: string) => {
+                            return (
+                              <Button
+                                type="primary"
+                                style={{
+                                  backgroundColor: COLORS.bgColorDark,
+                                  color: "white",
+                                  cursor: "pointer",
+                                  borderRadius: 12,
+                                  border: "0px",
+                                  height: 32,
+                                  fontSize: FONT_SIZE.default,
+                                  width: "max-content",
+                                }}
+                                onClick={() => {
+                                  if (!proChatRef) {
+                                    return;
+                                  }
+                                  proChatRef.current?.sendMessage(q);
+                                }}
+                              >
+                                {q}
+                              </Button>
+                            );
+                          })}
+                        </Flex>
+                      ) : null}
+                    </>
+                  ) : (
+                    <></>
+                  )}
                 </Flex>
               );
             },
