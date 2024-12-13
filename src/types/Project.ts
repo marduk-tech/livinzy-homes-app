@@ -189,7 +189,7 @@ export interface IMegaDriverScore {
 
 export interface IExtrinsicDriver {
   _id: string;
-  placeId: ILivIndexPlaces;
+  place: ILivIndexPlaces;
   distance: number;
   coefficients: {
     proximityCoeffecient: Number;

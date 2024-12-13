@@ -9,12 +9,11 @@ import {
 } from "@vis.gl/react-google-maps";
 import { Flex, Tag, Tooltip, Typography } from "antd";
 import React, { useCallback, useState } from "react";
-import { LivIndexDriversConfig } from "../../libs/constants";
+import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace, IExtrinsicDriver, Project } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { RoadInfra } from "./road-infra";
-import { PLACE_TIMELINE } from "../../libs/constants";
 const { Paragraph } = Typography;
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
@@ -81,7 +80,7 @@ export const ProjectLivIndexMapView = ({
         >
           {project.livIndexScore.extrinsicDrivers.map(
             (extrinsicDriver: IExtrinsicDriver, index: number) => {
-              const originalLivIndexPlace = extrinsicDriver.placeId;
+              const originalLivIndexPlace = extrinsicDriver.place;
 
               const driverConfig = (LivIndexDriversConfig as any)[
                 originalLivIndexPlace!.driver
