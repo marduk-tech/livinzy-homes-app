@@ -1,5 +1,5 @@
 import { ChatItemProps, ProChat, ProChatInstance } from "@ant-design/pro-chat";
-import { Button, Flex, Typography } from "antd";
+import { Button, Flex, Form, Input, Typography } from "antd";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import { useParams } from "react-router-dom";
@@ -10,7 +10,13 @@ import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import DynamicReactIcon from "./common/dynamic-react-icon";
 
-export default function AskLiv({ projectName }: { projectName?: string }) {
+export default function AskLiv({
+  projectName,
+  onNewProjectContent,
+}: {
+  projectName?: string;
+  onNewProjectContent: any;
+}) {
   const [sessionIdIsLoading, setSessionIdIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>();
   const [initialChats, setInitialChats] = useState<any[] | undefined>();
@@ -19,6 +25,54 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
 
   const { isMobile } = useDevice();
   const proChatRef = useRef<ProChatInstance>();
+
+  const inputAreaRender = (
+    _: ReactNode,
+    onMessageSend: (message: string) => void | Promise<any>,
+    onClear: () => void
+  ) => {
+    const [form] = Form.useForm();
+    const [query, setQuery] = useState<string>();
+
+    return (
+      <Form
+        form={form}
+        onFinish={async (value) => {
+          form.resetFields();
+          const { question } = value;
+          await onMessageSend(question);
+        }}
+      >
+        <Form.Item label="" name="question">
+          <Input
+            style={{ height: 50, paddingRight: 0 }}
+            name="query"
+            onChange={(event: any) => {
+              setQuery(event.currentTarget.value);
+            }}
+            placeholder="What are you looking for ?"
+            suffix={
+              <Button
+                htmlType="submit"
+                type="link"
+                disabled={!query}
+                style={{
+                  opacity: query ? 1 : 0.3,
+                  padding: 0,
+                  paddingRight: 8,
+                }}
+              >
+                <DynamicReactIcon
+                  iconName="BiSolidSend"
+                  iconSet="bi"
+                ></DynamicReactIcon>
+              </Button>
+            }
+          />
+        </Form.Item>
+      </Form>
+    );
+  };
 
   useEffect(() => {
     const fetchSessionId = async () => {
@@ -150,13 +204,13 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
       <Flex
         vertical
         style={{
-          border: "1px solid",
           padding: 0,
           borderRadius: 8,
           borderColor: COLORS.borderColor,
+          width: "100%",
         }}
       >
-        <Flex
+        {/* <Flex
           align="center"
           gap={8}
           justify="center"
@@ -177,12 +231,15 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
           >
             LivIQ
           </Typography.Text>
-        </Flex>
+        </Flex> */}
         <ProChat
           onResetMessage={clearSession}
           style={{ height: isMobile ? "80vh" : projectId ? 500 : "80vh" }}
           request={handleRequest}
           locale="en-US"
+          actions={{
+            render: (doms: any) => [],
+          }}
           chatRef={proChatRef}
           userMeta={{
             avatar:
@@ -194,13 +251,8 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
             avatarRender: (props: ChatItemProps, node: ReactNode) => {
               return (
                 <Flex style={{ alignSelf: "flex-start" }}>
-                  {props.originData && props.originData.role == "user" ? (
-                    <DynamicReactIcon
-                      iconSet="fa"
-                      size={20}
-                      iconName="FaRegUserCircle"
-                    ></DynamicReactIcon>
-                  ) : (
+                  {props.originData &&
+                  props.originData.role == "user" ? null : (
                     <DynamicReactIcon
                       iconSet="gi"
                       color={COLORS.primaryColor}
@@ -212,17 +264,41 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
               );
             },
             contentRender: (props: ChatItemProps, node: ReactNode) => {
+              let msgContent;
+              try {
+                msgContent = JSON.parse(props.message!.toString());
+              } catch (err) {
+                msgContent = props.message!.toString();
+              }
+              if (msgContent.projectsList) {
+                onNewProjectContent(msgContent.projectsList);
+              }
               return (
                 <Flex vertical>
-                  <Typography.Text
-                    style={{
-                      fontSize: FONT_SIZE.subText,
-                    }}
-                  >
-                    <Markdown className="liviq-content">
-                      {props.message?.toString()}
-                    </Markdown>
-                  </Typography.Text>
+                  {props.originData && props.originData.role == "user" ? (
+                    <Typography.Text
+                      style={{
+                        fontSize: FONT_SIZE.subText,
+                        backgroundColor: COLORS.bgColorMedium,
+                        padding: "4px 8px",
+                        borderRadius: 16,
+                      }}
+                    >
+                      {msgContent}
+                    </Typography.Text>
+                  ) : (
+                    <Typography.Text
+                      style={{
+                        fontSize: FONT_SIZE.subText,
+                      }}
+                    >
+                      <Markdown className="liviq-content">
+                        {msgContent.generalInfo
+                          ? msgContent.generalInfo
+                          : msgContent}
+                      </Markdown>
+                    </Typography.Text>
+                  )}
 
                   {projectId ? (
                     <>
@@ -263,6 +339,7 @@ export default function AskLiv({ projectName }: { projectName?: string }) {
               );
             },
           }}
+          inputAreaRender={inputAreaRender}
           inputAreaProps={{
             style: {
               border: "1px solid",

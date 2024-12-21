@@ -5,6 +5,7 @@ export const COLORS = {
   yellowIdentifier: "#f1b24b",
   orangeIdentifier: "#d68438",
   bgColor: "#fafbfb",
+  bgColorMedium: "#ddd",
   bgColorDark: "#2D3F4E",
   borderColor: "#eee",
   borderColorDark: "#666",

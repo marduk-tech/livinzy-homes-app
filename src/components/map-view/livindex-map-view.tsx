@@ -30,9 +30,7 @@ export function LivIndexMapView() {
   useEffect(() => {
     if (livindexPlaces) {
       const formattedPlaces = livindexPlaces
-        .filter(
-          (place) => place.megaDriver == "macro" || place.driver == "commercial"
-        )
+        .filter((place) => place.driver !== "road")
         .filter((place) => place.location?.lat && place.location?.lng);
 
       const roads = livindexPlaces.filter(

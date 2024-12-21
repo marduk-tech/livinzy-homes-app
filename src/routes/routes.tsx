@@ -6,12 +6,12 @@ import { DashboardLayout } from "../layouts/dashboard-layout";
 // Pages
 import LandMeasurementConvertor from "../components/sides/land-measurement-convertor";
 import AskPage from "../pages/ask-page";
-import { HomePage } from "../pages/home-page";
 import { LivindexPlaces } from "../pages/livindex-places";
 import { LivIQPage } from "../pages/liviq-page";
 import { ProfilePage } from "../pages/profile-page";
 import ProjectPage from "../pages/project-page";
 import { SignUpForm } from "../pages/signup";
+import HomePage from "../pages/home-page";
 
 export const Router = () => {
   return (
