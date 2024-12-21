@@ -11,7 +11,7 @@ import { LivIQPage } from "../pages/liviq-page";
 import { ProfilePage } from "../pages/profile-page";
 import ProjectPage from "../pages/project-page";
 import { SignUpForm } from "../pages/signup";
-import HomePage from "../pages/home-page";
+import { HomePage } from "../pages/home-page";
 
 export const Router = () => {
   return (
