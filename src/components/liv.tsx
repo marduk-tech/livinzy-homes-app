@@ -188,7 +188,7 @@ export default function Liv({
             display: "inline",
           }}
         >
-          {question || "farmland projects"}
+          {question || "Ask away anything!"}
         </Typography.Text>
       </Flex>
       <Flex vertical style={{ maxHeight: 550, overflowY: "scroll" }}>
