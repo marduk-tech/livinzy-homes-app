@@ -1,16 +1,5 @@
-import {
-  Button,
-  Col,
-  Flex,
-  FloatButton,
-  Modal,
-  Row,
-  Select,
-  Slider,
-  Typography,
-} from "antd";
+import { Col, Flex, FloatButton, Row, Typography } from "antd";
 import { useEffect, useState } from "react";
-import { RiListSettingsLine } from "react-icons/ri";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { Loader } from "../components/common/loader";
 import { ProjectCard } from "../components/common/project-card";
@@ -18,16 +7,16 @@ import { LocationAndPriceFilters } from "../components/location-price-filter";
 import { ProjectsMapView } from "../components/map-view/projects-map-view";
 import { useDevice } from "../hooks/use-device";
 import { useFetchProjects } from "../hooks/use-project";
-import { ProjectCategories } from "../libs/constants";
 import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { Project } from "../types/Project";
 
-export function HomePage() {
+const HomePage: React.FC<{
+  filteredProjectsIdList?: any[];
+  projectClick: any;
+}> = ({ filteredProjectsIdList, projectClick }) => {
   const { isMobile } = useDevice();
   const [categoryFilter, setCategoryFilter] = useState();
   const [priceRange, setPriceRange] = useState([300, 1000]);
-
   const [locationFilter, setLocationFilter] = useState<string[] | undefined>();
   const [isFiltersModalVisible, setIsFiltersModalVisible] = useState(false);
 
@@ -38,27 +27,43 @@ export function HomePage() {
   const [filteredProjects, setFilteredProjects] = useState<Project[]>();
 
   useEffect(() => {
+    if (filteredProjectsIdList && filteredProjectsIdList.length && projects) {
+      const newProjects: any = [];
+
+      filteredProjectsIdList.forEach((p) => {
+        newProjects.push({
+          ...projects!.find((op) => op._id == p.projectId),
+          relevantDetails: p.relevantDetails,
+        });
+      });
+
+      setFilteredProjects(newProjects);
+    }
+  }, [filteredProjectsIdList]);
+
+  useEffect(() => {
     if (!projects) {
       return;
     }
     captureAnalyticsEvent("app-homepage-open", {});
 
-    let filtered = projects;
+    let filtered = filteredProjects || projects;
 
     //  category filter
     if (categoryFilter) {
       filtered = filtered.filter(
         (p: Project) =>
-          p.ui &&
-          p.ui.categories &&
-          p.ui.categories.find((c) => c === categoryFilter)
+          !p.ui ||
+          (p.ui &&
+            p.ui.categories &&
+            p.ui.categories.find((c) => c === categoryFilter))
       );
     }
 
     //  price range filter
     if (priceRange) {
       filtered = filtered.filter((p) => {
-        if (!p.ui || !p.ui.costSummary) return false;
+        if (!p.ui || !p.ui.costSummary) return true;
 
         try {
           const costSummary = JSON.parse(p.ui.costSummary);
@@ -77,11 +82,12 @@ export function HomePage() {
     if (locationFilter && locationFilter.length > 0) {
       filtered = filtered.filter(
         (p) =>
-          p.ui &&
-          p.ui.locationFilters &&
-          p.ui.locationFilters.some((location) =>
-            locationFilter.includes(location)
-          )
+          !p.ui ||
+          (p.ui &&
+            p.ui.locationFilters &&
+            p.ui.locationFilters.some((location) =>
+              locationFilter.includes(location)
+            ))
       );
     }
 
@@ -132,15 +138,13 @@ export function HomePage() {
           {isMobile ? null : toggleMapView ? "List View" : "Map View"}
         </FloatButton>
         <Flex
-          justify="center"
           vertical
           style={{
             width: "100%",
-            marginTop: 16,
           }}
           gap={16}
         >
-          <Flex
+          {/* <Flex
             align={isMobile ? "flex-start" : "center"}
             vertical
             style={{
@@ -209,31 +213,30 @@ export function HomePage() {
                 Filters
               </Button>
             </Flex>
-          </Flex>
+          </Flex> */}
 
           {toggleMapView ? (
             <Row>
-              <ProjectsMapView
-                projects={filteredProjects.filter((p) => p.ui && p.ui.oneLiner)}
-              />
+              <ProjectsMapView projects={filteredProjects} />
             </Row>
           ) : (
-            <Row gutter={[32, 32]} style={{ width: "100%", margin: 0 }}>
+            <Row gutter={[24, 24]} style={{ width: "100%", margin: 0 }}>
               {filteredProjects.length > 0 ? (
                 <>
-                  {filteredProjects
-                    .filter((p) => p.ui && p.ui.oneLiner)
-                    .map((project) => (
-                      <Col
-                        key={project._id}
-                        xs={24}
-                        md={12}
-                        lg={6}
-                        style={{ padding: isMobile ? 0 : 16 }}
-                      >
-                        <ProjectCard project={project} key={project._id} />
-                      </Col>
-                    ))}
+                  {filteredProjects.map((project) => (
+                    <Col
+                      key={project._id}
+                      xs={24}
+                      md={12}
+                      lg={6}
+                      onClick={() => {
+                        projectClick(project._id);
+                      }}
+                      style={{ padding: isMobile ? 0 : "0 8px" }}
+                    >
+                      <ProjectCard project={project} key={project._id} />
+                    </Col>
+                  ))}
                 </>
               ) : (
                 <>
@@ -258,4 +261,6 @@ export function HomePage() {
   }
 
   return null;
-}
+};
+
+export default HomePage;

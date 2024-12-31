@@ -185,7 +185,7 @@ export const ProjectMarker = ({
           <Flex justify="space-between" align="center">
             <Typography.Text
               style={{
-                fontSize: isExpanded ? FONT_SIZE.subHeading : "16px",
+                fontSize: isExpanded ? FONT_SIZE.HEADING_3 : "16px",
                 fontWeight: "medium",
               }}
             >

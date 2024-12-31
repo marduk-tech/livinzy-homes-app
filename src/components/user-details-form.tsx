@@ -65,7 +65,7 @@ export function UserDetailsForm({
           <Input
             style={{
               width: "100%",
-              fontSize: FONT_SIZE.subHeading,
+              fontSize: FONT_SIZE.HEADING_3,
             }}
             placeholder="Jon Doe"
           />
@@ -86,7 +86,7 @@ export function UserDetailsForm({
           <Input
             style={{
               width: "100%",
-              fontSize: FONT_SIZE.subHeading,
+              fontSize: FONT_SIZE.HEADING_3,
             }}
             placeholder="jondoe@gmail.com"
           />
@@ -101,7 +101,7 @@ export function UserDetailsForm({
             <Input
               style={{
                 width: "100%",
-                fontSize: FONT_SIZE.subHeading,
+                fontSize: FONT_SIZE.HEADING_3,
               }}
               placeholder="Enter your city"
             />
@@ -116,7 +116,7 @@ export function UserDetailsForm({
           >
             <Select
               placeholder="Select an option"
-              style={{ width: "100%", fontSize: FONT_SIZE.subHeading }}
+              style={{ width: "100%", fontSize: FONT_SIZE.HEADING_3 }}
               allowClear
             >
               {sourceOptions.map((option) => (

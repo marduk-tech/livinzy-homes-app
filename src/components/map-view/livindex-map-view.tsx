@@ -21,7 +21,7 @@ export type LivIndexPlacesGeoJson = FeatureCollection<
 
 export function LivIndexMapView() {
   const { data: livindexPlaces, isLoading: livindexPlacesLoading } =
-    useFetchAllLivindexPlaces({});
+    useFetchAllLivindexPlaces();
 
   const [geojson, setGeojson] = useState<LivIndexPlacesGeoJson | null>(null);
   const [numClusters, setNumClusters] = useState(4);
@@ -30,11 +30,11 @@ export function LivIndexMapView() {
   useEffect(() => {
     if (livindexPlaces) {
       const formattedPlaces = livindexPlaces
-        .filter((place) => place.driver !== "road")
+        .filter((place) => place.driver !== "highway")
         .filter((place) => place.location?.lat && place.location?.lng);
 
       const roads = livindexPlaces.filter(
-        (place) => place.driver === "road" || place.driver === "transit"
+        (place) => place.driver === "highway" || place.driver === "transit"
       );
       setRoadsData(roads);
 
@@ -53,9 +53,11 @@ export function LivIndexMapView() {
               type: "Point",
               coordinates: cords as any,
             },
+            place,
             properties: {
+              place,
               name: place.name || "",
-              description: place.description || "",
+              details: place.details || "",
               placeId: place._id || "",
               type: place.driver,
             },

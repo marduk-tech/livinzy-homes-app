@@ -205,7 +205,7 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
           >
             <div style={{ padding: "8px" }}>
               <Typography.Text
-                style={{ color: "white", fontSize: FONT_SIZE.subHeading }}
+                style={{ color: "white", fontSize: FONT_SIZE.HEADING_3 }}
               >
                 {roadData.name}
               </Typography.Text>
@@ -220,7 +220,7 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
                     style={{
                       marginRight: "4px",
                       marginBottom: "4px",
-                      fontSize: FONT_SIZE.default,
+                      fontSize: FONT_SIZE.SUB_TEXT,
                       color: "white",
                     }}
                   >
@@ -236,7 +236,7 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
                   style={{
                     marginRight: "4px",
                     marginBottom: "4px",
-                    fontSize: FONT_SIZE.default,
+                    fontSize: FONT_SIZE.SUB_TEXT,
                   }}
                 >
                   {selectedLine.dashConfig
@@ -248,7 +248,7 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
                 style={{
                   height: 90,
                   overflowY: "scroll",
-                  fontSize: FONT_SIZE.default,
+                  fontSize: FONT_SIZE.SUB_TEXT,
                   color: "white",
                 }}
                 ellipsis={{ rows: 2, expandable: true, symbol: "more" }}

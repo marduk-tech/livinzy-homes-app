@@ -1,6 +1,5 @@
 import { Flex, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
-import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IMedia, Project } from "../../types/Project";
 
@@ -28,15 +27,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         cursor: "pointer",
         borderRadius: 16,
       }}
-      onClick={() => {
-        navigate(`/project/${project._id}`);
-      }}
     >
       <div
         style={{
           width: "100%",
-          borderRadius: 16,
-          height: 250,
+          borderRadius: 8,
+          height: 200,
           border: "1px solid",
           borderColor: COLORS.borderColor,
           backgroundImage: `url(${previewImage || "/images/img-plchlder.png"})`,
@@ -53,35 +49,52 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         <Typography.Text
           style={{
             margin: 0,
-            fontSize: FONT_SIZE.subHeading,
-            fontWeight: "bold",
+            fontSize: FONT_SIZE.HEADING_3,
+            lineHeight: "100%",
+            fontWeight: 500,
           }}
         >
           {project.metadata.name}
         </Typography.Text>
+        {/* {costSummary ? (
+          <Flex>
+            <Typography.Text
+              style={{
+                display: "inline",
+                fontSize: FONT_SIZE.PARA,
+                marginTop: 4,
+              }}
+            >
+              {rupeeAmountFormat(costSummary.cost)} / {costSummary.size}
+            </Typography.Text>
+          </Flex>
+        ) : null} */}
         {project.ui && project.ui.oneLiner ? (
           <Typography.Text
             style={{
               color: COLORS.textColorLight,
               whiteSpace: "wrap",
               lineHeight: "110%",
-              marginBottom: 8,
+              marginTop: 4,
+              fontSize: FONT_SIZE.SUB_TEXT,
             }}
           >
             {project.ui.oneLiner}
           </Typography.Text>
         ) : null}
-        {costSummary ? (
-          <Flex>
-            <Typography.Text
-              style={{
-                display: "inline",
-                fontSize: FONT_SIZE.subText,
-              }}
-            >
-              {rupeeAmountFormat(costSummary.cost)} / {costSummary.size}
-            </Typography.Text>
-          </Flex>
+        {project.relevantDetails ? (
+          <Typography.Text
+            style={{
+              color: COLORS.textColorLight,
+              backgroundColor: "white",
+              whiteSpace: "wrap",
+              lineHeight: "110%",
+              marginTop: 4,
+              fontSize: FONT_SIZE.SUB_TEXT,
+            }}
+          >
+            {project.relevantDetails}
+          </Typography.Text>
         ) : null}
 
         {/* <Flex gap={7} color={COLORS.textColorLight} align="center">

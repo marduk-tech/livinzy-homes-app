@@ -37,7 +37,7 @@ export const enum PLACE_TIMELINE {
 }
 
 export const LivIndexDriversConfig = {
-  road: { label: "Road Network", icon: { name: "FaRoad", set: "fa" } },
+  highway: { label: "Road Network", icon: { name: "FaRoad", set: "fa" } },
   school: { label: "Schools", icon: { name: "IoMdSchool", set: "io" } },
   university: {
     label: "Universities",

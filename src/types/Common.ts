@@ -28,4 +28,4 @@ export interface ILivIndexPlaces {
   updatedAt: Date;
 }
 
-export type PlaceType = "road" | "hospital" | "school" | "futureInfra";
+export type PlaceType = "highway" | "hospital" | "school" | "futureInfra";

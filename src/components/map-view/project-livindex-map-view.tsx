@@ -86,7 +86,7 @@ export const ProjectLivIndexMapView = ({
                 originalLivIndexPlace!.driver
               ];
 
-              if (originalLivIndexPlace!.driver == "road") {
+              if (originalLivIndexPlace!.driver == "highway") {
                 return <RoadInfra roadData={originalLivIndexPlace}></RoadInfra>;
               } else {
                 let zIndex = index + 1;
@@ -157,7 +157,7 @@ export const PlaceCard = ({
             <Typography.Text
               style={{
                 color: "white",
-                fontSize: FONT_SIZE.subHeading,
+                fontSize: FONT_SIZE.HEADING_3,
                 lineHeight: "100%",
               }}
             >
@@ -168,7 +168,7 @@ export const PlaceCard = ({
             {place.distance && (
               <Tag
                 style={{
-                  fontSize: FONT_SIZE.default,
+                  fontSize: FONT_SIZE.SUB_TEXT,
                 }}
               >
                 {Math.round(place.distance)} kms away
@@ -178,7 +178,7 @@ export const PlaceCard = ({
               <Tag
                 color={COLORS.yellowIdentifier}
                 style={{
-                  fontSize: FONT_SIZE.default,
+                  fontSize: FONT_SIZE.SUB_TEXT,
                 }}
               >
                 Under Construction

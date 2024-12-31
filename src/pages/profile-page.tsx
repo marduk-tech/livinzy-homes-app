@@ -69,7 +69,7 @@ export function ProfilePage() {
               <Flex vertical>
                 <Typography.Text
                   style={{
-                    fontSize: FONT_SIZE.default,
+                    fontSize: FONT_SIZE.SUB_TEXT,
                     color: COLORS.textColorLight,
                   }}
                 >
@@ -77,7 +77,7 @@ export function ProfilePage() {
                 </Typography.Text>
                 <Typography.Text
                   style={{
-                    fontSize: FONT_SIZE.subHeading,
+                    fontSize: FONT_SIZE.HEADING_3,
                   }}
                 >
                   {user.profile?.name}
@@ -87,7 +87,7 @@ export function ProfilePage() {
                 <Flex vertical>
                   <Typography.Text
                     style={{
-                      fontSize: FONT_SIZE.default,
+                      fontSize: FONT_SIZE.SUB_TEXT,
                       color: COLORS.textColorLight,
                     }}
                   >
@@ -95,7 +95,7 @@ export function ProfilePage() {
                   </Typography.Text>
                   <Typography.Text
                     style={{
-                      fontSize: FONT_SIZE.subHeading,
+                      fontSize: FONT_SIZE.HEADING_3,
                     }}
                   >
                     {user.profile?.email}
@@ -106,7 +106,7 @@ export function ProfilePage() {
               <Flex vertical>
                 <Typography.Text
                   style={{
-                    fontSize: FONT_SIZE.default,
+                    fontSize: FONT_SIZE.SUB_TEXT,
                     color: COLORS.textColorLight,
                   }}
                 >
@@ -114,7 +114,7 @@ export function ProfilePage() {
                 </Typography.Text>
                 <Typography.Text
                   style={{
-                    fontSize: FONT_SIZE.subHeading,
+                    fontSize: FONT_SIZE.HEADING_3,
                   }}
                 >
                   {user?.mobile}
@@ -123,7 +123,7 @@ export function ProfilePage() {
                 <Typography.Text
                   style={{
                     color: COLORS.textColorLight,
-                    fontSize: FONT_SIZE.default,
+                    fontSize: FONT_SIZE.SUB_TEXT,
                   }}
                 >
                   * Login again to update your number

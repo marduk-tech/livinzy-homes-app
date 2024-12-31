@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { LocalStorageKeys, queryKeys } from "../libs/constants";
 import { User } from "../types/User";
@@ -30,12 +29,6 @@ export function useUser() {
     queryFn: getUser,
     retry: 2,
   });
-
-  useEffect(() => {
-    if (isError) {
-      logout.mutate();
-    }
-  }, [isError, error, logout]);
 
   return { user: data, isLoading, isError, error, refetch };
 }

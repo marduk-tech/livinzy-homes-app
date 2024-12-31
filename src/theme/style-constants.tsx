@@ -5,7 +5,7 @@ export const COLORS = {
   yellowIdentifier: "#f1b24b",
   orangeIdentifier: "#d68438",
   bgColor: "#fafbfb",
-  bgColorMedium: "#ddd",
+  bgColorMedium: "#f2f4f5",
   bgColorDark: "#2D3F4E",
   borderColor: "#eee",
   borderColorDark: "#666",
@@ -22,9 +22,9 @@ export const FONTS = {
 
 const isMobile = !!window.matchMedia("((max-width: 576px))").matches;
 export const FONT_SIZE = {
-  default: 12,
-  subText: 14,
-  title: isMobile ? 32 : 32,
-  heading: isMobile ? 22 : 24,
-  subHeading: 18,
+  SUB_TEXT: 12,
+  PARA: 14,
+  HEADING_1: isMobile ? 32 : 32,
+  HEADING_2: isMobile ? 22 : 24,
+  HEADING_3: 18,
 };

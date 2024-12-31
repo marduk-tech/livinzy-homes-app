@@ -8,7 +8,7 @@ import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { NavLink } from "../types/Common";
-import { envMode, LocalStorageKeys } from "../libs/constants";
+import { LocalStorageKeys } from "../libs/constants";
 
 const { Header, Content } = Layout;
 
@@ -22,7 +22,7 @@ export const DashboardLayout: React.FC = () => {
   useEffect(() => {
     const userItem = localStorage.getItem(LocalStorageKeys.user);
     const user = userItem ? JSON.parse(userItem) : null;
-    if (user || envMode == "dev") {
+    if (user) {
       return;
     } else {
       setLoginModalOpen(true);
@@ -83,7 +83,7 @@ export const DashboardLayout: React.FC = () => {
                 <Image width={16} src={link.icon.src}></Image>
               )}
 
-              <Typography.Text style={{ fontSize: FONT_SIZE.subHeading }}>
+              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
                 {link.title}
               </Typography.Text>
             </Flex>
@@ -168,7 +168,7 @@ export const DashboardLayout: React.FC = () => {
               <NavLinks navLinks={navLinks} />
               <Typography.Text
                 style={{
-                  fontSize: FONT_SIZE.default,
+                  fontSize: FONT_SIZE.SUB_TEXT,
                   color: COLORS.textColorLight,
                 }}
               >
@@ -176,7 +176,7 @@ export const DashboardLayout: React.FC = () => {
               </Typography.Text>
             </Flex>
           </Drawer>
-          <Content style={{ margin: isMobile ? 16 : 48, marginTop: 0 }}>
+          <Content style={{ margin: isMobile ? 16 : 32, marginTop: 0 }}>
             {/* <Menu mode="horizontal" items={menuItems} /> */}
             <CustomErrorBoundary>
               <Outlet />

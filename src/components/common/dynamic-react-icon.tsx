@@ -9,6 +9,7 @@ type IconSetKey =
   | "gi"
   | "ai"
   | "io"
+  | "io5"
   | "tb"
   | "si"
   | "ri"
@@ -34,6 +35,7 @@ const dynamicImportMap = {
   gi: () => import("react-icons/gi"),
   ai: () => import("react-icons/ai"),
   io: () => import("react-icons/io"),
+  io5: () => import("react-icons/io5"),
   tb: () => import("react-icons/tb"),
   si: () => import("react-icons/si"),
   ri: () => import("react-icons/ri"),

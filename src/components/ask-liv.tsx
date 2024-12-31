@@ -2,26 +2,26 @@ import { ChatItemProps, ProChat, ProChatInstance } from "@ant-design/pro-chat";
 import { Button, Flex, Form, Input, Typography } from "antd";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
-import { useParams } from "react-router-dom";
 import { useDevice } from "../hooks/use-device";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { LivIQPredefinedQuestions } from "../libs/constants";
 import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import DynamicReactIcon from "./common/dynamic-react-icon";
+import { useUser } from "../hooks/use-user";
 
 export default function AskLiv({
-  projectName,
+  projectId,
   onNewProjectContent,
 }: {
-  projectName?: string;
-  onNewProjectContent: any;
+  projectId?: string;
+  onNewProjectContent?: any;
 }) {
   const [sessionIdIsLoading, setSessionIdIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>();
   const [initialChats, setInitialChats] = useState<any[] | undefined>();
 
-  const { projectId } = useParams();
+  const { user } = useUser();
 
   const { isMobile } = useDevice();
   const proChatRef = useRef<ProChatInstance>();
@@ -45,12 +45,17 @@ export default function AskLiv({
       >
         <Form.Item label="" name="question">
           <Input
-            style={{ height: 50, paddingRight: 0 }}
+            style={{
+              height: 50,
+              paddingRight: 0,
+              border: 0,
+              backgroundColor: COLORS.bgColorMedium,
+            }}
             name="query"
             onChange={(event: any) => {
               setQuery(event.currentTarget.value);
             }}
-            placeholder="What are you looking for ?"
+            placeholder="Ask here"
             suffix={
               <Button
                 htmlType="submit"
@@ -75,36 +80,10 @@ export default function AskLiv({
   };
 
   useEffect(() => {
-    const fetchSessionId = async () => {
-      const sessionKey = projectId
-        ? `sessionId-${projectId}`
-        : `sessionId-liviq-${Math.random().toString(36).substring(7)}`;
-
-      const storedSessionId = localStorage.getItem(sessionKey);
-
-      if (storedSessionId) {
-        setSessionId(storedSessionId);
-        setSessionIdIsLoading(false);
-        return;
-      } else {
-        try {
-          setSessionIdIsLoading(true);
-          const response = await axiosApiInstance.post("/ai/create-session");
-          if (response.data && response.data.data.sessionId) {
-            const newSessionId = response.data.data.sessionId;
-            localStorage.setItem(sessionKey, newSessionId);
-            setSessionId(newSessionId);
-          }
-        } catch (error) {
-          console.error("Error fetching session ID:", error);
-        } finally {
-          setSessionIdIsLoading(false);
-        }
-      }
-    };
-
-    fetchSessionId();
-  }, [projectId]);
+    if (user && user?._id) {
+      setSessionId(user._id);
+    }
+  }, [user]);
 
   useEffect(() => {
     // Fetch chat history once sessionId is available
@@ -123,7 +102,7 @@ export default function AskLiv({
           const formattedChats = response.data.data.map(
             (message: any, index: number) => ({
               id: `i-chat-${index}`,
-              content: message.kwargs.content,
+              content: message.kwargs.content || message.kwargs.general_info,
               role: message.id.includes("HumanMessage") ? "user" : "assistant",
               updateAt: Date.now(),
               createAt: Date.now(),
@@ -137,7 +116,7 @@ export default function AskLiv({
               id: `p-chat-1`,
               content: projectId
                 ? "LivIQ has the full upto date knowledge about this project and other insights about the location, team etc. See questions people are already asking about this project"
-                : "Hello am LivIQ. How can I help you today?",
+                : "How can I help you today ?",
               role: "assistant",
               updateAt: Date.now(),
               createAt: Date.now(),
@@ -169,7 +148,7 @@ export default function AskLiv({
           question: latestMessage.content,
           sessionId: sessionId,
           project: {
-            name: projectName || "",
+            id: projectId || "",
           },
         }
       );
@@ -204,10 +183,13 @@ export default function AskLiv({
       <Flex
         vertical
         style={{
-          padding: 0,
+          padding: 12,
           borderRadius: 8,
+          backgroundColor: "white",
+          border: "1px solid",
           borderColor: COLORS.borderColor,
           width: "100%",
+          height: isMobile ? "85vh" : projectId ? 500 : "85vh",
         }}
       >
         {/* <Flex
@@ -234,7 +216,7 @@ export default function AskLiv({
         </Flex> */}
         <ProChat
           onResetMessage={clearSession}
-          style={{ height: isMobile ? "80vh" : projectId ? 500 : "80vh" }}
+          style={{ height: isMobile ? "85vh" : projectId ? 500 : "85vh" }}
           request={handleRequest}
           locale="en-US"
           actions={{
@@ -250,7 +232,7 @@ export default function AskLiv({
             actionsRender: false,
             avatarRender: (props: ChatItemProps, node: ReactNode) => {
               return (
-                <Flex style={{ alignSelf: "flex-start" }}>
+                <Flex style={{ alignSelf: "center" }}>
                   {props.originData &&
                   props.originData.role == "user" ? null : (
                     <DynamicReactIcon
@@ -268,9 +250,13 @@ export default function AskLiv({
               try {
                 msgContent = JSON.parse(props.message!.toString());
               } catch (err) {
-                msgContent = props.message!.toString();
+                msgContent = props.message ? props.message!.toString() : "";
               }
-              if (msgContent.projectsList) {
+              if (
+                msgContent &&
+                msgContent.projectsList &&
+                onNewProjectContent
+              ) {
                 onNewProjectContent(msgContent.projectsList);
               }
               return (
@@ -278,8 +264,9 @@ export default function AskLiv({
                   {props.originData && props.originData.role == "user" ? (
                     <Typography.Text
                       style={{
-                        fontSize: FONT_SIZE.subText,
-                        backgroundColor: COLORS.bgColorMedium,
+                        fontSize: FONT_SIZE.SUB_TEXT,
+                        backgroundColor: COLORS.primaryColor,
+                        color: "white",
                         padding: "4px 8px",
                         borderRadius: 16,
                       }}
@@ -289,7 +276,10 @@ export default function AskLiv({
                   ) : (
                     <Typography.Text
                       style={{
-                        fontSize: FONT_SIZE.subText,
+                        fontSize: FONT_SIZE.SUB_TEXT,
+                        backgroundColor: COLORS.bgColorMedium,
+                        padding: "4px 8px",
+                        borderRadius: 16,
                       }}
                     >
                       <Markdown className="liviq-content">
@@ -315,7 +305,7 @@ export default function AskLiv({
                                   borderRadius: 12,
                                   border: "0px",
                                   height: 32,
-                                  fontSize: FONT_SIZE.default,
+                                  fontSize: FONT_SIZE.SUB_TEXT,
                                   width: "max-content",
                                 }}
                                 onClick={() => {

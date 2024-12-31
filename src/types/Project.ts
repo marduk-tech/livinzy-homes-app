@@ -131,6 +131,7 @@ export interface Project {
   updatedAt: string;
   livestment: ILivestment;
   livIndexScore: ILivIndexScore;
+  relevantDetails: string;
 }
 
 export interface ProjectField {
@@ -154,6 +155,11 @@ export interface IDriverPlace {
   _id: string;
   name: string;
   description?: string;
+  details?: {
+    oneLiner: string;
+    description: string;
+    footfall: number;
+  };
   location?: {
     lat: number;
     lng: number;
@@ -225,4 +231,5 @@ export interface ProjectStructure {
   clickToAction: ProjectField[];
   team: ProjectField[];
   livIndexScore: ILivIndexScore;
+  relevantDetails?: string;
 }

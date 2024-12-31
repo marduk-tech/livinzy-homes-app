@@ -1,12 +1,4 @@
-import {
-  Button,
-  Flex,
-  Form,
-  Input,
-  InputNumber,
-  message,
-  Typography,
-} from "antd";
+import { Button, Flex, Form, Input, message, Typography } from "antd";
 import PhoneInput from "antd-phone-input";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
@@ -125,13 +117,13 @@ export function LoginForm() {
       >
         <Flex vertical>
           <Typography.Text
-            style={{ fontSize: FONT_SIZE.title, fontWeight: "bold" }}
+            style={{ fontSize: FONT_SIZE.HEADING_1, fontWeight: "bold" }}
           >
             Welcome To Livinzy
           </Typography.Text>
           <Typography.Text
             style={{
-              fontSize: FONT_SIZE.subText,
+              fontSize: FONT_SIZE.PARA,
               marginBottom: 24,
             }}
           >
@@ -253,7 +245,7 @@ By signing up, you agree to the terms & conditions.
                             <Input
                               style={{
                                 width: "100%",
-                                fontSize: FONT_SIZE.subHeading,
+                                fontSize: FONT_SIZE.HEADING_3,
                               }}
                               placeholder="Enter the OTP"
                               maxLength={6}
