@@ -15,7 +15,7 @@ import { CalendlyPopup } from "../components/calendly-popup";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import LivestIndexRange from "../components/common/livest-index-range";
 import { Loader } from "../components/common/loader";
-import { ProjectLivIndexMapView } from "../components/map-view/project-livindex-map-view";
+import { ProjectMapView } from "../components/map-view/project-map-view";
 import { useDevice } from "../hooks/use-device";
 import { useFetchAllLivindexPlaces } from "../hooks/use-livindex-places";
 import { useFetchProjectById } from "../hooks/use-project";
@@ -794,10 +794,10 @@ const Livestment: React.FC<{
             width: isMobile ? "100%" : "60%",
           }}
         >
-          <ProjectLivIndexMapView
+          <ProjectMapView
             project={project}
             livIndexPlaces={livIndexPlaces}
-          ></ProjectLivIndexMapView>
+          ></ProjectMapView>
         </Flex>
       </Flex>
     </Flex>

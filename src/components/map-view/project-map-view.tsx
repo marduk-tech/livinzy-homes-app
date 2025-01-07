@@ -20,7 +20,7 @@ export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
 const API_KEY = "AIzaSyADagII4pmkrk8R1VVsEzbz0qws3evTYfQ";
 
-export const ProjectLivIndexMapView = ({
+export const ProjectMapView = ({
   project,
   livIndexPlaces,
 }: {
