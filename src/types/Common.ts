@@ -16,11 +16,13 @@ export interface ILivIndexPlaces {
   type?: PlaceType;
   placeId?: string;
   pincode?: string;
-  location?: {
-    lat?: number;
-    lng?: number;
-  };
+  location?: google.maps.LatLngLiteral;
   status?: string;
+  parameters?: {
+    proximityThreshold?: number;
+    triggerCoefficient?: number;
+    growthLever?: boolean;
+  };
   features?: any;
   driver: string;
   megaDriver: string;

@@ -1,4 +1,3 @@
-import { ArrowRightOutlined, CloseOutlined } from "@ant-design/icons";
 import {
   AdvancedMarker,
   AdvancedMarkerAnchorPoint,
@@ -7,50 +6,63 @@ import {
   Map,
   useAdvancedMarkerRef,
 } from "@vis.gl/react-google-maps";
-import { Button, Flex, Typography } from "antd";
 import React, { useCallback, useState } from "react";
-import { Link } from "react-router-dom";
+import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { FONT_SIZE } from "../../theme/style-constants";
+import { ILivIndexPlaces } from "../../types/Common";
 import { Project } from "../../types/Project";
-import { ProjectCard } from "../common/project-card";
+import { LivIndexMarker } from "./liv-index-marker";
 import { getProjectsMapData } from "./map-util";
+import { ProjectMarker } from "./project-marker";
+import { RoadInfra } from "./road-infra";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
 const API_KEY = "AIzaSyADagII4pmkrk8R1VVsEzbz0qws3evTYfQ";
 
 export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
-  console.log(projects);
-
-  const data = getProjectsMapData({ projects: projects })
+  const { data: livIndexPlaces } = useFetchAllLivindexPlaces();
+  const projectsData = getProjectsMapData({ projects: projects })
     .sort((a, b) => b.position!.lat - a.position!.lat)
     .map((dataItem, index) => ({ ...dataItem, zIndex: index }));
 
-  const Z_INDEX_SELECTED = data.length;
-  const Z_INDEX_HOVER = data.length + 1;
+  const Z_INDEX_SELECTED = projectsData.length;
+  const Z_INDEX_HOVER = projectsData.length + 1;
 
-  const [markers] = useState(data);
-
+  const [markers] = useState(projectsData);
+  const [anchorPoint] = useState<AnchorPointName>("BOTTOM");
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedLivIndexId, setExpandedLivIndexId] = useState<string | null>(
+    null
+  );
 
   const onMouseEnter = useCallback((id: string | null) => setHoverId(id), []);
   const onMouseLeave = useCallback(() => setHoverId(null), []);
 
   const onMapClick = useCallback(() => {
     setSelectedId(null);
+    setExpandedId(null);
+    setExpandedLivIndexId(null);
   }, []);
-
-  const [anchorPoint, setAnchorPoint] = useState("BOTTOM" as AnchorPointName);
-
-  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const handleCardExpand = useCallback((id: string) => {
     setExpandedId((prevId) => (prevId === id ? null : id));
   }, []);
 
-  if (data && projects) {
+  const handleLivIndexExpand = useCallback((id: string) => {
+    setExpandedLivIndexId((prevId) => (prevId === id ? null : id));
+  }, []);
+
+  if (projectsData && projects && livIndexPlaces) {
+    const roadsData = livIndexPlaces
+      .filter(
+        (place) => place.driver === "highway" || place.driver === "transit"
+      )
+      .filter((place) => place.parameters?.growthLever === true);
+
     return (
       <APIProvider
         apiKey={API_KEY}
@@ -66,12 +78,13 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
           }}
           mapId={"bf51a910020fa25a"}
           defaultZoom={8.8}
-          defaultCenter={data[0].position}
+          defaultCenter={projectsData[0].position}
           gestureHandling={"greedy"}
           onClick={onMapClick}
           clickableIcons={false}
           disableDefaultUI
         >
+          {/* Project Markers */}
           {markers.map(({ id, zIndex: zIndexDefault, position, project }) => {
             let zIndex = zIndexDefault;
 
@@ -137,74 +150,65 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
               </React.Fragment>
             );
           })}
+
+          {/* LivIndex Markers */}
+          {livIndexPlaces?.map(
+            (place) =>
+              place.parameters?.growthLever && (
+                <React.Fragment key={place._id}>
+                  <AdvancedMarkerWithRef
+                    anchorPoint={AdvancedMarkerAnchorPoint.BOTTOM}
+                    className="custom-marker"
+                    position={place.location}
+                    zIndex={1}
+                    onMarkerClick={() => {}}
+                    onMouseEnter={() => onMouseEnter(place._id)}
+                    onMouseLeave={onMouseLeave}
+                    style={{
+                      transform: `scale(${hoverId === place._id ? 1.05 : 1})`,
+                    }}
+                  >
+                    <LivIndexMarker
+                      place={place}
+                      isExpanded={expandedLivIndexId === place._id}
+                      onExpand={() => {
+                        handleLivIndexExpand(place._id);
+                        captureAnalyticsEvent("click-livindex-marker-mapview", {
+                          placeId: place._id,
+                        });
+                      }}
+                    />
+                  </AdvancedMarkerWithRef>
+
+                  <AdvancedMarkerWithRef
+                    onMarkerClick={() => {}}
+                    zIndex={1}
+                    onMouseEnter={() => onMouseEnter(place._id)}
+                    onMouseLeave={onMouseLeave}
+                    anchorPoint={AdvancedMarkerAnchorPoint.CENTER}
+                    position={place.location}
+                  >
+                    <div
+                      style={{
+                        width: "8px",
+                        height: "8px",
+                        background: "#4CAF50",
+                        borderRadius: "50%",
+                      }}
+                    ></div>
+                  </AdvancedMarkerWithRef>
+                </React.Fragment>
+              )
+          )}
+
+          {roadsData &&
+            roadsData.map((road) => {
+              return <RoadInfra roadData={road}></RoadInfra>;
+            })}
         </Map>
       </APIProvider>
     );
   }
-};
-
-export const ProjectMarker = ({
-  project,
-  isExpanded,
-  onExpand,
-}: {
-  project: Project;
-  isExpanded: boolean;
-  onExpand: () => void;
-}) => {
-  const handleClick = () => {
-    onExpand();
-  };
-  const imageSrc = project.media.find((m) => m.isPreview)?.image?.url;
-
-  return (
-    <div
-      onClick={handleClick}
-      style={{
-        backgroundColor: "white",
-        borderRadius: 10,
-        padding: "10px",
-        whiteSpace: "nowrap",
-        border: "1px solid #ccc",
-        cursor: "pointer",
-        overflow: "hidden",
-        position: "relative",
-      }}
-    >
-      {isExpanded ? (
-        <Flex style={{ width: 250, height: 300 }}>
-          <CloseButton
-            onClick={() => {
-              isExpanded = false;
-            }}
-          ></CloseButton>
-          <ProjectCard project={project}></ProjectCard>
-        </Flex>
-      ) : (
-        <div style={{ marginTop: isExpanded ? "24px" : "0px" }}>
-          <Flex justify="space-between" align="center">
-            <Typography.Text
-              style={{
-                fontSize: isExpanded ? FONT_SIZE.HEADING_3 : "16px",
-                fontWeight: "medium",
-              }}
-            >
-              {project.metadata.name}
-            </Typography.Text>
-            {isExpanded && (
-              <Link to={`/project/${project._id}`}>
-                <Button
-                  variant="outlined"
-                  icon={<ArrowRightOutlined />}
-                  size="small"
-                ></Button>
-              </Link>
-            )}
-          </Flex>
-        </div>
-      )}
-    </div>
-  );
 };
 
 export const AdvancedMarkerWithRef = (
@@ -227,32 +231,5 @@ export const AdvancedMarkerWithRef = (
     >
       {children}
     </AdvancedMarker>
-  );
-};
-
-export const CloseButton: React.FC<{ onClick: (e: any) => void }> = ({
-  onClick,
-}) => {
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: "18px",
-        right: "18px",
-        fontSize: "14px",
-        cursor: "pointer",
-        zIndex: 1,
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
-        width: "24px",
-        height: "24px",
-        borderRadius: "50%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-      onClick={onClick}
-    >
-      <CloseOutlined />
-    </div>
   );
 };
