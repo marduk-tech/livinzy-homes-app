@@ -11,7 +11,12 @@ import { Flex, Tag, Tooltip, Typography } from "antd";
 import React, { useCallback, useState } from "react";
 import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { IDriverPlace, IExtrinsicDriver, Project } from "../../types/Project";
+import {
+  IDriverPlace,
+  IProjectDriver,
+  IScoreBreakup,
+  Project,
+} from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { RoadInfra } from "./road-infra";
 const { Paragraph } = Typography;
@@ -60,6 +65,15 @@ export const ProjectMapView = ({
   }, []);
 
   if (project && project.livIndexScore && project.livIndexScore.score > 0) {
+    const allProjectDrivers: any = [];
+
+    project.livIndexScore.scoreBreakup.map(
+      (scoreBreakup: IScoreBreakup, index: number) => {
+        scoreBreakup.drivers.map((driver: IProjectDriver) => {
+          allProjectDrivers.push(driver);
+        });
+      }
+    );
     return (
       <APIProvider apiKey={API_KEY} libraries={["marker"]}>
         <Map
@@ -78,9 +92,9 @@ export const ProjectMapView = ({
           clickableIcons={false}
           disableDefaultUI
         >
-          {project.livIndexScore.extrinsicDrivers.map(
-            (extrinsicDriver: IExtrinsicDriver, index: number) => {
-              const originalLivIndexPlace = extrinsicDriver.place;
+          {allProjectDrivers.map(
+            (projectDriver: IProjectDriver, index: number) => {
+              const originalLivIndexPlace = projectDriver.place;
 
               const driverConfig = (LivIndexDriversConfig as any)[
                 originalLivIndexPlace!.driver
@@ -99,14 +113,14 @@ export const ProjectMapView = ({
                   <LivIndexMarker
                     coordinates={originalLivIndexPlace!.location}
                     icon={driverConfig.icon}
-                    zIndex={project.livIndexScore.extrinsicDrivers.length + 1}
+                    zIndex={allProjectDrivers.length + 1}
                     place={{
                       ...originalLivIndexPlace,
                       distance: Math.round(
-                        extrinsicDriver.mapsDistanceMetres / 1000
+                        projectDriver.mapsDistanceMetres / 1000
                       ),
                     }}
-                    markerId={extrinsicDriver._id}
+                    markerId={projectDriver._id}
                     isProject={false}
                   ></LivIndexMarker>
                 );

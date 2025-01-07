@@ -836,7 +836,14 @@ const ProjectPage: React.FC<{
 
   return (
     <>
-      <Flex vertical style={{ width: "100%" }}>
+      <Flex
+        vertical
+        style={{
+          width: "100%",
+          height: "calc(100vh - 250px)",
+          overflowY: "scroll",
+        }}
+      >
         <Gallery media={[...sortedMediaArray, ...videoMedia]} />
         <Flex
           gap={40}

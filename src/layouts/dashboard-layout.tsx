@@ -124,15 +124,15 @@ export const DashboardLayout: React.FC = () => {
             style={{
               padding: isMobile ? 8 : "8px 24px",
               background: "transparent",
+              height: "100px",
             }}
           >
             <Flex align="center" justify="space-between">
-              <Link to="/">
-                <Image
-                  preview={false}
+              <Link to="/" style={{ height: "100px" }}>
+                <img
                   src="/logo-name.png"
                   style={{ height: 35, width: "auto" }}
-                ></Image>
+                ></img>
               </Link>
 
               {user && (
@@ -176,7 +176,7 @@ export const DashboardLayout: React.FC = () => {
               </Typography.Text>
             </Flex>
           </Drawer>
-          <Content style={{ margin: isMobile ? 16 : 32, marginTop: 0 }}>
+          <Content style={{ margin: isMobile ? 16 : 24, marginTop: 0 }}>
             {/* <Menu mode="horizontal" items={menuItems} /> */}
             <CustomErrorBoundary>
               <Outlet />
