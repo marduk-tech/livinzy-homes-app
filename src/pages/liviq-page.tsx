@@ -1,7 +1,6 @@
 import { Flex } from "antd";
 import { useState } from "react";
 import HomePage from "./home-page";
-import { COLORS } from "../theme/style-constants";
 import { useNavigate } from "react-router-dom";
 import ProjectPage from "./project-page";
 import Liv from "../components/liv";
@@ -14,65 +13,56 @@ export function LivIQPage() {
   const { isMobile } = useDevice();
 
   return (
-    <Flex vertical>
-      {/* <Button
-        style={{ marginBottom: 8 }}
-        type="link"
-        onClick={() => {
-          setSelectedProjectId(undefined);
-        }}
-        icon={
-          <DynamicReactIcon
-            iconName="IoChevronBackCircleSharp"
-            iconSet="io5"
-            size={40}
-            color={COLORS.borderColorDark}
-          ></DynamicReactIcon>
-        }
-      ></Button> */}
+    <Flex
+      gap={8}
+      style={{ width: "100%", position: "relative", height: "85vh" }}
+    >
       <Flex
-        gap={8}
-        style={{ width: "100%", position: "relative", height: "85vh" }}
-      >
-        <Flex
-          style={{
-            width: isMobile ? "100%" : "36%",
+        style={{
+          ...{
+            width: "36%",
             marginRight: "0.5%",
-            height: isMobile ? 400 : "100%",
-            position: isMobile ? "absolute" : "initial",
+          },
+          ...(isMobile
+            ? {
+                width: "100%",
+                position: "absolute",
+                bottom: 0,
+                borderRadius: 8,
+                boxShadow: "0 0 4px #999",
+                zIndex: 99,
+                backgroundColor: "white",
+                padding: 16,
+              }
+            : {}),
+        }}
+      >
+        <Liv
+          onNewProjectContent={(projects: any[]) => {
+            setProjectsList(projects);
           }}
-        >
-          <Liv
-            onNewProjectContent={(projects: any[]) => {
-              setProjectsList(projects);
+          projectId={selectedProjectId}
+        ></Liv>
+      </Flex>
+      <Flex
+        style={{
+          ...{
+            width: "63.5%",
+            marginLeft: "auto",
+          },
+          ...(isMobile ? { width: "100%" } : {}),
+        }}
+      >
+        {selectedProjectId ? (
+          <ProjectPage projectId={selectedProjectId}></ProjectPage>
+        ) : (
+          <HomePage
+            projectClick={(projectId: string) => {
+              setSelectedProjectId(projectId);
             }}
-            projectId={selectedProjectId}
-          ></Liv>
-        </Flex>
-        <Flex
-          style={{
-            width: isMobile ? "100%" : "63.5%",
-            height: "85vh",
-            overflowY: "scroll",
-            scrollbarWidth: "none",
-            backgroundColor: "white",
-            padding: "16px 8px",
-            border: "1px solid",
-            borderColor: COLORS.borderColor,
-            borderRadius: 8,
-          }}
-        >
-          {selectedProjectId ? (
-            <ProjectPage projectId={selectedProjectId}></ProjectPage>
-          ) : (
-            <HomePage
-              projectClick={(projectId: string) => {
-                setSelectedProjectId(projectId);
-              }}
-              filteredProjectsIdList={projectsList}
-            ></HomePage>
-          )}
-        </Flex>
+            filteredProjectsIdList={projectsList}
+          ></HomePage>
+        )}
       </Flex>
     </Flex>
   );

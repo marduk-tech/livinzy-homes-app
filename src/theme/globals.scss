@@ -31,12 +31,14 @@ body {
   margin: 0;
   font-family: "DM Sans";
   padding: 0;
-  background-color: #f2f3f4;
+  background-color: white;
+  overflow-y: hidden;
   /* Add any other styles you want to reset or modify */
 }
 
 .liviq-content {
   font-size: 16px;
+
   img {
     max-width: 250px;
   }

@@ -193,7 +193,7 @@ export interface IMegaDriverScore {
   places: [IPlace];
 }
 
-export interface IExtrinsicDriver {
+export interface IProjectDriver {
   _id: string;
   place: ILivIndexPlaces;
   distance: number;
@@ -206,6 +206,10 @@ export interface IExtrinsicDriver {
     timelineCoeffecient: Number;
   };
 }
+export interface IScoreBreakup {
+  megaDriver: string;
+  drivers: [IProjectDriver];
+}
 
 export interface IIntrinsicDriver {
   coefficients: {
@@ -217,8 +221,7 @@ export interface IIntrinsicDriver {
 export interface ILivIndexScore {
   score: number;
   summary: string;
-  extrinsicDrivers: [IExtrinsicDriver];
-  intrinsicDriver: IIntrinsicDriver;
+  scoreBreakup: [IScoreBreakup];
 }
 
 export interface ProjectStructure {

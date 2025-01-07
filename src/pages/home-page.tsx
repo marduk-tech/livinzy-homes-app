@@ -1,4 +1,4 @@
-import { Col, Flex, FloatButton, Row, Typography } from "antd";
+import { Button, Col, Flex, Row, Typography } from "antd";
 import { useEffect, useState } from "react";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { Loader } from "../components/common/loader";
@@ -9,6 +9,7 @@ import { useDevice } from "../hooks/use-device";
 import { useFetchProjects } from "../hooks/use-project";
 import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 import { Project } from "../types/Project";
+import { FONT_SIZE } from "../theme/style-constants";
 
 const HomePage: React.FC<{
   filteredProjectsIdList?: any[];
@@ -110,7 +111,7 @@ const HomePage: React.FC<{
   if (filteredProjects) {
     return (
       <>
-        <FloatButton
+        {/* <FloatButton
           icon={
             !toggleMapView ? (
               <DynamicReactIcon
@@ -136,7 +137,7 @@ const HomePage: React.FC<{
           onClick={() => setToggleMapView(!toggleMapView)}
         >
           {isMobile ? null : toggleMapView ? "List View" : "Map View"}
-        </FloatButton>
+        </FloatButton> */}
         <Flex
           vertical
           style={{
@@ -144,7 +145,7 @@ const HomePage: React.FC<{
           }}
           gap={16}
         >
-          {/* <Flex
+          <Flex
             align={isMobile ? "flex-start" : "center"}
             vertical
             style={{
@@ -153,7 +154,6 @@ const HomePage: React.FC<{
             }}
           >
             <Flex
-              gap={32}
               align="center"
               justify={isMobile ? "flex-start" : "center"}
               style={{
@@ -163,7 +163,7 @@ const HomePage: React.FC<{
                 scrollbarWidth: "none",
               }}
             >
-              {ProjectCategories.map((cat: any) => {
+              {/* {ProjectCategories.map((cat: any) => {
                 return (
                   <Flex
                     vertical
@@ -188,7 +188,7 @@ const HomePage: React.FC<{
                     ></DynamicReactIcon>
                     <Typography.Text
                       style={{
-                        fontSize: FONT_SIZE.subText,
+                        fontSize: FONT_SIZE.SUB_TEXT,
                         fontWeight:
                           categoryFilter && categoryFilter == cat.key
                             ? "bold"
@@ -203,47 +203,85 @@ const HomePage: React.FC<{
                     </Typography.Text>
                   </Flex>
                 );
-              })}
-              <Button
+              })} */}
+              {/* <Button
                 onClick={() => setIsFiltersModalVisible(true)}
                 type="default"
                 size="small"
                 icon={<RiListSettingsLine />}
               >
                 Filters
-              </Button>
+              </Button> */}
+              <Button
+                size="small"
+                icon={
+                  !toggleMapView ? (
+                    <DynamicReactIcon
+                      iconName="FaMap"
+                      color="primary"
+                      iconSet="fa"
+                      size={16}
+                    ></DynamicReactIcon>
+                  ) : (
+                    <DynamicReactIcon
+                      iconName="FaRegListAlt"
+                      iconSet="fa"
+                      size={16}
+                      color="primary"
+                    ></DynamicReactIcon>
+                  )
+                }
+                style={{
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  marginLeft: "auto",
+                  fontSize: FONT_SIZE.SUB_TEXT,
+                  marginRight: isMobile ? 0 : 8,
+                }}
+                onClick={() => setToggleMapView(!toggleMapView)}
+              ></Button>
             </Flex>
-          </Flex> */}
+          </Flex>
 
           {toggleMapView ? (
             <Row>
               <ProjectsMapView projects={filteredProjects} />
             </Row>
           ) : (
-            <Row gutter={[24, 24]} style={{ width: "100%", margin: 0 }}>
-              {filteredProjects.length > 0 ? (
-                <>
-                  {filteredProjects.map((project) => (
-                    <Col
-                      key={project._id}
-                      xs={24}
-                      md={12}
-                      lg={6}
-                      onClick={() => {
-                        projectClick(project._id);
-                      }}
-                      style={{ padding: isMobile ? 0 : "0 8px" }}
-                    >
-                      <ProjectCard project={project} key={project._id} />
-                    </Col>
-                  ))}
-                </>
-              ) : (
-                <>
-                  <Typography.Text>No Projects Found</Typography.Text>
-                </>
-              )}
-            </Row>
+            <Flex
+              style={{
+                height: isMobile
+                  ? "calc(100vh - 290px)"
+                  : "calc(100vh - 200px)",
+                overflowY: "scroll",
+                scrollbarWidth: "none",
+              }}
+            >
+              <Row gutter={[24, 24]} style={{ width: "100%", margin: 0 }}>
+                {filteredProjects.length > 0 ? (
+                  <>
+                    {filteredProjects.map((project) => (
+                      <Col
+                        key={project._id}
+                        xs={24}
+                        md={12}
+                        lg={6}
+                        onClick={() => {
+                          projectClick(project._id);
+                        }}
+                        style={{ padding: isMobile ? 0 : "0 8px" }}
+                      >
+                        <ProjectCard project={project} key={project._id} />
+                      </Col>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <Typography.Text>No Projects Found</Typography.Text>
+                  </>
+                )}
+              </Row>
+            </Flex>
           )}
         </Flex>
 

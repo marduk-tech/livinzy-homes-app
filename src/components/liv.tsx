@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 import { useUser } from "../hooks/use-user";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
+import { COLORS } from "../theme/style-constants";
+import { useDevice } from "../hooks/use-device";
 
 interface Answer {
   directAnswer?: string;
@@ -70,6 +72,10 @@ export default function Liv({
   const [projectAnswer, setProjectAnswer] = useState<string>();
 
   const [question, setQuestion] = useState<string>();
+  const [minimized, setMinimized] = useState(false);
+  const { isMobile } = useDevice();
+  const [query, setQuery] = useState<string>();
+  const [form] = Form.useForm();
 
   useEffect(() => {
     if (user && user?._id) {
@@ -83,169 +89,208 @@ export default function Liv({
     }
   }, [projectId]);
 
-  //   useEffect(() => {
-  //     onNewProjectContent(DUMMY_RESPONSE.projectsList);
-  //   }, []);
+  const handleRequest = async (question: string) => {
+    try {
+      captureAnalyticsEvent("question-asked", {
+        projectId: projectId,
+        question: question,
+      });
+      setQueryProcessing(true);
 
-  const inputAreaRender = () => {
-    const [form] = Form.useForm();
-    const [query, setQuery] = useState<string>();
-
-    const handleRequest = async (question: string) => {
-      try {
-        captureAnalyticsEvent("question-asked", {
-          projectId: projectId,
+      const response = await axiosApiInstance.post(
+        projectId ? "/ai/ask" : "/ai/ask-global",
+        {
           question: question,
-        });
-        setQueryProcessing(true);
+          sessionId: sessionId,
+          project: {
+            id: projectId || "",
+          },
+        }
+      );
 
-        const response = await axiosApiInstance.post(
-          projectId ? "/ai/ask" : "/ai/ask-global",
-          {
-            question: question,
-            sessionId: sessionId,
-            project: {
-              id: projectId || "",
-            },
-          }
-        );
-
-        if (response.data && response.data.data) {
-          setQueryProcessing(false);
-          if (projectId) {
-            setProjectAnswer(response.data.data.answer);
-          } else {
-            let answerObj = JSON.parse(response.data.data.answer);
-            setAnswer(answerObj);
-            if (
-              answerObj &&
-              !!answerObj.projectsList &&
-              !!answerObj.projectsList.projects &&
-              !!answerObj.projectsList.projects.length &&
-              onNewProjectContent
-            ) {
-              onNewProjectContent(answerObj.projectsList.projects);
-            }
+      if (response.data && response.data.data) {
+        setQueryProcessing(false);
+        if (projectId) {
+          setProjectAnswer(response.data.data.answer);
+        } else {
+          let answerObj = JSON.parse(response.data.data.answer);
+          setAnswer(answerObj);
+          if (
+            answerObj &&
+            !!answerObj.projectsList &&
+            !!answerObj.projectsList.projects &&
+            !!answerObj.projectsList.projects.length &&
+            onNewProjectContent
+          ) {
+            onNewProjectContent(answerObj.projectsList.projects);
           }
         }
-      } catch (error) {
-        console.error("Error sending message:", error);
-        return {
-          content: new Response(
-            "Sorry, there was an error processing your request."
-          ),
-          success: false,
-        };
       }
-    };
-
-    return (
-      <Form
-        form={form}
-        style={{ width: "100%" }}
-        onFinish={async (value) => {
-          form.resetFields();
-          const { question } = value;
-          setQuestion(question);
-          handleRequest(question);
-        }}
-      >
-        <Form.Item label="" name="question" style={{ marginBottom: 0 }}>
-          <Input
-            style={{
-              height: 50,
-              paddingRight: 0,
-              border: 0,
-              backgroundColor: "white",
-            }}
-            name="query"
-            onChange={(event: any) => {
-              setQuery(event.currentTarget.value);
-            }}
-            placeholder="Ask here"
-            suffix={
-              <Button
-                htmlType="submit"
-                type="link"
-                disabled={!query || queryProcessing}
-                style={{
-                  opacity: query ? 1 : 0.3,
-                  padding: 0,
-                  paddingRight: 8,
-                }}
-              >
-                <DynamicReactIcon
-                  iconName="BiSolidSend"
-                  iconSet="bi"
-                ></DynamicReactIcon>
-              </Button>
-            }
-          />
-        </Form.Item>
-      </Form>
-    );
+    } catch (error) {
+      console.error("Error sending message:", error);
+      return {
+        content: new Response(
+          "Sorry, there was an error processing your request."
+        ),
+        success: false,
+      };
+    }
   };
 
   return (
-    <Flex vertical style={{ width: "100%", position: "relative" }}>
+    <Flex
+      vertical
+      style={{
+        width: "100%",
+        height: isMobile ? (minimized ? "auto" : 400) : "calc(100vh - 150px)",
+      }}
+    >
       <Flex>
-        <Typography.Text
-          style={{
-            backgroundColor: "white",
-            padding: "4px 12px",
-            borderRadius: 16,
-            display: "inline",
-          }}
-        >
-          {question || "Ask away anything!"}
-        </Typography.Text>
+        <Flex align="center" gap={8}>
+          <DynamicReactIcon
+            iconName="GiOilySpiral"
+            iconSet="gi"
+          ></DynamicReactIcon>
+          <Typography.Text
+            style={{
+              backgroundColor: COLORS.bgColor,
+              padding: "4px 12px",
+              borderRadius: 16,
+              border: "1px solid",
+              borderColor: COLORS.borderColorMedium,
+              display: "inline",
+            }}
+          >
+            {question || "How can I help ?"}
+          </Typography.Text>
+        </Flex>
+        {isMobile && (
+          <Button
+            size="small"
+            type="default"
+            onClick={() => {
+              setMinimized(!minimized);
+            }}
+            style={{
+              padding: 0,
+              height: 32,
+              width: 32,
+              marginLeft: "auto",
+              border: "1px solid",
+              borderColor: COLORS.borderColorMedium,
+            }}
+            icon={
+              <DynamicReactIcon
+                iconName={minimized ? "IoExpand" : "FiMinimize2"}
+                iconSet={minimized ? "io5" : "fi"}
+                size={16}
+              ></DynamicReactIcon>
+            }
+          ></Button>
+        )}
       </Flex>
-      <Flex vertical style={{ maxHeight: 550, overflowY: "scroll" }}>
-        <Typography.Title
-          level={5}
-          style={{ opacity: queryProcessing ? 0.8 : 1 }}
-        >
-          {projectAnswer && projectId
-            ? "Project - XXX "
-            : answer?.directAnswer
-            ? "Sure"
-            : answer?.areaInfo
-            ? answer?.areaInfo.summary
-            : "Uh Ho!"}
-        </Typography.Title>
-        <Typography.Text style={{ opacity: queryProcessing ? 0.8 : 1 }}>
-          <Markdown className="liviq-content">
-            {projectAnswer && projectId
-              ? projectAnswer
-              : answer?.directAnswer
-              ? answer.directAnswer
-              : answer?.areaInfo
-              ? answer?.areaInfo.details
-              : "I completely blank on this! Try again ?"}
-          </Markdown>
-        </Typography.Text>
-      </Flex>
-      <Flex
-        style={{ width: "100%", justifySelf: "flex-end", marginTop: "auto" }}
-      >
-        {inputAreaRender()}
-      </Flex>
-      {queryProcessing ? (
-        <img
-          src={
-            !queryProcessing
-              ? "/images/liv-icon-dark.png"
-              : "/images/liv-icon-gif.gif"
-          }
-          style={{
-            height: 56,
-            width: 56,
-            position: "absolute",
-            top: "calc(50% - 28px)",
-            left: "calc(50% - 28px)",
-          }}
-        />
-      ) : null}
+      {!minimized && (
+        <Flex style={{ position: "relative", height: "100%" }}>
+          <Flex vertical style={{ maxHeight: 550, overflowY: "scroll" }}>
+            <Typography.Title
+              level={5}
+              style={{ opacity: queryProcessing ? 0.8 : 1, marginTop: 16 }}
+            >
+              {projectAnswer || answer
+                ? projectAnswer && projectId
+                  ? "Project - XXX "
+                  : answer?.directAnswer
+                  ? "Sure"
+                  : answer?.areaInfo
+                  ? answer?.areaInfo.summary
+                  : "Uh Ho!"
+                : ""}
+            </Typography.Title>
+            <Typography.Text style={{ opacity: queryProcessing ? 0.8 : 1 }}>
+              <Markdown className="liviq-content">
+                {projectAnswer || answer
+                  ? projectAnswer && projectId
+                    ? projectAnswer
+                    : answer?.directAnswer
+                    ? answer.directAnswer
+                    : answer?.areaInfo
+                    ? answer?.areaInfo.details
+                    : "I completely blank on this! Try again ?"
+                  : ""}
+              </Markdown>
+            </Typography.Text>
+          </Flex>
+          <Flex
+            style={{
+              width: "100%",
+              justifySelf: "flex-end",
+              marginTop: "auto",
+            }}
+          >
+            <Form
+              form={form}
+              style={{ width: "100%" }}
+              onFinish={async (value) => {
+                form.resetFields();
+                const { question } = value;
+                setQuestion(question);
+                handleRequest(question);
+              }}
+            >
+              <Form.Item label="" name="question" style={{ marginBottom: 0 }}>
+                <Input
+                  style={{
+                    height: 50,
+                    paddingRight: 0,
+                    backgroundColor: "white",
+                    border: "1px solid",
+                    borderColor: COLORS.borderColorMedium,
+                    borderRadius: 16,
+                  }}
+                  name="query"
+                  onChange={(event: any) => {
+                    setQuery(event.currentTarget.value);
+                  }}
+                  placeholder="Ask here"
+                  suffix={
+                    <Button
+                      htmlType="submit"
+                      type="link"
+                      disabled={!query || queryProcessing}
+                      style={{
+                        opacity: query ? 1 : 0.3,
+                        padding: 0,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <DynamicReactIcon
+                        iconName="BiSolidSend"
+                        iconSet="bi"
+                      ></DynamicReactIcon>
+                    </Button>
+                  }
+                />
+              </Form.Item>
+            </Form>
+          </Flex>
+          {queryProcessing ? (
+            <img
+              src={
+                !queryProcessing
+                  ? "/images/liv-icon-dark.png"
+                  : "/images/liv-icon-gif.gif"
+              }
+              style={{
+                height: 56,
+                width: 56,
+                position: "absolute",
+                top: "calc(50% - 28px)",
+                left: "calc(50% - 28px)",
+              }}
+            />
+          ) : null}
+        </Flex>
+      )}
     </Flex>
   );
 }
