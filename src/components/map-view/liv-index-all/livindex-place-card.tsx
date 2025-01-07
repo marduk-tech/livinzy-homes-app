@@ -1,8 +1,8 @@
 import { Flex, Tag, Tooltip, Typography } from "antd";
-import { IDriverPlace } from "../../types/Project";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
-import DynamicReactIcon from "../common/dynamic-react-icon";
+import { IDriverPlace } from "../../../types/Project";
+import { COLORS, FONT_SIZE } from "../../../theme/style-constants";
+import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../../libs/constants";
+import DynamicReactIcon from "../../common/dynamic-react-icon";
 const { Paragraph } = Typography;
 
 interface LivIndexPlaceCardProps {

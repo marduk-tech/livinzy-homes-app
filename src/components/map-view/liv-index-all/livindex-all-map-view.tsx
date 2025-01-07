@@ -1,10 +1,10 @@
 import { APIProvider, Map } from "@vis.gl/react-google-maps";
 import { FeatureCollection, Point } from "geojson";
 import { useEffect, useState } from "react";
-import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
-import { Loader } from "../common/loader";
+import { useFetchAllLivindexPlaces } from "../../../hooks/use-livindex-places";
+import { Loader } from "../../common/loader";
 import { ClusteredMarkers } from "./clustered-markers";
-import { RoadInfra } from "./road-infra";
+import { RoadInfra } from "../road-infra";
 
 export type CastleFeatureProps = {
   name?: string;
@@ -19,7 +19,7 @@ export type LivIndexPlacesGeoJson = FeatureCollection<
   CastleFeatureProps
 >;
 
-export function LivIndexMapView() {
+export function LivIndexAllMapView() {
   const { data: livindexPlaces, isLoading: livindexPlacesLoading } =
     useFetchAllLivindexPlaces();
 

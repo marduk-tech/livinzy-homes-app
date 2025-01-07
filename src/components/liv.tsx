@@ -7,11 +7,15 @@ import { useUser } from "../hooks/use-user";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 
 interface Answer {
-  generalInfo: {
+  directAnswer?: string;
+  areaInfo: {
     summary: string;
     details: string;
   };
-  projectsList: any[];
+  projectsList: {
+    projects: any[];
+    summary: string;
+  };
 }
 const DUMMY_RESPONSE = {
   generalInfo: {
@@ -107,17 +111,22 @@ export default function Liv({
         );
 
         if (response.data && response.data.data) {
+          setQueryProcessing(false);
           if (projectId) {
             setProjectAnswer(response.data.data.answer);
           } else {
             let answerObj = JSON.parse(response.data.data.answer);
             setAnswer(answerObj);
-            if (answerObj && answerObj.projectsList && onNewProjectContent) {
-              onNewProjectContent(answerObj.projectsList);
+            if (
+              answerObj &&
+              !!answerObj.projectsList &&
+              !!answerObj.projectsList.projects &&
+              !!answerObj.projectsList.projects.length &&
+              onNewProjectContent
+            ) {
+              onNewProjectContent(answerObj.projectsList.projects);
             }
           }
-
-          setQueryProcessing(false);
         }
       } catch (error) {
         console.error("Error sending message:", error);
@@ -198,13 +207,21 @@ export default function Liv({
         >
           {projectAnswer && projectId
             ? "Project - XXX "
-            : answer?.generalInfo.summary}
+            : answer?.directAnswer
+            ? "Sure"
+            : answer?.areaInfo
+            ? answer?.areaInfo.summary
+            : "Uh Ho!"}
         </Typography.Title>
         <Typography.Text style={{ opacity: queryProcessing ? 0.8 : 1 }}>
           <Markdown className="liviq-content">
             {projectAnswer && projectId
               ? projectAnswer
-              : answer?.generalInfo.details}
+              : answer?.directAnswer
+              ? answer.directAnswer
+              : answer?.areaInfo
+              ? answer?.areaInfo.details
+              : "I completely blank on this! Try again ?"}
           </Markdown>
         </Typography.Text>
       </Flex>

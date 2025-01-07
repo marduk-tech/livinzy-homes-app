@@ -197,6 +197,8 @@ export interface IExtrinsicDriver {
   _id: string;
   place: ILivIndexPlaces;
   distance: number;
+  mapsDistanceMetres: number;
+  mapsDurationSeconds: number;
   coefficients: {
     proximityCoeffecient: Number;
     countCoeffecient: Number;

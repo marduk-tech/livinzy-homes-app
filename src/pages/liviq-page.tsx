@@ -5,11 +5,13 @@ import { COLORS } from "../theme/style-constants";
 import { useNavigate } from "react-router-dom";
 import ProjectPage from "./project-page";
 import Liv from "../components/liv";
+import { useDevice } from "../hooks/use-device";
 
 export function LivIQPage() {
   const [projectsList, setProjectsList] = useState<any>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string>();
   const navigate = useNavigate();
+  const { isMobile } = useDevice();
 
   return (
     <Flex vertical>
@@ -28,11 +30,16 @@ export function LivIQPage() {
           ></DynamicReactIcon>
         }
       ></Button> */}
-      <Flex gap={8} style={{ width: "100%" }}>
+      <Flex
+        gap={8}
+        style={{ width: "100%", position: "relative", height: "85vh" }}
+      >
         <Flex
           style={{
-            width: "36%",
+            width: isMobile ? "100%" : "36%",
             marginRight: "0.5%",
+            height: isMobile ? 400 : "100%",
+            position: isMobile ? "absolute" : "initial",
           }}
         >
           <Liv
@@ -44,7 +51,7 @@ export function LivIQPage() {
         </Flex>
         <Flex
           style={{
-            width: "63.5%",
+            width: isMobile ? "100%" : "63.5%",
             height: "85vh",
             overflowY: "scroll",
             scrollbarWidth: "none",

@@ -102,7 +102,9 @@ export const ProjectLivIndexMapView = ({
                     zIndex={project.livIndexScore.extrinsicDrivers.length + 1}
                     place={{
                       ...originalLivIndexPlace,
-                      distance: extrinsicDriver.distance,
+                      distance: Math.round(
+                        extrinsicDriver.mapsDistanceMetres / 1000
+                      ),
                     }}
                     markerId={extrinsicDriver._id}
                     isProject={false}
@@ -186,7 +188,7 @@ export const PlaceCard = ({
             ) : null}
           </Flex>
 
-          {place.description ? (
+          {place.details && place.details.oneLiner ? (
             <Paragraph
               style={{
                 color: "white",
@@ -199,7 +201,7 @@ export const PlaceCard = ({
                 expandable: true,
               }}
             >
-              {place.description}
+              {place.details?.oneLiner}
             </Paragraph>
           ) : null}
         </Flex>
