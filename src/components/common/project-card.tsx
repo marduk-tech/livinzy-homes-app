@@ -7,7 +7,7 @@ import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
 interface ProjectCardProps {
   project: Project;
   fromMap: boolean;
-  onProjectClick: any;
+  onProjectClick?: any;
 }
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({
@@ -123,7 +123,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         <Flex
           style={{ marginTop: 8 }}
           onClick={() => {
-            onProjectClick(project._id);
+            onProjectClick();
           }}
         >
           <Tag>More Details</Tag>

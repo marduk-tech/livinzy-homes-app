@@ -188,7 +188,11 @@ export function ProfilePage() {
                       lg={6}
                       style={{ padding: isMobile ? 0 : 16 }}
                     >
-                      <ProjectCard project={project} key={project._id} />
+                      <ProjectCard
+                        fromMap={false}
+                        project={project}
+                        key={project._id}
+                      />
                     </Col>
                   ))}
                 </Row>

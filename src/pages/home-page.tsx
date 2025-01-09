@@ -276,7 +276,11 @@ const HomePage: React.FC<{
                         }}
                         style={{ padding: isMobile ? 0 : "0 8px" }}
                       >
-                        <ProjectCard project={project} key={project._id} />
+                        <ProjectCard
+                          project={project}
+                          key={project._id}
+                          fromMap={false}
+                        />
                       </Col>
                     ))}
                   </>
