@@ -28,6 +28,7 @@ export interface ILivIndexPlaces {
   megaDriver: string;
   createdAt: Date;
   updatedAt: Date;
+  details: any;
 }
 
 export type PlaceType = "highway" | "hospital" | "school" | "futureInfra";

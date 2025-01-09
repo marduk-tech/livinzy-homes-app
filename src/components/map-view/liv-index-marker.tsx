@@ -4,6 +4,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FONT_SIZE } from "../../theme/style-constants";
 import { ILivIndexPlaces } from "../../types/Common";
+import { LivIndexPlaceCard } from "./livindex-place-card";
+import { IDriverPlace } from "../../types/Project";
 
 export const PlaceCard = ({
   place,
@@ -38,7 +40,7 @@ export const PlaceCard = ({
               fontWeight: "medium",
             }}
           >
-            {place.name}
+            {place.name} *
           </Typography.Text>
           {isExpanded && (
             <Link to={`/livindex-place/${place._id}`}>
@@ -62,22 +64,8 @@ export const PlaceCard = ({
   );
 };
 
-export const LivIndexMarker = ({
-  place,
-  isExpanded,
-  onExpand,
-}: {
-  place: ILivIndexPlaces;
-  isExpanded: boolean;
-  onExpand: () => void;
-}) => {
-  return (
-    <PlaceCard
-      place={place}
-      isExpanded={isExpanded}
-      onClose={() => onExpand()}
-    />
-  );
+export const LivIndexMarker = ({ place }: { place: IDriverPlace }) => {
+  return <LivIndexPlaceCard place={place} />;
 };
 
 export const CloseButton: React.FC<{ onClick: (e: any) => void }> = ({

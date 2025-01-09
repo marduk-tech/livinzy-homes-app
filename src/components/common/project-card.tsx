@@ -1,24 +1,38 @@
-import { Flex, Typography } from "antd";
+import { Flex, Tag, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IMedia, Project } from "../../types/Project";
+import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
 
 interface ProjectCardProps {
   project: Project;
+  fromMap: boolean;
+  onProjectClick: any;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
+export const ProjectCard: React.FC<ProjectCardProps> = ({
+  project,
+  fromMap,
+  onProjectClick,
+}) => {
   const navigate = useNavigate();
 
   const randomPrice = (Math.random() * (15 - 8) + 8).toFixed(1);
 
-  const costSummary =
-    project.ui && project.ui.costSummary
-      ? JSON.parse(project.ui.costSummary)
-      : undefined;
+  let costSummary;
+  if (project.ui && project.ui.costSummary) {
+    try {
+      costSummary = JSON.parse(project.ui.costSummary);
+    } catch (err) {
+      // ignore
+    }
+  }
 
-  let previewImage: any = project.media.find((m: IMedia) => m.isPreview);
-  previewImage = previewImage?.image?.url;
+  let previewImage;
+  if (project.media) {
+    previewImage = project.media.find((m: IMedia) => m.isPreview);
+    previewImage = previewImage?.image?.url;
+  }
   return (
     <Flex
       vertical
@@ -52,11 +66,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
             fontSize: FONT_SIZE.HEADING_3,
             lineHeight: "100%",
             fontWeight: 500,
+            wordWrap: "break-word",
           }}
         >
           {project.metadata.name}
         </Typography.Text>
-        {/* {costSummary ? (
+        {costSummary ? (
           <Flex>
             <Typography.Text
               style={{
@@ -68,7 +83,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
               {rupeeAmountFormat(costSummary.cost)} / {costSummary.size}
             </Typography.Text>
           </Flex>
-        ) : null} */}
+        ) : null}
         {project.ui && project.ui.oneLiner ? (
           <Typography.Text
             style={{
@@ -104,6 +119,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           <DescText text={`₹${randomPrice}Lacs`} />
         </Flex> */}
       </Flex>
+      {fromMap && (
+        <Flex
+          style={{ marginTop: 8 }}
+          onClick={() => {
+            onProjectClick(project._id);
+          }}
+        >
+          <Tag>More Details</Tag>
+        </Flex>
+      )}
     </Flex>
   );
 };

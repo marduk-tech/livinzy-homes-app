@@ -449,7 +449,7 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                       textTransform: "uppercase",
                     }}
                   >
-                    Plots
+                    Configuration
                   </Typography.Text>
                   <Typography.Text
                     style={{
@@ -459,7 +459,7 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                       lineHeight: "100%",
                     }}
                   >
-                    {summary.plots}
+                    {summary.configurations}
                   </Typography.Text>
                 </Flex>
               </Flex>

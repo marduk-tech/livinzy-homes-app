@@ -1,3 +1,4 @@
+import { ProjectHomeType } from "../libs/constants";
 import { ILivIndexPlaces } from "./Common";
 
 export interface IMedia {
@@ -37,6 +38,7 @@ export interface IMetadata {
   oneLiner?: string;
   description: string;
   summary: string;
+  homeType: ProjectHomeType;
 }
 
 export interface ILand {
@@ -159,10 +161,14 @@ export interface IDriverPlace {
     oneLiner: string;
     description: string;
     footfall: number;
+    icon?: string;
   };
   location?: {
     lat: number;
     lng: number;
+  };
+  parameters: {
+    growthLever: boolean;
   };
   driver: string;
   megaDriver: string;

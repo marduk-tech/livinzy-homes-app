@@ -73,7 +73,7 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
               coordinates: [coordinates],
               strokeColor:
                 feature.properties.strokeColor || COLORS.textColorLight,
-              strokeWeight: 2,
+              strokeWeight: 4,
               ...customProps,
             };
           } else if (feature.geometry.type === "MultiLineString") {
@@ -89,7 +89,7 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
               coordinates,
               strokeColor:
                 feature.properties.strokeColor || COLORS.textColorLight,
-              strokeWeight: 2,
+              strokeWeight: 4,
               ...customProps,
             };
           }

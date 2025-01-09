@@ -1,19 +1,21 @@
-import { ArrowRightOutlined, CloseOutlined } from "@ant-design/icons";
-import { Button, Flex, Typography } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
+import { Flex } from "antd";
 import React from "react";
-import { Link } from "react-router-dom";
-import { FONT_SIZE } from "../../theme/style-constants";
 import { Project } from "../../types/Project";
 import { ProjectCard } from "../common/project-card";
+import { getProjectTypeIcon } from "./project-type-icon";
+import { COLORS } from "../../theme/style-constants";
 
 export const ProjectMarker = ({
   project,
   isExpanded,
   onExpand,
+  onProjectClick,
 }: {
   project: Project;
   isExpanded: boolean;
   onExpand: () => void;
+  onProjectClick: any;
 }) => {
   const handleClick = () => {
     onExpand();
@@ -23,41 +25,28 @@ export const ProjectMarker = ({
     <div
       onClick={handleClick}
       style={{
-        backgroundColor: "white",
+        backgroundColor: isExpanded ? "white" : COLORS.primaryColor,
         borderRadius: 10,
-        padding: "10px",
+        padding: 4,
         whiteSpace: "nowrap",
-        border: "1px solid #ccc",
         cursor: "pointer",
         overflow: "hidden",
         position: "relative",
+        transform: isExpanded ? "scale(0.8)" : "none",
       }}
     >
       {isExpanded ? (
         <Flex style={{ width: 250, height: 300 }}>
-          <CloseButton onClick={() => onExpand()} />
-          <ProjectCard project={project} />
+          <ProjectCard
+            project={project}
+            fromMap={true}
+            onProjectClick={onProjectClick}
+          />
         </Flex>
       ) : (
         <div style={{ marginTop: isExpanded ? "24px" : "0px" }}>
           <Flex justify="space-between" align="center">
-            <Typography.Text
-              style={{
-                fontSize: isExpanded ? FONT_SIZE.HEADING_3 : "16px",
-                fontWeight: "medium",
-              }}
-            >
-              {project.metadata.name}
-            </Typography.Text>
-            {isExpanded && (
-              <Link to={`/project/${project._id}`}>
-                <Button
-                  variant="outlined"
-                  icon={<ArrowRightOutlined />}
-                  size="small"
-                />
-              </Link>
-            )}
+            {getProjectTypeIcon(project.metadata.homeType)}
           </Flex>
         </div>
       )}

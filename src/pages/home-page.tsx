@@ -245,7 +245,12 @@ const HomePage: React.FC<{
 
           {toggleMapView ? (
             <Row>
-              <ProjectsMapView projects={filteredProjects} />
+              <ProjectsMapView
+                projects={filteredProjects}
+                onProjectClick={(projectId: string) => {
+                  projectClick(projectId);
+                }}
+              />
             </Row>
           ) : (
             <Flex

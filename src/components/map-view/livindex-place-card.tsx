@@ -1,13 +1,32 @@
 import { Flex, Tag, Tooltip, Typography } from "antd";
-import { IDriverPlace } from "../../../types/Project";
-import { COLORS, FONT_SIZE } from "../../../theme/style-constants";
-import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../../libs/constants";
-import DynamicReactIcon from "../../common/dynamic-react-icon";
+import { IDriverPlace } from "../../types/Project";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
+import DynamicReactIcon from "../common/dynamic-react-icon";
 const { Paragraph } = Typography;
 
 interface LivIndexPlaceCardProps {
   place: IDriverPlace;
 }
+
+const renderIcon = (place: IDriverPlace) => {
+  if (place.details && place.details.icon) {
+    return <img src={place.details.icon} height={24} width={24}></img>;
+  }
+  let icon: any = { name: "FaLocationDot", set: "fa" };
+  if ((LivIndexDriversConfig as any)[place!.driver]) {
+    icon = (LivIndexDriversConfig as any)[place!.driver].icon;
+  }
+  return (
+    <DynamicReactIcon
+      iconName={icon.name}
+      iconSet={icon.set}
+      size={18}
+      color={"black"}
+    ></DynamicReactIcon>
+  );
+};
+
 export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
   place,
 }) => {
@@ -15,8 +34,6 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
     PLACE_TIMELINE.LAUNCHED,
     PLACE_TIMELINE.POST_LAUNCH,
   ].includes(place.status as any);
-
-  const icon = (LivIndexDriversConfig as any)[place!.driver].icon;
 
   return (
     <Tooltip
@@ -78,22 +95,17 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
     >
       <Flex
         style={{
-          backgroundColor: "white",
+          backgroundColor: "rgba(255,255,255, 1)",
           borderRadius: "50%",
           padding: 8,
-          borderWidth: "2px",
+          borderWidth: "1px",
           borderColor: isUnderConstruction
             ? COLORS.borderColorDark
-            : COLORS.borderColor,
+            : COLORS.borderColorDark,
           borderStyle: isUnderConstruction ? "dotted" : "solid",
         }}
       >
-        <DynamicReactIcon
-          iconName={icon.name}
-          iconSet={icon.set}
-          size={18}
-          color={"black"}
-        ></DynamicReactIcon>
+        {renderIcon(place)}
       </Flex>
     </Tooltip>
   );

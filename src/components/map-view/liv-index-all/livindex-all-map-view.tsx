@@ -5,6 +5,7 @@ import { useFetchAllLivindexPlaces } from "../../../hooks/use-livindex-places";
 import { Loader } from "../../common/loader";
 import { ClusteredMarkers } from "./clustered-markers";
 import { RoadInfra } from "../road-infra";
+import brightColorsStyles from "../map-styles/bright-colors";
 
 export type CastleFeatureProps = {
   name?: string;
@@ -12,6 +13,13 @@ export type CastleFeatureProps = {
   description?: string;
   placeId?: string;
   type?: string;
+};
+
+const MAP_STYLE_BRIGHT = {
+  id: "styled1",
+  label: 'Raster / "Bright Colors" (no mapId)',
+  mapTypeId: "roadmap",
+  styles: brightColorsStyles,
 };
 
 export type LivIndexPlacesGeoJson = FeatureCollection<
@@ -81,7 +89,9 @@ export function LivIndexAllMapView() {
           defaultCenter={{ lat: 14.5638117, lng: 77.8884163 }}
           defaultZoom={7}
           gestureHandling={"greedy"}
-          disableDefaultUI
+          mapTypeId={MAP_STYLE_BRIGHT.mapTypeId}
+          styles={MAP_STYLE_BRIGHT.styles}
+          disableDefaultUI={true}
         >
           {geojson && (
             <ClusteredMarkers

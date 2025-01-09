@@ -18,6 +18,10 @@ interface Answer {
     projects: any[];
     summary: string;
   };
+  projectInfo: {
+    summary: string;
+    details: string;
+  };
 }
 const DUMMY_RESPONSE = {
   generalInfo: {
@@ -77,6 +81,9 @@ export default function Liv({
   const [query, setQuery] = useState<string>();
   const [form] = Form.useForm();
 
+  const [details, setDetails] = useState<string>();
+  const [summary, setSummary] = useState<string>();
+
   useEffect(() => {
     if (user && user?._id) {
       setSessionId(user._id);
@@ -97,33 +104,32 @@ export default function Liv({
       });
       setQueryProcessing(true);
 
-      const response = await axiosApiInstance.post(
-        projectId ? "/ai/ask" : "/ai/ask-global",
-        {
-          question: question,
-          sessionId: sessionId,
-          project: {
-            id: projectId || "",
-          },
-        }
-      );
+      const response = await axiosApiInstance.post("/ai/ask-global", {
+        question: question,
+        sessionId: sessionId,
+        projectId,
+      });
 
       if (response.data && response.data.data) {
         setQueryProcessing(false);
-        if (projectId) {
-          setProjectAnswer(response.data.data.answer);
-        } else {
-          let answerObj = JSON.parse(response.data.data.answer);
-          setAnswer(answerObj);
-          if (
-            answerObj &&
-            !!answerObj.projectsList &&
-            !!answerObj.projectsList.projects &&
-            !!answerObj.projectsList.projects.length &&
-            onNewProjectContent
-          ) {
-            onNewProjectContent(answerObj.projectsList.projects);
-          }
+        let answerObj = JSON.parse(response.data.data.answer);
+        setAnswer(answerObj);
+        if (answerObj.areaInfo && answerObj.areaInfo.details) {
+          setSummary(answerObj.areaInfo.summary);
+          setDetails(answerObj.areaInfo.details);
+        } else if (
+          answerObj &&
+          !!answerObj.projectsList &&
+          !!answerObj.projectsList.projects &&
+          !!answerObj.projectsList.projects.length &&
+          onNewProjectContent
+        ) {
+          setSummary(answerObj.projectsList.summary);
+          setDetails(answerObj.projectsList.details);
+          onNewProjectContent(answerObj.projectsList.projects);
+        } else if (answerObj.projectInfo.details) {
+          setSummary(answerObj.projectInfo.summary);
+          setDetails(answerObj.projectInfo.details);
         }
       }
     } catch (error) {
@@ -190,34 +196,16 @@ export default function Liv({
         )}
       </Flex>
       {!minimized && (
-        <Flex style={{ position: "relative", height: "100%" }}>
+        <Flex vertical style={{ position: "relative", height: "100%" }}>
           <Flex vertical style={{ maxHeight: 550, overflowY: "scroll" }}>
             <Typography.Title
               level={5}
               style={{ opacity: queryProcessing ? 0.8 : 1, marginTop: 16 }}
             >
-              {projectAnswer || answer
-                ? projectAnswer && projectId
-                  ? "Project - XXX "
-                  : answer?.directAnswer
-                  ? "Sure"
-                  : answer?.areaInfo
-                  ? answer?.areaInfo.summary
-                  : "Uh Ho!"
-                : ""}
+              {summary}
             </Typography.Title>
             <Typography.Text style={{ opacity: queryProcessing ? 0.8 : 1 }}>
-              <Markdown className="liviq-content">
-                {projectAnswer || answer
-                  ? projectAnswer && projectId
-                    ? projectAnswer
-                    : answer?.directAnswer
-                    ? answer.directAnswer
-                    : answer?.areaInfo
-                    ? answer?.areaInfo.details
-                    : "I completely blank on this! Try again ?"
-                  : ""}
-              </Markdown>
+              <Markdown className="liviq-content">{details}</Markdown>
             </Typography.Text>
           </Flex>
           <Flex

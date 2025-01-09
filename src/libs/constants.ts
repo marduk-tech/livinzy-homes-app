@@ -6,7 +6,6 @@ export const queryKeys = {
   projects: "projects",
   getProjectById: "getProjectById",
   getAllPlaces: "getAllPlaces",
-
   user: "user",
 };
 
@@ -64,7 +63,10 @@ export const LivIndexDriversConfig = {
     label: "International Airport",
     icon: { name: "MdLocalAirport", set: "md" },
   },
-  transit: { label: "Transit Network" },
+  transit: {
+    label: "Transit Network",
+    icon: { name: "MdOutlineDirectionsTransit", set: "md" },
+  },
   "tier-1-city": {
     label: "Tier 1 City",
     icon: { name: "PiCityBold", set: "pi" },
@@ -221,3 +223,13 @@ export const LivIQPredefinedQuestions = [
   "Any idea about the plot availability?",
   "What about the water supply?",
 ];
+
+export enum ProjectHomeType {
+  FARMLAND = "farmland",
+  PLOT = "plot",
+  VILLA = "villa",
+  ROWHOUSE = "rowhouse",
+  VILLAMENT = "villament",
+  APARTMENT = "apartment",
+  PENTHOUSE = "penthouse",
+}

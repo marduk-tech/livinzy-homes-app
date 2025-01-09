@@ -9,19 +9,24 @@ import {
 import React, { useCallback, useState } from "react";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
-import { FONT_SIZE } from "../../theme/style-constants";
-import { ILivIndexPlaces } from "../../types/Common";
 import { Project } from "../../types/Project";
 import { LivIndexMarker } from "./liv-index-marker";
 import { getProjectsMapData } from "./map-util";
 import { ProjectMarker } from "./project-marker";
 import { RoadInfra } from "./road-infra";
+import { useDevice } from "../../hooks/use-device";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
 const API_KEY = "AIzaSyADagII4pmkrk8R1VVsEzbz0qws3evTYfQ";
 
-export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
+export const ProjectsMapView = ({
+  projects,
+  onProjectClick,
+}: {
+  projects: Project[];
+  onProjectClick: any;
+}) => {
   const { data: livIndexPlaces } = useFetchAllLivindexPlaces();
   const projectsData = getProjectsMapData({ projects: projects })
     .sort((a, b) => b.position!.lat - a.position!.lat)
@@ -41,6 +46,7 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
 
   const onMouseEnter = useCallback((id: string | null) => setHoverId(id), []);
   const onMouseLeave = useCallback(() => setHoverId(null), []);
+  const { isMobile } = useDevice();
 
   const onMapClick = useCallback(() => {
     setSelectedId(null);
@@ -74,11 +80,12 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
         <Map
           style={{
             width: "100%",
-            height: "100vh",
+            height: isMobile ? "calc(100vh - 290px)" : "calc(100vh - 200px)",
           }}
           mapId={"bf51a910020fa25a"}
-          defaultZoom={8.8}
-          defaultCenter={projectsData[0].position}
+          defaultZoom={11}
+          minZoom={10}
+          defaultCenter={{ lat: 13.201304, lng: 77.602374 }}
           gestureHandling={"greedy"}
           onClick={onMapClick}
           clickableIcons={false}
@@ -125,81 +132,39 @@ export const ProjectsMapView = ({ projects }: { projects: Project[] }) => {
                         projectId: project._id,
                       });
                     }}
+                    onProjectClick={onProjectClick}
                   />
-                </AdvancedMarkerWithRef>
-
-                <AdvancedMarkerWithRef
-                  onMarkerClick={(
-                    marker: google.maps.marker.AdvancedMarkerElement
-                  ) => console.log(id, marker)}
-                  zIndex={zIndex}
-                  onMouseEnter={() => onMouseEnter(id)}
-                  onMouseLeave={onMouseLeave}
-                  anchorPoint={AdvancedMarkerAnchorPoint.CENTER}
-                  position={position}
-                >
-                  <div
-                    style={{
-                      width: "8px",
-                      height: "8px",
-                      background: "#ccc",
-                      borderRadius: "50%",
-                    }}
-                  ></div>
                 </AdvancedMarkerWithRef>
               </React.Fragment>
             );
           })}
 
           {/* LivIndex Markers */}
-          {livIndexPlaces?.map(
-            (place) =>
-              place.parameters?.growthLever && (
-                <React.Fragment key={place._id}>
-                  <AdvancedMarkerWithRef
-                    anchorPoint={AdvancedMarkerAnchorPoint.BOTTOM}
-                    className="custom-marker"
-                    position={place.location}
-                    zIndex={1}
-                    onMarkerClick={() => {}}
-                    onMouseEnter={() => onMouseEnter(place._id)}
-                    onMouseLeave={onMouseLeave}
-                    style={{
-                      transform: `scale(${hoverId === place._id ? 1.05 : 1})`,
-                    }}
-                  >
-                    <LivIndexMarker
-                      place={place}
-                      isExpanded={expandedLivIndexId === place._id}
-                      onExpand={() => {
-                        handleLivIndexExpand(place._id);
-                        captureAnalyticsEvent("click-livindex-marker-mapview", {
-                          placeId: place._id,
-                        });
-                      }}
-                    />
-                  </AdvancedMarkerWithRef>
-
-                  <AdvancedMarkerWithRef
-                    onMarkerClick={() => {}}
-                    zIndex={1}
-                    onMouseEnter={() => onMouseEnter(place._id)}
-                    onMouseLeave={onMouseLeave}
-                    anchorPoint={AdvancedMarkerAnchorPoint.CENTER}
-                    position={place.location}
-                  >
-                    <div
-                      style={{
-                        width: "8px",
-                        height: "8px",
-                        background: "#4CAF50",
-                        borderRadius: "50%",
-                      }}
-                    ></div>
-                  </AdvancedMarkerWithRef>
-                </React.Fragment>
-              )
-          )}
+          {livIndexPlaces
+            ?.filter(
+              (place) =>
+                place.driver !== "highway" &&
+                place.driver !== "transit" &&
+                place.parameters.growthLever
+            )
+            .map((place) => (
+              <React.Fragment key={place._id}>
+                <AdvancedMarkerWithRef
+                  anchorPoint={AdvancedMarkerAnchorPoint.BOTTOM}
+                  className="custom-marker"
+                  position={place.location}
+                  zIndex={1}
+                  onMarkerClick={() => {}}
+                  onMouseEnter={() => onMouseEnter(place._id)}
+                  onMouseLeave={onMouseLeave}
+                  style={{
+                    transform: `scale(${hoverId === place._id ? 1.05 : 1})`,
+                  }}
+                >
+                  <LivIndexMarker place={place} />
+                </AdvancedMarkerWithRef>
+              </React.Fragment>
+            ))}
 
           {roadsData &&
             roadsData.map((road) => {
