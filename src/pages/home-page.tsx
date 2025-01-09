@@ -51,46 +51,46 @@ const HomePage: React.FC<{
     let filtered = filteredProjects || projects;
 
     //  category filter
-    if (categoryFilter) {
-      filtered = filtered.filter(
-        (p: Project) =>
-          !p.ui ||
-          (p.ui &&
-            p.ui.categories &&
-            p.ui.categories.find((c) => c === categoryFilter))
-      );
-    }
+    // if (categoryFilter) {
+    //   filtered = filtered.filter(
+    //     (p: Project) =>
+    //       !p.ui ||
+    //       (p.ui &&
+    //         p.ui.categories &&
+    //         p.ui.categories.find((c) => c === categoryFilter))
+    //   );
+    // }
 
-    //  price range filter
-    if (priceRange) {
-      filtered = filtered.filter((p) => {
-        if (!p.ui || !p.ui.costSummary) return true;
+    // //  price range filter
+    // if (priceRange) {
+    //   filtered = filtered.filter((p) => {
+    //     if (!p.ui || !p.ui.costSummary) return true;
 
-        try {
-          const costSummary = JSON.parse(p.ui.costSummary);
-          return (
-            costSummary.sqftRate >= priceRange[0] &&
-            costSummary.sqftRate <= priceRange[1]
-          );
-        } catch (error) {
-          console.error("Invalid JSON in costSummary", p.ui.costSummary, error);
-          return false;
-        }
-      });
-    }
+    //     try {
+    //       const costSummary = JSON.parse(p.ui.costSummary);
+    //       return (
+    //         costSummary.sqftRate >= priceRange[0] &&
+    //         costSummary.sqftRate <= priceRange[1]
+    //       );
+    //     } catch (error) {
+    //       console.error("Invalid JSON in costSummary", p.ui.costSummary, error);
+    //       return false;
+    //     }
+    //   });
+    // }
 
     //  location filter
-    if (locationFilter && locationFilter.length > 0) {
-      filtered = filtered.filter(
-        (p) =>
-          !p.ui ||
-          (p.ui &&
-            p.ui.locationFilters &&
-            p.ui.locationFilters.some((location) =>
-              locationFilter.includes(location)
-            ))
-      );
-    }
+    // if (locationFilter && locationFilter.length > 0) {
+    //   filtered = filtered.filter(
+    //     (p) =>
+    //       !p.ui ||
+    //       (p.ui &&
+    //         p.ui.locationFilters &&
+    //         p.ui.locationFilters.some((location) =>
+    //           locationFilter.includes(location)
+    //         ))
+    //   );
+    // }
 
     setFilteredProjects(filtered);
   }, [categoryFilter, locationFilter, priceRange, projects]);

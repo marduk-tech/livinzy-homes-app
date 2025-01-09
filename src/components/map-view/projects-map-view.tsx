@@ -67,7 +67,9 @@ export const ProjectsMapView = ({
       .filter(
         (place) => place.driver === "highway" || place.driver === "transit"
       )
-      .filter((place) => place.parameters?.growthLever === true);
+      .filter(
+        (place) => place.parameters && place.parameters.growthLever === true
+      );
 
     return (
       <APIProvider
@@ -145,6 +147,7 @@ export const ProjectsMapView = ({
               (place) =>
                 place.driver !== "highway" &&
                 place.driver !== "transit" &&
+                place.parameters &&
                 place.parameters.growthLever
             )
             .map((place) => (
