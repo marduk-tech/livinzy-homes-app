@@ -211,6 +211,7 @@ export interface ILivIndexScore {
   summary: string;
   extrinsicDrivers: [IExtrinsicDriver];
   intrinsicDriver: IIntrinsicDriver;
+  scoreBreakup: any;
 }
 
 export interface ProjectStructure {
