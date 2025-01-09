@@ -883,7 +883,8 @@ const ProjectPage: React.FC = () => {
             {allLivIndexPlacesLoading ? (
               <Loader></Loader>
             ) : projectData.livIndexScore &&
-              projectData.livIndexScore.score > 0 &&
+              projectData.livIndexScore.scoreBreakup &&
+              projectData.livIndexScore.scoreBreakup.length &&
               allLivIndexPlaces ? (
               <Livestment
                 project={projectData}
