@@ -1,4 +1,4 @@
-import { Button, Flex, Form, Input, Typography } from "antd";
+import { Button, Flex, Form, Input, Tag, Typography } from "antd";
 import Markdown from "react-markdown";
 import DynamicReactIcon from "./common/dynamic-react-icon";
 import { useEffect, useState } from "react";
@@ -84,6 +84,8 @@ export default function Liv({
   const [details, setDetails] = useState<string>();
   const [summary, setSummary] = useState<string>();
 
+  const [drivers, setDrivers] = useState<string[]>([]);
+
   useEffect(() => {
     if (user && user?._id) {
       setSessionId(user._id);
@@ -114,22 +116,32 @@ export default function Liv({
         setQueryProcessing(false);
         let answerObj = JSON.parse(response.data.data.answer);
         setAnswer(answerObj);
-        if (answerObj.areaInfo && answerObj.areaInfo.details) {
-          setSummary(answerObj.areaInfo.summary);
-          setDetails(answerObj.areaInfo.details);
-        } else if (
-          answerObj &&
-          !!answerObj.projectsList &&
-          !!answerObj.projectsList.projects &&
-          !!answerObj.projectsList.projects.length &&
-          onNewProjectContent
-        ) {
-          setSummary(answerObj.projectsList.summary);
-          setDetails(answerObj.projectsList.details);
-          onNewProjectContent(answerObj.projectsList.projects);
-        } else if (answerObj.projectInfo.details) {
+        let details = "",
+          summary = "";
+
+        if (projectId && answerObj.projectInfo.details) {
           setSummary(answerObj.projectInfo.summary);
           setDetails(answerObj.projectInfo.details);
+        } else {
+          if (answerObj.areaInfo && answerObj.areaInfo.details) {
+            summary = answerObj.areaInfo.summary;
+            details = answerObj.areaInfo.details;
+            setDrivers(answerObj.areaInfo.drivers);
+          }
+
+          if (
+            answerObj &&
+            !!answerObj.projectsList &&
+            !!answerObj.projectsList.projects &&
+            !!answerObj.projectsList.projects.length &&
+            onNewProjectContent
+          ) {
+            summary = summary || answerObj.projectsList.summary;
+            details += details
+              ? `\n\n${answerObj.projectsList.summary}`
+              : answerObj.projectsList.details;
+            onNewProjectContent(answerObj.projectsList.projects);
+          }
         }
       }
     } catch (error) {
@@ -206,6 +218,9 @@ export default function Liv({
             </Typography.Title>
             <Typography.Text style={{ opacity: queryProcessing ? 0.8 : 1 }}>
               <Markdown className="liviq-content">{details}</Markdown>
+              {drivers && drivers.length ? (
+                <Tag>See these places on a map</Tag>
+              ) : null}
             </Typography.Text>
           </Flex>
           <Flex

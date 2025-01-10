@@ -31,6 +31,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   let previewImage;
   if (project.media) {
     previewImage = project.media.find((m: IMedia) => m.isPreview);
+    previewImage = previewImage || project.media[0];
     previewImage = previewImage?.image?.url;
   }
   return (
