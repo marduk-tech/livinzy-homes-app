@@ -140,7 +140,10 @@ export default function Liv({
             details += details
               ? `\n\n${answerObj.projectsList.summary}`
               : answerObj.projectsList.details;
-            onNewProjectContent(answerObj.projectsList.projects);
+            onNewProjectContent(
+              answerObj.projectsList.projects,
+              answerObj.projectsList.categories
+            );
           }
           setSummary(summary);
           setDetails(details);

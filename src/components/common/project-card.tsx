@@ -100,12 +100,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         {project.relevantDetails ? (
           <Typography.Text
             style={{
-              color: COLORS.textColorLight,
-              backgroundColor: "white",
+              backgroundColor: COLORS.bgColor,
+              borderRadius: 8,
+              border: "1px solid",
+              borderColor: COLORS.borderColorMedium,
               whiteSpace: "wrap",
               lineHeight: "110%",
               marginTop: 4,
+              padding: 4,
               fontSize: FONT_SIZE.SUB_TEXT,
+              fontStyle: "italic",
             }}
           >
             {project.relevantDetails}

@@ -8,6 +8,8 @@ import { useDevice } from "../hooks/use-device";
 
 export function LivIQPage() {
   const [projectsList, setProjectsList] = useState<any>([]);
+  const [catsList, setCatsList] = useState<string[]>([]);
+
   const [selectedProjectId, setSelectedProjectId] = useState<string>();
   const navigate = useNavigate();
   const { isMobile } = useDevice();
@@ -38,8 +40,11 @@ export function LivIQPage() {
         }}
       >
         <Liv
-          onNewProjectContent={(projects: any[]) => {
+          onNewProjectContent={(projects: any[], projectsCat: string[]) => {
             setProjectsList(projects);
+            if (projectsCat) {
+              setCatsList(projectsCat);
+            }
           }}
           projectId={selectedProjectId}
         ></Liv>
@@ -60,7 +65,8 @@ export function LivIQPage() {
             projectClick={(projectId: string) => {
               setSelectedProjectId(projectId);
             }}
-            filteredProjectsIdList={projectsList}
+            aiProjectsList={projectsList}
+            aiProjectsCategories={catsList}
           ></HomePage>
         )}
       </Flex>

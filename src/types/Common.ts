@@ -32,3 +32,11 @@ export interface ILivIndexPlaces {
 }
 
 export type PlaceType = "highway" | "hospital" | "school" | "futureInfra";
+
+export interface ProjectAIResponse {
+  projectId: string;
+  projectName: string;
+  relevantDetails: string;
+  relevancyScore: number;
+  projectCategories: string[];
+}
