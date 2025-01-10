@@ -14,7 +14,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   fromMap,
   onProjectClick,
 }) => {
-  if (!project) {
+  if (!project || !project.metadata || !project.metadata.name) {
     return;
   }
   let costSummary;
