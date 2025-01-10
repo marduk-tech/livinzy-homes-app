@@ -65,9 +65,11 @@ const DUMMY_RESPONSE = {
 export default function Liv({
   projectId,
   onNewProjectContent,
+  onDriversContent,
 }: {
   projectId?: string;
   onNewProjectContent?: any;
+  onDriversContent: any;
 }) {
   const [sessionId, setSessionId] = useState<string>();
   const [queryProcessing, setQueryProcessing] = useState<boolean>(false);
@@ -127,8 +129,8 @@ export default function Liv({
             summary = answerObj.areaInfo.summary;
             details = answerObj.areaInfo.details;
             setDrivers(answerObj.areaInfo.drivers);
+            onDriversContent(answerObj.areaInfo.drivers);
           }
-
           if (
             answerObj &&
             !!answerObj.projectsList &&
@@ -169,23 +171,61 @@ export default function Liv({
       }}
     >
       <Flex>
-        <Flex align="center" gap={8}>
+        <Flex align="flex-start" gap={8}>
           <DynamicReactIcon
             iconName="GiOilySpiral"
             iconSet="gi"
+            size={32}
           ></DynamicReactIcon>
-          <Typography.Text
-            style={{
-              backgroundColor: COLORS.bgColor,
-              padding: "4px 12px",
-              borderRadius: 16,
-              border: "1px solid",
-              borderColor: COLORS.borderColorMedium,
-              display: "inline",
-            }}
-          >
-            {question || "How can I help ?"}
-          </Typography.Text>
+          {question ? (
+            <Typography.Text
+              style={{
+                backgroundColor: COLORS.bgColor,
+                padding: "4px 12px",
+                borderRadius: 16,
+                border: "1px solid",
+                borderColor: COLORS.borderColorMedium,
+                display: "inline",
+              }}
+            >
+              {question}
+            </Typography.Text>
+          ) : (
+            <Flex vertical gap={8}>
+              <Flex>
+                <Typography.Text
+                  style={{
+                    backgroundColor: COLORS.textColorDark,
+                    padding: "4px 12px",
+                    borderRadius: 16,
+                    border: "1px solid",
+                    borderColor: COLORS.borderColorMedium,
+                    color: "white",
+                    display: "flex",
+                  }}
+                >
+                  {"I am your AI Expert for North Bengaluru Real Estate"}
+                </Typography.Text>
+              </Flex>
+              <Flex>
+                <Typography.Text
+                  style={{
+                    backgroundColor: COLORS.textColorDark,
+                    padding: "4px 12px",
+                    borderRadius: 16,
+                    display: "flex",
+                    border: "1px solid",
+                    color: "white",
+                    borderColor: COLORS.borderColorMedium,
+                  }}
+                >
+                  I can assist you with insights about the area including
+                  schools, infra etc. as well as with finding your dream home.
+                  How can I help you today ?
+                </Typography.Text>
+              </Flex>
+            </Flex>
+          )}
         </Flex>
         {isMobile && (
           <Button
@@ -224,7 +264,7 @@ export default function Liv({
             <Typography.Text style={{ opacity: queryProcessing ? 0.8 : 1 }}>
               <Markdown className="liviq-content">{details}</Markdown>
               {drivers && drivers.length ? (
-                <Tag>See these places on a map</Tag>
+                <Tag onClick={() => {}}>See these places on a map</Tag>
               ) : null}
             </Typography.Text>
           </Flex>

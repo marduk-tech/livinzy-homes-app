@@ -1,338 +1,119 @@
-import { Button, Col, Flex, Row, Typography } from "antd";
+import { Flex } from "antd";
 import { useEffect, useState } from "react";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
-import { Loader } from "../components/common/loader";
-import { ProjectCard } from "../components/common/project-card";
-import { LocationAndPriceFilters } from "../components/location-price-filter";
-import { ProjectsMapView } from "../components/map-view/projects-map-view";
+import ProjectsView from "../components/projects-view";
+import { useNavigate } from "react-router-dom";
+import Liv from "../components/liv";
 import { useDevice } from "../hooks/use-device";
 import { useFetchProjects } from "../hooks/use-project";
-import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
-import { Project } from "../types/Project";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { ProjectAIResponse } from "../types/Common";
+import { Loader } from "../components/common/loader";
+import ProjectView from "../components/project-view";
 
-const HomePage: React.FC<{
-  aiProjectsList?: ProjectAIResponse[];
-  aiProjectsCategories: string[];
-  projectClick: any;
-}> = ({ aiProjectsList, aiProjectsCategories, projectClick }) => {
+export function HomePage() {
+  const [projectsList, setProjectsList] = useState<any>([]);
+  const [catsList, setCatsList] = useState<string[]>([]);
+  const [drivers, setDrivers] = useState<string[]>([]);
+
+  const navigate = useNavigate();
   const { isMobile } = useDevice();
-  const [categoryFilter, setCategoryFilter] = useState();
-  const [priceRange, setPriceRange] = useState([300, 1000]);
-  const [locationFilter, setLocationFilter] = useState<string[] | undefined>();
-  const [isFiltersModalVisible, setIsFiltersModalVisible] = useState(false);
-
-  const [toggleMapView, setToggleMapView] = useState(false);
 
   const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
 
-  const [aiProjects, setAiProjects] = useState<any>();
-
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>();
+  useEffect(() => {
+    setProjectsList(projects);
+  }, [projects]);
 
   useEffect(() => {
-    if (aiProjectsList && aiProjectsList.length && projects) {
-      const newProjects: any = [];
-
-      aiProjectsList.forEach((p) => {
-        newProjects.push({
-          ...projects!.find((op) => op._id == p.projectId),
-          ...p,
-        });
-      });
-      setAiProjects(newProjects);
-      setFilteredProjects(newProjects);
+    const searchParams = new URLSearchParams(location.search);
+    const projectId = searchParams.get("projectId");
+    if (projectId) {
+      setSelectedProjectId(projectId);
     }
-  }, [aiProjectsList]);
+  }, [location.search]);
 
-  useEffect(() => {
-    if (!projects) {
-      return;
-    }
-    captureAnalyticsEvent("app-homepage-open", {});
-
-    let filtered = aiProjects || (projects as any);
-
-    if (categoryFilter) {
-      filtered = filtered.filter(
-        (p: any) =>
-          !p.projectCategories ||
-          (p.projectCategories &&
-            p.projectCategories &&
-            p.projectCategories.includes(categoryFilter))
-      );
-    }
-
-    // //  price range filter
-    // if (priceRange) {
-    //   filtered = filtered.filter((p) => {
-    //     if (!p.ui || !p.ui.costSummary) return true;
-
-    //     try {
-    //       const costSummary = JSON.parse(p.ui.costSummary);
-    //       return (
-    //         costSummary.sqftRate >= priceRange[0] &&
-    //         costSummary.sqftRate <= priceRange[1]
-    //       );
-    //     } catch (error) {
-    //       console.error("Invalid JSON in costSummary", p.ui.costSummary, error);
-    //       return false;
-    //     }
-    //   });
-    // }
-
-    //  location filter
-    // if (locationFilter && locationFilter.length > 0) {
-    //   filtered = filtered.filter(
-    //     (p) =>
-    //       !p.ui ||
-    //       (p.ui &&
-    //         p.ui.locationFilters &&
-    //         p.ui.locationFilters.some((location) =>
-    //           locationFilter.includes(location)
-    //         ))
-    //   );
-    // }
-
-    setFilteredProjects(filtered);
-  }, [categoryFilter, locationFilter, priceRange, projects]);
-
-  const handleApplyFilters = (filters: {
-    location: string[];
-    priceRange: [number, number];
-  }) => {
-    setLocationFilter(filters.location);
-    setPriceRange(filters.priceRange);
-    setIsFiltersModalVisible(false);
+  const setSelectedProjectId = (projectId: string) => {
+    navigate(`?projectId=${projectId}`);
   };
 
-  if (projectIsLoading) {
-    return <Loader />;
-  }
-
-  if (filteredProjects) {
-    return (
-      <>
-        {/* <FloatButton
-          icon={
-            !toggleMapView ? (
-              <DynamicReactIcon
-                iconName="FaMap"
-                color="primary"
-                iconSet="fa"
-              ></DynamicReactIcon>
-            ) : (
-              <DynamicReactIcon
-                iconName="FaRegListAlt"
-                iconSet="fa"
-                color="primary"
-              ></DynamicReactIcon>
-            )
-          }
-          style={{
-            padding: 16,
-            marginTop: 16,
-            borderRadius: 12,
-            cursor: "pointer",
-            marginLeft: "auto",
-          }}
-          onClick={() => setToggleMapView(!toggleMapView)}
-        >
-          {isMobile ? null : toggleMapView ? "List View" : "Map View"}
-        </FloatButton> */}
-        <Flex
-          vertical
-          style={{
-            width: "100%",
-          }}
-          gap={16}
-        >
-          <Flex
-            align={isMobile ? "flex-start" : "center"}
-            vertical
-            style={{
-              marginLeft: 8,
-              padding: 0,
-            }}
-          >
-            <Flex
-              align="center"
-              gap={8}
-              justify={isMobile ? "flex-start" : "center"}
-              style={{
-                overflowX: "scroll",
-                whiteSpace: "nowrap",
+  return (
+    <Flex
+      gap={8}
+      style={{ width: "100%", position: "relative", height: "85vh" }}
+    >
+      <Flex
+        style={{
+          ...{
+            width: "36%",
+            marginRight: "1%",
+          },
+          ...(isMobile
+            ? {
                 width: "100%",
-                scrollbarWidth: "none",
-              }}
-            >
-              {aiProjectsCategories.map((cat: any) => {
-                return (
-                  <Flex
-                    vertical
-                    align="center"
-                    style={{
-                      cursor: "pointer",
-                      padding: "4px 8px",
-                      borderRadius: 8,
-                      backgroundColor:
-                        categoryFilter == cat
-                          ? COLORS.primaryColor
-                          : COLORS.bgColor,
-                      border: "1px solid",
-                      borderColor: COLORS.borderColorMedium,
-                    }}
-                    onClick={() => {
-                      if (cat == categoryFilter) {
-                        setCategoryFilter(undefined);
-                      } else {
-                        setCategoryFilter(cat);
-                        captureAnalyticsEvent("click-homepage-category", {
-                          categoryName: cat,
-                        });
-                      }
-                    }}
-                  >
-                    {/* <DynamicReactIcon
-                        size={28}
-                        color={
-                          categoryFilter && categoryFilter == cat.key
-                            ? COLORS.primaryColor
-                            : COLORS.bgColorDark
-                        }
-                        iconName={cat.icon.name}
-                        iconSet={cat.icon.set}
-                      ></DynamicReactIcon> */}
-                    <Typography.Text
-                      style={{
-                        fontSize: FONT_SIZE.PARA,
-                        fontWeight:
-                          categoryFilter && categoryFilter == cat.key
-                            ? "bold"
-                            : "normal",
-                        color:
-                          categoryFilter && categoryFilter == cat
-                            ? "white"
-                            : COLORS.textColorDark,
-                      }}
-                    >
-                      {cat}
-                    </Typography.Text>
-                  </Flex>
-                );
-              })}
-              {/* <Button
-                onClick={() => setIsFiltersModalVisible(true)}
-                type="default"
-                size="small"
-                icon={<RiListSettingsLine />}
-              >
-                Filters
-              </Button> */}
-              <Typography.Text
-                style={{ fontSize: FONT_SIZE.HEADING_3, fontWeight: "bold" }}
-              >
-                {aiProjects && aiProjects.length
-                  ? `${aiProjects.length} projects matching your query`
-                  : "Projects in North Bangalore"}
-              </Typography.Text>
-              <Button
-                size="small"
-                icon={
-                  !toggleMapView ? (
-                    <DynamicReactIcon
-                      iconName="FaMap"
-                      color="primary"
-                      iconSet="fa"
-                      size={16}
-                    ></DynamicReactIcon>
-                  ) : (
-                    <DynamicReactIcon
-                      iconName="FaRegListAlt"
-                      iconSet="fa"
-                      size={16}
-                      color="primary"
-                    ></DynamicReactIcon>
-                  )
-                }
-                style={{
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  marginLeft: "auto",
-                  fontSize: FONT_SIZE.SUB_TEXT,
-                  marginRight: isMobile ? 0 : 8,
-                }}
-                onClick={() => setToggleMapView(!toggleMapView)}
-              ></Button>
-            </Flex>
-          </Flex>
-
-          {toggleMapView ? (
-            <Row>
-              <ProjectsMapView
-                projects={filteredProjects}
-                onProjectClick={(projectId: string) => {
-                  projectClick(projectId);
-                }}
-              />
-            </Row>
-          ) : (
-            <Flex
-              style={{
-                height: isMobile
-                  ? "calc(100vh - 290px)"
-                  : "calc(100vh - 200px)",
-                overflowY: "scroll",
-                scrollbarWidth: "none",
-              }}
-            >
-              <Row gutter={[24, 24]} style={{ width: "100%", margin: 0 }}>
-                {filteredProjects.length > 0 ? (
-                  <>
-                    {filteredProjects.map((project) => (
-                      <Col
-                        key={project._id}
-                        xs={24}
-                        md={12}
-                        lg={6}
-                        onClick={() => {
-                          projectClick(project._id);
-                        }}
-                        style={{ padding: isMobile ? 0 : "0 8px" }}
-                      >
-                        <ProjectCard
-                          project={project}
-                          key={project._id}
-                          fromMap={false}
-                        />
-                      </Col>
-                    ))}
-                  </>
-                ) : (
-                  <>
-                    <Typography.Text>No Projects Found</Typography.Text>
-                  </>
-                )}
-              </Row>
-            </Flex>
-          )}
-        </Flex>
-
-        <LocationAndPriceFilters
-          open={isFiltersModalVisible}
-          onClose={() => setIsFiltersModalVisible(false)}
-          onApply={handleApplyFilters}
-          initialFilters={{
-            location: locationFilter,
-            priceRange: priceRange as any,
+                position: "absolute",
+                bottom: 0,
+                borderRadius: 8,
+                boxShadow: "0 0 4px #999",
+                zIndex: 99,
+                backgroundColor: "white",
+                padding: 16,
+              }
+            : {}),
+        }}
+      >
+        <Liv
+          onNewProjectContent={(aiProjects: any[]) => {
+            // When projects are filtered by AI, use the new list to filter existing projects.
+            const newProjects: any = [];
+            aiProjects.forEach((p) => {
+              newProjects.push({
+                ...projects!.find((op: any) => op._id == p.projectId),
+                ...p,
+              });
+            });
+            setProjectsList(newProjects);
+            setDrivers([]);
           }}
-        />
-      </>
-    );
-  }
-
-  return null;
-};
-
-export default HomePage;
+          onDriversContent={(drivers: string[]) => {
+            setDrivers(drivers);
+          }}
+          projectId={
+            location.search
+              ? (new URLSearchParams(location.search).get(
+                  "projectId"
+                ) as string)
+              : undefined
+          }
+        ></Liv>
+      </Flex>
+      <Flex
+        style={{
+          ...{
+            width: "62.5%",
+            marginLeft: "auto",
+          },
+          ...(isMobile ? { width: "100%" } : {}),
+        }}
+      >
+        {location.search &&
+        new URLSearchParams(location.search).get("projectId") ? (
+          <ProjectView
+            projectId={
+              new URLSearchParams(location.search).get("projectId") as string
+            }
+          ></ProjectView>
+        ) : projectIsLoading ? (
+          <Flex style={{ width: "100%" }} align="center" justify="center">
+            <Loader></Loader>
+          </Flex>
+        ) : (
+          <ProjectsView
+            projectClick={(projectId: string) => {
+              setSelectedProjectId(projectId);
+            }}
+            drivers={drivers}
+            projects={projectsList}
+          ></ProjectsView>
+        )}
+      </Flex>
+    </Flex>
+  );
+}

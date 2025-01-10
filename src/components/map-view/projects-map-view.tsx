@@ -22,9 +22,11 @@ const API_KEY = "AIzaSyADagII4pmkrk8R1VVsEzbz0qws3evTYfQ";
 
 export const ProjectsMapView = ({
   projects,
+  drivers,
   onProjectClick,
 }: {
   projects: Project[];
+  drivers: string[];
   onProjectClick: any;
 }) => {
   const { data: livIndexPlaces } = useFetchAllLivindexPlaces();
@@ -68,7 +70,9 @@ export const ProjectsMapView = ({
         (place) => place.driver === "highway" || place.driver === "transit"
       )
       .filter(
-        (place) => place.parameters && place.parameters.growthLever === true
+        (place) =>
+          (drivers && drivers.includes(place._id)) ||
+          (place.parameters && place.parameters.growthLever === true)
       );
 
     return (
@@ -147,8 +151,8 @@ export const ProjectsMapView = ({
               (place) =>
                 place.driver !== "highway" &&
                 place.driver !== "transit" &&
-                place.parameters &&
-                place.parameters.growthLever
+                ((drivers && drivers.includes(place._id)) ||
+                  (place.parameters && place.parameters.growthLever === true))
             )
             .map((place) => (
               <React.Fragment key={place._id}>

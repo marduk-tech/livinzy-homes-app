@@ -6,7 +6,7 @@ import { DashboardLayout } from "../layouts/dashboard-layout";
 // Pages
 import LandMeasurementConvertor from "../components/sides/land-measurement-convertor";
 import { LivindexPlaces } from "../pages/livindex-places";
-import { LivIQPage } from "../pages/liviq-page";
+import { HomePage } from "../pages/home-page";
 import { ProfilePage } from "../pages/profile-page";
 import { SignUpForm } from "../pages/signup";
 
@@ -19,7 +19,7 @@ export const Router = () => {
       />
       <Route element={<DashboardLayout />}>
         <Route path="/livindex-places" element={<LivindexPlaces />} />
-        <Route path="/" element={<LivIQPage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/*" element={<div>404</div>} />{" "}
       </Route>

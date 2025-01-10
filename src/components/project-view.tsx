@@ -11,11 +11,11 @@ import {
 import React, { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
-import { CalendlyPopup } from "../components/calendly-popup";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
-import LivestIndexRange from "../components/common/livest-index-range";
-import { Loader } from "../components/common/loader";
-import { ProjectMapView } from "../components/map-view/project-map-view";
+import { CalendlyPopup } from "./calendly-popup";
+import DynamicReactIcon from "./common/dynamic-react-icon";
+import LivestIndexRange from "./common/livest-index-range";
+import { Loader } from "./common/loader";
+import { ProjectMapView } from "./map-view/project-map-view";
 import { useDevice } from "../hooks/use-device";
 import { useFetchAllLivindexPlaces } from "../hooks/use-livindex-places";
 import { useFetchProjectById } from "../hooks/use-project";
@@ -804,7 +804,7 @@ const Livestment: React.FC<{
   );
 };
 
-const ProjectPage: React.FC<{
+const ProjectView: React.FC<{
   projectId: string;
 }> = ({ projectId }) => {
   // const { projectId } = useParams();
@@ -886,4 +886,4 @@ const ProjectPage: React.FC<{
   );
 };
 
-export default ProjectPage;
+export default ProjectView;
