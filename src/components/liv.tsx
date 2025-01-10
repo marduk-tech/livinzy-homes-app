@@ -116,13 +116,13 @@ export default function Liv({
         setQueryProcessing(false);
         let answerObj = JSON.parse(response.data.data.answer);
         setAnswer(answerObj);
-        let details = "",
-          summary = "";
 
         if (projectId && answerObj.projectInfo.details) {
           setSummary(answerObj.projectInfo.summary);
           setDetails(answerObj.projectInfo.details);
         } else {
+          let details = "",
+            summary = "";
           if (answerObj.areaInfo && answerObj.areaInfo.details) {
             summary = answerObj.areaInfo.summary;
             details = answerObj.areaInfo.details;
@@ -142,6 +142,8 @@ export default function Liv({
               : answerObj.projectsList.details;
             onNewProjectContent(answerObj.projectsList.projects);
           }
+          setSummary(summary);
+          setDetails(details);
         }
       }
     } catch (error) {
