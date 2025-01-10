@@ -22,7 +22,9 @@ const renderIcon = (place: IDriverPlace) => {
       iconName={icon.name}
       iconSet={icon.set}
       size={18}
-      color={"black"}
+      color={
+        place.parameters && place.parameters.growthLever ? "white" : "black"
+      }
     ></DynamicReactIcon>
   );
 };
@@ -39,7 +41,12 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
     <Tooltip
       style={{ width: 300 }}
       title={
-        <Flex vertical style={{ padding: 2 }}>
+        <Flex
+          vertical
+          style={{
+            padding: 2,
+          }}
+        >
           <Flex gap={4} style={{ marginTop: 4 }} align="flex-start">
             <Typography.Text
               style={{
@@ -95,7 +102,10 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
     >
       <Flex
         style={{
-          backgroundColor: "rgba(255,255,255, 1)",
+          backgroundColor:
+            place.parameters && place.parameters.growthLever
+              ? COLORS.textColorDark
+              : "rgba(255,255,255, 1)",
           borderRadius: "50%",
           padding: 8,
           borderWidth: "1px",
@@ -103,6 +113,10 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
             ? COLORS.borderColorDark
             : COLORS.borderColorDark,
           borderStyle: isUnderConstruction ? "dotted" : "solid",
+          animation:
+            place.parameters && place.parameters.growthLever
+              ? "none"
+              : "bounceAnimation 1s infinite",
         }}
       >
         {renderIcon(place)}

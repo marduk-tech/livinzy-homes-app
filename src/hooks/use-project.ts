@@ -11,6 +11,9 @@ import { Project } from "../types/Project";
  */
 export const useFetchProjects = () => {
   return useQuery<Project[], Error>({
+    refetchOnWindowFocus: false, // Disable refetch on window focus
+    refetchOnReconnect: false, // Disable refetch on network reconnect
+    staleTime: Infinity, // Data will never be marked as stale
     queryKey: [queryKeys.projects],
     queryFn: async () => {
       const { data } = await axiosApiInstance.get("/projects");
