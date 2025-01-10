@@ -1,16 +1,28 @@
 import { Flex } from "antd";
-import { useState } from "react";
-import HomePage from "./home-page";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ProjectPage from "./project-page";
 import Liv from "../components/liv";
 import { useDevice } from "../hooks/use-device";
+import HomePage from "./home-page";
+import ProjectPage from "./project-page";
 
 export function LivIQPage() {
   const [projectsList, setProjectsList] = useState<any>([]);
-  const [selectedProjectId, setSelectedProjectId] = useState<string>();
+
   const navigate = useNavigate();
   const { isMobile } = useDevice();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const projectId = searchParams.get("projectId");
+    if (projectId) {
+      setSelectedProjectId(projectId);
+    }
+  }, [location.search]);
+
+  const setSelectedProjectId = (projectId: string) => {
+    navigate(`?projectId=${projectId}`);
+  };
 
   return (
     <Flex
@@ -41,7 +53,13 @@ export function LivIQPage() {
           onNewProjectContent={(projects: any[]) => {
             setProjectsList(projects);
           }}
-          projectId={selectedProjectId}
+          projectId={
+            location.search
+              ? (new URLSearchParams(location.search).get(
+                  "projectId"
+                ) as string)
+              : undefined
+          }
         ></Liv>
       </Flex>
       <Flex
@@ -53,8 +71,13 @@ export function LivIQPage() {
           ...(isMobile ? { width: "100%" } : {}),
         }}
       >
-        {selectedProjectId ? (
-          <ProjectPage projectId={selectedProjectId}></ProjectPage>
+        {location.search &&
+        new URLSearchParams(location.search).get("projectId") ? (
+          <ProjectPage
+            projectId={
+              new URLSearchParams(location.search).get("projectId") as string
+            }
+          ></ProjectPage>
         ) : (
           <HomePage
             projectClick={(projectId: string) => {
