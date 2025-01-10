@@ -1,5 +1,4 @@
 import { Flex, Tag, Typography } from "antd";
-import { useNavigate } from "react-router-dom";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IMedia, Project } from "../../types/Project";
 import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
@@ -15,10 +14,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   fromMap,
   onProjectClick,
 }) => {
-  const navigate = useNavigate();
-
-  const randomPrice = (Math.random() * (15 - 8) + 8).toFixed(1);
-
+  if (!project) {
+    return;
+  }
   let costSummary;
   if (project.ui && project.ui.costSummary) {
     try {
@@ -34,6 +32,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     previewImage = previewImage || project.media[0];
     previewImage = previewImage?.image?.url;
   }
+
   return (
     <Flex
       vertical
