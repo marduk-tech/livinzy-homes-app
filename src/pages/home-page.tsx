@@ -9,12 +9,14 @@ import { useDevice } from "../hooks/use-device";
 import { useFetchProjects } from "../hooks/use-project";
 import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 import { Project } from "../types/Project";
-import { FONT_SIZE } from "../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { ProjectAIResponse } from "../types/Common";
 
 const HomePage: React.FC<{
-  filteredProjectsIdList?: any[];
+  aiProjectsList?: ProjectAIResponse[];
+  aiProjectsCategories: string[];
   projectClick: any;
-}> = ({ filteredProjectsIdList, projectClick }) => {
+}> = ({ aiProjectsList, aiProjectsCategories, projectClick }) => {
   const { isMobile } = useDevice();
   const [categoryFilter, setCategoryFilter] = useState();
   const [priceRange, setPriceRange] = useState([300, 1000]);
@@ -25,22 +27,24 @@ const HomePage: React.FC<{
 
   const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
 
+  const [aiProjects, setAiProjects] = useState<any>();
+
   const [filteredProjects, setFilteredProjects] = useState<Project[]>();
 
   useEffect(() => {
-    if (filteredProjectsIdList && filteredProjectsIdList.length && projects) {
+    if (aiProjectsList && aiProjectsList.length && projects) {
       const newProjects: any = [];
 
-      filteredProjectsIdList.forEach((p) => {
+      aiProjectsList.forEach((p) => {
         newProjects.push({
           ...projects!.find((op) => op._id == p.projectId),
-          relevantDetails: p.relevantDetails,
+          ...p,
         });
       });
-
+      setAiProjects(newProjects);
       setFilteredProjects(newProjects);
     }
-  }, [filteredProjectsIdList]);
+  }, [aiProjectsList]);
 
   useEffect(() => {
     if (!projects) {
@@ -48,18 +52,17 @@ const HomePage: React.FC<{
     }
     captureAnalyticsEvent("app-homepage-open", {});
 
-    let filtered = filteredProjects || projects;
+    let filtered = aiProjects || (projects as any);
 
-    //  category filter
-    // if (categoryFilter) {
-    //   filtered = filtered.filter(
-    //     (p: Project) =>
-    //       !p.ui ||
-    //       (p.ui &&
-    //         p.ui.categories &&
-    //         p.ui.categories.find((c) => c === categoryFilter))
-    //   );
-    // }
+    if (categoryFilter) {
+      filtered = filtered.filter(
+        (p: any) =>
+          !p.projectCategories ||
+          (p.projectCategories &&
+            p.projectCategories &&
+            p.projectCategories.includes(categoryFilter))
+      );
+    }
 
     // //  price range filter
     // if (priceRange) {
@@ -155,6 +158,7 @@ const HomePage: React.FC<{
           >
             <Flex
               align="center"
+              gap={8}
               justify={isMobile ? "flex-start" : "center"}
               style={{
                 overflowX: "scroll",
@@ -163,47 +167,61 @@ const HomePage: React.FC<{
                 scrollbarWidth: "none",
               }}
             >
-              {/* {ProjectCategories.map((cat: any) => {
+              {aiProjectsCategories.map((cat: any) => {
                 return (
                   <Flex
                     vertical
                     align="center"
-                    style={{ cursor: "pointer" }}
+                    style={{
+                      cursor: "pointer",
+                      padding: "4px 8px",
+                      borderRadius: 8,
+                      backgroundColor:
+                        categoryFilter == cat
+                          ? COLORS.primaryColor
+                          : COLORS.bgColor,
+                      border: "1px solid",
+                      borderColor: COLORS.borderColorMedium,
+                    }}
                     onClick={() => {
-                      setCategoryFilter(cat.key);
-                      captureAnalyticsEvent("click-homepage-category", {
-                        categoryName: cat.label,
-                      });
+                      if (cat == categoryFilter) {
+                        setCategoryFilter(undefined);
+                      } else {
+                        setCategoryFilter(cat);
+                        captureAnalyticsEvent("click-homepage-category", {
+                          categoryName: cat,
+                        });
+                      }
                     }}
                   >
-                    <DynamicReactIcon
-                      size={28}
-                      color={
-                        categoryFilter && categoryFilter == cat.key
-                          ? COLORS.primaryColor
-                          : COLORS.bgColorDark
-                      }
-                      iconName={cat.icon.name}
-                      iconSet={cat.icon.set}
-                    ></DynamicReactIcon>
+                    {/* <DynamicReactIcon
+                        size={28}
+                        color={
+                          categoryFilter && categoryFilter == cat.key
+                            ? COLORS.primaryColor
+                            : COLORS.bgColorDark
+                        }
+                        iconName={cat.icon.name}
+                        iconSet={cat.icon.set}
+                      ></DynamicReactIcon> */}
                     <Typography.Text
                       style={{
-                        fontSize: FONT_SIZE.SUB_TEXT,
+                        fontSize: FONT_SIZE.PARA,
                         fontWeight:
                           categoryFilter && categoryFilter == cat.key
                             ? "bold"
                             : "normal",
                         color:
-                          categoryFilter && categoryFilter == cat.key
-                            ? COLORS.primaryColor
+                          categoryFilter && categoryFilter == cat
+                            ? "white"
                             : COLORS.textColorDark,
                       }}
                     >
-                      {cat.label}
+                      {cat}
                     </Typography.Text>
                   </Flex>
                 );
-              })} */}
+              })}
               {/* <Button
                 onClick={() => setIsFiltersModalVisible(true)}
                 type="default"
@@ -212,6 +230,13 @@ const HomePage: React.FC<{
               >
                 Filters
               </Button> */}
+              <Typography.Text
+                style={{ fontSize: FONT_SIZE.HEADING_3, fontWeight: "bold" }}
+              >
+                {aiProjects && aiProjects.length
+                  ? `${aiProjects.length} projects matching your query`
+                  : "Projects in North Bangalore"}
+              </Typography.Text>
               <Button
                 size="small"
                 icon={
