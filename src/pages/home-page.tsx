@@ -66,7 +66,7 @@ export function HomePage() {
             aiProjects = aiProjects || [];
             console.log(`Total projects generated: ${aiProjects.length}`);
             aiProjects.forEach((p) => {
-              if (p.relevancyScore > 3) {
+              if (p.relevancyScore >= 3) {
                 newProjects.push({
                   ...projects!.find((op: any) => op._id == p.projectId),
                   ...p,
