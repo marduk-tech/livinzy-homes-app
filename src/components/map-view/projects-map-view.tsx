@@ -138,7 +138,9 @@ export const ProjectsMapView = ({
                         projectId: project._id,
                       });
                     }}
-                    onProjectClick={onProjectClick}
+                    onProjectClick={() => {
+                      onProjectClick(project._id);
+                    }}
                   />
                 </AdvancedMarkerWithRef>
               </React.Fragment>
