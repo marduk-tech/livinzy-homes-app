@@ -64,10 +64,15 @@ export function HomePage() {
             // When projects are filtered by AI, use the new list to filter existing projects.
             const newProjects: any = [];
             aiProjects.forEach((p) => {
-              newProjects.push({
-                ...projects!.find((op: any) => op._id == p.projectId),
-                ...p,
-              });
+              if (p.relevancyScore > 3) {
+                newProjects.push({
+                  ...projects!.find((op: any) => op._id == p.projectId),
+                  ...p,
+                });
+              }
+            });
+            newProjects.sort((a: any, b: any) => {
+              return (b.relevancyScore || 0) - (a.relevancyScore || 0);
             });
             setProjectsList(newProjects);
             setDrivers([]);
