@@ -63,6 +63,8 @@ export function HomePage() {
           onNewProjectContent={(aiProjects: any[]) => {
             // When projects are filtered by AI, use the new list to filter existing projects.
             const newProjects: any = [];
+            aiProjects = aiProjects || [];
+            console.log(`Total projects generated: ${aiProjects.length}`);
             aiProjects.forEach((p) => {
               if (p.relevancyScore > 3) {
                 newProjects.push({
@@ -71,6 +73,7 @@ export function HomePage() {
                 });
               }
             });
+            console.log(`Total projects filtered: ${newProjects.length}`);
             newProjects.sort((a: any, b: any) => {
               return (b.relevancyScore || 0) - (a.relevancyScore || 0);
             });
