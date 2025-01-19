@@ -16,7 +16,7 @@ export const useFetchProjects = () => {
     staleTime: Infinity, // Data will never be marked as stale
     queryKey: [queryKeys.projects],
     queryFn: async () => {
-      const { data } = await axiosApiInstance.get("/projects");
+      const { data } = await axiosApiInstance.get(`/projects?source=app`);
       return data;
     },
   });
