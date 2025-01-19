@@ -7,18 +7,73 @@ import {
   useAdvancedMarkerRef,
 } from "@vis.gl/react-google-maps";
 import React, { useCallback, useState } from "react";
+import { useDevice } from "../../hooks/use-device";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
+import { envMode } from "../../libs/constants";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { Project } from "../../types/Project";
 import { LivIndexMarker } from "./liv-index-marker";
 import { getProjectsMapData } from "./map-util";
 import { ProjectMarker } from "./project-marker";
 import { RoadInfra } from "./road-infra";
-import { useDevice } from "../../hooks/use-device";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
 const API_KEY = "AIzaSyADagII4pmkrk8R1VVsEzbz0qws3evTYfQ";
+
+// Bright map style
+const mapStyles = [
+  {
+    featureType: "all",
+    elementType: "all",
+    stylers: [
+      { saturation: "32" },
+      { lightness: "-3" },
+      { visibility: "on" },
+      { weight: "1.18" },
+    ],
+  },
+  {
+    featureType: "administrative",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "landscape",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "landscape.man_made",
+    elementType: "all",
+    stylers: [{ saturation: "-70" }, { lightness: "14" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "road",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "transit",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "water",
+    elementType: "all",
+    stylers: [{ saturation: "100" }, { lightness: "-14" }],
+  },
+  {
+    featureType: "water",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }, { lightness: "12" }],
+  },
+];
 
 export const ProjectsMapView = ({
   projects,
@@ -84,11 +139,13 @@ export const ProjectsMapView = ({
         }}
       >
         <Map
+          styles={mapStyles}
+          mapTypeId={"roadmap"}
+          mapId={envMode === "production" ? "" : "bf51a910020fa25a"}
           style={{
             width: "100%",
             height: isMobile ? "calc(100vh - 290px)" : "calc(100vh - 200px)",
           }}
-          mapId={"bf51a910020fa25a"}
           defaultZoom={11}
           minZoom={10}
           defaultCenter={{ lat: 13.201304, lng: 77.602374 }}
