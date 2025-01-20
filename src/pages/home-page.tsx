@@ -12,6 +12,7 @@ export function HomePage() {
   const [projectsList, setProjectsList] = useState<any>([]);
   const [catsList, setCatsList] = useState<string[]>([]);
   const [drivers, setDrivers] = useState<string[]>([]);
+  const [streaming, setStreaming] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const { isMobile } = useDevice();
@@ -60,8 +61,9 @@ export function HomePage() {
         }}
       >
         <Liv
-          onNewProjectContent={(aiProjects: any[]) => {
+          onNewProjectContent={(aiProjects: any[], isStreaming: boolean) => {
             // When projects are filtered by AI, use the new list to filter existing projects.
+            setStreaming(isStreaming);
             const newProjects: any = [];
             aiProjects = aiProjects || [];
             console.log(`Total projects generated: ${aiProjects.length}`);
@@ -119,6 +121,7 @@ export function HomePage() {
             }}
             drivers={drivers}
             projects={projectsList}
+            streaming={streaming}
           ></ProjectsView>
         )}
       </Flex>

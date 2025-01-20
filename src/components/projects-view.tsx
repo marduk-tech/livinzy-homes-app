@@ -13,7 +13,8 @@ const ProjectsPage: React.FC<{
   projects?: any[];
   projectClick: any;
   drivers: string[];
-}> = ({ projects, projectClick, drivers }) => {
+  streaming: boolean;
+}> = ({ projects, projectClick, drivers, streaming }) => {
   const { isMobile } = useDevice();
   const [categoryFilter, setCategoryFilter] = useState();
   const [priceRange, setPriceRange] = useState([300, 1000]);
@@ -194,10 +195,13 @@ const ProjectsPage: React.FC<{
               >
                 Filters
               </Button> */}
+
               <Typography.Text
                 style={{ fontSize: FONT_SIZE.HEADING_3, fontWeight: "bold" }}
               >
-                {drivers && drivers.length
+                {streaming
+                  ? "Loading..."
+                  : drivers && drivers.length
                   ? "See location insights on the map"
                   : projects && projects.length < 30
                   ? `${projects.length} projects matching your query`

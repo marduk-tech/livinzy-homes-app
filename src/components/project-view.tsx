@@ -163,8 +163,8 @@ const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
   );
 };
 
-const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
-  const costSummary = JSON.parse(project.ui.costSummary);
+const CostSnapshot: React.FC<{ project: Project }> = ({ project }) => {
+  const costingDetails = project.ui.costingDetails;
   const { isMobile } = useDevice();
   const { projectId } = useParams();
 
@@ -218,7 +218,7 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
               lineHeight: "100%",
             }}
           >
-            ₹{rupeeAmountFormat(costSummary.cost)}
+            ₹{rupeeAmountFormat(costingDetails.singleUnitCost)}
           </Typography.Text>
 
           <Typography.Text
@@ -238,13 +238,13 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
               fontSize: FONT_SIZE.HEADING_3,
             }}
           >
-            {costSummary.size}
+            {costingDetails.singleUnitSize} sqft
           </Typography.Text>
         </Flex>
-        {costSummary.sqftRate ? (
+        {costingDetails.sqftRate ? (
           <Typography.Text style={{ color: COLORS.textColorLight }}>
-            Priced at ₹{costSummary.sqftRate} per sqft.{" "}
-            {costSummary.details ? costSummary.details : ""}
+            Priced at ₹{costingDetails.sqftRate} per sqft.{" "}
+            {costingDetails.details ? costingDetails.details : ""}
           </Typography.Text>
         ) : null}
       </Flex>
@@ -284,7 +284,7 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
 };
 
 const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
-  const highlights = JSON.parse(project.ui.highlights);
+  const highlights = project.ui.projectHighlights;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedHighlight, setSelectedHighlight] = useState<any>();
@@ -377,7 +377,7 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
   ui,
   media,
 }) => {
-  const summary = JSON.parse(ui.summary);
+  const costingDetails = ui.costingDetails;
 
   const isMobile = useMediaQuery({
     query: "(max-width: 576px)",
@@ -397,11 +397,11 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
         borderBottomColor: COLORS.borderColor,
       }}
     >
-      <Flex>
+      {/* <Flex>
         <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.HEADING_2 }}>
-          What are you Buying ?
+          What can you buy ?
         </Typography.Text>
-      </Flex>
+      </Flex> */}
 
       <Flex
         style={{
@@ -459,7 +459,7 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                       lineHeight: "100%",
                     }}
                   >
-                    {summary.configurations}
+                    {costingDetails.configurations}
                   </Typography.Text>
                 </Flex>
               </Flex>
@@ -479,7 +479,7 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                       color: COLORS.textColorVeryLight,
                     }}
                   >
-                    Costing
+                    Other Charges
                   </Typography.Text>
                   <Typography.Text
                     style={{
@@ -489,7 +489,11 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                       color: "white",
                     }}
                   >
-                    {summary.costing}
+                    {`${costingDetails.plcCharges}${
+                      costingDetails.maintenanceCharges
+                        ? ", " + costingDetails.maintenanceCharges
+                        : ""
+                    }`}
                   </Typography.Text>
                 </Flex>
               </Flex>
@@ -520,7 +524,7 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                       color: "white",
                     }}
                   >
-                    {summary.income}
+                    {costingDetails.income}
                   </Typography.Text>
                 </Flex>
               </Flex>
@@ -633,12 +637,7 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
 
   const { isMobile } = useDevice();
 
-  let amenities;
-  try {
-    amenities = JSON.parse(project.ui.amenitiesSummary);
-  } catch (err) {
-    console.log("amenities not rightly structuered");
-  }
+  let amenities = project.ui.amenitiesSummary;
   if (!amenities) {
     return;
   }
@@ -858,7 +857,7 @@ const ProjectView: React.FC<{
           >
             <Header metadata={projectData.metadata} ui={projectData.ui} />
 
-            <CostSummery project={projectData} />
+            <CostSnapshot project={projectData} />
 
             <ProjectHighlights project={projectData} />
 

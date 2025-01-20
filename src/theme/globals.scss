@@ -53,3 +53,16 @@ body {
     transform: translateY(-5px);
   }
 }
+
+.fade-in-style {
+  animation: fade-in 2s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 100;
+  }
+}

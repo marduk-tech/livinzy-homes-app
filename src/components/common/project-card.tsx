@@ -17,14 +17,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   if (!project || !project.metadata || !project.metadata.name) {
     return;
   }
-  let costSummary;
-  if (project.ui && project.ui.costSummary) {
-    try {
-      costSummary = JSON.parse(project.ui.costSummary);
-    } catch (err) {
-      // ignore
-    }
-  }
+  let costingDetails;
 
   let previewImage;
   if (project.media) {
@@ -35,6 +28,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
   return (
     <Flex
+      className="fade-in-style"
       vertical
       style={{
         width: "100%",
@@ -71,7 +65,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         >
           {project.metadata.name}
         </Typography.Text>
-        {costSummary ? (
+        {project.ui && project.ui.costingDetails ? (
           <Flex>
             <Typography.Text
               style={{
@@ -80,7 +74,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 marginTop: 4,
               }}
             >
-              {rupeeAmountFormat(costSummary.cost)} / {costSummary.size}
+              {rupeeAmountFormat(project.ui.costingDetails.singleUnitCost)} /{" "}
+              {project.ui.costingDetails.singleUnitSize} sqft
             </Typography.Text>
           </Flex>
         ) : null}

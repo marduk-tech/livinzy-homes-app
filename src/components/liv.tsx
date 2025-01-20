@@ -4,9 +4,10 @@ import DynamicReactIcon from "./common/dynamic-react-icon";
 import { useEffect, useState } from "react";
 import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 import { useUser } from "../hooks/use-user";
-import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { COLORS } from "../theme/style-constants";
 import { useDevice } from "../hooks/use-device";
+import { makeStreamingJsonRequest } from "http-streaming-request";
+import { baseApiUrl } from "../libs/constants";
 
 interface Answer {
   directAnswer?: string;
@@ -73,8 +74,8 @@ export default function Liv({
 }) {
   const [sessionId, setSessionId] = useState<string>();
   const [queryProcessing, setQueryProcessing] = useState<boolean>(false);
+
   const { user } = useUser();
-  const [answer, setAnswer] = useState<Answer>();
   const [projectAnswer, setProjectAnswer] = useState<string>();
 
   const [question, setQuestion] = useState<string>();
@@ -107,7 +108,69 @@ export default function Liv({
         question: question,
       });
       setQueryProcessing(true);
+      const stream = makeStreamingJsonRequest({
+        url: `${baseApiUrl}ai/ask-stream`,
+        method: "POST",
+        payload: {
+          question: question,
+          sessionId: sessionId,
+          projectId,
+        },
+      });
+      let isStreaming = false,
+        streamingTimer;
+      for await (const data of stream) {
+        const answerObj = data;
 
+        if (projectId && answerObj.projectInfo.details) {
+          setSummary(answerObj.projectInfo.summary);
+          setDetails(answerObj.projectInfo.details);
+        } else {
+          let details = "",
+            summary = "";
+          if (answerObj.areaInfo && answerObj.areaInfo.details) {
+            summary = answerObj.areaInfo.summary;
+            details = answerObj.areaInfo.details;
+            setQueryProcessing(false);
+
+            if (answerObj.areaInfo.drivers) {
+              setDrivers(answerObj.areaInfo.drivers);
+              onDriversContent(answerObj.areaInfo.drivers);
+            }
+          }
+          if (
+            answerObj &&
+            !!answerObj.projectsList &&
+            !!answerObj.projectsList.projects &&
+            !!answerObj.projectsList.projects.length &&
+            onNewProjectContent
+          ) {
+            isStreaming = true;
+            if (streamingTimer) {
+              clearTimeout(streamingTimer);
+            }
+            streamingTimer = setTimeout(() => {
+              isStreaming = false;
+              onNewProjectContent(answerObj.projectsList.projects, isStreaming);
+            }, 2000);
+
+            summary = summary || answerObj.projectsList.summary;
+            details += details
+              ? `\n\n${answerObj.projectsList.summary}`
+              : answerObj.projectsList.details;
+            setQueryProcessing(false);
+
+            if (answerObj.projectsList.projects) {
+              onNewProjectContent(answerObj.projectsList.projects, isStreaming);
+            }
+          }
+          setSummary(summary);
+          setDetails(details);
+        }
+      }
+
+      /**
+       * WITHOUT STREAM
       const response = await axiosApiInstance.post("/ai/ask-global", {
         question: question,
         sessionId: sessionId,
@@ -117,7 +180,6 @@ export default function Liv({
       if (response.data && response.data.data) {
         setQueryProcessing(false);
         let answerObj = JSON.parse(response.data.data.answer);
-        setAnswer(answerObj);
 
         if (projectId && answerObj.projectInfo.details) {
           setSummary(answerObj.projectInfo.summary);
@@ -151,6 +213,7 @@ export default function Liv({
           setDetails(details);
         }
       }
+         */
     } catch (error) {
       console.error("Error sending message:", error);
       return {

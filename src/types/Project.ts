@@ -107,14 +107,14 @@ export interface ITeam {
 }
 
 export interface IUI {
-  summary: string;
   description: string;
   oneLiner: string;
-  highlights: string;
-  costSummary: string;
-  amenitiesSummary: string;
-  categories: string[];
-  locationFilters: string[];
+  projectHighlights: any;
+  costingDetails: any;
+  amenitiesSummary: any;
+  statusDetails: any;
+  builderDetails: any;
+  landDetails: any;
 }
 
 export interface Project {
