@@ -141,7 +141,6 @@ export const ProjectsMapView = ({
         <Map
           styles={mapStyles}
           mapTypeId={"roadmap"}
-          mapId={envMode === "production" ? "" : "bf51a910020fa25a"}
           style={{
             width: "100%",
             height: isMobile ? "calc(100vh - 290px)" : "calc(100vh - 200px)",
