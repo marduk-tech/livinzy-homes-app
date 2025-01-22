@@ -13,7 +13,7 @@ export const useFetchProjects = () => {
   return useQuery<Project[], Error>({
     queryKey: [queryKeys.projects],
     queryFn: async () => {
-      const { data } = await axiosApiInstance.get("/projects");
+      const { data } = await axiosApiInstance.get(`/projects?source=app`);
       return data;
     },
   });
