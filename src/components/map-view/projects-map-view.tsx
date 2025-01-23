@@ -9,13 +9,12 @@ import {
 import React, { useCallback, useState } from "react";
 import { useDevice } from "../../hooks/use-device";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
-import { envMode } from "../../libs/constants";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { Project } from "../../types/Project";
 import { LivIndexMarker } from "./liv-index-marker";
 import { getProjectsMapData } from "./map-util";
 import { ProjectMarker } from "./project-marker";
-import { RoadInfra } from "./road-infra";
+import { ConnectivityInfra } from "./connectivity-infra";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -120,7 +119,7 @@ export const ProjectsMapView = ({
   }, []);
 
   if (projectsData && projects && livIndexPlaces) {
-    const roadsData = livIndexPlaces
+    const connectivityData = livIndexPlaces
       .filter(
         (place) => place.driver === "highway" || place.driver === "transit"
       )
@@ -141,6 +140,7 @@ export const ProjectsMapView = ({
         <Map
           styles={mapStyles}
           mapTypeId={"roadmap"}
+          mapId={"bf51a910020fa25a"}
           style={{
             width: "100%",
           }}
@@ -230,9 +230,11 @@ export const ProjectsMapView = ({
               </React.Fragment>
             ))}
 
-          {roadsData &&
-            roadsData.map((road) => {
-              return <RoadInfra roadData={road}></RoadInfra>;
+          {connectivityData &&
+            connectivityData.map((road) => {
+              return (
+                <ConnectivityInfra connectivityData={road}></ConnectivityInfra>
+              );
             })}
         </Map>
       </APIProvider>

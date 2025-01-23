@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useFetchAllLivindexPlaces } from "../../../hooks/use-livindex-places";
 import { Loader } from "../../common/loader";
 import { ClusteredMarkers } from "./clustered-markers";
-import { RoadInfra } from "../road-infra";
+import { ConnectivityInfra } from "../connectivity-infra";
 import brightColorsStyles from "../map-styles/bright-colors";
 
 export type CastleFeatureProps = {
@@ -33,7 +33,7 @@ export function LivIndexAllMapView() {
 
   const [geojson, setGeojson] = useState<LivIndexPlacesGeoJson | null>(null);
   const [numClusters, setNumClusters] = useState(4);
-  const [roadsData, setRoadsData] = useState<any[]>();
+  const [connectivityData, setConnectivityData] = useState<any[]>();
 
   useEffect(() => {
     if (livindexPlaces) {
@@ -44,7 +44,7 @@ export function LivIndexAllMapView() {
       const roads = livindexPlaces.filter(
         (place) => place.driver === "highway" || place.driver === "transit"
       );
-      setRoadsData(roads);
+      setConnectivityData(roads);
 
       const formattedGeoJson: LivIndexPlacesGeoJson = {
         type: "FeatureCollection",
@@ -99,9 +99,13 @@ export function LivIndexAllMapView() {
               setNumClusters={setNumClusters}
             />
           )}
-          {roadsData &&
-            roadsData.map((road) => {
-              return <RoadInfra roadData={road}></RoadInfra>;
+          {connectivityData &&
+            connectivityData.map((placeData) => {
+              return (
+                <ConnectivityInfra
+                  connectivityData={placeData}
+                ></ConnectivityInfra>
+              );
             })}
         </Map>
       </APIProvider>

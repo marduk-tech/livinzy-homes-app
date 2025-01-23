@@ -18,7 +18,7 @@ import {
   Project,
 } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
-import { RoadInfra } from "./road-infra";
+import { ConnectivityInfra } from "./connectivity-infra";
 const { Paragraph } = Typography;
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
@@ -100,8 +100,15 @@ export const ProjectMapView = ({
                 originalLivIndexPlace!.driver
               ];
 
-              if (originalLivIndexPlace!.driver == "highway") {
-                return <RoadInfra roadData={originalLivIndexPlace}></RoadInfra>;
+              if (
+                originalLivIndexPlace!.driver == "highway" ||
+                originalLivIndexPlace!.driver == "transit"
+              ) {
+                return (
+                  <ConnectivityInfra
+                    connectivityData={originalLivIndexPlace}
+                  ></ConnectivityInfra>
+                );
               } else {
                 let zIndex = index + 1;
                 const coordinates = originalLivIndexPlace!.location!;

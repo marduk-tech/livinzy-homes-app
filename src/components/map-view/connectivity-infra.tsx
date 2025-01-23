@@ -23,7 +23,7 @@ interface LineFeature {
   };
 }
 
-export const RoadInfra: React.FC<any> = ({ roadData }) => {
+export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
   const map = useMap();
   const [lines, setLines] = useState<LineFeature[]>([]);
 
@@ -35,19 +35,19 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
 
   useEffect(() => {
     const extractedLines: LineFeature[] =
-      (roadData?.features
+      (connectivityData?.features
         .map((feature: any) => {
           const roadName =
-            roadData.features.length > 1
-              ? feature.properties.name || roadData.name
-              : roadData.name;
+            connectivityData.features.length > 1
+              ? feature.properties.name || connectivityData.name
+              : connectivityData.name;
 
           let customProps = {};
 
           const status =
-            roadData.features.length == 1
-              ? roadData.status
-              : feature.properties.status || roadData.status;
+            connectivityData.features.length == 1
+              ? connectivityData.status
+              : feature.properties.status || connectivityData.status;
           if (
             status &&
             ![
@@ -207,13 +207,13 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
               <Typography.Text
                 style={{ color: "white", fontSize: FONT_SIZE.HEADING_3 }}
               >
-                {roadData.name}
+                {connectivityData.name}
               </Typography.Text>
               <Flex
                 style={{ marginBottom: "8px", marginTop: "8px" }}
                 wrap="wrap"
               >
-                {roadData?.features.length > 1 ? (
+                {connectivityData?.features.length > 1 ? (
                   <Tag
                     color="blue"
                     key={selectedLine.name}
@@ -221,7 +221,6 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
                       marginRight: "4px",
                       marginBottom: "4px",
                       fontSize: FONT_SIZE.SUB_TEXT,
-                      color: "white",
                     }}
                   >
                     {selectedLine.name}
@@ -253,7 +252,7 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
                 }}
                 ellipsis={{ rows: 2, expandable: true, symbol: "more" }}
               >
-                {roadData?.description}
+                {connectivityData?.description}
               </Paragraph>
             </div>
           </div>
