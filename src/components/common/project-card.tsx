@@ -33,7 +33,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       style={{
         cursor: "pointer",
         borderRadius: 16,
-        width: 150,
+        width: 200,
       }}
     >
       <div
@@ -106,10 +106,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               color: COLORS.textColorLight,
             }}
           >
-            {project.ui.oneLiner.split(" · ").slice(1).join(" · ")}
+            {project.relevantDetails ||
+              project.ui.oneLiner.split(" · ").slice(1).join(" · ")}
           </Typography.Text>
         ) : null}
-        {project.relevantDetails ? (
+        {/* {project.relevantDetails ? (
           <Typography.Text
             style={{
               backgroundColor: COLORS.bgColor,
@@ -124,9 +125,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               fontStyle: "italic",
             }}
           >
-            {project.relevantDetails}
+            {project.relevantDetails || project.ui.oneLiner.split(" · ").slice(1).join(" · ")}
           </Typography.Text>
-        ) : null}
+        ) : null} */}
 
         {/* <Flex gap={7} color={COLORS.textColorLight} align="center">
      

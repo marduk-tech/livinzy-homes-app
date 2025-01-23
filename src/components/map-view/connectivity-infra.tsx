@@ -37,7 +37,7 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
     const extractedLines: LineFeature[] =
       (connectivityData?.features
         .map((feature: any) => {
-          const roadName =
+          const featureName =
             connectivityData.features.length > 1
               ? feature.properties.name || connectivityData.name
               : connectivityData.name;
@@ -69,7 +69,7 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
             );
 
             return {
-              name: roadName,
+              name: featureName,
               coordinates: [coordinates],
               strokeColor:
                 feature.properties.strokeColor || COLORS.textColorLight,
@@ -85,7 +85,7 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
                 }))
             );
             return {
-              name: roadName,
+              name: featureName,
               coordinates,
               strokeColor:
                 feature.properties.strokeColor || COLORS.textColorLight,

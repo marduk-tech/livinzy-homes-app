@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Liv from "../components/liv";
 import { useFetchProjects } from "../hooks/use-project";
-import { Loader } from "../components/common/loader";
 import ProjectViewV2 from "../components/project-view-v2";
 import ProjectsViewV2 from "../components/projects-view-v2";
 
@@ -43,10 +42,6 @@ export function HomePageV2() {
               new URLSearchParams(location.search).get("projectId") as string
             }
           ></ProjectViewV2>
-        ) : projectIsLoading ? (
-          <Flex style={{ width: "100%" }} align="center" justify="center">
-            <Loader></Loader>
-          </Flex>
         ) : (
           <ProjectsViewV2
             projectClick={(projectId: string) => {

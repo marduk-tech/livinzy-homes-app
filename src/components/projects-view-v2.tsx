@@ -1,11 +1,11 @@
 import { Button, Flex, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { ProjectCard } from "./common/project-card";
-import { ProjectsMapView } from "./map-view/projects-map-view";
 import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 import { Project } from "../types/Project";
 import DynamicReactIcon from "./common/dynamic-react-icon";
 import { FONT_SIZE, MAX_WIDTH, MOBILE_MARGIN } from "../theme/style-constants";
+import { ProjectsMapView } from "./map-view/projects-map-view";
 
 const ProjectsViewV2: React.FC<{
   projects?: any[];
@@ -39,7 +39,6 @@ const ProjectsViewV2: React.FC<{
           vertical
           style={{
             width: "100%",
-            marginTop: 16,
           }}
           gap={16}
         >
@@ -157,9 +156,10 @@ const ProjectsViewV2: React.FC<{
                   window.innerWidth - MOBILE_MARGIN * 2,
                   MAX_WIDTH
                 ),
-                height: 300,
+                minHeight: 300,
               }}
             >
+              &nbsp;
               <ProjectsMapView
                 projects={filteredProjects}
                 drivers={drivers}
@@ -173,32 +173,27 @@ const ProjectsViewV2: React.FC<{
               style={{
                 overflowX: "scroll",
                 width: "100%",
+                minHeight: 175,
                 whiteSpace: "nowrap",
                 scrollbarWidth: "none",
               }}
             >
-              {filteredProjects.length > 0 ? (
-                <Flex gap={16}>
-                  {filteredProjects.map((project) => (
-                    <Flex
-                      style={{ width: 175, overflowX: "hidden" }}
-                      onClick={() => {
-                        projectClick(project._id);
-                      }}
-                    >
-                      <ProjectCard
-                        project={project}
-                        key={project._id}
-                        fromMap={false}
-                      />
-                    </Flex>
-                  ))}
-                </Flex>
-              ) : (
-                <>
-                  <Typography.Text>No Projects Found</Typography.Text>
-                </>
-              )}
+              <Flex gap={16}>
+                {filteredProjects.map((project) => (
+                  <Flex
+                    style={{ overflowX: "hidden" }}
+                    onClick={() => {
+                      projectClick(project._id);
+                    }}
+                  >
+                    <ProjectCard
+                      project={project}
+                      key={project._id}
+                      fromMap={false}
+                    />
+                  </Flex>
+                ))}
+              </Flex>
             </Flex>
           )}
         </Flex>

@@ -8,6 +8,7 @@ import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { useDevice } from "../hooks/use-device";
 import { makeStreamingJsonRequest } from "http-streaming-request";
 import { baseApiUrl, PlaceholderContent } from "../libs/constants";
+import { useNavigate } from "react-router-dom";
 
 interface Answer {
   directAnswer?: string;
@@ -85,9 +86,9 @@ export default function Liv({
   const [form] = Form.useForm();
 
   const [details, setDetails] = useState<string>();
-  const [summary, setSummary] = useState<string>();
 
   const [drivers, setDrivers] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user && user?._id) {
@@ -122,50 +123,36 @@ export default function Liv({
       for await (const data of stream) {
         const answerObj = data;
 
-        if (projectId && answerObj.projectInfo.details) {
-          setSummary(answerObj.projectInfo.summary);
-          setDetails(answerObj.projectInfo.details);
-        } else {
-          let details = "",
-            summary = "";
-          if (answerObj.areaInfo && answerObj.areaInfo.details) {
-            summary = answerObj.areaInfo.summary;
-            details = answerObj.areaInfo.details;
-            setQueryProcessing(false);
-
-            if (answerObj.areaInfo.drivers) {
-              setDrivers(answerObj.areaInfo.drivers);
-              onDriversContent(answerObj.areaInfo.drivers);
-            }
+        setDetails(answerObj.details);
+        if (answerObj.projectId) {
+          navigate(`?projectId=${answerObj.projectId}`);
+          setQueryProcessing(false);
+        } else if (answerObj.drivers && answerObj.details) {
+          setQueryProcessing(false);
+          if (answerObj.drivers) {
+            setDrivers(answerObj.drivers);
+            onDriversContent(answerObj.drivers);
           }
-          if (
-            answerObj &&
-            !!answerObj.projectsList &&
-            !!answerObj.projectsList.projects &&
-            !!answerObj.projectsList.projects.length &&
-            onNewProjectContent
-          ) {
-            isStreaming = true;
-            if (streamingTimer) {
-              clearTimeout(streamingTimer);
-            }
-            streamingTimer = setTimeout(() => {
-              isStreaming = false;
-              onNewProjectContent(answerObj.projectsList.projects, isStreaming);
-            }, 2000);
-
-            summary = summary || answerObj.projectsList.summary;
-            details += details
-              ? `\n\n${answerObj.projectsList.summary}`
-              : answerObj.projectsList.details;
-            setQueryProcessing(false);
-
-            if (answerObj.projectsList.projects) {
-              onNewProjectContent(answerObj.projectsList.projects, isStreaming);
-            }
+        }
+        if (
+          answerObj &&
+          !!answerObj.projects &&
+          !!answerObj.projects.length &&
+          onNewProjectContent
+        ) {
+          isStreaming = true;
+          if (streamingTimer) {
+            clearTimeout(streamingTimer);
           }
-          setSummary(summary);
-          setDetails(details);
+          streamingTimer = setTimeout(() => {
+            isStreaming = false;
+            onNewProjectContent(answerObj.projects, isStreaming);
+          }, 2000);
+
+          setQueryProcessing(false);
+          if (answerObj.projects) {
+            onNewProjectContent(answerObj.projects, isStreaming);
+          }
         }
       }
 
@@ -275,13 +262,14 @@ export default function Liv({
         </Flex>
       </Flex>
       <Flex vertical style={{ position: "relative", height: "100%" }}>
-        <Flex vertical style={{ maxHeight: 400, overflowY: "scroll" }}>
-          <Typography.Title
-            level={5}
-            style={{ opacity: queryProcessing ? 0.8 : 1, marginTop: 16 }}
-          >
-            {summary || "North Bengaluru: A Thriving Real Estate Hub"}
-          </Typography.Title>
+        <Flex
+          vertical
+          style={{
+            maxHeight: window.innerHeight - 460,
+            overflowY: "scroll",
+            scrollbarWidth: "none",
+          }}
+        >
           <Typography.Text style={{ opacity: queryProcessing ? 0.8 : 1 }}>
             <Markdown className="liviq-content">
               {details || PlaceholderContent}
