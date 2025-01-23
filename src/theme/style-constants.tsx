@@ -28,4 +28,8 @@ export const FONT_SIZE = {
   HEADING_1: isMobile ? 32 : 32,
   HEADING_2: isMobile ? 22 : 24,
   HEADING_3: 18,
+  HEADING_4: 16,
 };
+
+export const MOBILE_MARGIN = 16;
+export const MAX_WIDTH = 1000;

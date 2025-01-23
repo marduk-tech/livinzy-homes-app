@@ -4,10 +4,10 @@ import DynamicReactIcon from "./common/dynamic-react-icon";
 import { useEffect, useState } from "react";
 import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 import { useUser } from "../hooks/use-user";
-import { COLORS } from "../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { useDevice } from "../hooks/use-device";
 import { makeStreamingJsonRequest } from "http-streaming-request";
-import { baseApiUrl } from "../libs/constants";
+import { baseApiUrl, PlaceholderContent } from "../libs/constants";
 
 interface Answer {
   directAnswer?: string;
@@ -230,178 +230,152 @@ export default function Liv({
       vertical
       style={{
         width: "100%",
-        height: isMobile ? (minimized ? "auto" : 400) : "calc(100vh - 150px)",
       }}
     >
       <Flex>
-        <Flex align="flex-start" gap={8}>
-          <DynamicReactIcon
-            iconName="GiOilySpiral"
-            iconSet="gi"
-            size={32}
-          ></DynamicReactIcon>
+        <Flex align="flex-end" gap={8}>
           {question ? (
             <Typography.Text
               style={{
-                backgroundColor: COLORS.bgColor,
+                backgroundColor: COLORS.textColorDark,
                 padding: "4px 12px",
                 borderRadius: 16,
                 border: "1px solid",
+                color: "white",
                 borderColor: COLORS.borderColorMedium,
                 display: "inline",
+                alignSelf: "flex-end",
               }}
             >
               {question}
             </Typography.Text>
           ) : (
-            <Flex vertical gap={8}>
-              <Flex>
-                <Typography.Text
-                  style={{
-                    backgroundColor: COLORS.textColorDark,
-                    padding: "4px 12px",
-                    borderRadius: 16,
-                    border: "1px solid",
-                    borderColor: COLORS.borderColorMedium,
-                    color: "white",
-                    display: "flex",
-                  }}
-                >
-                  {"I am your AI Expert for North Bengaluru Real Estate"}
-                </Typography.Text>
-              </Flex>
-              <Flex>
-                <Typography.Text
-                  style={{
-                    backgroundColor: COLORS.textColorDark,
-                    padding: "4px 12px",
-                    borderRadius: 16,
-                    display: "flex",
-                    border: "1px solid",
-                    color: "white",
-                    borderColor: COLORS.borderColorMedium,
-                  }}
-                >
-                  I can assist you with insights about the area including
-                  schools, infra etc. as well as with finding your dream home.
-                  How can I help you today ?
-                </Typography.Text>
-              </Flex>
+            <Flex gap={8}>
+              {projectId
+                ? ["Amenities", "Location", "Cost"].map((q) => {
+                    return (
+                      <Typography.Text
+                        style={{
+                          backgroundColor: COLORS.textColorDark,
+                          padding: "4px 12px",
+                          borderRadius: 16,
+                          border: "1px solid",
+                          borderColor: COLORS.borderColorMedium,
+                          color: "white",
+                          display: "flex",
+                        }}
+                      >
+                        {q}
+                      </Typography.Text>
+                    );
+                  })
+                : null}
             </Flex>
           )}
         </Flex>
-        {isMobile && (
-          <Button
-            size="small"
-            type="default"
-            onClick={() => {
-              setMinimized(!minimized);
-            }}
-            style={{
-              padding: 0,
-              height: 32,
-              width: 32,
-              marginLeft: "auto",
-              border: "1px solid",
-              borderColor: COLORS.borderColorMedium,
-            }}
-            icon={
-              <DynamicReactIcon
-                iconName={minimized ? "IoExpand" : "FiMinimize2"}
-                iconSet={minimized ? "io5" : "fi"}
-                size={16}
-              ></DynamicReactIcon>
-            }
-          ></Button>
-        )}
       </Flex>
-      {!minimized && (
-        <Flex vertical style={{ position: "relative", height: "100%" }}>
-          <Flex vertical style={{ maxHeight: 550, overflowY: "scroll" }}>
-            <Typography.Title
-              level={5}
-              style={{ opacity: queryProcessing ? 0.8 : 1, marginTop: 16 }}
-            >
-              {summary}
-            </Typography.Title>
-            <Typography.Text style={{ opacity: queryProcessing ? 0.8 : 1 }}>
-              <Markdown className="liviq-content">{details}</Markdown>
-              {drivers && drivers.length ? (
-                <Tag onClick={() => {}}>See these places on a map</Tag>
-              ) : null}
-            </Typography.Text>
-          </Flex>
-          <Flex
+      <Flex vertical style={{ position: "relative", height: "100%" }}>
+        <Flex vertical style={{ maxHeight: 400, overflowY: "scroll" }}>
+          <Typography.Title
+            level={5}
+            style={{ opacity: queryProcessing ? 0.8 : 1, marginTop: 16 }}
+          >
+            {summary || "North Bengaluru: A Thriving Real Estate Hub"}
+          </Typography.Title>
+          <Typography.Text style={{ opacity: queryProcessing ? 0.8 : 1 }}>
+            <Markdown className="liviq-content">
+              {details || PlaceholderContent}
+            </Markdown>
+            {drivers && drivers.length ? (
+              <Tag onClick={() => {}}>See these places on a map</Tag>
+            ) : null}
+          </Typography.Text>
+        </Flex>
+        <Flex
+          style={{
+            width: "100%",
+            justifySelf: "flex-end",
+            marginTop: "auto",
+          }}
+        >
+          <Form
+            form={form}
             style={{
-              width: "100%",
-              justifySelf: "flex-end",
-              marginTop: "auto",
+              width: isMobile ? "95%" : "100%",
+              position: "fixed",
+              bottom: 24,
+              maxWidth: 1000,
+            }}
+            onFinish={async (value) => {
+              form.resetFields();
+              const { question } = value;
+              setQuestion(question);
+              handleRequest(question);
             }}
           >
-            <Form
-              form={form}
-              style={{ width: "100%" }}
-              onFinish={async (value) => {
-                form.resetFields();
-                const { question } = value;
-                setQuestion(question);
-                handleRequest(question);
-              }}
-            >
-              <Form.Item label="" name="question" style={{ marginBottom: 0 }}>
-                <Input
-                  style={{
-                    height: 50,
-                    paddingRight: 0,
-                    backgroundColor: "white",
-                    border: "1px solid",
-                    borderColor: COLORS.borderColorMedium,
-                    borderRadius: 16,
-                  }}
-                  name="query"
-                  onChange={(event: any) => {
-                    setQuery(event.currentTarget.value);
-                  }}
-                  placeholder="Ask here"
-                  suffix={
-                    <Button
-                      htmlType="submit"
-                      type="link"
-                      disabled={!query || queryProcessing}
-                      style={{
-                        opacity: query ? 1 : 0.3,
-                        padding: 0,
-                        paddingRight: 8,
-                      }}
-                    >
-                      <DynamicReactIcon
-                        iconName="BiSolidSend"
-                        iconSet="bi"
-                      ></DynamicReactIcon>
-                    </Button>
-                  }
-                />
-              </Form.Item>
-            </Form>
-          </Flex>
-          {queryProcessing ? (
-            <img
-              src={
-                !queryProcessing
-                  ? "/images/liv-icon-dark.png"
-                  : "/images/liv-icon-gif.gif"
-              }
-              style={{
-                height: 56,
-                width: 56,
-                position: "absolute",
-                top: "calc(50% - 28px)",
-                left: "calc(50% - 28px)",
-              }}
-            />
-          ) : null}
+            <Form.Item label="" name="question" style={{ marginBottom: 0 }}>
+              <Input
+                style={{
+                  height: 50,
+                  paddingRight: 0,
+                  backgroundColor: "white",
+                  border: "1px solid",
+                  borderColor: COLORS.borderColorMedium,
+                  borderRadius: 16,
+                  fontSize: FONT_SIZE.HEADING_3,
+                }}
+                name="query"
+                onChange={(event: any) => {
+                  setQuery(event.currentTarget.value);
+                }}
+                placeholder="Ask here"
+                prefix={
+                  <Flex style={{ marginRight: 8 }}>
+                    <DynamicReactIcon
+                      iconName="GiOilySpiral"
+                      iconSet="gi"
+                      size={24}
+                    ></DynamicReactIcon>
+                  </Flex>
+                }
+                suffix={
+                  <Button
+                    htmlType="submit"
+                    type="link"
+                    disabled={!query || queryProcessing}
+                    style={{
+                      opacity: query ? 1 : 0.3,
+                      padding: 0,
+                      paddingRight: 8,
+                    }}
+                  >
+                    <DynamicReactIcon
+                      iconName="BiSolidSend"
+                      iconSet="bi"
+                    ></DynamicReactIcon>
+                  </Button>
+                }
+              />
+            </Form.Item>
+          </Form>
         </Flex>
-      )}
+        {queryProcessing ? (
+          <img
+            src={
+              !queryProcessing
+                ? "/images/liv-icon-dark.png"
+                : "/images/liv-icon-gif.gif"
+            }
+            style={{
+              height: 56,
+              width: 56,
+              position: "absolute",
+              top: "calc(50% - 28px)",
+              left: "calc(50% - 28px)",
+            }}
+          />
+        ) : null}
+      </Flex>
     </Flex>
   );
 }

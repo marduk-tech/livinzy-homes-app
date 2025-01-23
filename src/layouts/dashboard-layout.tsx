@@ -6,7 +6,12 @@ import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { LoginForm } from "../components/login-forms";
 import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import {
+  COLORS,
+  FONT_SIZE,
+  MAX_WIDTH,
+  MOBILE_MARGIN,
+} from "../theme/style-constants";
 import { NavLink } from "../types/Common";
 import { LocalStorageKeys } from "../libs/constants";
 
@@ -122,16 +127,21 @@ export const DashboardLayout: React.FC = () => {
         >
           <Header
             style={{
-              padding: isMobile ? 8 : "8px 24px",
               background: "transparent",
-              height: "100px",
+              height: "60px",
+              padding: "0 24px",
+              borderBottom: "1px solid",
+              borderBottomColor: COLORS.borderColor,
             }}
           >
-            <Flex align="center" justify="space-between">
-              <Link to="/" style={{ height: "100px" }}>
+            <Flex align="center" justify="space-between" style={{ height: 60 }}>
+              <Link
+                to="/"
+                style={{ height: 60, display: "flex", alignItems: "center" }}
+              >
                 <img
                   src="/logo-name.png"
-                  style={{ height: 35, width: "auto" }}
+                  style={{ height: 30, width: "auto" }}
                 ></img>
               </Link>
 
@@ -148,8 +158,6 @@ export const DashboardLayout: React.FC = () => {
                   ></DynamicReactIcon>
                 </Flex>
               )}
-
-              {/* {user && !isLoading && !isError ? <UserDropDown /> : null} */}
             </Flex>
           </Header>
           <Drawer
@@ -176,7 +184,13 @@ export const DashboardLayout: React.FC = () => {
               </Typography.Text>
             </Flex>
           </Drawer>
-          <Content style={{ margin: isMobile ? 16 : 24, marginTop: 0 }}>
+          <Content
+            style={{
+              margin: isMobile ? MOBILE_MARGIN : "auto",
+              marginTop: 24,
+              maxWidth: MAX_WIDTH,
+            }}
+          >
             {/* <Menu mode="horizontal" items={menuItems} /> */}
             <CustomErrorBoundary>
               <Outlet />

@@ -143,7 +143,6 @@ export const ProjectsMapView = ({
           mapTypeId={"roadmap"}
           style={{
             width: "100%",
-            height: isMobile ? "calc(100vh - 290px)" : "calc(100vh - 200px)",
           }}
           defaultZoom={11}
           minZoom={10}

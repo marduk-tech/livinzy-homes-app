@@ -1,7 +1,7 @@
 import { Flex, Tag, Typography } from "antd";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IMedia, Project } from "../../types/Project";
-import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
+import { capitalize, rupeeAmountFormat } from "../../libs/lvnzy-helper";
 
 interface ProjectCardProps {
   project: Project;
@@ -31,16 +31,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       className="fade-in-style"
       vertical
       style={{
-        width: "100%",
         cursor: "pointer",
         borderRadius: 16,
+        width: 150,
       }}
     >
       <div
         style={{
-          width: "100%",
           borderRadius: 8,
-          height: 200,
+          height: 125,
+          width: "100%",
           border: "1px solid",
           borderColor: COLORS.borderColor,
           backgroundImage: `url(${previewImage || "/images/img-plchlder.png"})`,
@@ -57,14 +57,30 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         <Typography.Text
           style={{
             margin: 0,
-            fontSize: FONT_SIZE.HEADING_3,
+            fontSize: FONT_SIZE.HEADING_4,
             lineHeight: "100%",
             fontWeight: 500,
             wordWrap: "break-word",
+            whiteSpace: "wrap",
           }}
         >
           {project.metadata.name}
         </Typography.Text>
+        <Flex>
+          <Tag
+            style={{
+              fontSize: FONT_SIZE.SUB_TEXT,
+              padding: "2px 4px",
+              lineHeight: "100%",
+              marginTop: 4,
+              border: "1px solid",
+              color: "white",
+              backgroundColor: COLORS.textColorDark,
+            }}
+          >
+            {capitalize(project.metadata.homeType)}
+          </Tag>
+        </Flex>
         {project.ui && project.ui.costingDetails ? (
           <Flex>
             <Typography.Text
@@ -79,17 +95,18 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             </Typography.Text>
           </Flex>
         ) : null}
+
         {project.ui && project.ui.oneLiner ? (
           <Typography.Text
             style={{
-              color: COLORS.textColorLight,
               whiteSpace: "wrap",
               lineHeight: "110%",
               marginTop: 4,
               fontSize: FONT_SIZE.SUB_TEXT,
+              color: COLORS.textColorLight,
             }}
           >
-            {project.ui.oneLiner}
+            {project.ui.oneLiner.split(" · ").slice(1).join(" · ")}
           </Typography.Text>
         ) : null}
         {project.relevantDetails ? (
