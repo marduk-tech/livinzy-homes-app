@@ -276,8 +276,8 @@ const ProjectsPage: React.FC<{
                       >
                         <ProjectCard
                           project={project}
+                          showClick={false}
                           key={project._id}
-                          fromMap={false}
                         />
                       </Col>
                     ))}

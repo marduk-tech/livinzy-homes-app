@@ -186,7 +186,7 @@ const ProjectsViewV2: React.FC<{
                     <ProjectCard
                       project={project}
                       key={project._id}
-                      fromMap={false}
+                      showClick={false}
                     />
                   </Flex>
                 ))}
