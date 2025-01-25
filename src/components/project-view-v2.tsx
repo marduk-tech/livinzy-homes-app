@@ -1,41 +1,18 @@
-import { HeartFilled, HeartOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Flex,
-  Image,
-  Modal,
-  notification,
-  Row,
-  Typography,
-} from "antd";
+import { Button, Flex, Image, Modal, Row, Typography } from "antd";
 import React, { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
-import { CalendlyPopup } from "./calendly-popup";
 import DynamicReactIcon from "./common/dynamic-react-icon";
-import LivestIndexRange from "./common/livest-index-range";
 import { Loader } from "./common/loader";
-import { ProjectMapView } from "./map-view/project-map-view";
 import { useDevice } from "../hooks/use-device";
 import { useFetchAllLivindexPlaces } from "../hooks/use-livindex-places";
 import { useFetchProjectById } from "../hooks/use-project";
-import { useUser } from "../hooks/use-user";
-import { useUpdateUserMutation } from "../hooks/user-hooks";
-import {
-  LivIndexDriversConfig,
-  LivIndexMegaDriverConfig,
-} from "../libs/constants";
 import { captureAnalyticsEvent, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { sortedMedia } from "../libs/utils";
 import "../theme/scroll-bar.css";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import {
-  IDriverPlace,
-  IMedia,
-  IMetadata,
-  IUI,
-  Project,
-} from "../types/Project";
+import { IMedia, IUI, Project } from "../types/Project";
+import { ProjectsMapView } from "./map-view/projects-map-view";
 
 const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
   const { isMobile } = useDevice();
@@ -46,8 +23,8 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
         width: "100%",
         overflowX: "scroll",
         whiteSpace: "nowrap",
-        minHeight: 320,
-        height: 320,
+        minHeight: 225,
+        height: 225,
         scrollbarWidth: "none",
       }}
     >
@@ -64,6 +41,7 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
                 overflow: "hidden",
                 borderRadius: 8,
                 minWidth: 200,
+                height: 225,
                 marginRight: 8,
                 position: "relative",
                 filter:
@@ -137,101 +115,6 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
             ) : null}
           </div>
         ))}
-    </Flex>
-  );
-};
-
-const Header: React.FC<{ metadata: IMetadata; ui: IUI; projectId: string }> = ({
-  metadata,
-  ui,
-  projectId,
-}) => {
-  const { user } = useUser();
-  const { isMobile } = useDevice();
-
-  const updateUser = useUpdateUserMutation({
-    userId: user?._id as string,
-    enableToasts: false,
-  });
-
-  const handleSave = () => {
-    captureAnalyticsEvent("click-project-save", {
-      projectId: projectId,
-    });
-    if (user) {
-      const updatedProjects = user.savedProjects || [];
-
-      // Toggle projectId: remove if exists, add if not
-      const projectExists = updatedProjects.includes(projectId as string);
-      console.log(projectExists);
-
-      const newProjects = projectExists
-        ? updatedProjects.filter((id) => id !== projectId)
-        : [...updatedProjects, projectId];
-
-      const uniqueProjects = Array.from(new Set(newProjects));
-
-      updateUser.mutate({
-        userData: {
-          savedProjects: uniqueProjects as string[],
-        },
-      });
-    } else {
-      notification.error({
-        message: "Please login first",
-      });
-    }
-  };
-
-  const isSaved = user?.savedProjects.includes(projectId as string);
-
-  const [showCalendlyPopup, setShowCalendlyPopup] = useState(false);
-
-  return (
-    <Flex align="flex-start">
-      <Flex vertical>
-        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.HEADING_1 }}>
-          {metadata.name}
-        </Typography.Text>
-
-        <Typography.Text
-          style={{
-            margin: 0,
-            fontSize: FONT_SIZE.HEADING_3,
-            color: COLORS.textColorLight,
-          }}
-        >
-          {ui.oneLiner}
-        </Typography.Text>
-      </Flex>
-      <Flex
-        style={{
-          marginLeft: "auto",
-        }}
-        gap={8}
-      >
-        <CalendlyPopup
-          open={showCalendlyPopup}
-          onCancel={() => setShowCalendlyPopup(false)}
-        />
-        {/* <Button
-          type="default"
-          onClick={() => setShowCalendlyPopup(true)}
-          size={isMobile ? "small" : "middle"}
-          icon={<SendOutlined />}
-        >
-          Schedule Callback
-        </Button> */}
-        <Button
-          loading={updateUser.isPending}
-          onClick={handleSave}
-          size={isMobile ? "small" : "middle"}
-          icon={isSaved ? <HeartFilled /> : <HeartOutlined />}
-          type={isSaved ? "primary" : "default"}
-        >
-          {isMobile ? "" : `${isSaved ? "Saved" : "Save"}`}
-        </Button>
-      </Flex>
     </Flex>
   );
 };
@@ -697,127 +580,15 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
   );
 };
 
-const Livestment: React.FC<{
-  project: Project;
-  livIndexPlaces: IDriverPlace[];
-}> = ({ project, livIndexPlaces }) => {
-  const { isMobile } = useDevice();
-  const livIndexDriverConfig = LivIndexDriversConfig;
-
-  return (
-    <Flex vertical style={{ marginTop: 32 }}>
-      <Flex align="center" gap={8}>
-        <DynamicReactIcon
-          iconName="PiRanking"
-          iconSet="pi"
-          size={36}
-          color={COLORS.primaryColor}
-        ></DynamicReactIcon>
-        <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
-          LivIndex
-        </Typography.Text>
-      </Flex>
-      <Flex
-        vertical={isMobile ? true : false}
-        gap={16}
-        style={{ height: isMobile ? "auto" : 400, marginTop: 16 }}
-      >
-        {project.livIndexScore.summary ? (
-          <Flex
-            gap={16}
-            vertical
-            style={{
-              width: isMobile ? "100%" : "40%",
-              height: "100%",
-              overflowY: "scroll",
-              scrollbarWidth: "none",
-            }}
-          >
-            <LivestIndexRange
-              value={project.livIndexScore.score}
-            ></LivestIndexRange>
-            {Object.entries(JSON.parse(project.livIndexScore.summary)).map(
-              ([key, value], index) => {
-                return (
-                  <Flex
-                    vertical
-                    style={{
-                      padding: 8,
-                      backgroundColor: "white",
-                      borderRadius: 8,
-                      border: "1px solid",
-                      borderColor: COLORS.borderColor,
-                    }}
-                  >
-                    {key == "oneLiner" ? (
-                      <Typography.Text
-                        style={{
-                          lineHeight: "120%",
-                          color: COLORS.textColorLight,
-                        }}
-                      >
-                        {value as any}
-                      </Typography.Text>
-                    ) : value ? (
-                      <Flex vertical>
-                        {" "}
-                        <Typography.Text
-                          style={{ color: COLORS.textColorLight }}
-                        >
-                          {(LivIndexMegaDriverConfig as any)[key].label}
-                        </Typography.Text>
-                        {/* <Tag style={{ width: "auto" }}>{key}</Tag> */}
-                        <Typography.Paragraph
-                          ellipsis={{
-                            rows: 3,
-                            expandable: true,
-                            symbol: "more",
-                          }}
-                          style={{ margin: 0 }}
-                        >
-                          {value as any}
-                        </Typography.Paragraph>
-                      </Flex>
-                    ) : null}
-                  </Flex>
-                );
-              }
-            )}
-          </Flex>
-        ) : null}
-
-        <Flex
-          vertical
-          style={{
-            borderRadius: 32,
-            height: 400,
-            width: isMobile ? "100%" : "60%",
-          }}
-        >
-          <ProjectMapView
-            project={project}
-            livIndexPlaces={livIndexPlaces}
-          ></ProjectMapView>
-        </Flex>
-      </Flex>
-    </Flex>
-  );
-};
-
 const ProjectViewV2: React.FC<{
   projectId: string;
 }> = ({ projectId }) => {
-  // const { projectId } = useParams();
-
   const { data: projectData, isLoading: projectDataLoading } =
     useFetchProjectById(projectId!);
 
   const { data: allLivIndexPlaces, isLoading: allLivIndexPlacesLoading } =
     useFetchAllLivindexPlaces();
-
-  const [livIQOpen, setLivIQOpen] = useState(false);
-
-  const { isMobile } = useDevice();
+  const [toggleMapView, setToggleMapView] = useState(false);
 
   if (!projectData) {
     return <Loader></Loader>;
@@ -834,21 +605,91 @@ const ProjectViewV2: React.FC<{
 
   captureAnalyticsEvent("app-projectpage-open", { projectId: projectData._id });
 
+  let projectDrivers: string[] = [];
+  if (projectData.livIndexScore && projectData.livIndexScore.score) {
+    projectData.livIndexScore.scoreBreakup.forEach((scoreBreakup) => {
+      projectDrivers = [
+        ...projectDrivers,
+        ...scoreBreakup.drivers.map((driver) => driver.place._id),
+      ];
+    });
+  }
   return (
     <>
       <Flex
         vertical
         style={{
           width: "100%",
-          overflowY: "scroll",
+          minHeight: 275,
         }}
       >
-        <Gallery media={[...sortedMediaArray, ...videoMedia]} />
-        <Header
-          metadata={projectData.metadata}
-          ui={projectData.ui}
-          projectId={projectData._id}
-        />
+        {toggleMapView ? (
+          <ProjectsMapView
+            projects={[projectData]}
+            drivers={projectDrivers}
+            onProjectClick={() => {}}
+          />
+        ) : (
+          <Gallery media={[...sortedMediaArray, ...videoMedia]} />
+        )}
+        <Flex align="flex-start" style={{ marginTop: 16 }}>
+          <Flex vertical>
+            <Flex>
+              <Typography.Text
+                style={{ margin: 0, fontSize: FONT_SIZE.HEADING_1 }}
+              >
+                {projectData.metadata.name}
+              </Typography.Text>
+            </Flex>
+
+            <Typography.Text
+              style={{
+                margin: 0,
+                fontSize: FONT_SIZE.HEADING_4,
+                color: COLORS.textColorLight,
+              }}
+            >
+              {projectData.ui.oneLiner}
+            </Typography.Text>
+          </Flex>
+          <Flex
+            style={{
+              marginLeft: "auto",
+            }}
+            gap={8}
+          >
+            <Button
+              size="small"
+              icon={
+                !toggleMapView ? (
+                  <DynamicReactIcon
+                    iconName="FaMap"
+                    color="primary"
+                    iconSet="fa"
+                    size={16}
+                  ></DynamicReactIcon>
+                ) : (
+                  <DynamicReactIcon
+                    iconName="FaRegListAlt"
+                    iconSet="fa"
+                    size={16}
+                    color="primary"
+                  ></DynamicReactIcon>
+                )
+              }
+              style={{
+                borderRadius: 8,
+                cursor: "pointer",
+                marginLeft: "auto",
+                fontSize: FONT_SIZE.SUB_TEXT,
+              }}
+              onClick={() => {
+                setToggleMapView(!toggleMapView);
+              }}
+            ></Button>
+          </Flex>
+        </Flex>
+
         <CostSnapshot project={projectData} />
         {/* <Flex
           gap={40}

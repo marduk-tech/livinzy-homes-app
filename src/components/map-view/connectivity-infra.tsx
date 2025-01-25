@@ -58,7 +58,7 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
           ) {
             customProps = {
               dashConfig: {
-                spacing: 20,
+                spacing: 15,
               },
             };
           }

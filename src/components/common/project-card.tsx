@@ -5,13 +5,13 @@ import { capitalize, rupeeAmountFormat } from "../../libs/lvnzy-helper";
 
 interface ProjectCardProps {
   project: Project;
-  fromMap: boolean;
+  showClick: boolean;
   onProjectClick?: any;
 }
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({
   project,
-  fromMap,
+  showClick,
   onProjectClick,
 }) => {
   if (!project || !project.metadata || !project.metadata.name) {
@@ -39,7 +39,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       <div
         style={{
           borderRadius: 8,
-          height: 125,
+          height: 165,
           width: "100%",
           border: "1px solid",
           borderColor: COLORS.borderColor,
@@ -57,7 +57,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         <Typography.Text
           style={{
             margin: 0,
-            fontSize: FONT_SIZE.HEADING_4,
+            fontSize: FONT_SIZE.HEADING_3,
             lineHeight: "100%",
             fontWeight: 500,
             wordWrap: "break-word",
@@ -69,8 +69,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         <Flex>
           <Tag
             style={{
-              fontSize: FONT_SIZE.SUB_TEXT,
-              padding: "2px 4px",
+              fontSize: FONT_SIZE.PARA,
+              padding: "4px 8px",
               lineHeight: "100%",
               marginTop: 4,
               border: "1px solid",
@@ -136,7 +136,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           <DescText text={`₹${randomPrice}Lacs`} />
         </Flex> */}
       </Flex>
-      {fromMap && (
+      {showClick && (
         <Flex
           style={{ marginTop: 8 }}
           onClick={() => {

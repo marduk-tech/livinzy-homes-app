@@ -11,8 +11,7 @@ const ProjectsViewV2: React.FC<{
   projects?: any[];
   projectClick: any;
   drivers: string[];
-  streaming: boolean;
-}> = ({ projects, projectClick, drivers, streaming }) => {
+}> = ({ projects, projectClick, drivers }) => {
   const [categoryFilter, setCategoryFilter] = useState();
   const [priceRange, setPriceRange] = useState([300, 1000]);
   const [locationFilter, setLocationFilter] = useState<string[] | undefined>();
@@ -111,9 +110,7 @@ const ProjectsViewV2: React.FC<{
             <Typography.Text
               style={{ fontSize: FONT_SIZE.HEADING_3, fontWeight: "bold" }}
             >
-              {streaming
-                ? "Loading..."
-                : drivers && drivers.length
+              {drivers && drivers.length
                 ? "See location insights on the map"
                 : projects && projects.length < 30
                 ? `${projects.length} projects matching your query`

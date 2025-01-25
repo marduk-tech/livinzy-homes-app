@@ -146,7 +146,14 @@ export const ProjectsMapView = ({
           }}
           defaultZoom={11}
           minZoom={10}
-          defaultCenter={{ lat: 13.201304, lng: 77.602374 }}
+          defaultCenter={
+            projects && projects.length == 1
+              ? {
+                  lat: projects[0].metadata.location.lat,
+                  lng: projects[0].metadata.location.lng,
+                }
+              : { lat: 13.201304, lng: 77.602374 }
+          }
           gestureHandling={"greedy"}
           onClick={onMapClick}
           clickableIcons={false}
@@ -193,6 +200,7 @@ export const ProjectsMapView = ({
                         projectId: project._id,
                       });
                     }}
+                    showClick={projects && projects.length > 1}
                     onProjectClick={() => {
                       onProjectClick(project._id);
                     }}

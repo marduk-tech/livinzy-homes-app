@@ -1,18 +1,16 @@
-import { Flex } from "antd";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Liv from "../components/liv";
+import { Divider, Flex } from "antd";
+import { useEffect, useRef, useState } from "react";
+import Liv, { LivRef } from "../components/liv";
 import { useFetchProjects } from "../hooks/use-project";
 import ProjectViewV2 from "../components/project-view-v2";
 import ProjectsViewV2 from "../components/projects-view-v2";
 
 export function HomePageV2() {
   const [projectsList, setProjectsList] = useState<any>([]);
-  const [catsList, setCatsList] = useState<string[]>([]);
   const [drivers, setDrivers] = useState<string[]>([]);
-  const [streaming, setStreaming] = useState<boolean>(false);
+  const [projectId, setProjectId] = useState<string>("");
 
-  const navigate = useNavigate();
+  const livRef = useRef<LivRef>(null);
 
   const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
 
@@ -20,44 +18,29 @@ export function HomePageV2() {
     setProjectsList(projects);
   }, [projects]);
 
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const projectId = searchParams.get("projectId");
-    if (projectId) {
-      setSelectedProjectId(projectId);
-    }
-  }, [location.search]);
-
-  const setSelectedProjectId = (projectId: string) => {
-    navigate(`?projectId=${projectId}`);
-  };
-
   return (
     <Flex gap={8} vertical style={{ width: "100%", position: "relative" }}>
-      <Flex>
-        {location.search &&
-        new URLSearchParams(location.search).get("projectId") ? (
-          <ProjectViewV2
-            projectId={
-              new URLSearchParams(location.search).get("projectId") as string
-            }
-          ></ProjectViewV2>
+      <Flex style={{ minHeight: 325 }}>
+        {projectId ? (
+          <ProjectViewV2 projectId={projectId}></ProjectViewV2>
         ) : (
           <ProjectsViewV2
             projectClick={(projectId: string) => {
-              setSelectedProjectId(projectId);
+              setProjectId(projectId);
+              livRef.current?.summarizeProject(projectId);
             }}
             drivers={drivers}
             projects={projectsList}
-            streaming={streaming}
           ></ProjectsViewV2>
         )}
       </Flex>
+      <Divider style={{ height: 24, margin: 0 }}></Divider>
       <Flex>
         <Liv
-          onNewProjectContent={(aiProjects: any[], isStreaming: boolean) => {
+          ref={livRef}
+          onNewProjectContent={(aiProjects: any[]) => {
+            setProjectId("");
             // When projects are filtered by AI, use the new list to filter existing projects.
-            setStreaming(isStreaming);
             const newProjects: any = [];
             aiProjects = aiProjects || [];
             console.log(`Total projects generated: ${aiProjects.length}`);
@@ -77,15 +60,10 @@ export function HomePageV2() {
             setDrivers([]);
           }}
           onDriversContent={(drivers: string[]) => {
+            setProjectId("");
             setDrivers(drivers);
           }}
-          projectId={
-            location.search
-              ? (new URLSearchParams(location.search).get(
-                  "projectId"
-                ) as string)
-              : undefined
-          }
+          projectId={projectId}
         ></Liv>
       </Flex>
     </Flex>

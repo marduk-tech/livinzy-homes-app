@@ -1,14 +1,19 @@
-import { Button, Flex, Form, Input, Tag, Typography } from "antd";
+import { Button, Flex, Form, Input, message, Typography } from "antd";
 import Markdown from "react-markdown";
 import DynamicReactIcon from "./common/dynamic-react-icon";
-import { useEffect, useState } from "react";
+import {
+  forwardRef,
+  Ref,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 import { useUser } from "../hooks/use-user";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { useDevice } from "../hooks/use-device";
 import { makeStreamingJsonRequest } from "http-streaming-request";
 import { baseApiUrl, PlaceholderContent } from "../libs/constants";
-import { useNavigate } from "react-router-dom";
 
 interface Answer {
   directAnswer?: string;
@@ -25,81 +30,61 @@ interface Answer {
     details: string;
   };
 }
-const DUMMY_RESPONSE = {
-  generalInfo: {
-    summary:
-      "Here are the matching farmland projects in North Bengaluru based on your query.",
-    details:
-      "Several farmland and agricultural-themed projects are available in North Bengaluru, offering a mix of residential plots and agricultural land. These projects are situated near key drivers like the KIADB Aerospace SEZ, University of Agricultural Sciences, and various tech parks, providing good connectivity and potential for growth.",
-  },
-  projectsList: [
-    {
-      projectId: "67176fde82dd14792342e80f",
-      projectName: "Sylvan Retreat",
-      relevantDetails:
-        "58 acre project with 25 acres dedicated to farmland. Features existing 10-year-old mango plantation, fruit trees, and plans for beekeeping and cattle farming.",
-    },
-    {
-      projectId: "66f645413696885ef13d55ce",
-      projectName: "Aranyam Phase 1",
-      relevantDetails:
-        "Large 113 acre project suitable for farmland development.",
-    },
-    {
-      projectId: "6721a597990ab34103aeb9d9",
-      projectName: "Orchard Valley",
-      relevantDetails:
-        "30 acre project with well-planted trees and landscaping, suitable for orchard or farmland development.",
-    },
-    {
-      projectId: "676e91a6dccff80d381d0270",
-      projectName: "The Midsummer Rain",
-      relevantDetails:
-        "Features regenerative agriculture with butterfly garden, aromatic garden, and fruit orchards. Adjacent to a 200-acre natural lake.",
-    },
-  ],
-  tool_calls: [],
-  invalid_tool_calls: [],
-  additional_kwargs: {},
-  response_metadata: {},
-};
-
-export default function Liv({
-  projectId,
-  onNewProjectContent,
-  onDriversContent,
-}: {
+interface LivProps {
   projectId?: string;
   onNewProjectContent?: any;
   onDriversContent: any;
-}) {
+}
+
+export interface LivRef {
+  summarizeProject: (projectId: string) => void;
+}
+
+const Liv = forwardRef((livProps: LivProps, ref: Ref<LivRef>) => {
+  const { projectId, onNewProjectContent, onDriversContent } = livProps;
   const [sessionId, setSessionId] = useState<string>();
   const [queryProcessing, setQueryProcessing] = useState<boolean>(false);
 
   const { user } = useUser();
-  const [projectAnswer, setProjectAnswer] = useState<string>();
 
   const [question, setQuestion] = useState<string>();
-  const [minimized, setMinimized] = useState(false);
   const { isMobile } = useDevice();
   const [query, setQuery] = useState<string>();
   const [form] = Form.useForm();
+  const [followUp, setFollowUp] = useState<string[]>([]);
 
+  const [currentProjectId, setCurrentProjectId] = useState("");
   const [details, setDetails] = useState<string>();
-
   const [drivers, setDrivers] = useState<string[]>([]);
-  const navigate = useNavigate();
+
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const [
+    selectedProjectPredefinedQuestion,
+    setSelectedProjectPredefinedQuestion,
+  ] = useState<string>();
 
   useEffect(() => {
     if (user && user?._id) {
       setSessionId(user._id);
     }
   }, [user]);
+
+  useImperativeHandle(ref, () => ({
+    summarizeProject(projectId: string) {
+      summarize(projectId);
+    },
+  }));
+
+  const summarize = (projectId: string) => {
+    setQueryProcessing(true);
+    setQuestion("");
+    setDetails("");
+    handleRequest(`summarize this project - ${projectId}`);
+  };
+
   useEffect(() => {
-    if (!projectId) {
-      setProjectAnswer(undefined);
-      setQuestion(undefined);
-    }
+    setCurrentProjectId(projectId || "");
   }, [projectId]);
 
   const handleRequest = async (question: string) => {
@@ -108,7 +93,6 @@ export default function Liv({
         projectId: projectId,
         question: question,
       });
-      setQueryProcessing(true);
       const stream = makeStreamingJsonRequest({
         url: `${baseApiUrl}ai/ask-stream`,
         method: "POST",
@@ -120,40 +104,52 @@ export default function Liv({
       });
       let isStreaming = false,
         streamingTimer;
-      for await (const data of stream) {
-        const answerObj = data;
+      try {
+        for await (const data of stream) {
+          const answerObj = data;
 
-        setDetails(answerObj.details);
-        if (answerObj.projectId) {
-          navigate(`?projectId=${answerObj.projectId}`);
-          setQueryProcessing(false);
-        } else if (answerObj.drivers && answerObj.details) {
-          setQueryProcessing(false);
-          if (answerObj.drivers) {
-            setDrivers(answerObj.drivers);
-            onDriversContent(answerObj.drivers);
-          }
-        }
-        if (
-          answerObj &&
-          !!answerObj.projects &&
-          !!answerObj.projects.length &&
-          onNewProjectContent
-        ) {
+          setDetails(answerObj.details);
+          setFollowUp(answerObj.followUp || []);
+
           isStreaming = true;
           if (streamingTimer) {
             clearTimeout(streamingTimer);
           }
           streamingTimer = setTimeout(() => {
             isStreaming = false;
-            onNewProjectContent(answerObj.projects, isStreaming);
+            setQueryProcessing(false);
           }, 2000);
 
-          setQueryProcessing(false);
-          if (answerObj.projects) {
-            onNewProjectContent(answerObj.projects, isStreaming);
+          if (answerObj.projectId) {
+            console.log(answerObj.projectId);
+            if (!currentProjectId) {
+              setCurrentProjectId(answerObj.projectId);
+            }
+          } else if (answerObj.drivers && answerObj.details) {
+            setQueryProcessing(false);
+            if (answerObj.drivers) {
+              setDrivers(answerObj.drivers);
+              onDriversContent(answerObj.drivers);
+            }
+          } else if (
+            answerObj &&
+            !!answerObj.projects &&
+            !!answerObj.projects.length &&
+            onNewProjectContent
+          ) {
+            if (answerObj.projects) {
+              onNewProjectContent(answerObj.projects);
+            }
           }
         }
+      } catch (err) {
+        if (selectedProjectPredefinedQuestion) {
+          setSelectedProjectPredefinedQuestion(undefined);
+        }
+        messageApi.open({
+          type: "error",
+          content: "Oops. Can you please try again ?",
+        });
       }
 
       /**
@@ -219,64 +215,106 @@ export default function Liv({
         width: "100%",
       }}
     >
-      <Flex>
-        <Flex align="flex-end" gap={8}>
-          {question ? (
-            <Typography.Text
-              style={{
-                backgroundColor: COLORS.textColorDark,
-                padding: "4px 12px",
-                borderRadius: 16,
-                border: "1px solid",
-                color: "white",
-                borderColor: COLORS.borderColorMedium,
-                display: "inline",
-                alignSelf: "flex-end",
-              }}
-            >
-              {question}
-            </Typography.Text>
-          ) : (
-            <Flex gap={8}>
-              {projectId
-                ? ["Amenities", "Location", "Cost"].map((q) => {
-                    return (
-                      <Typography.Text
-                        style={{
-                          backgroundColor: COLORS.textColorDark,
-                          padding: "4px 12px",
-                          borderRadius: 16,
-                          border: "1px solid",
-                          borderColor: COLORS.borderColorMedium,
-                          color: "white",
-                          display: "flex",
-                        }}
-                      >
-                        {q}
-                      </Typography.Text>
-                    );
-                  })
-                : null}
-            </Flex>
-          )}
-        </Flex>
-      </Flex>
       <Flex vertical style={{ position: "relative", height: "100%" }}>
         <Flex
           vertical
           style={{
-            maxHeight: window.innerHeight - 460,
+            maxHeight: window.innerHeight - 550,
             overflowY: "scroll",
             scrollbarWidth: "none",
           }}
         >
-          <Typography.Text style={{ opacity: queryProcessing ? 0.8 : 1 }}>
-            <Markdown className="liviq-content">
-              {details || PlaceholderContent}
-            </Markdown>
-            {drivers && drivers.length ? (
-              <Tag onClick={() => {}}>See these places on a map</Tag>
+          {currentProjectId || !question ? (
+            <Flex
+              style={{ flexWrap: "wrap", marginBottom: 8 }}
+              vertical={isMobile}
+              gap={8}
+              align={isMobile ? "flex-start" : "center"}
+            >
+              <Typography.Text style={{ color: COLORS.textColorLight }}>
+                How can I help ?
+              </Typography.Text>
+              <Flex style={{ flexWrap: "wrap" }} gap={8}>
+                {(currentProjectId
+                  ? ["Amenities", "Cost Structure", "Location"]
+                  : [
+                      "Show villa Projects",
+                      "Find homes near Nandi Hills",
+                      "Properties with rental income ? ",
+                    ]
+                ).map((q) => {
+                  return (
+                    <Typography.Text
+                      onClick={() => {
+                        if (selectedProjectPredefinedQuestion == q) {
+                          return;
+                        }
+                        setSelectedProjectPredefinedQuestion(q);
+                        setQueryProcessing(true);
+                        handleRequest(
+                          currentProjectId
+                            ? `more about ${q} for this project`
+                            : q
+                        );
+                      }}
+                      style={{
+                        cursor: "pointer",
+                        backgroundColor:
+                          selectedProjectPredefinedQuestion == q
+                            ? COLORS.primaryColor
+                            : "white",
+                        padding: "4px 12px",
+                        color:
+                          selectedProjectPredefinedQuestion == q
+                            ? "white"
+                            : COLORS.textColorDark,
+                        borderRadius: 16,
+                        border: "1px solid",
+                        borderColor: COLORS.primaryColor,
+                        display: "flex",
+                      }}
+                    >
+                      {q}
+                    </Typography.Text>
+                  );
+                })}
+              </Flex>
+            </Flex>
+          ) : null}
+
+          <Flex align="flex-end" gap={8} style={{ marginTop: 8 }}>
+            {question ? (
+              <Typography.Text
+                style={{
+                  backgroundColor: COLORS.textColorDark,
+                  padding: "4px 12px",
+                  borderRadius: 16,
+                  border: "1px solid",
+                  color: "white",
+                  borderColor: COLORS.borderColorMedium,
+                  display: "inline",
+                  alignSelf: "flex-end",
+                  marginTop: 8,
+                  marginBottom: 8,
+                }}
+              >
+                {question}
+              </Typography.Text>
             ) : null}
+          </Flex>
+
+          <Typography.Text
+            style={{ opacity: queryProcessing ? 0.8 : 1, marginTop: 8 }}
+          >
+            <Markdown className="liviq-content">
+              {currentProjectId ? details || "" : details || PlaceholderContent}
+            </Markdown>
+            {currentProjectId && currentProjectId !== projectId ? (
+              <Button>See Project Details</Button>
+            ) : null}
+            {/* {drivers && drivers.length ? (
+              <Tag onClick={() => {}}>See these places on a map</Tag>
+            ) : null} */}
           </Typography.Text>
         </Flex>
         <Flex
@@ -298,11 +336,13 @@ export default function Liv({
               form.resetFields();
               const { question } = value;
               setQuestion(question);
+              setQueryProcessing(true);
               handleRequest(question);
             }}
           >
             <Form.Item label="" name="question" style={{ marginBottom: 0 }}>
               <Input
+                disabled={queryProcessing}
                 style={{
                   height: 50,
                   paddingRight: 0,
@@ -366,4 +406,6 @@ export default function Liv({
       </Flex>
     </Flex>
   );
-}
+});
+
+export default Liv;

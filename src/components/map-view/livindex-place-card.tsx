@@ -116,7 +116,9 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
           animation:
             place.parameters && place.parameters.growthLever
               ? "none"
-              : "bounceAnimation 1s infinite",
+              : false
+              ? "none bounceAnimation 1s infinite"
+              : "none",
         }}
       >
         {renderIcon(place)}

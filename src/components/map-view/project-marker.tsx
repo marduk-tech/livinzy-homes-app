@@ -11,11 +11,13 @@ export const ProjectMarker = ({
   isExpanded,
   onExpand,
   onProjectClick,
+  showClick,
 }: {
   project: Project;
   isExpanded: boolean;
   onExpand: () => void;
   onProjectClick: any;
+  showClick: boolean;
 }) => {
   const handleClick = () => {
     onExpand();
@@ -32,14 +34,14 @@ export const ProjectMarker = ({
         cursor: "pointer",
         overflow: "hidden",
         position: "relative",
-        transform: isExpanded ? "scale(0.8)" : "none",
+        transform: isExpanded ? "scale(0.6)" : "none",
       }}
     >
       {isExpanded ? (
-        <Flex style={{ width: 250, height: 300 }}>
+        <Flex>
           <ProjectCard
             project={project}
-            fromMap={true}
+            showClick={showClick}
             onProjectClick={onProjectClick}
           />
         </Flex>

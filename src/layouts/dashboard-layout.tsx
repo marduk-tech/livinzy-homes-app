@@ -129,7 +129,7 @@ export const DashboardLayout: React.FC = () => {
             style={{
               background: "transparent",
               height: "60px",
-              padding: "0 24px",
+              padding: "0 12px",
               borderBottom: "1px solid",
               borderBottomColor: COLORS.borderColor,
             }}
@@ -141,7 +141,7 @@ export const DashboardLayout: React.FC = () => {
               >
                 <img
                   src="/logo-name.png"
-                  style={{ height: 30, width: "auto" }}
+                  style={{ height: 30, width: "auto", marginLeft: -8 }}
                 ></img>
               </Link>
 
@@ -189,6 +189,7 @@ export const DashboardLayout: React.FC = () => {
               margin: isMobile ? MOBILE_MARGIN : "auto",
               marginTop: 24,
               maxWidth: MAX_WIDTH,
+              width: "100%",
             }}
           >
             {/* <Menu mode="horizontal" items={menuItems} /> */}
