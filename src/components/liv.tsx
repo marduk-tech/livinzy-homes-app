@@ -106,6 +106,7 @@ const Liv = forwardRef((livProps: LivProps, ref: Ref<LivRef>) => {
         streamingTimer;
       try {
         for await (const data of stream) {
+          console.log("received stream response: ", JSON.stringify(data));
           const answerObj = data;
 
           setDetails(answerObj.details);
