@@ -40,3 +40,13 @@ export interface ProjectAIResponse {
   relevancyScore: number;
   projectCategories: string[];
 }
+
+export interface SubArea {
+  name: string;
+  aliases: string[];
+  type: string;
+  features: {
+    type: string;
+    coordinates: number[][][];
+  };
+}

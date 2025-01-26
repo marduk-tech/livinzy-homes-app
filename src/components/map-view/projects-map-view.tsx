@@ -9,12 +9,15 @@ import {
 import React, { useCallback, useState } from "react";
 import { useDevice } from "../../hooks/use-device";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
+import { subAreas } from "../../libs/constants";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
+import { SubArea } from "../../types/Common";
 import { Project } from "../../types/Project";
+import { ConnectivityInfra } from "./connectivity-infra";
 import { LivIndexMarker } from "./liv-index-marker";
 import { getProjectsMapData } from "./map-util";
+import { Polygon } from "./polygon";
 import { ProjectMarker } from "./project-marker";
-import { ConnectivityInfra } from "./connectivity-infra";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -159,6 +162,23 @@ export const ProjectsMapView = ({
           clickableIcons={false}
           disableDefaultUI
         >
+          {/* Sub Area Polygons */}
+          {subAreas.map((area: SubArea) => (
+            <Polygon
+              key={area.name}
+              paths={[
+                area.features.coordinates[0].map((coord: number[]) => ({
+                  lat: coord[1],
+                  lng: coord[0],
+                })),
+              ]}
+              fillColor="#808080"
+              fillOpacity={0.1}
+              strokeColor="#808080"
+              strokeWeight={1}
+            />
+          ))}
+
           {/* Project Markers */}
           {markers.map(({ id, zIndex: zIndexDefault, position, project }) => {
             let zIndex = zIndexDefault;
