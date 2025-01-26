@@ -1,7 +1,7 @@
 import { Flex, Tag, Typography } from "antd";
+import { capitalize, rupeeAmountFormat } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IMedia, Project } from "../../types/Project";
-import { capitalize, rupeeAmountFormat } from "../../libs/lvnzy-helper";
 
 interface ProjectCardProps {
   project: Project;
@@ -78,7 +78,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               backgroundColor: COLORS.textColorDark,
             }}
           >
-            {capitalize(project.metadata.homeType)}
+            {capitalize(project.metadata.homeType[0])}
           </Tag>
         </Flex>
         {project.ui && project.ui.costingDetails ? (
