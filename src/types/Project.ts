@@ -174,6 +174,11 @@ export interface IDriverPlace {
   megaDriver: string;
   status: string;
   distance?: number;
+
+  features: {
+    type: string;
+    coordinates: number[][][];
+  };
 }
 
 export interface ISubLivestment {
@@ -206,10 +211,10 @@ export interface IProjectDriver {
   mapsDistanceMetres: number;
   mapsDurationSeconds: number;
   coefficients: {
-    proximityCoeffecient: Number;
-    countCoeffecient: Number;
-    triggerCoeffecient: Number;
-    timelineCoeffecient: Number;
+    proximityCoeffecient: number;
+    countCoeffecient: number;
+    triggerCoeffecient: number;
+    timelineCoeffecient: number;
   };
 }
 export interface IScoreBreakup {
@@ -220,7 +225,7 @@ export interface IScoreBreakup {
 export interface IIntrinsicDriver {
   coefficients: {
     craftCoeffecient: number;
-    builderCoeffecient: Number;
+    builderCoeffecient: number;
   };
 }
 
