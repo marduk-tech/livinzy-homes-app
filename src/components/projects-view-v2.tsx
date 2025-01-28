@@ -7,9 +7,7 @@ import { Project } from "../types/Project";
 const ProjectsViewV2: React.FC<{
   projects?: any[];
   projectClick: any;
-  drivers: string[];
-  queryProcessing: boolean;
-}> = ({ projects, projectClick, drivers, queryProcessing }) => {
+}> = ({ projects, projectClick }) => {
   const [categoryFilter, setCategoryFilter] = useState();
   const [priceRange, setPriceRange] = useState([300, 1000]);
   const [locationFilter, setLocationFilter] = useState<string[] | undefined>();

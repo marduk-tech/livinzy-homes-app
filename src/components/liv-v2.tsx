@@ -12,7 +12,7 @@ import { useFetchProjects } from "../hooks/use-project";
 import ProjectsViewV2 from "./projects-view-v2";
 import { ProjectCard } from "./common/project-card";
 import { LoadingOutlined } from "@ant-design/icons";
-import { ProjectsMapView } from "./map-view/projects-map-view";
+import { MapView } from "./map-view/map-view";
 import { Project } from "../types/Project";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 
@@ -304,7 +304,7 @@ const LivV2 = forwardRef(() => {
                     minHeight: 300,
                   }}
                 >
-                  <ProjectsMapView
+                  <MapView
                     projects={[projects!.find((p: any) => p._id == projectId)!]}
                     drivers={getProjectDrivers(
                       projects!.find((p: any) => p._id == projectId)!
@@ -317,8 +317,6 @@ const LivV2 = forwardRef(() => {
               !toggleMapView ? (
                 <ProjectsViewV2
                   projects={projectsList.slice(20)}
-                  drivers={drivers}
-                  queryProcessing={queryProcessing}
                   projectClick={(projectId: string) => {
                     setQuestion("");
                     handleRequest(`summarize this project - ${projectId}`);
@@ -331,7 +329,7 @@ const LivV2 = forwardRef(() => {
                     minHeight: 300,
                   }}
                 >
-                  <ProjectsMapView
+                  <MapView
                     projects={projectsList}
                     drivers={drivers}
                     onProjectClick={() => {
@@ -348,7 +346,7 @@ const LivV2 = forwardRef(() => {
                   minHeight: 300,
                 }}
               >
-                <ProjectsMapView projects={[]} drivers={drivers} />{" "}
+                <MapView projects={[]} drivers={drivers} />{" "}
               </Flex>
             ) : null}
           </Flex>

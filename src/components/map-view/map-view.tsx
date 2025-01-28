@@ -75,7 +75,7 @@ const mapStyles = [
   },
 ];
 
-export const ProjectsMapView = ({
+export const MapView = ({
   projects,
   drivers,
   onProjectClick,

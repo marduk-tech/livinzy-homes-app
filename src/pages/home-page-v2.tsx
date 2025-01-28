@@ -49,7 +49,6 @@ export function HomePageV2() {
                 // livRef.current?.summarizeProject(projectId);
                 // Current URL: https://my-website.com/page_a
               }}
-              drivers={drivers}
               projects={projectsList}
             ></ProjectsViewV2>
           </Flex>
