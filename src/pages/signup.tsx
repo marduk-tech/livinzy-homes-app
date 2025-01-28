@@ -154,7 +154,7 @@ export function SignUpForm() {
             <>
               <Flex vertical style={{ marginBottom: 24 }}>
                 <Typography.Text
-                  style={{ fontSize: FONT_SIZE.heading, fontWeight: "bold" }}
+                  style={{ fontSize: FONT_SIZE.HEADING_2, fontWeight: "bold" }}
                 >
                   Explore Farmlands For Sale Near Bangalore
                 </Typography.Text>

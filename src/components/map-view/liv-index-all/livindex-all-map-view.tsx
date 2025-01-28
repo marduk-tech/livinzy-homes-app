@@ -1,10 +1,11 @@
 import { APIProvider, Map } from "@vis.gl/react-google-maps";
 import { FeatureCollection, Point } from "geojson";
 import { useEffect, useState } from "react";
-import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
-import { Loader } from "../common/loader";
+import { useFetchAllLivindexPlaces } from "../../../hooks/use-livindex-places";
+import { Loader } from "../../common/loader";
 import { ClusteredMarkers } from "./clustered-markers";
-import { RoadInfra } from "./road-infra";
+import { ConnectivityInfra } from "../connectivity-infra";
+import brightColorsStyles from "../map-styles/bright-colors";
 
 export type CastleFeatureProps = {
   name?: string;
@@ -14,31 +15,36 @@ export type CastleFeatureProps = {
   type?: string;
 };
 
+const MAP_STYLE_BRIGHT = {
+  id: "styled1",
+  label: 'Raster / "Bright Colors" (no mapId)',
+  mapTypeId: "roadmap",
+  styles: brightColorsStyles,
+};
+
 export type LivIndexPlacesGeoJson = FeatureCollection<
   Point,
   CastleFeatureProps
 >;
 
-export function LivIndexMapView() {
+export function LivIndexAllMapView() {
   const { data: livindexPlaces, isLoading: livindexPlacesLoading } =
-    useFetchAllLivindexPlaces({});
+    useFetchAllLivindexPlaces();
 
   const [geojson, setGeojson] = useState<LivIndexPlacesGeoJson | null>(null);
   const [numClusters, setNumClusters] = useState(4);
-  const [roadsData, setRoadsData] = useState<any[]>();
+  const [connectivityData, setConnectivityData] = useState<any[]>();
 
   useEffect(() => {
     if (livindexPlaces) {
       const formattedPlaces = livindexPlaces
-        .filter(
-          (place) => place.megaDriver == "macro" || place.driver == "commercial"
-        )
+        .filter((place) => place.driver !== "highway")
         .filter((place) => place.location?.lat && place.location?.lng);
 
       const roads = livindexPlaces.filter(
-        (place) => place.driver === "road" || place.driver === "transit"
+        (place) => place.driver === "highway" || place.driver === "transit"
       );
-      setRoadsData(roads);
+      setConnectivityData(roads);
 
       const formattedGeoJson: LivIndexPlacesGeoJson = {
         type: "FeatureCollection",
@@ -55,9 +61,11 @@ export function LivIndexMapView() {
               type: "Point",
               coordinates: cords as any,
             },
+            place,
             properties: {
+              place,
               name: place.name || "",
-              description: place.description || "",
+              details: place.details || "",
               placeId: place._id || "",
               type: place.driver,
             },
@@ -81,7 +89,9 @@ export function LivIndexMapView() {
           defaultCenter={{ lat: 14.5638117, lng: 77.8884163 }}
           defaultZoom={7}
           gestureHandling={"greedy"}
-          disableDefaultUI
+          mapTypeId={MAP_STYLE_BRIGHT.mapTypeId}
+          styles={MAP_STYLE_BRIGHT.styles}
+          disableDefaultUI={true}
         >
           {geojson && (
             <ClusteredMarkers
@@ -89,9 +99,13 @@ export function LivIndexMapView() {
               setNumClusters={setNumClusters}
             />
           )}
-          {roadsData &&
-            roadsData.map((road) => {
-              return <RoadInfra roadData={road}></RoadInfra>;
+          {connectivityData &&
+            connectivityData.map((placeData) => {
+              return (
+                <ConnectivityInfra
+                  connectivityData={placeData}
+                ></ConnectivityInfra>
+              );
             })}
         </Map>
       </APIProvider>

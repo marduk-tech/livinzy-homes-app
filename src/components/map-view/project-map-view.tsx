@@ -9,19 +9,23 @@ import {
 } from "@vis.gl/react-google-maps";
 import { Flex, Tag, Tooltip, Typography } from "antd";
 import React, { useCallback, useState } from "react";
-import { LivIndexDriversConfig } from "../../libs/constants";
+import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { IDriverPlace, IExtrinsicDriver, Project } from "../../types/Project";
+import {
+  IDriverPlace,
+  IProjectDriver,
+  IScoreBreakup,
+  Project,
+} from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
-import { RoadInfra } from "./road-infra";
-import { PLACE_TIMELINE } from "../../libs/constants";
+import { ConnectivityInfra } from "./connectivity-infra";
 const { Paragraph } = Typography;
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
 const API_KEY = "AIzaSyADagII4pmkrk8R1VVsEzbz0qws3evTYfQ";
 
-export const ProjectLivIndexMapView = ({
+export const ProjectMapView = ({
   project,
   livIndexPlaces,
 }: {
@@ -61,6 +65,15 @@ export const ProjectLivIndexMapView = ({
   }, []);
 
   if (project && project.livIndexScore && project.livIndexScore.score > 0) {
+    const allProjectDrivers: any = [];
+
+    project.livIndexScore.scoreBreakup.map(
+      (scoreBreakup: IScoreBreakup, index: number) => {
+        scoreBreakup.drivers.map((driver: IProjectDriver) => {
+          allProjectDrivers.push(driver);
+        });
+      }
+    );
     return (
       <APIProvider apiKey={API_KEY} libraries={["marker"]}>
         <Map
@@ -79,16 +92,23 @@ export const ProjectLivIndexMapView = ({
           clickableIcons={false}
           disableDefaultUI
         >
-          {project.livIndexScore.extrinsicDrivers.map(
-            (extrinsicDriver: IExtrinsicDriver, index: number) => {
-              const originalLivIndexPlace = extrinsicDriver.placeId;
+          {allProjectDrivers.map(
+            (projectDriver: IProjectDriver, index: number) => {
+              const originalLivIndexPlace = projectDriver.place;
 
               const driverConfig = (LivIndexDriversConfig as any)[
                 originalLivIndexPlace!.driver
               ];
 
-              if (originalLivIndexPlace!.driver == "road") {
-                return <RoadInfra roadData={originalLivIndexPlace}></RoadInfra>;
+              if (
+                originalLivIndexPlace!.driver == "highway" ||
+                originalLivIndexPlace!.driver == "transit"
+              ) {
+                return (
+                  <ConnectivityInfra
+                    connectivityData={originalLivIndexPlace}
+                  ></ConnectivityInfra>
+                );
               } else {
                 let zIndex = index + 1;
                 const coordinates = originalLivIndexPlace!.location!;
@@ -100,12 +120,14 @@ export const ProjectLivIndexMapView = ({
                   <LivIndexMarker
                     coordinates={originalLivIndexPlace!.location}
                     icon={driverConfig.icon}
-                    zIndex={project.livIndexScore.extrinsicDrivers.length + 1}
+                    zIndex={allProjectDrivers.length + 1}
                     place={{
                       ...originalLivIndexPlace,
-                      distance: extrinsicDriver.distance,
+                      distance: Math.round(
+                        projectDriver.mapsDistanceMetres / 1000
+                      ),
                     }}
-                    markerId={extrinsicDriver._id}
+                    markerId={projectDriver._id}
                     isProject={false}
                   ></LivIndexMarker>
                 );
@@ -158,7 +180,7 @@ export const PlaceCard = ({
             <Typography.Text
               style={{
                 color: "white",
-                fontSize: FONT_SIZE.subHeading,
+                fontSize: FONT_SIZE.HEADING_3,
                 lineHeight: "100%",
               }}
             >
@@ -169,7 +191,7 @@ export const PlaceCard = ({
             {place.distance && (
               <Tag
                 style={{
-                  fontSize: FONT_SIZE.default,
+                  fontSize: FONT_SIZE.SUB_TEXT,
                 }}
               >
                 {Math.round(place.distance)} kms away
@@ -179,7 +201,7 @@ export const PlaceCard = ({
               <Tag
                 color={COLORS.yellowIdentifier}
                 style={{
-                  fontSize: FONT_SIZE.default,
+                  fontSize: FONT_SIZE.SUB_TEXT,
                 }}
               >
                 Under Construction
@@ -187,7 +209,7 @@ export const PlaceCard = ({
             ) : null}
           </Flex>
 
-          {place.description ? (
+          {place.details && place.details.oneLiner ? (
             <Paragraph
               style={{
                 color: "white",
@@ -200,7 +222,7 @@ export const PlaceCard = ({
                 expandable: true,
               }}
             >
-              {place.description}
+              {place.details?.oneLiner}
             </Paragraph>
           ) : null}
         </Flex>

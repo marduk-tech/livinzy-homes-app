@@ -1,95 +1,170 @@
-import { Flex, Typography } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Flex, Tag, Tooltip, Typography } from "antd";
 import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IMedia, Project } from "../../types/Project";
+import ProjectGallery from "../project-gallery";
+const { Paragraph, Text } = Typography;
 
 interface ProjectCardProps {
   project: Project;
+  showClick: boolean;
+  onProjectClick?: any;
+  fullWidth?: boolean;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
-  const navigate = useNavigate();
+export const ProjectCard: React.FC<ProjectCardProps> = ({
+  project,
+  showClick,
+  onProjectClick,
+  fullWidth,
+}) => {
+  if (!project || !project.metadata || !project.metadata.name) {
+    return;
+  }
+  let costingDetails;
 
-  const randomPrice = (Math.random() * (15 - 8) + 8).toFixed(1);
-
-  const costSummary =
-    project.ui && project.ui.costSummary
-      ? JSON.parse(project.ui.costSummary)
-      : undefined;
-
-  let previewImage: any = project.media.find((m: IMedia) => m.isPreview);
-  previewImage = previewImage?.image?.url;
+  let previewImage;
+  if (project.media) {
+    previewImage = project.media.find((m: IMedia) => m.isPreview);
+    previewImage = previewImage || project.media[0];
+    previewImage = previewImage?.image?.url;
+  }
   return (
     <Flex
+      className="fade-in-style"
       vertical
       style={{
-        width: "100%",
         cursor: "pointer",
-        borderRadius: 16,
-      }}
-      onClick={() => {
-        navigate(`/project/${project._id}`);
+        width: fullWidth ? "100%" : 200,
+        padding: 0,
       }}
     >
-      <div
-        style={{
-          width: "100%",
-          borderRadius: 16,
-          height: 250,
-          border: "1px solid",
-          borderColor: COLORS.borderColor,
-          backgroundImage: `url(${previewImage || "/images/img-plchlder.png"})`,
-          backgroundPosition: "center",
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-        }}
-      ></div>
-
-      <Flex
-        style={{ width: "100%", marginTop: 8, padding: "0px 4px" }}
-        vertical
-      >
-        <Typography.Text
-          style={{
-            margin: 0,
-            fontSize: FONT_SIZE.subHeading,
-            fontWeight: "bold",
-          }}
+      <Flex vertical>
+        <Flex
+          style={{ width: "100%", marginTop: 8, padding: "0px 4px" }}
+          vertical
         >
-          {project.metadata.name}
-        </Typography.Text>
-        {project.ui && project.ui.oneLiner ? (
-          <Typography.Text
+          <Flex>
+            <Tooltip title={project.metadata.name}>
+              <Paragraph
+                ellipsis={{ rows: 1, expandable: false }}
+                style={{
+                  margin: 0,
+                  fontSize: FONT_SIZE.HEADING_2,
+                  lineHeight: "100%",
+                  fontWeight: 500,
+                }}
+              >
+                {project.metadata.name}
+              </Paragraph>
+            </Tooltip>
+          </Flex>
+
+          {/* <Flex>
+                <Tag
+                  style={{
+                    fontSize: FONT_SIZE.PARA,
+                    padding: "4px 8px",
+                    lineHeight: "100%",
+                    marginTop: 4,
+                    border: "1px solid",
+                    color: "white",
+                    backgroundColor: COLORS.textColorDark,
+                  }}
+                >
+                  {capitalize(project.metadata.homeType[0])}
+                </Tag>
+              </Flex> */}
+          {project.ui && project.ui.costingDetails ? (
+            <Flex>
+              <Paragraph
+                ellipsis={{ rows: 1, expandable: false }}
+                style={{
+                  display: "inline",
+                  fontSize: fullWidth ? FONT_SIZE.HEADING_3 : FONT_SIZE.PARA,
+                  marginTop: 4,
+                  marginBottom: 0,
+                }}
+              >
+                {rupeeAmountFormat(project.ui.costingDetails.singleUnitCost)} /{" "}
+                {project.ui.costingDetails.singleUnitSize} sqft
+              </Paragraph>
+            </Flex>
+          ) : null}
+
+          {project.ui && project.ui.oneLiner ? (
+            <Tooltip title={project.relevantDetails || project.ui.oneLiner}>
+              <Paragraph
+                ellipsis={{ rows: 2, expandable: false }}
+                style={{
+                  whiteSpace: "wrap",
+                  lineHeight: "110%",
+                  marginTop: 4,
+                  marginBottom: 8,
+                  fontSize: fullWidth ? FONT_SIZE.HEADING_3 : FONT_SIZE.PARA,
+                  color: COLORS.textColorLight,
+                }}
+              >
+                {project.relevantDetails || project.ui.oneLiner}
+              </Paragraph>
+            </Tooltip>
+          ) : null}
+          {/* {project.relevantDetails ? (
+                <Typography.Text
+                  style={{
+                    backgroundColor: COLORS.bgColor,
+                    borderRadius: 8,
+                    border: "1px solid",
+                    borderColor: COLORS.borderColorMedium,
+                    whiteSpace: "wrap",
+                    lineHeight: "110%",
+                    marginTop: 4,
+                    padding: 4,
+                    fontSize: FONT_SIZE.SUB_TEXT,
+                    fontStyle: "italic",
+                  }}
+                >
+                  {project.relevantDetails || project.ui.oneLiner.split(" · ").slice(1).join(" · ")}
+                </Typography.Text>
+              ) : null} */}
+
+          {/* <Flex gap={7} color={COLORS.textColorLight} align="center">
+           
+      
+                <SeparatorDot />
+                <DescText text={`₹${randomPrice}Lacs`} />
+              </Flex> */}
+        </Flex>
+        {fullWidth ? (
+          <ProjectGallery media={project.media}></ProjectGallery>
+        ) : (
+          <div
             style={{
-              color: COLORS.textColorLight,
-              whiteSpace: "wrap",
-              lineHeight: "110%",
-              marginBottom: 8,
+              borderRadius: 8,
+              height: fullWidth ? 225 : 175,
+              width: "100%",
+              border: "1px solid",
+              borderColor: COLORS.borderColor,
+              backgroundImage: `url(${
+                previewImage || "/images/img-plchlder.png"
+              })`,
+              backgroundPosition: "center",
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
+            }}
+          ></div>
+        )}
+
+        {showClick && (
+          <Flex
+            style={{ marginTop: 8 }}
+            onClick={() => {
+              onProjectClick();
             }}
           >
-            {project.ui.oneLiner}
-          </Typography.Text>
-        ) : null}
-        {costSummary ? (
-          <Flex>
-            <Typography.Text
-              style={{
-                display: "inline",
-                fontSize: FONT_SIZE.subText,
-              }}
-            >
-              {rupeeAmountFormat(costSummary.cost)} / {costSummary.size}
-            </Typography.Text>
+            <Tag>More Details</Tag>
           </Flex>
-        ) : null}
-
-        {/* <Flex gap={7} color={COLORS.textColorLight} align="center">
-     
-
-          <SeparatorDot />
-          <DescText text={`₹${randomPrice}Lacs`} />
-        </Flex> */}
+        )}
       </Flex>
     </Flex>
   );

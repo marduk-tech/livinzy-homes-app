@@ -1,3 +1,4 @@
+import { ProjectHomeType } from "../libs/constants";
 import { ILivIndexPlaces } from "./Common";
 
 export interface IMedia {
@@ -37,6 +38,7 @@ export interface IMetadata {
   oneLiner?: string;
   description: string;
   summary: string;
+  homeType: ProjectHomeType;
 }
 
 export interface ILand {
@@ -105,14 +107,14 @@ export interface ITeam {
 }
 
 export interface IUI {
-  summary: string;
   description: string;
   oneLiner: string;
-  highlights: string;
-  costSummary: string;
-  amenitiesSummary: string;
-  categories: string[];
-  locationFilters: string[];
+  projectHighlights: any;
+  costingDetails: any;
+  amenitiesSummary: any;
+  statusDetails: any;
+  builderDetails: any;
+  landDetails: any;
 }
 
 export interface Project {
@@ -131,6 +133,7 @@ export interface Project {
   updatedAt: string;
   livestment: ILivestment;
   livIndexScore: ILivIndexScore;
+  relevantDetails: string;
 }
 
 export interface ProjectField {
@@ -154,14 +157,28 @@ export interface IDriverPlace {
   _id: string;
   name: string;
   description?: string;
+  details?: {
+    oneLiner: string;
+    description: string;
+    footfall: number;
+    icon?: string;
+  };
   location?: {
     lat: number;
     lng: number;
+  };
+  parameters: {
+    growthLever: boolean;
   };
   driver: string;
   megaDriver: string;
   status: string;
   distance?: number;
+
+  features: {
+    type: string;
+    coordinates: number[][][];
+  };
 }
 
 export interface ISubLivestment {
@@ -187,31 +204,35 @@ export interface IMegaDriverScore {
   places: [IPlace];
 }
 
-export interface IExtrinsicDriver {
+export interface IProjectDriver {
   _id: string;
-  placeId: ILivIndexPlaces;
+  place: ILivIndexPlaces;
   distance: number;
+  mapsDistanceMetres: number;
+  mapsDurationSeconds: number;
   coefficients: {
-    proximityCoeffecient: Number;
-    countCoeffecient: Number;
-    triggerCoeffecient: Number;
-    timelineCoeffecient: Number;
+    proximityCoeffecient: number;
+    countCoeffecient: number;
+    triggerCoeffecient: number;
+    timelineCoeffecient: number;
   };
+}
+export interface IScoreBreakup {
+  megaDriver: string;
+  drivers: [IProjectDriver];
 }
 
 export interface IIntrinsicDriver {
   coefficients: {
     craftCoeffecient: number;
-    builderCoeffecient: Number;
+    builderCoeffecient: number;
   };
 }
 
 export interface ILivIndexScore {
   score: number;
   summary: string;
-  extrinsicDrivers: [IExtrinsicDriver];
-  intrinsicDriver: IIntrinsicDriver;
-  scoreBreakup: any;
+  scoreBreakup: [IScoreBreakup];
 }
 
 export interface ProjectStructure {
@@ -226,4 +247,5 @@ export interface ProjectStructure {
   clickToAction: ProjectField[];
   team: ProjectField[];
   livIndexScore: ILivIndexScore;
+  relevantDetails?: string;
 }

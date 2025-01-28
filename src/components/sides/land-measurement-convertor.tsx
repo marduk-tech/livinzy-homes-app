@@ -105,7 +105,7 @@ const LandMeasurementConvertor = () => {
         style={{
           width: "15%",
           marginRight: "8px",
-          fontSize: FONT_SIZE.subHeading,
+          fontSize: FONT_SIZE.HEADING_3,
           fontWeight: "bold",
         }}
       />
@@ -115,7 +115,7 @@ const LandMeasurementConvertor = () => {
         labelRender={(labelProps) => {
           return (
             <Typography.Text
-              style={{ fontSize: FONT_SIZE.subHeading, fontWeight: "bold" }}
+              style={{ fontSize: FONT_SIZE.HEADING_3, fontWeight: "bold" }}
             >
               {labelProps.label}
             </Typography.Text>

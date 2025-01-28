@@ -31,12 +31,47 @@ body {
   margin: 0;
   font-family: "DM Sans";
   padding: 0;
-  background-color: #fafbfb;
+  background-color: white;
+  overflow-y: hidden;
   /* Add any other styles you want to reset or modify */
 }
 
 .liviq-content {
+  font-size: 18px;
+  min-height: 200px;
+
   img {
     max-width: 250px;
   }
+
+  p {
+    margin: 0;
+  }
+}
+
+@keyframes bounceAnimation {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.fade-in-style {
+  animation: fade-in 2s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 100;
+  }
+}
+
+.ant-modal-content {
+  padding: 16px !important;
 }

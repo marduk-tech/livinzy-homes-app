@@ -6,9 +6,9 @@ import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { LoginForm } from "../components/login-forms";
 import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { NavLink } from "../types/Common";
-import { envMode, LocalStorageKeys } from "../libs/constants";
+import { LocalStorageKeys } from "../libs/constants";
 
 const { Header, Content } = Layout;
 
@@ -22,7 +22,7 @@ export const DashboardLayout: React.FC = () => {
   useEffect(() => {
     const userItem = localStorage.getItem(LocalStorageKeys.user);
     const user = userItem ? JSON.parse(userItem) : null;
-    if (user || envMode == "dev") {
+    if (user) {
       return;
     } else {
       setLoginModalOpen(true);
@@ -83,7 +83,7 @@ export const DashboardLayout: React.FC = () => {
                 <Image width={16} src={link.icon.src}></Image>
               )}
 
-              <Typography.Text style={{ fontSize: FONT_SIZE.subHeading }}>
+              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
                 {link.title}
               </Typography.Text>
             </Flex>
@@ -122,17 +122,22 @@ export const DashboardLayout: React.FC = () => {
         >
           <Header
             style={{
-              padding: isMobile ? 8 : "8px 24px",
               background: "transparent",
+              height: "60px",
+              padding: "0 12px",
+              borderBottom: "1px solid",
+              borderBottomColor: COLORS.borderColor,
             }}
           >
-            <Flex align="center" justify="space-between">
-              <Link to="/">
-                <Image
-                  preview={false}
+            <Flex align="center" justify="space-between" style={{ height: 60 }}>
+              <Link
+                to="/"
+                style={{ height: 60, display: "flex", alignItems: "center" }}
+              >
+                <img
                   src="/logo-name.png"
-                  style={{ height: 35, width: "auto" }}
-                ></Image>
+                  style={{ height: 30, width: "auto", marginLeft: -8 }}
+                ></img>
               </Link>
 
               {user && (
@@ -148,8 +153,6 @@ export const DashboardLayout: React.FC = () => {
                   ></DynamicReactIcon>
                 </Flex>
               )}
-
-              {/* {user && !isLoading && !isError ? <UserDropDown /> : null} */}
             </Flex>
           </Header>
           <Drawer
@@ -168,7 +171,7 @@ export const DashboardLayout: React.FC = () => {
               <NavLinks navLinks={navLinks} />
               <Typography.Text
                 style={{
-                  fontSize: FONT_SIZE.default,
+                  fontSize: FONT_SIZE.SUB_TEXT,
                   color: COLORS.textColorLight,
                 }}
               >
@@ -176,7 +179,14 @@ export const DashboardLayout: React.FC = () => {
               </Typography.Text>
             </Flex>
           </Drawer>
-          <Content style={{ margin: isMobile ? 16 : 48, marginTop: 0 }}>
+          <Content
+            style={{
+              margin: "auto",
+              marginTop: 24,
+              maxWidth: MAX_WIDTH,
+              width: "100%",
+            }}
+          >
             {/* <Menu mode="horizontal" items={menuItems} /> */}
             <CustomErrorBoundary>
               <Outlet />

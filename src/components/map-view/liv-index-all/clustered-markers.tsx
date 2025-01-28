@@ -3,13 +3,13 @@ import {
   AdvancedMarkerAnchorPoint,
   useAdvancedMarkerRef,
 } from "@vis.gl/react-google-maps";
-import { Flex, Tooltip, Typography } from "antd";
+import { Flex, Typography } from "antd";
 import { FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { useCallback, useEffect, useMemo } from "react";
 import Supercluster, { ClusterProperties } from "supercluster";
-import { useSupercluster } from "../../hooks/use-supercluster";
-import { LivIndexDriversConfig } from "../../libs/constants";
-import DynamicReactIcon from "../common/dynamic-react-icon";
+import { useSupercluster } from "../../../hooks/use-supercluster";
+import { LivIndexDriversConfig } from "../../../libs/constants";
+import { LivIndexPlaceCard } from "../livindex-place-card";
 
 type ClusteredMarkersProps = {
   geojson: FeatureCollection<Point>;
@@ -178,7 +178,11 @@ export const FeatureMarker = ({
           {featureName}
           
         </Tag> */}
-        <Tooltip title={featureName}>
+
+        <LivIndexPlaceCard
+          place={feature!.properties!.place}
+        ></LivIndexPlaceCard>
+        {/* <Tooltip title={featureName}>
           <Flex>
             <DynamicReactIcon
               iconName={driverConfig.icon.name}
@@ -187,7 +191,7 @@ export const FeatureMarker = ({
               color="black"
             ></DynamicReactIcon>
           </Flex>
-        </Tooltip>
+        </Tooltip> */}
       </Flex>
     </AdvancedMarker>
   );

@@ -5,13 +5,11 @@ import { DashboardLayout } from "../layouts/dashboard-layout";
 
 // Pages
 import LandMeasurementConvertor from "../components/sides/land-measurement-convertor";
-import AskPage from "../pages/ask-page";
-import { HomePage } from "../pages/home-page";
 import { LivindexPlaces } from "../pages/livindex-places";
 import { ProfilePage } from "../pages/profile-page";
-import ProjectPage from "../pages/project-page";
 import { SignUpForm } from "../pages/signup";
 
+import LivV2 from "../components/liv-v2";
 export const Router = () => {
   return (
     <Routes>
@@ -20,10 +18,8 @@ export const Router = () => {
         element={<LandMeasurementConvertor />}
       />
       <Route element={<DashboardLayout />}>
-        <Route path="/" element={<HomePage></HomePage>} />
-        <Route path="/project/:projectId" element={<ProjectPage />} />
         <Route path="/livindex-places" element={<LivindexPlaces />} />
-        <Route path="/ask" element={<AskPage />} />
+        <Route path="/" element={<LivV2 />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/*" element={<div>404</div>} />{" "}
       </Route>

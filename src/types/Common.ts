@@ -16,16 +16,27 @@ export interface ILivIndexPlaces {
   type?: PlaceType;
   placeId?: string;
   pincode?: string;
-  location?: {
-    lat?: number;
-    lng?: number;
-  };
+  location?: google.maps.LatLngLiteral;
   status?: string;
+  parameters?: {
+    proximityThreshold?: number;
+    triggerCoefficient?: number;
+    growthLever?: boolean;
+  };
   features?: any;
   driver: string;
   megaDriver: string;
   createdAt: Date;
   updatedAt: Date;
+  details: any;
 }
 
-export type PlaceType = "road" | "hospital" | "school" | "futureInfra";
+export type PlaceType = "highway" | "hospital" | "school" | "futureInfra";
+
+export interface ProjectAIResponse {
+  projectId: string;
+  projectName: string;
+  relevantDetails: string;
+  relevancyScore: number;
+  projectCategories: string[];
+}

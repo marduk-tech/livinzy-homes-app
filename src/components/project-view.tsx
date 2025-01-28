@@ -1,9 +1,7 @@
-import { CloseOutlined, HeartFilled, HeartOutlined } from "@ant-design/icons";
+import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import {
   Button,
-  Drawer,
   Flex,
-  FloatButton,
   Image,
   Modal,
   notification,
@@ -13,12 +11,11 @@ import {
 import React, { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
-import AskLiv from "../components/ask-liv";
-import { CalendlyPopup } from "../components/calendly-popup";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
-import LivestIndexRange from "../components/common/livest-index-range";
-import { Loader } from "../components/common/loader";
-import { ProjectLivIndexMapView } from "../components/map-view/project-livindex-map-view";
+import { CalendlyPopup } from "./calendly-popup";
+import DynamicReactIcon from "./common/dynamic-react-icon";
+import LivestIndexRange from "./common/livest-index-range";
+import { Loader } from "./common/loader";
+import { ProjectMapView } from "./map-view/project-map-view";
 import { useDevice } from "../hooks/use-device";
 import { useFetchAllLivindexPlaces } from "../hooks/use-livindex-places";
 import { useFetchProjectById } from "../hooks/use-project";
@@ -43,104 +40,103 @@ import {
 const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
   const { isMobile } = useDevice();
   return (
-    <div className="scrollbar-wrapper">
-      <Flex
-        className="custom-scrollbar"
-        style={{
-          height: isMobile ? 320 : 520,
-          width: "100%",
-          overflowX: "scroll",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {media
-          .filter((item: IMedia) => item.type === "image" && item.image)
-          .map((img: IMedia, index: number) => (
-            <div style={{ position: "relative" }}>
-              <img
-                key={index}
-                src={img.image!.url}
-                height="100%"
-                width="auto"
-                style={{
-                  overflow: "hidden",
-                  borderRadius: 8,
-                  minWidth: 200,
-                  marginRight: 8,
-                  position: "relative",
-                  filter:
-                    "brightness(1.1) contrast(1.1) saturate(1.1)  sepia(0.3)",
-                }}
-                alt={img.image!.caption || `Project image ${index + 1}`}
-              />
-              {img.image!.caption ||
-              (img.image?.tags && img.image.tags.length) ? (
-                <Typography.Text
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    bottom: 0,
-                    color: "white",
-                    textTransform: "capitalize",
-                    borderTopRightRadius: 8,
-                    borderBottomLeftRadius: 8,
-
-                    padding: "8px 16px",
-                    backgroundColor: "rgba(0,0,0,0.3)",
-                  }}
-                >
-                  {img.image!.caption || img.image!.tags}
-                </Typography.Text>
-              ) : null}
-            </div>
-          ))}
-
-        {media
-          .filter((item: IMedia) => item.type === "video" && item.video)
-          .map((media: IMedia, index: number) => (
-            <div
+    <Flex
+      className="custom-scrollbar"
+      style={{
+        width: "100%",
+        overflowX: "scroll",
+        whiteSpace: "nowrap",
+        minHeight: 320,
+        height: 320,
+      }}
+    >
+      {media
+        .filter((item: IMedia) => item.type === "image" && item.image)
+        .map((img: IMedia, index: number) => (
+          <div style={{ position: "relative" }}>
+            <img
+              key={index}
+              src={img.image!.url}
+              height="100%"
+              width="auto"
               style={{
-                height: "100%",
-                width: isMobile ? "100%" : "49%",
-                borderRadius: 8,
                 overflow: "hidden",
-                flexShrink: 0,
+                borderRadius: 8,
+                minWidth: 200,
                 marginRight: 8,
                 position: "relative",
+                filter:
+                  "brightness(1.1) contrast(1.1) saturate(1.1)  sepia(0.3)",
               }}
-            >
-              <iframe
-                src={`https://iframe.mediadelivery.net/embed/330257/${media.video?.bunnyVideoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true`}
-                loading="lazy"
+              alt={img.image!.caption || `Project image ${index + 1}`}
+            />
+            {img.image!.caption ||
+            (img.image?.tags && img.image.tags.length) ? (
+              <Typography.Text
                 style={{
-                  height: "100%",
-                  width: "100%",
-                  border: "none",
+                  position: "absolute",
+                  left: 0,
+                  bottom: 0,
+                  color: "white",
+                  textTransform: "capitalize",
+                  borderTopRightRadius: 8,
+                  borderBottomLeftRadius: 8,
+
+                  padding: "8px 16px",
+                  backgroundColor: "rgba(0,0,0,0.3)",
                 }}
-                allow="accelerometer;gyroscope;encrypted-media;picture-in-picture;"
-              ></iframe>
-              //{" "}
-              {media.video!.caption ||
-              (media.video?.tags && media.video.tags.length) ? (
-                <Typography.Text
-                  style={{
-                    position: "absolute",
-                    right: 0,
-                    top: 0,
-                    color: "white",
-                    textTransform: "capitalize",
-                    borderBottomLeftRadius: 8,
-                    padding: "8px 16px",
-                    backgroundColor: "rgba(0,0,0,0.3)",
-                  }}
-                >
-                  {media.video!.caption || media.video!.tags}
-                </Typography.Text>
-              ) : null}
-            </div>
-          ))}
-      </Flex>
-    </div>
+              >
+                {img.image!.caption || img.image!.tags}
+              </Typography.Text>
+            ) : null}
+          </div>
+        ))}
+
+      {media
+        .filter((item: IMedia) => item.type === "video" && item.video)
+        .map((media: IMedia, index: number) => (
+          <div
+            style={{
+              height: "100%",
+              width: isMobile ? "100%" : "49%",
+              borderRadius: 8,
+              overflow: "hidden",
+              flexShrink: 0,
+              marginRight: 8,
+              position: "relative",
+            }}
+          >
+            <iframe
+              src={`https://iframe.mediadelivery.net/embed/330257/${media.video?.bunnyVideoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true`}
+              loading="lazy"
+              style={{
+                height: "100%",
+                width: "100%",
+                border: "none",
+              }}
+              allow="accelerometer;gyroscope;encrypted-media;picture-in-picture;"
+            ></iframe>
+            //{" "}
+            {media.video!.caption ||
+            (media.video?.tags && media.video.tags.length) ? (
+              <Typography.Text
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: 0,
+                  color: "white",
+                  textTransform: "capitalize",
+                  borderBottomLeftRadius: 8,
+                  padding: "8px 16px",
+                  backgroundColor: "rgba(0,0,0,0.3)",
+                }}
+              >
+                {media.video!.caption || media.video!.tags}
+              </Typography.Text>
+            ) : null}
+          </div>
+        ))}
+    </Flex>
   );
 };
 
@@ -150,14 +146,14 @@ const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
 }) => {
   return (
     <Flex vertical>
-      <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.title }}>
+      <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.HEADING_1 }}>
         {metadata.name}
       </Typography.Text>
 
       <Typography.Text
         style={{
           margin: 0,
-          fontSize: FONT_SIZE.subHeading,
+          fontSize: FONT_SIZE.HEADING_3,
           color: COLORS.textColorLight,
         }}
       >
@@ -167,8 +163,8 @@ const Header: React.FC<{ metadata: IMetadata; ui: IUI }> = ({
   );
 };
 
-const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
-  const costSummary = JSON.parse(project.ui.costSummary);
+const CostSnapshot: React.FC<{ project: Project }> = ({ project }) => {
+  const costingDetails = project.ui.costingDetails;
   const { isMobile } = useDevice();
   const { projectId } = useParams();
 
@@ -218,18 +214,18 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
           <Typography.Text
             style={{
               margin: 0,
-              fontSize: FONT_SIZE.heading,
+              fontSize: FONT_SIZE.HEADING_2,
               lineHeight: "100%",
             }}
           >
-            ₹{rupeeAmountFormat(costSummary.cost)}
+            ₹{rupeeAmountFormat(costingDetails.singleUnitCost)}
           </Typography.Text>
 
           <Typography.Text
             style={{
               margin: "0 8px",
               lineHeight: "100%",
-              fontSize: FONT_SIZE.subHeading,
+              fontSize: FONT_SIZE.HEADING_3,
             }}
           >
             /
@@ -239,16 +235,16 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
             style={{
               margin: 0,
               lineHeight: "100%",
-              fontSize: FONT_SIZE.subHeading,
+              fontSize: FONT_SIZE.HEADING_3,
             }}
           >
-            {costSummary.size}
+            {costingDetails.singleUnitSize} sqft
           </Typography.Text>
         </Flex>
-        {costSummary.sqftRate ? (
+        {costingDetails.sqftRate ? (
           <Typography.Text style={{ color: COLORS.textColorLight }}>
-            Priced at ₹{costSummary.sqftRate} per sqft.{" "}
-            {costSummary.details ? costSummary.details : ""}
+            Priced at ₹{costingDetails.sqftRate} per sqft.{" "}
+            {costingDetails.details ? costingDetails.details : ""}
           </Typography.Text>
         ) : null}
       </Flex>
@@ -288,7 +284,7 @@ const CostSummery: React.FC<{ project: Project }> = ({ project }) => {
 };
 
 const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
-  const highlights = JSON.parse(project.ui.highlights);
+  const highlights = project.ui.projectHighlights;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedHighlight, setSelectedHighlight] = useState<any>();
@@ -298,10 +294,6 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
     setIsModalOpen(false);
   };
 
-  const isMobile = useMediaQuery({
-    query: "(max-width: 576px)",
-  });
-
   return (
     <>
       <Flex
@@ -309,6 +301,7 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
         gap={32}
         style={{
           padding: "32px 0",
+          width: "100%",
           borderTop: "2px solid",
           borderBottom: "2px solid",
           borderColor: COLORS.borderColor,
@@ -347,7 +340,7 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
             )}
             <Flex vertical>
               <Typography.Text
-                style={{ fontSize: FONT_SIZE.subHeading, lineHeight: "100%" }}
+                style={{ fontSize: FONT_SIZE.HEADING_3, lineHeight: "100%" }}
               >
                 {highlight.title}
               </Typography.Text>
@@ -370,7 +363,7 @@ const ProjectHighlights: React.FC<{ project: Project }> = ({ project }) => {
         <Typography.Text
           style={{
             margin: 0,
-            fontSize: FONT_SIZE.subText,
+            fontSize: FONT_SIZE.PARA,
           }}
         >
           {selectedHighlight?.details || selectedHighlight?.description}
@@ -384,7 +377,7 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
   ui,
   media,
 }) => {
-  const summary = JSON.parse(ui.summary);
+  const costingDetails = ui.costingDetails;
 
   const isMobile = useMediaQuery({
     query: "(max-width: 576px)",
@@ -404,11 +397,11 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
         borderBottomColor: COLORS.borderColor,
       }}
     >
-      <Flex>
-        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.heading }}>
-          What are you Buying ?
+      {/* <Flex>
+        <Typography.Text style={{ margin: 0, fontSize: FONT_SIZE.HEADING_2 }}>
+          What can you buy ?
         </Typography.Text>
-      </Flex>
+      </Flex> */}
 
       <Flex
         style={{
@@ -450,23 +443,23 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                 <Flex vertical gap={4}>
                   <Typography.Text
                     style={{
-                      fontSize: FONT_SIZE.subText,
+                      fontSize: FONT_SIZE.PARA,
                       color: COLORS.textColorVeryLight,
                       lineHeight: "100%",
                       textTransform: "uppercase",
                     }}
                   >
-                    Plots
+                    Configuration
                   </Typography.Text>
                   <Typography.Text
                     style={{
                       margin: 0,
                       color: "white",
-                      fontSize: FONT_SIZE.subHeading,
+                      fontSize: FONT_SIZE.HEADING_3,
                       lineHeight: "100%",
                     }}
                   >
-                    {summary.plots}
+                    {costingDetails.configurations}
                   </Typography.Text>
                 </Flex>
               </Flex>
@@ -481,22 +474,26 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                   <Typography.Text
                     style={{
                       lineHeight: "100%",
-                      fontSize: FONT_SIZE.subText,
+                      fontSize: FONT_SIZE.PARA,
                       textTransform: "uppercase",
                       color: COLORS.textColorVeryLight,
                     }}
                   >
-                    Costing
+                    Other Charges
                   </Typography.Text>
                   <Typography.Text
                     style={{
                       margin: 0,
                       lineHeight: "100%",
-                      fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                      fontSize: isMobile ? 16 : FONT_SIZE.HEADING_3,
                       color: "white",
                     }}
                   >
-                    {summary.costing}
+                    {`${costingDetails.plcCharges}${
+                      costingDetails.maintenanceCharges
+                        ? ", " + costingDetails.maintenanceCharges
+                        : ""
+                    }`}
                   </Typography.Text>
                 </Flex>
               </Flex>
@@ -512,7 +509,7 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                   <Typography.Text
                     style={{
                       lineHeight: "100%",
-                      fontSize: FONT_SIZE.subText,
+                      fontSize: FONT_SIZE.PARA,
                       textTransform: "uppercase",
                       color: COLORS.textColorVeryLight,
                     }}
@@ -523,11 +520,11 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
                     style={{
                       margin: 0,
                       lineHeight: "100%",
-                      fontSize: isMobile ? 16 : FONT_SIZE.subHeading,
+                      fontSize: isMobile ? 16 : FONT_SIZE.HEADING_3,
                       color: "white",
                     }}
                   >
-                    {summary.income}
+                    {costingDetails.income}
                   </Typography.Text>
                 </Flex>
               </Flex>
@@ -555,8 +552,8 @@ const ProjectSummary: React.FC<{ ui: IUI; media: IMedia[] }> = ({
 
 const ProjectDescription: React.FC<{ project: Project }> = ({ project }) => {
   return (
-    <Flex vertical>
-      <Typography.Text style={{ fontSize: FONT_SIZE.subText }}>
+    <Flex vertical style={{ width: "100%" }}>
+      <Typography.Text style={{ fontSize: FONT_SIZE.PARA }}>
         {project.ui.description}
       </Typography.Text>
       {/* <Link href={project.metadata.website}>See Website</Link> */}
@@ -586,7 +583,7 @@ const AmenityCard: React.FC<any> = ({ amenity }) => {
           <Typography.Text
             style={{
               margin: 0,
-              fontSize: FONT_SIZE.subHeading,
+              fontSize: FONT_SIZE.HEADING_3,
               textAlign: "center",
             }}
           >
@@ -624,7 +621,7 @@ const AmenityCard: React.FC<any> = ({ amenity }) => {
         <Typography.Text
           style={{
             margin: 0,
-            fontSize: FONT_SIZE.default,
+            fontSize: FONT_SIZE.SUB_TEXT,
           }}
         >
           {amenity.description}
@@ -640,12 +637,7 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
 
   const { isMobile } = useDevice();
 
-  let amenities;
-  try {
-    amenities = JSON.parse(project.ui.amenitiesSummary);
-  } catch (err) {
-    console.log("amenities not rightly structuered");
-  }
+  let amenities = project.ui.amenitiesSummary;
   if (!amenities) {
     return;
   }
@@ -658,7 +650,7 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
   return (
     <Flex vertical gap={24}>
       <Flex>
-        <Typography.Text style={{ fontSize: FONT_SIZE.heading }}>
+        <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
           Amenities Offered
         </Typography.Text>
       </Flex>
@@ -694,7 +686,7 @@ const ProjectAmenities: React.FC<{ project: Project }> = ({ project }) => {
         <Typography.Text
           style={{
             margin: 0,
-            fontSize: FONT_SIZE.default,
+            fontSize: FONT_SIZE.SUB_TEXT,
           }}
         >
           {selectedHighlight?.description}
@@ -720,7 +712,7 @@ const Livestment: React.FC<{
           size={36}
           color={COLORS.primaryColor}
         ></DynamicReactIcon>
-        <Typography.Text style={{ fontSize: FONT_SIZE.heading }}>
+        <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
           LivIndex
         </Typography.Text>
       </Flex>
@@ -801,24 +793,26 @@ const Livestment: React.FC<{
             width: isMobile ? "100%" : "60%",
           }}
         >
-          <ProjectLivIndexMapView
+          <ProjectMapView
             project={project}
             livIndexPlaces={livIndexPlaces}
-          ></ProjectLivIndexMapView>
+          ></ProjectMapView>
         </Flex>
       </Flex>
     </Flex>
   );
 };
 
-const ProjectPage: React.FC = () => {
-  const { projectId } = useParams();
+const ProjectView: React.FC<{
+  projectId: string;
+}> = ({ projectId }) => {
+  // const { projectId } = useParams();
 
   const { data: projectData, isLoading: projectDataLoading } =
     useFetchProjectById(projectId!);
 
   const { data: allLivIndexPlaces, isLoading: allLivIndexPlacesLoading } =
-    useFetchAllLivindexPlaces({});
+    useFetchAllLivindexPlaces();
 
   const [livIQOpen, setLivIQOpen] = useState(false);
 
@@ -841,21 +835,14 @@ const ProjectPage: React.FC = () => {
 
   return (
     <>
-      {!livIQOpen && isMobile ? (
-        <FloatButton
-          icon={
-            <DynamicReactIcon
-              iconName="GiOilySpiral"
-              iconSet="gi"
-              color={COLORS.primaryColor}
-            ></DynamicReactIcon>
-          }
-          onClick={() => {
-            setLivIQOpen(true);
-          }}
-        ></FloatButton>
-      ) : null}
-      <Flex vertical>
+      <Flex
+        vertical
+        style={{
+          width: "100%",
+          height: "calc(100vh - 250px)",
+          overflowY: "scroll",
+        }}
+      >
         <Gallery media={[...sortedMediaArray, ...videoMedia]} />
         <Flex
           gap={40}
@@ -866,11 +853,11 @@ const ProjectPage: React.FC = () => {
           <Flex
             vertical
             gap={32}
-            style={{ width: isMobile ? "100%" : "calc(100% - 415px)" }}
+            style={{ width: isMobile ? "100%" : "calc(100%)" }}
           >
             <Header metadata={projectData.metadata} ui={projectData.ui} />
 
-            <CostSummery project={projectData} />
+            <CostSnapshot project={projectData} />
 
             <ProjectHighlights project={projectData} />
 
@@ -892,51 +879,10 @@ const ProjectPage: React.FC = () => {
               />
             ) : null}
           </Flex>
-
-          {isMobile ? (
-            <Drawer
-              title={
-                <Flex align="center" justify="space-between">
-                  <Button
-                    type="text"
-                    style={{ marginLeft: "auto" }}
-                    icon={<CloseOutlined />}
-                    onClick={() => {
-                      setLivIQOpen(false);
-                    }}
-                  />
-                </Flex>
-              }
-              styles={{
-                header: {
-                  padding: 0,
-                },
-              }}
-              placement="bottom"
-              closable={false}
-              onClose={() => {
-                setLivIQOpen(false);
-              }}
-              open={livIQOpen}
-              height="100%"
-            >
-              <AskLiv projectName={projectData.metadata.name} />
-            </Drawer>
-          ) : (
-            <Flex style={{ width: 375, backgroundColor: "white" }}>
-              <Flex
-                style={{
-                  overflow: "hidden",
-                }}
-              >
-                <AskLiv projectName={projectData.metadata.name} />
-              </Flex>
-            </Flex>
-          )}
         </Flex>
       </Flex>
     </>
   );
 };
 
-export default ProjectPage;
+export default ProjectView;

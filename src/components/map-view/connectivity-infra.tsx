@@ -1,5 +1,5 @@
 import { useMap } from "@vis.gl/react-google-maps";
-import { Flex, Tag } from "antd";
+import { Flex, Modal, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { Typography } from "antd";
@@ -23,7 +23,7 @@ interface LineFeature {
   };
 }
 
-export const RoadInfra: React.FC<any> = ({ roadData }) => {
+export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
   const map = useMap();
   const [lines, setLines] = useState<LineFeature[]>([]);
 
@@ -35,19 +35,19 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
 
   useEffect(() => {
     const extractedLines: LineFeature[] =
-      (roadData?.features
+      (connectivityData?.features
         .map((feature: any) => {
-          const roadName =
-            roadData.features.length > 1
-              ? feature.properties.name || roadData.name
-              : roadData.name;
+          const featureName =
+            connectivityData.features.length > 1
+              ? feature.properties.name || connectivityData.name
+              : connectivityData.name;
 
           let customProps = {};
 
           const status =
-            roadData.features.length == 1
-              ? roadData.status
-              : feature.properties.status || roadData.status;
+            connectivityData.features.length == 1
+              ? connectivityData.status
+              : feature.properties.status || connectivityData.status;
           if (
             status &&
             ![
@@ -58,7 +58,7 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
           ) {
             customProps = {
               dashConfig: {
-                spacing: 20,
+                spacing: 15,
               },
             };
           }
@@ -69,11 +69,11 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
             );
 
             return {
-              name: roadName,
+              name: featureName,
               coordinates: [coordinates],
               strokeColor:
-                feature.properties.strokeColor || COLORS.textColorLight,
-              strokeWeight: 2,
+                feature.properties.strokeColor || COLORS.textColorDark,
+              strokeWeight: 4,
               ...customProps,
             };
           } else if (feature.geometry.type === "MultiLineString") {
@@ -85,11 +85,11 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
                 }))
             );
             return {
-              name: roadName,
+              name: featureName,
               coordinates,
               strokeColor:
-                feature.properties.strokeColor || COLORS.textColorLight,
-              strokeWeight: 2,
+                feature.properties.strokeColor || COLORS.textColorDark,
+              strokeWeight: 4,
               ...customProps,
             };
           }
@@ -189,76 +189,56 @@ export const RoadInfra: React.FC<any> = ({ roadData }) => {
   }, []);
 
   return (
-    <>
-      <>
-        {selectedLine && popupPosition && selectedLine.name && (
-          <div
-            style={{
-              position: "fixed",
-              left: popupPosition.x,
-              top: popupPosition.y,
-              zIndex: 10,
-              borderRadius: "10px",
-              maxWidth: "300px",
-              backgroundColor: "#4c5b68",
-            }}
-          >
-            <div style={{ padding: "8px" }}>
-              <Typography.Text
-                style={{ color: "white", fontSize: FONT_SIZE.subHeading }}
-              >
-                {roadData.name}
-              </Typography.Text>
-              <Flex
-                style={{ marginBottom: "8px", marginTop: "8px" }}
-                wrap="wrap"
-              >
-                {roadData?.features.length > 1 ? (
-                  <Tag
-                    color="blue"
-                    key={selectedLine.name}
-                    style={{
-                      marginRight: "4px",
-                      marginBottom: "4px",
-                      fontSize: FONT_SIZE.default,
-                      color: "white",
-                    }}
-                  >
-                    {selectedLine.name}
-                  </Tag>
-                ) : null}
-                <Tag
-                  color={
-                    selectedLine.dashConfig
-                      ? COLORS.yellowIdentifier
-                      : COLORS.greenIdentifier
-                  }
-                  style={{
-                    marginRight: "4px",
-                    marginBottom: "4px",
-                    fontSize: FONT_SIZE.default,
-                  }}
-                >
-                  {selectedLine.dashConfig
-                    ? "Under Construction"
-                    : "Operational"}
-                </Tag>
-              </Flex>
-              <Paragraph
+    <Modal
+      title={connectivityData.name}
+      open={!!(selectedLine && selectedLine.name)}
+      style={{ padding: 0 }}
+      footer={null}
+      onCancel={() => {
+        setSelectedLine(null);
+      }}
+    >
+      {selectedLine && selectedLine.name ? (
+        <div>
+          <Flex style={{ marginBottom: "8px", marginTop: "8px" }} wrap="wrap">
+            {connectivityData?.features.length > 1 ? (
+              <Tag
+                color="blue"
+                key={selectedLine.name}
                 style={{
-                  height: 90,
-                  overflowY: "scroll",
-                  fontSize: FONT_SIZE.default,
-                  color: "white",
+                  marginRight: "4px",
+                  marginBottom: "4px",
+                  fontSize: FONT_SIZE.SUB_TEXT,
                 }}
-                ellipsis={{ rows: 2, expandable: true, symbol: "more" }}
               >
-                {roadData?.description}
-              </Paragraph>
-            </div>
-          </div>
-        )}
-      </>
-    </>
+                {selectedLine.name}
+              </Tag>
+            ) : null}
+            <Tag
+              color={
+                selectedLine.dashConfig
+                  ? COLORS.yellowIdentifier
+                  : COLORS.greenIdentifier
+              }
+              style={{
+                marginRight: "4px",
+                marginBottom: "4px",
+                fontSize: FONT_SIZE.SUB_TEXT,
+              }}
+            >
+              {selectedLine.dashConfig ? "Under Construction" : "Operational"}
+            </Tag>
+          </Flex>
+          <Paragraph
+            style={{
+              fontSize: FONT_SIZE.PARA,
+            }}
+            ellipsis={{ rows: 5, expandable: true, symbol: "more" }}
+          >
+            {connectivityData?.description}
+          </Paragraph>
+        </div>
+      ) : null}
+    </Modal>
   );
 };

@@ -6,7 +6,6 @@ export const queryKeys = {
   projects: "projects",
   getProjectById: "getProjectById",
   getAllPlaces: "getAllPlaces",
-
   user: "user",
 };
 
@@ -37,8 +36,12 @@ export const enum PLACE_TIMELINE {
 }
 
 export const LivIndexDriversConfig = {
-  road: { label: "Road Network", icon: { name: "FaRoad", set: "fa" } },
+  highway: { label: "Road Network", icon: { name: "FaRoad", set: "fa" } },
   school: { label: "Schools", icon: { name: "IoMdSchool", set: "io" } },
+  university: {
+    label: "Universities",
+    icon: { name: "IoMdSchool", set: "io" },
+  },
   hospital: { label: "Hospitals", icon: { name: "FaRegHospital", set: "fa" } },
   leisure: {
     label: "Leisure Activity",
@@ -60,7 +63,10 @@ export const LivIndexDriversConfig = {
     label: "International Airport",
     icon: { name: "MdLocalAirport", set: "md" },
   },
-  transit: { label: "Transit Network" },
+  transit: {
+    label: "Transit Network",
+    icon: { name: "MdOutlineDirectionsTransit", set: "md" },
+  },
   "tier-1-city": {
     label: "Tier 1 City",
     icon: { name: "PiCityBold", set: "pi" },
@@ -217,3 +223,15 @@ export const LivIQPredefinedQuestions = [
   "Any idea about the plot availability?",
   "What about the water supply?",
 ];
+
+export enum ProjectHomeType {
+  FARMLAND = "farmland",
+  PLOT = "plot",
+  VILLA = "villa",
+  ROWHOUSE = "rowhouse",
+  VILLAMENT = "villament",
+  APARTMENT = "apartment",
+  PENTHOUSE = "penthouse",
+}
+
+export const PlaceholderContent = `North Bengaluru is emerging as a prime real estate destination bolstered by several significant infrastructural developments. Key commercial projects, such as **Prestige Tech Cloud and Bengaluru Signature Business Park**, are on the rise, offering vast office spaces. The area benefits from excellent connectivity through Bellary Road and Satellite Town Ring Road which handle substantial vehicular traffic. `;
