@@ -14,6 +14,7 @@ import { ProjectCard } from "./common/project-card";
 import { LoadingOutlined } from "@ant-design/icons";
 import { MapView } from "./map-view/map-view";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
+const { Paragraph } = Typography;
 
 interface AICuratedProject {
   projectId: string;
@@ -188,7 +189,35 @@ const LivV2 = forwardRef(() => {
             gap={8}
             style={{ marginTop: 8, padding: isMobile ? "0 16px" : 0 }}
           >
-            {question ? (
+            {queryProcessing ? (
+              <Flex
+                align="center"
+                gap={8}
+                style={{
+                  backgroundColor: COLORS.bgColor,
+                  padding: "4px 12px",
+                  borderRadius: 16,
+                  border: "1px solid",
+                  borderColor: COLORS.borderColorMedium,
+                  marginTop: 8,
+                  marginBottom: 8,
+                }}
+              >
+                <img
+                  src="/images/liv-streaming.gif"
+                  style={{
+                    height: 28,
+                    width: 28,
+                  }}
+                />
+                <Paragraph
+                  style={{ margin: 0, color: COLORS.textColorLight }}
+                  ellipsis={{ rows: 1, expandable: false }}
+                >
+                  {question}
+                </Paragraph>
+              </Flex>
+            ) : question ? (
               <Typography.Text
                 style={{
                   backgroundColor: COLORS.textColorDark,
@@ -222,7 +251,7 @@ const LivV2 = forwardRef(() => {
               marginBottom: 16,
               borderRadius: isMobile ? 0 : 4,
               marginTop: 16,
-              padding: "8px",
+              padding: "24px 8px",
               backgroundColor: COLORS.bgColorMedium,
               boxShadow:
                 "inset 0 10px 10px -10px #ccc, inset 0 -10px 10px -10px #ccc",
@@ -232,7 +261,7 @@ const LivV2 = forwardRef(() => {
               <Flex
                 align="flex-start"
                 gap={8}
-                style={{ alignItems: "center", marginBottom: 8 }}
+                style={{ alignItems: "center", marginBottom: 16 }}
               >
                 {!projectId ? (
                   queryProcessing ? (
@@ -304,8 +333,9 @@ const LivV2 = forwardRef(() => {
               !toggleMapView ? (
                 <ProjectsViewV2
                   projects={projectsList.slice(0, 20)}
-                  projectClick={(projectId: string) => {
-                    setQuestion("");
+                  projectClick={(projectId: string, projectName: string) => {
+                    setQuestion(`more about ${projectName}`);
+                    setQueryProcessing(true);
                     handleRequest(`summarize this project - ${projectId}`);
                   }}
                 ></ProjectsViewV2>
@@ -380,9 +410,9 @@ const LivV2 = forwardRef(() => {
                       if (selectedProjectPredefinedQuestion == q) {
                         return;
                       }
-                      if (!projectId) {
-                        setQuestion(q);
-                      }
+                      setQuestion(
+                        projectId ? `more about ${q.toLowerCase()}` : q
+                      );
                       setSelectedProjectPredefinedQuestion(q);
                       setQueryProcessing(true);
                       handleRequest(
@@ -391,15 +421,9 @@ const LivV2 = forwardRef(() => {
                     }}
                     style={{
                       cursor: "pointer",
-                      backgroundColor:
-                        selectedProjectPredefinedQuestion == q
-                          ? COLORS.textColorDark
-                          : "white",
+                      backgroundColor: "white",
                       padding: "4px 12px",
-                      color:
-                        selectedProjectPredefinedQuestion == q
-                          ? "white"
-                          : COLORS.textColorDark,
+                      color: COLORS.textColorDark,
                       borderRadius: 16,
                       border: "1px solid",
                       borderColor: COLORS.textColorDark,
@@ -472,7 +496,7 @@ const LivV2 = forwardRef(() => {
             </Form.Item>
           </Form>
         </Flex>
-        {queryProcessing ? (
+        {/* {queryProcessing ? (
           <img
             src={
               !queryProcessing
@@ -487,7 +511,7 @@ const LivV2 = forwardRef(() => {
               left: "calc(50% - 28px)",
             }}
           />
-        ) : null}
+        ) : null} */}
       </Flex>
     </Flex>
   );

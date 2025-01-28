@@ -35,7 +35,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       vertical
       style={{
         cursor: "pointer",
-        width: fullWidth ? "100%" : 200,
+        width: fullWidth ? "100%" : 185,
         padding: 0,
       }}
     >
@@ -50,7 +50,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 ellipsis={{ rows: 1, expandable: false }}
                 style={{
                   margin: 0,
-                  fontSize: FONT_SIZE.HEADING_2,
+                  fontSize: fullWidth
+                    ? FONT_SIZE.HEADING_2
+                    : FONT_SIZE.HEADING_3,
                   lineHeight: "100%",
                   fontWeight: 500,
                 }}
@@ -141,7 +143,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           <div
             style={{
               borderRadius: 8,
-              height: fullWidth ? 225 : 175,
+              height: fullWidth ? 225 : 150,
               width: "100%",
               border: "1px solid",
               borderColor: COLORS.borderColor,

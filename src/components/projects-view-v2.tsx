@@ -43,12 +43,12 @@ const ProjectsViewV2: React.FC<{
               scrollbarWidth: "none",
             }}
           >
-            <Flex gap={16}>
+            <Flex gap={24}>
               {filteredProjects.map((project) => (
                 <Flex
                   style={{ overflowX: "hidden" }}
                   onClick={() => {
-                    projectClick(project._id);
+                    projectClick(project._id, project.metadata.name);
                   }}
                 >
                   <ProjectCard

@@ -89,6 +89,16 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
                 Under Construction
               </Tag>
             ) : null}
+            {place.parameters.growthLever ? (
+              <Tag
+                color={COLORS.textColorDark}
+                style={{
+                  fontSize: FONT_SIZE.SUB_TEXT,
+                }}
+              >
+                Key Growth Driver
+              </Tag>
+            ) : null}
           </Flex>
 
           {place.details && place.details.oneLiner ? (
