@@ -1,9 +1,10 @@
-import { Divider, Flex } from "antd";
+import { Divider, Flex, Typography } from "antd";
 import { useEffect, useRef, useState } from "react";
 import Liv, { LivRef } from "../components/liv";
 import { useFetchProjects } from "../hooks/use-project";
 import ProjectViewV2 from "../components/project-view-v2";
 import ProjectsViewV2 from "../components/projects-view-v2";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
 
 export function HomePageV2() {
   const [projectsList, setProjectsList] = useState<any>([]);
@@ -20,21 +21,41 @@ export function HomePageV2() {
 
   return (
     <Flex gap={8} vertical style={{ width: "100%", position: "relative" }}>
-      <Flex style={{ minHeight: 325 }}>
+      <Flex style={{ minHeight: 325, width: "100%" }}>
         {projectId ? (
-          <ProjectViewV2 projectId={projectId}></ProjectViewV2>
+          <Flex vertical style={{ width: "100%" }}>
+            <Flex
+              align="center"
+              gap={4}
+              style={{ padding: 4, marginBottom: 8 }}
+              onClick={() => {
+                setProjectId("");
+              }}
+            >
+              <DynamicReactIcon
+                iconName="IoChevronBackCircle"
+                iconSet="io5"
+              ></DynamicReactIcon>
+              <Typography.Text>Back to projects</Typography.Text>
+            </Flex>
+            <ProjectViewV2 projectId={projectId}></ProjectViewV2>
+          </Flex>
         ) : (
-          <ProjectsViewV2
-            projectClick={(projectId: string) => {
-              setProjectId(projectId);
-              livRef.current?.summarizeProject(projectId);
-            }}
-            drivers={drivers}
-            projects={projectsList}
-          ></ProjectsViewV2>
+          <Flex style={{ width: "100%" }}>
+            {" "}
+            <ProjectsViewV2
+              projectClick={(projectId: string) => {
+                setProjectId(projectId);
+                // livRef.current?.summarizeProject(projectId);
+                // Current URL: https://my-website.com/page_a
+              }}
+              drivers={drivers}
+              projects={projectsList}
+            ></ProjectsViewV2>
+          </Flex>
         )}
       </Flex>
-      <Divider style={{ height: 24, margin: 0 }}></Divider>
+      <Divider style={{ height: 12, margin: 0 }}></Divider>
       <Flex>
         <Liv
           ref={livRef}

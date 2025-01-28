@@ -82,7 +82,7 @@ export const ProjectsMapView = ({
 }: {
   projects: Project[];
   drivers: string[];
-  onProjectClick: any;
+  onProjectClick?: any;
 }) => {
   const { data: livIndexPlaces } = useFetchAllLivindexPlaces();
   const projectsData = getProjectsMapData({ projects: projects })

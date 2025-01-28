@@ -6,12 +6,7 @@ import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { LoginForm } from "../components/login-forms";
 import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
-import {
-  COLORS,
-  FONT_SIZE,
-  MAX_WIDTH,
-  MOBILE_MARGIN,
-} from "../theme/style-constants";
+import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { NavLink } from "../types/Common";
 import { LocalStorageKeys } from "../libs/constants";
 
@@ -186,7 +181,7 @@ export const DashboardLayout: React.FC = () => {
           </Drawer>
           <Content
             style={{
-              margin: isMobile ? MOBILE_MARGIN : "auto",
+              margin: "auto",
               marginTop: 24,
               maxWidth: MAX_WIDTH,
               width: "100%",

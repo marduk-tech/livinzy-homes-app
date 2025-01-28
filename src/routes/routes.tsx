@@ -8,8 +8,8 @@ import LandMeasurementConvertor from "../components/sides/land-measurement-conve
 import { LivindexPlaces } from "../pages/livindex-places";
 import { ProfilePage } from "../pages/profile-page";
 import { SignUpForm } from "../pages/signup";
-import { HomePageV2 } from "../pages/home-page-v2";
 
+import LivV2 from "../components/liv-v2";
 export const Router = () => {
   return (
     <Routes>
@@ -19,7 +19,7 @@ export const Router = () => {
       />
       <Route element={<DashboardLayout />}>
         <Route path="/livindex-places" element={<LivindexPlaces />} />
-        <Route path="/" element={<HomePageV2 />} />
+        <Route path="/" element={<LivV2 />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/*" element={<div>404</div>} />{" "}
       </Route>

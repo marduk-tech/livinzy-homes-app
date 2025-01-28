@@ -12,7 +12,6 @@ import { sortedMedia } from "../libs/utils";
 import "../theme/scroll-bar.css";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia, IUI, Project } from "../types/Project";
-import { ProjectsMapView } from "./map-view/projects-map-view";
 
 const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
   const { isMobile } = useDevice();
@@ -23,8 +22,7 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
         width: "100%",
         overflowX: "scroll",
         whiteSpace: "nowrap",
-        minHeight: 225,
-        height: 225,
+        height: 165,
         scrollbarWidth: "none",
       }}
     >
@@ -41,7 +39,7 @@ const Gallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
                 overflow: "hidden",
                 borderRadius: 8,
                 minWidth: 200,
-                height: 225,
+                height: 165,
                 marginRight: 8,
                 position: "relative",
                 filter:
@@ -605,33 +603,16 @@ const ProjectViewV2: React.FC<{
 
   captureAnalyticsEvent("app-projectpage-open", { projectId: projectData._id });
 
-  let projectDrivers: string[] = [];
-  if (projectData.livIndexScore && projectData.livIndexScore.score) {
-    projectData.livIndexScore.scoreBreakup.forEach((scoreBreakup) => {
-      projectDrivers = [
-        ...projectDrivers,
-        ...scoreBreakup.drivers.map((driver) => driver.place._id),
-      ];
-    });
-  }
   return (
     <>
       <Flex
         vertical
+        className="fade-in-style"
         style={{
           width: "100%",
-          minHeight: 275,
         }}
       >
-        {toggleMapView ? (
-          <ProjectsMapView
-            projects={[projectData]}
-            drivers={projectDrivers}
-            onProjectClick={() => {}}
-          />
-        ) : (
-          <Gallery media={[...sortedMediaArray, ...videoMedia]} />
-        )}
+        <Gallery media={[...sortedMediaArray, ...videoMedia]} />
         <Flex align="flex-start" style={{ marginTop: 16 }}>
           <Flex vertical>
             <Flex>
@@ -651,42 +632,6 @@ const ProjectViewV2: React.FC<{
             >
               {projectData.ui.oneLiner}
             </Typography.Text>
-          </Flex>
-          <Flex
-            style={{
-              marginLeft: "auto",
-            }}
-            gap={8}
-          >
-            <Button
-              size="small"
-              icon={
-                !toggleMapView ? (
-                  <DynamicReactIcon
-                    iconName="FaMap"
-                    color="primary"
-                    iconSet="fa"
-                    size={16}
-                  ></DynamicReactIcon>
-                ) : (
-                  <DynamicReactIcon
-                    iconName="FaRegListAlt"
-                    iconSet="fa"
-                    size={16}
-                    color="primary"
-                  ></DynamicReactIcon>
-                )
-              }
-              style={{
-                borderRadius: 8,
-                cursor: "pointer",
-                marginLeft: "auto",
-                fontSize: FONT_SIZE.SUB_TEXT,
-              }}
-              onClick={() => {
-                setToggleMapView(!toggleMapView);
-              }}
-            ></Button>
           </Flex>
         </Flex>
 
