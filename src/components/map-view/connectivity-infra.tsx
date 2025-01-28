@@ -1,9 +1,8 @@
 import { useMap } from "@vis.gl/react-google-maps";
-import { Flex, Modal, Tag } from "antd";
+import { Flex, Modal, Tag, Typography } from "antd";
 import { useEffect, useState } from "react";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { Typography } from "antd";
 import { PLACE_TIMELINE } from "../../libs/constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 
 const { Paragraph } = Typography;
 
@@ -23,6 +22,12 @@ interface LineFeature {
   };
 }
 
+interface PointFeature {
+  name: string;
+  coordinates: LatLng;
+  color: string;
+}
+
 export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
   const map = useMap();
   const [lines, setLines] = useState<LineFeature[]>([]);
@@ -32,6 +37,8 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
     x: number;
     y: number;
   } | null>(null);
+
+  const [points, setPoints] = useState<PointFeature[]>([]);
 
   useEffect(() => {
     const extractedLines: LineFeature[] =
@@ -97,7 +104,23 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
         })
         .filter(Boolean) as LineFeature[]) || [];
 
+    // Extract points
+    const extractedPoints: PointFeature[] = connectivityData?.features
+      .map((feature: any) => {
+        if (feature.geometry.type === "Point") {
+          const [lng, lat] = feature.geometry.coordinates as [number, number];
+          return {
+            name: feature.properties.name || connectivityData.name,
+            coordinates: { lat, lng },
+            color: feature.properties.color || COLORS.textColorDark,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean) as PointFeature[];
+
     setLines(extractedLines);
+    setPoints(extractedPoints);
   }, []);
 
   useEffect(() => {
@@ -163,17 +186,45 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
       })
     );
 
+    const pointObjects = points.map((point) => {
+      const circle = new google.maps.Circle({
+        center: point.coordinates,
+        radius: 100,
+        strokeColor: "#008000",
+        strokeOpacity: 0.8,
+        strokeWeight: 1,
+        fillColor: "#90ee90",
+        fillOpacity: 0.5,
+        map: map,
+      });
+
+      circle.addListener("click", (e: any) => {
+        e.stop();
+        setSelectedLine({ name: point.name } as LineFeature);
+        setPopupPosition({
+          x: e.domEvent.clientX,
+          y: e.domEvent.clientY,
+        });
+      });
+
+      return circle;
+    });
+
     // Cleanup when unmounting
     return () => {
       polylineObjects.forEach((polyline) => {
         google.maps.event.clearListeners(polyline, "click");
         polyline.setMap(null);
       });
+      pointObjects.forEach((point) => {
+        google.maps.event.clearListeners(point, "click");
+        point.setMap(null);
+      });
       mapListeners.forEach((listener) =>
         google.maps.event.removeListener(listener)
       );
     };
-  }, [map, lines]);
+  }, [map, lines, points]);
 
   useEffect(() => {
     const handleScroll = () => {
