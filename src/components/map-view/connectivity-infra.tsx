@@ -235,7 +235,7 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
             }}
             ellipsis={{ rows: 5, expandable: true, symbol: "more" }}
           >
-            {connectivityData?.description}
+            {connectivityData?.details.oneLiner}
           </Paragraph>
         </div>
       ) : null}

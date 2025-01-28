@@ -44,12 +44,12 @@ export const LivIndexDriversConfig = {
   },
   hospital: { label: "Hospitals", icon: { name: "FaRegHospital", set: "fa" } },
   leisure: {
-    label: "Leisure Activity",
-    icon: { name: "FaRegHospital", set: "fa" },
+    label: "Leisure/Tourism",
+    icon: { name: "GiMountainRoad", set: "gi" },
   },
   commercial: {
     label: "Commercial Infra",
-    icon: { name: "RiStore3Fill", set: "ri" },
+    icon: { name: "FaStore", set: "fa" },
   },
   "industrial-hitech": {
     label: "Hitech Industrial Parks",

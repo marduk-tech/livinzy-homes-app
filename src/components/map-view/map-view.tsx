@@ -184,10 +184,13 @@ export const MapView = ({
           defaultZoom={11}
           minZoom={10}
           defaultCenter={
-            projects && projects.length == 1
+            projectId &&
+            projectData &&
+            projectData.metadata.location &&
+            projectData.metadata.location.lat
               ? {
-                  lat: projects[0].metadata.location.lat,
-                  lng: projects[0].metadata.location.lng,
+                  lat: projectData.metadata.location.lat,
+                  lng: projectData.metadata.location.lng,
                 }
               : { lat: 13.201304, lng: 77.602374 }
           }
