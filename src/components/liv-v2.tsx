@@ -55,7 +55,9 @@ const LivV2 = forwardRef(() => {
   ] = useState<string>();
 
   useEffect(() => {
-    setProjectsList(projects);
+    if (projects) {
+      setProjectsList(projects.sort((a, b) => 0.5 - Math.random()));
+    }
   }, [projects]);
 
   useEffect(() => {
@@ -379,7 +381,7 @@ const LivV2 = forwardRef(() => {
             bottom: 0,
             paddingBottom: 24,
             maxWidth: 1000,
-            paddingTop: 16,
+            paddingTop: 24,
             backgroundColor: "white",
           }}
           vertical
@@ -397,9 +399,13 @@ const LivV2 = forwardRef(() => {
               align={isMobile ? "flex-start" : "center"}
             >
               {(projectId
-                ? ["Amenities", "Cost Structure", "Location"]
+                ? [
+                    "Project amenities",
+                    "Explain cost structure",
+                    "How is the location ?",
+                  ]
                 : [
-                    "Show villa Projects",
+                    "Show me villa projects",
                     "Find homes near Nandi Hills",
                     "Properties with rental income ? ",
                   ]
@@ -410,14 +416,10 @@ const LivV2 = forwardRef(() => {
                       if (selectedProjectPredefinedQuestion == q) {
                         return;
                       }
-                      setQuestion(
-                        projectId ? `more about ${q.toLowerCase()}` : q
-                      );
+                      setQuestion(q);
                       setSelectedProjectPredefinedQuestion(q);
                       setQueryProcessing(true);
-                      handleRequest(
-                        projectId ? `more about ${q} for this project` : q
-                      );
+                      handleRequest(q);
                     }}
                     style={{
                       cursor: "pointer",
@@ -428,6 +430,7 @@ const LivV2 = forwardRef(() => {
                       border: "1px solid",
                       borderColor: COLORS.textColorDark,
                       display: "flex",
+                      fontSize: FONT_SIZE.PARA,
                     }}
                   >
                     {q}
