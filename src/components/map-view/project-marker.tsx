@@ -24,6 +24,7 @@ export const ProjectMarker = ({
     <Flex>
       <Modal
         open={modalOpen}
+        footer={null}
         onCancel={() => {
           setModalOpen(false);
         }}
