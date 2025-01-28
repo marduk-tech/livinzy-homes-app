@@ -13,7 +13,6 @@ import ProjectsViewV2 from "./projects-view-v2";
 import { ProjectCard } from "./common/project-card";
 import { LoadingOutlined } from "@ant-design/icons";
 import { MapView } from "./map-view/map-view";
-import { Project } from "../types/Project";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 
 interface AICuratedProject {
@@ -70,19 +69,6 @@ const LivV2 = forwardRef(() => {
       sessionId: historySessionId,
     });
     console.log(response);
-  };
-
-  const getProjectDrivers = (project: Project) => {
-    let projectDrivers: string[] = [];
-    if (project.livIndexScore && project.livIndexScore.score) {
-      project.livIndexScore.scoreBreakup.forEach((scoreBreakup) => {
-        projectDrivers = [
-          ...projectDrivers,
-          ...scoreBreakup.drivers.map((driver) => driver.place._id),
-        ];
-      });
-    }
-    return projectDrivers;
   };
 
   const handleRequest = async (question: string) => {
@@ -248,12 +234,14 @@ const LivV2 = forwardRef(() => {
                 gap={8}
                 style={{ alignItems: "center", marginBottom: 8 }}
               >
-                {queryProcessing ? (
-                  <Spin indicator={<LoadingOutlined spin />} size="small" />
-                ) : projectsList && projectsList.length ? (
-                  <Typography.Text style={{ color: COLORS.textColorLight }}>
-                    Showing {Math.min(projectsList.length, 20)} projects
-                  </Typography.Text>
+                {!projectId ? (
+                  queryProcessing ? (
+                    <Spin indicator={<LoadingOutlined spin />} size="small" />
+                  ) : projectsList && projectsList.length ? (
+                    <Typography.Text style={{ color: COLORS.textColorLight }}>
+                      Showing {Math.min(projectsList.length, 20)} projects
+                    </Typography.Text>
+                  ) : null
                 ) : null}
                 <Button
                   size="small"
@@ -305,10 +293,9 @@ const LivV2 = forwardRef(() => {
                   }}
                 >
                   <MapView
+                    projectId={projectId}
                     projects={[projects!.find((p: any) => p._id == projectId)!]}
-                    drivers={getProjectDrivers(
-                      projects!.find((p: any) => p._id == projectId)!
-                    )}
+                    drivers={drivers}
                     onProjectClick={() => {}}
                   />
                 </Flex>
@@ -316,7 +303,7 @@ const LivV2 = forwardRef(() => {
             ) : projectsList && projectsList.length ? (
               !toggleMapView ? (
                 <ProjectsViewV2
-                  projects={projectsList.slice(20)}
+                  projects={projectsList.slice(0, 20)}
                   projectClick={(projectId: string) => {
                     setQuestion("");
                     handleRequest(`summarize this project - ${projectId}`);
@@ -367,7 +354,7 @@ const LivV2 = forwardRef(() => {
           }}
           vertical
         >
-          {projectId || !question ? (
+          {!queryProcessing && (projectId || !question) ? (
             <Flex
               style={{
                 overflowX: "scroll",

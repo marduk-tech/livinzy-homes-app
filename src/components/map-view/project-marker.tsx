@@ -1,6 +1,6 @@
 import { CloseOutlined } from "@ant-design/icons";
-import { Flex } from "antd";
-import React from "react";
+import { Flex, Modal } from "antd";
+import React, { useState } from "react";
 import { Project } from "../../types/Project";
 import { ProjectCard } from "../common/project-card";
 import { getProjectTypeIcon } from "./project-type-icon";
@@ -9,50 +9,56 @@ import { COLORS } from "../../theme/style-constants";
 export const ProjectMarker = ({
   project,
   isExpanded,
-  onExpand,
   onProjectClick,
   showClick,
+  disableModal,
 }: {
   project: Project;
   isExpanded: boolean;
-  onExpand: () => void;
   onProjectClick: any;
   showClick: boolean;
+  disableModal: boolean;
 }) => {
-  const handleClick = () => {
-    onExpand();
-  };
-
+  const [modalOpen, setModalOpen] = useState(false);
   return (
-    <div
-      onClick={handleClick}
-      style={{
-        backgroundColor: isExpanded ? "white" : COLORS.primaryColor,
-        borderRadius: 10,
-        padding: 4,
-        whiteSpace: "nowrap",
-        cursor: "pointer",
-        overflow: "hidden",
-        position: "relative",
-        transform: isExpanded ? "scale(0.6)" : "none",
-      }}
-    >
-      {isExpanded ? (
-        <Flex>
-          <ProjectCard
-            project={project}
-            showClick={showClick}
-            onProjectClick={onProjectClick}
-          />
-        </Flex>
-      ) : (
+    <Flex>
+      <Modal
+        open={modalOpen}
+        onCancel={() => {
+          setModalOpen(false);
+        }}
+      >
+        <ProjectCard
+          fullWidth={true}
+          project={project}
+          showClick={showClick}
+          onProjectClick={onProjectClick}
+        />
+      </Modal>
+      <div
+        onClick={() => {
+          if (!disableModal) {
+            setModalOpen(true);
+          }
+        }}
+        style={{
+          backgroundColor: isExpanded ? "white" : COLORS.primaryColor,
+          borderRadius: 10,
+          padding: 4,
+          whiteSpace: "nowrap",
+          cursor: "pointer",
+          overflow: "hidden",
+          position: "relative",
+          transform: isExpanded ? "scale(0.6)" : "none",
+        }}
+      >
         <div style={{ marginTop: isExpanded ? "24px" : "0px" }}>
           <Flex justify="space-between" align="center">
             {getProjectTypeIcon(project.metadata.homeType)}
           </Flex>
         </div>
-      )}
-    </div>
+      </div>
+    </Flex>
   );
 };
 

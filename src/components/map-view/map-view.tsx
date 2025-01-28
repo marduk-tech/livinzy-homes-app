@@ -6,16 +6,16 @@ import {
   Map,
   useAdvancedMarkerRef,
 } from "@vis.gl/react-google-maps";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDevice } from "../../hooks/use-device";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
-import { Project } from "../../types/Project";
+import { IProjectDriver, Project } from "../../types/Project";
 import { ConnectivityInfra } from "./connectivity-infra";
 import { LivIndexMarker } from "./liv-index-marker";
 import { getProjectsMapData } from "./map-util";
-import { Polygon } from "./polygon";
 import { ProjectMarker } from "./project-marker";
+import { useFetchProjectById } from "../../hooks/use-project";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -76,15 +76,51 @@ const mapStyles = [
 ];
 
 export const MapView = ({
+  projectId,
   projects,
   drivers,
   onProjectClick,
 }: {
+  projectId?: string;
   projects: Project[];
   drivers: string[];
   onProjectClick?: any;
 }) => {
   const { data: livIndexPlaces } = useFetchAllLivindexPlaces();
+  const { data: projectData } = useFetchProjectById(projectId!);
+  const [mapDrivers, setMapDrivers] = useState<string[]>();
+
+  useEffect(() => {
+    if (drivers && drivers.length) {
+      setMapDrivers(drivers);
+    }
+    if (projectId) {
+      if (projectData) {
+        if (!drivers || !drivers.length) {
+          // If no drivers are passed, show project drivers.
+          let projectDrivers: string[] = [];
+          if (projectData.livIndexScore && projectData.livIndexScore.score) {
+            projectData.livIndexScore.scoreBreakup.forEach((scoreBreakup) => {
+              projectDrivers = [
+                ...projectDrivers,
+                ...scoreBreakup.drivers
+                  .sort((d1: IProjectDriver, d2: IProjectDriver) => {
+                    return (
+                      (d1.mapsDurationSeconds + d1.mapsDistanceMetres) / 2 -
+                      (d2.mapsDurationSeconds + d2.mapsDistanceMetres) / 2
+                    );
+                  })
+                  .slice(0, 4)
+                  .map((driver) => driver.place._id),
+              ];
+            });
+            setMapDrivers(projectDrivers);
+          }
+        }
+      }
+    }
+  }, [projectId, drivers, projectData]);
+
   const projectsData = getProjectsMapData({ projects: projects })
     .sort((a, b) => b.position!.lat - a.position!.lat)
     .map((dataItem, index) => ({ ...dataItem, zIndex: index }));
@@ -126,7 +162,7 @@ export const MapView = ({
       )
       .filter(
         (place) =>
-          (drivers && drivers.includes(place._id)) ||
+          (mapDrivers && mapDrivers.includes(place._id)) ||
           (place.parameters && place.parameters.growthLever === true)
       );
 
@@ -161,7 +197,7 @@ export const MapView = ({
           disableDefaultUI
         >
           {/* Sub Area Polygons */}
-          {livIndexPlaces
+          {/* {livIndexPlaces
             ?.filter((place) => place.driver == "sub-area")
             .map((area) => {
               return (
@@ -179,7 +215,7 @@ export const MapView = ({
                   strokeWeight={1}
                 />
               );
-            })}
+            })} */}
 
           {/* Project Markers */}
           {markers.map(({ id, zIndex: zIndexDefault, position, project }) => {
@@ -211,17 +247,15 @@ export const MapView = ({
                     transform: `scale(${
                       [hoverId, selectedId].includes(id) ? 1.05 : 1
                     })`,
+                    animation: projectId
+                      ? "none bounceAnimation 1s infinite"
+                      : "none",
                   }}
                 >
                   <ProjectMarker
+                    disableModal={!!projectId}
                     project={project}
                     isExpanded={expandedId === id}
-                    onExpand={() => {
-                      handleCardExpand(id);
-                      captureAnalyticsEvent("click-project-marker-mapview", {
-                        projectId: project._id,
-                      });
-                    }}
                     showClick={projects && projects.length > 1}
                     onProjectClick={() => {
                       onProjectClick(project._id);
@@ -238,7 +272,7 @@ export const MapView = ({
               (place) =>
                 place.driver !== "highway" &&
                 place.driver !== "transit" &&
-                ((drivers && drivers.includes(place._id)) ||
+                ((mapDrivers && mapDrivers.includes(place._id)) ||
                   (place.parameters && place.parameters.growthLever === true))
             )
             .map((place) => (
@@ -261,9 +295,11 @@ export const MapView = ({
             ))}
 
           {connectivityData &&
-            connectivityData.map((road) => {
+            connectivityData.map((driver) => {
               return (
-                <ConnectivityInfra connectivityData={road}></ConnectivityInfra>
+                <ConnectivityInfra
+                  connectivityData={driver}
+                ></ConnectivityInfra>
               );
             })}
         </Map>

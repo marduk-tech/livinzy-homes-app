@@ -1,5 +1,5 @@
 import { useMap } from "@vis.gl/react-google-maps";
-import { Flex, Tag } from "antd";
+import { Flex, Modal, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { Typography } from "antd";
@@ -72,7 +72,7 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
               name: featureName,
               coordinates: [coordinates],
               strokeColor:
-                feature.properties.strokeColor || COLORS.textColorLight,
+                feature.properties.strokeColor || COLORS.textColorDark,
               strokeWeight: 4,
               ...customProps,
             };
@@ -88,7 +88,7 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
               name: featureName,
               coordinates,
               strokeColor:
-                feature.properties.strokeColor || COLORS.textColorLight,
+                feature.properties.strokeColor || COLORS.textColorDark,
               strokeWeight: 4,
               ...customProps,
             };
@@ -189,75 +189,56 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
   }, []);
 
   return (
-    <>
-      <>
-        {selectedLine && popupPosition && selectedLine.name && (
-          <div
-            style={{
-              position: "fixed",
-              left: popupPosition.x,
-              top: popupPosition.y,
-              zIndex: 10,
-              borderRadius: "10px",
-              maxWidth: "300px",
-              backgroundColor: "#4c5b68",
-            }}
-          >
-            <div style={{ padding: "8px" }}>
-              <Typography.Text
-                style={{ color: "white", fontSize: FONT_SIZE.HEADING_3 }}
-              >
-                {connectivityData.name}
-              </Typography.Text>
-              <Flex
-                style={{ marginBottom: "8px", marginTop: "8px" }}
-                wrap="wrap"
-              >
-                {connectivityData?.features.length > 1 ? (
-                  <Tag
-                    color="blue"
-                    key={selectedLine.name}
-                    style={{
-                      marginRight: "4px",
-                      marginBottom: "4px",
-                      fontSize: FONT_SIZE.SUB_TEXT,
-                    }}
-                  >
-                    {selectedLine.name}
-                  </Tag>
-                ) : null}
-                <Tag
-                  color={
-                    selectedLine.dashConfig
-                      ? COLORS.yellowIdentifier
-                      : COLORS.greenIdentifier
-                  }
-                  style={{
-                    marginRight: "4px",
-                    marginBottom: "4px",
-                    fontSize: FONT_SIZE.SUB_TEXT,
-                  }}
-                >
-                  {selectedLine.dashConfig
-                    ? "Under Construction"
-                    : "Operational"}
-                </Tag>
-              </Flex>
-              <Paragraph
+    <Modal
+      title={connectivityData.name}
+      open={!!(selectedLine && selectedLine.name)}
+      style={{ padding: 0 }}
+      footer={null}
+      onCancel={() => {
+        setSelectedLine(null);
+      }}
+    >
+      {selectedLine && selectedLine.name ? (
+        <div>
+          <Flex style={{ marginBottom: "8px", marginTop: "8px" }} wrap="wrap">
+            {connectivityData?.features.length > 1 ? (
+              <Tag
+                color="blue"
+                key={selectedLine.name}
                 style={{
-                  height: 90,
-                  overflowY: "scroll",
+                  marginRight: "4px",
+                  marginBottom: "4px",
                   fontSize: FONT_SIZE.SUB_TEXT,
-                  color: "white",
                 }}
-                ellipsis={{ rows: 2, expandable: true, symbol: "more" }}
               >
-                {connectivityData?.description}
-              </Paragraph>
-            </div>
-          </div>
-        )}
-      </>
-    </>
+                {selectedLine.name}
+              </Tag>
+            ) : null}
+            <Tag
+              color={
+                selectedLine.dashConfig
+                  ? COLORS.yellowIdentifier
+                  : COLORS.greenIdentifier
+              }
+              style={{
+                marginRight: "4px",
+                marginBottom: "4px",
+                fontSize: FONT_SIZE.SUB_TEXT,
+              }}
+            >
+              {selectedLine.dashConfig ? "Under Construction" : "Operational"}
+            </Tag>
+          </Flex>
+          <Paragraph
+            style={{
+              fontSize: FONT_SIZE.PARA,
+            }}
+            ellipsis={{ rows: 5, expandable: true, symbol: "more" }}
+          >
+            {connectivityData?.description}
+          </Paragraph>
+        </div>
+      ) : null}
+    </Modal>
   );
 };

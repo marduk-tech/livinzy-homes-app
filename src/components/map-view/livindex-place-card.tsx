@@ -1,8 +1,9 @@
-import { Flex, Tag, Tooltip, Typography } from "antd";
+import { Flex, Modal, Tag, Typography } from "antd";
 import { IDriverPlace } from "../../types/Project";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
+import { useState } from "react";
 const { Paragraph } = Typography;
 
 interface LivIndexPlaceCardProps {
@@ -37,10 +38,21 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
     PLACE_TIMELINE.POST_LAUNCH,
   ].includes(place.status as any);
 
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
-    <Tooltip
-      style={{ width: 300 }}
-      title={
+    <Flex>
+      <Modal
+        style={{ width: 300 }}
+        open={modalOpen}
+        footer={null}
+        onCancel={() => {
+          setModalOpen(false);
+        }}
+        onClose={() => {
+          setModalOpen(false);
+        }}
+      >
         <Flex
           vertical
           style={{
@@ -50,9 +62,8 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
           <Flex gap={4} style={{ marginTop: 4 }} align="flex-start">
             <Typography.Text
               style={{
-                color: "white",
-                fontSize: FONT_SIZE.HEADING_3,
-                lineHeight: "100%",
+                fontSize: FONT_SIZE.HEADING_2,
+                lineHeight: "120%",
               }}
             >
               {place.name}
@@ -83,13 +94,10 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
           {place.details && place.details.oneLiner ? (
             <Paragraph
               style={{
-                color: "white",
-                height: 130,
-                overflowY: "scroll",
                 marginTop: 8,
               }}
               ellipsis={{
-                rows: 4,
+                rows: 6,
                 expandable: true,
               }}
             >
@@ -97,10 +105,11 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
             </Paragraph>
           ) : null}
         </Flex>
-      }
-      trigger="click"
-    >
+      </Modal>
       <Flex
+        onClick={() => {
+          setModalOpen(true);
+        }}
         style={{
           backgroundColor:
             place.parameters && place.parameters.growthLever
@@ -113,16 +122,11 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
             ? COLORS.borderColorDark
             : COLORS.borderColorDark,
           borderStyle: isUnderConstruction ? "dotted" : "solid",
-          animation:
-            place.parameters && place.parameters.growthLever
-              ? "none"
-              : false
-              ? "none bounceAnimation 1s infinite"
-              : "none",
+          animation: "none",
         }}
       >
         {renderIcon(place)}
       </Flex>
-    </Tooltip>
+    </Flex>
   );
 };
