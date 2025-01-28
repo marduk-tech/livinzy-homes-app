@@ -89,7 +89,7 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
                 Under Construction
               </Tag>
             ) : null}
-            {place.parameters.growthLever ? (
+            {place.parameters && place.parameters.growthLever ? (
               <Tag
                 color={COLORS.textColorDark}
                 style={{

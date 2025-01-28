@@ -190,22 +190,20 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
       const circle = new google.maps.Circle({
         center: point.coordinates,
         radius: 100,
-        strokeColor: "#008000",
-        strokeOpacity: 0.8,
+        strokeColor: "#000000",
         strokeWeight: 1,
-        fillColor: "#90ee90",
-        fillOpacity: 0.5,
+        fillColor: "white",
+        fillOpacity: 1,
         map: map,
+        zIndex: 99,
       });
 
-      circle.addListener("click", (e: any) => {
-        e.stop();
-        setSelectedLine({ name: point.name } as LineFeature);
-        setPopupPosition({
-          x: e.domEvent.clientX,
-          y: e.domEvent.clientY,
-        });
-      });
+      // circle.addListener("click", (e: any) => {
+      //   e.stop();
+      //     x: e.domEvent.clientX,
+      //     y: e.domEvent.clientY,
+      //   });
+      // });
 
       return circle;
     });
