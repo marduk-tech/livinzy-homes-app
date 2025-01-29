@@ -1,14 +1,12 @@
 import {
   EditOutlined,
   ExclamationCircleFilled,
-  HeartOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Flex, Row, Typography } from "antd";
+import { Button, Flex, Typography } from "antd";
 import confirm from "antd/es/modal/confirm";
 import { useState } from "react";
 import { Loader } from "../components/common/loader";
-import { ProjectCard } from "../components/common/project-card";
 import { ProfileEditModal } from "../components/profile-edit-modal";
 import { useAuth } from "../hooks/use-auth";
 import { useDevice } from "../hooks/use-device";
@@ -157,7 +155,7 @@ export function ProfilePage() {
           </Flex>
         </Flex>
 
-        <Flex vertical>
+        {/* <Flex vertical>
           <Typography.Title level={4}>Saved Projects</Typography.Title>
 
           <Flex
@@ -199,7 +197,7 @@ export function ProfilePage() {
               </>
             )}
           </Flex>
-        </Flex>
+        </Flex> */}
       </Flex>
     );
   }

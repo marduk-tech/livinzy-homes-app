@@ -240,10 +240,51 @@ const LivV2 = forwardRef(() => {
           </Flex>
 
           {/* Main AI Reply */}
-          <Flex style={{ padding: isMobile ? "0 16px" : 0 }}>
+          <Flex style={{ padding: isMobile ? "0 16px" : 0 }} vertical>
             <Markdown className="liviq-content">
               {projectId ? details || "" : details || PlaceholderContent}
             </Markdown>
+            <Flex
+              style={{ flexWrap: "wrap", marginTop: 0, marginBottom: 16 }}
+              gap={16}
+            >
+              {!projectId && !details
+                ? [
+                    "Show me farmlands near Nandi Hills",
+                    "How are the schools in the area ?",
+                    "Properties with rental income ? ",
+                  ].map((q) => {
+                    return (
+                      <Flex>
+                        <Typography.Text
+                          onClick={() => {
+                            if (selectedProjectPredefinedQuestion == q) {
+                              return;
+                            }
+                            setQuestion(q);
+                            setSelectedProjectPredefinedQuestion(q);
+                            setQueryProcessing(true);
+                            handleRequest(q);
+                          }}
+                          style={{
+                            cursor: "pointer",
+                            backgroundColor: "white",
+                            padding: "4px 12px",
+                            color: COLORS.textColorDark,
+                            borderRadius: 16,
+                            border: "1px solid",
+                            borderColor: COLORS.textColorDark,
+                            display: "flex",
+                            fontSize: FONT_SIZE.HEADING_4,
+                          }}
+                        >
+                          {q}
+                        </Typography.Text>
+                      </Flex>
+                    );
+                  })
+                : null}
+            </Flex>
           </Flex>
 
           {/* Dynamic Content */}
@@ -423,11 +464,7 @@ const LivV2 = forwardRef(() => {
                     "Explain cost structure",
                     "How is the location ?",
                   ]
-                : [
-                    "Show me villa projects",
-                    "Find homes near Nandi Hills",
-                    "Properties with rental income ? ",
-                  ]
+                : []
               ).map((q) => {
                 return (
                   <Typography.Text
@@ -487,7 +524,7 @@ const LivV2 = forwardRef(() => {
                 onChange={(event: any) => {
                   setQuery(event.currentTarget.value);
                 }}
-                placeholder="How can I help ?"
+                placeholder="I am Liv. How can I help ?"
                 prefix={
                   <Flex style={{ marginRight: 8 }}>
                     <DynamicReactIcon

@@ -234,4 +234,10 @@ export enum ProjectHomeType {
   PENTHOUSE = "penthouse",
 }
 
-export const PlaceholderContent = `North Bengaluru is emerging as a prime real estate destination bolstered by several significant infrastructural developments. Key commercial projects, such as **Prestige Tech Cloud and Bengaluru Signature Business Park**, are on the rise, offering vast office spaces. The area benefits from excellent connectivity through Bellary Road and Satellite Town Ring Road which handle substantial vehicular traffic. `;
+export const PlaceholderContent = `### We built AI Intelligent Assistant for North Bengaluru. We call it Liv.
+
+**Liv** is here to make your property search effortless for North Bengaluru which is rapidly emerging as a real estate hotspot, fueled by its proximity to the **Airport, KIADB Hi-Tech Park, Metro, Highways, the upcoming Foxconn Factory** and more.  
+
+
+### 💡 Ask Liv anything
+`;

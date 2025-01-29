@@ -62,33 +62,35 @@ export const DashboardLayout: React.FC = () => {
   const NavLinks = ({ navLinks }: { navLinks: NavLink[] }) => {
     return (
       <>
-        {navLinks.map((link) => (
-          <Link
-            key={link.title}
-            to={link.link || "#"}
-            onClick={() => {
-              setSidebarOpen(false);
-            }}
-            style={{ marginTop: link.alignBottom ? "auto" : "initial" }}
-          >
-            <Flex align="center" gap={8}>
-              {link.icon.name ? (
-                <DynamicReactIcon
-                  iconName={link.icon.name}
-                  iconSet={link.icon.set as any}
-                  size={16}
-                  color={COLORS.textColorDark}
-                />
-              ) : (
-                <Image width={16} src={link.icon.src}></Image>
-              )}
+        {navLinks
+          .filter((l) => l.title == "Profile")
+          .map((link) => (
+            <Link
+              key={link.title}
+              to={link.link || "#"}
+              onClick={() => {
+                setSidebarOpen(false);
+              }}
+              style={{ marginTop: link.alignBottom ? "auto" : "initial" }}
+            >
+              <Flex align="center" gap={8}>
+                {link.icon.name ? (
+                  <DynamicReactIcon
+                    iconName={link.icon.name}
+                    iconSet={link.icon.set as any}
+                    size={16}
+                    color={COLORS.textColorDark}
+                  />
+                ) : (
+                  <Image width={16} src={link.icon.src}></Image>
+                )}
 
-              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
-                {link.title}
-              </Typography.Text>
-            </Flex>
-          </Link>
-        ))}
+                <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
+                  {link.title}
+                </Typography.Text>
+              </Flex>
+            </Link>
+          ))}
       </>
     );
   };
@@ -173,6 +175,7 @@ export const DashboardLayout: React.FC = () => {
                 style={{
                   fontSize: FONT_SIZE.SUB_TEXT,
                   color: COLORS.textColorLight,
+                  marginTop: "auto",
                 }}
               >
                 Copyright @Marduk Technologies Private Ltd
@@ -182,7 +185,7 @@ export const DashboardLayout: React.FC = () => {
           <Content
             style={{
               margin: "auto",
-              marginTop: 24,
+              marginTop: 16,
               maxWidth: MAX_WIDTH,
               width: "100%",
             }}
