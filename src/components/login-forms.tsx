@@ -92,7 +92,7 @@ export function LoginForm() {
       await loginMutation
         .mutateAsync({
           code: values.otp,
-          countryCode: values.mobileNumber.countryCode,
+          mobile: values.mobileNumber,
         })
         .then((user: any) => {
           if (!user.profile?.name) {
@@ -233,10 +233,6 @@ By signing up, you agree to the terms & conditions.
                               {
                                 required: true,
                                 message: "Please input the OTP!",
-                              },
-                              {
-                                pattern: /^\d{4}$/,
-                                message: "OTP must be exactly 4 digits long!",
                               },
                             ]}
                             validateTrigger="onSubmit"

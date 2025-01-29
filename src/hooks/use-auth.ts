@@ -42,17 +42,11 @@ export function useAuth() {
   });
 
   const login = useMutation({
-    mutationFn: ({
-      code,
-      countryCode,
-    }: {
-      code: number;
-      countryCode: string;
-    }) => {
+    mutationFn: ({ code, mobile }: { code: number; mobile: string }) => {
       return axiosApiInstance.post(`/auth/otp/login`, {
         verificationId: verificationId,
         code: code,
-        countryCode: countryCode,
+        mobile: mobile,
       });
     },
 
