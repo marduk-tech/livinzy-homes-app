@@ -115,17 +115,17 @@ const LivV2 = forwardRef(() => {
             if (!projectId) {
               setProjectId(answerObj.projectId);
             }
-          } else if (answerObj.drivers && answerObj.details) {
-            if (answerObj.drivers) {
+          } else {
+            if (answerObj.drivers && answerObj.drivers.length) {
               setProjectId("");
               setDrivers(answerObj.drivers);
             }
-          } else if (
-            answerObj &&
-            !!answerObj.projects &&
-            !!answerObj.projects.length
-          ) {
-            if (answerObj.projects) {
+
+            if (
+              answerObj &&
+              !!answerObj.projects &&
+              !!answerObj.projects.length
+            ) {
               setProjectId("");
               // When projects are filtered by AI, use the new list to filter existing projects.
               const newProjects: any = [];
