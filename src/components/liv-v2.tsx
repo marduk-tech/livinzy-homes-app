@@ -247,128 +247,147 @@ const LivV2 = forwardRef(() => {
           </Flex>
 
           {/* Dynamic Content */}
-          <Flex
-            vertical
-            style={{
-              marginBottom: 16,
-              borderRadius: isMobile ? 0 : 4,
-              marginTop: 16,
-              padding: "24px 8px",
-              backgroundColor: COLORS.bgColorMedium,
-              boxShadow:
-                "inset 0 10px 10px -10px #ccc, inset 0 -10px 10px -10px #ccc",
-            }}
-          >
-            {projectId || (projectsList && projectsList.length) ? (
-              <Flex
-                align="flex-start"
-                gap={8}
-                style={{ alignItems: "center", marginBottom: 16 }}
-              >
-                {!projectId ? (
-                  queryProcessing ? (
-                    <Spin indicator={<LoadingOutlined spin />} size="small" />
-                  ) : projectsList && projectsList.length ? (
-                    <Typography.Text style={{ color: COLORS.textColorLight }}>
-                      Showing {Math.min(projectsList.length, 20)} projects
-                    </Typography.Text>
-                  ) : null
-                ) : null}
-                <Button
-                  size="small"
-                  icon={
-                    !toggleMapView ? (
-                      <DynamicReactIcon
-                        iconName="FaMap"
-                        color="primary"
-                        iconSet="fa"
-                        size={16}
-                      ></DynamicReactIcon>
-                    ) : (
-                      <DynamicReactIcon
-                        iconName="FaRegListAlt"
-                        iconSet="fa"
-                        size={16}
-                        color="primary"
-                      ></DynamicReactIcon>
-                    )
-                  }
-                  style={{
-                    borderRadius: 8,
-                    cursor: "pointer",
-                    fontSize: FONT_SIZE.SUB_TEXT,
-                    marginLeft: "auto",
-                    height: 28,
-                  }}
-                  onClick={() => {
-                    setToggleMapView(!toggleMapView);
-                  }}
-                >
-                  {toggleMapView ? (projectId ? "Gallery" : "List") : "Map"}{" "}
-                  View
-                </Button>
-              </Flex>
-            ) : null}
-            {projectId ? (
-              !toggleMapView ? (
-                <ProjectCard
-                  project={projects!.find((p: any) => p._id == projectId)!}
-                  showClick={false}
-                  fullWidth={true}
-                ></ProjectCard>
-              ) : (
+          {projectId ||
+          (projectsList && projectsList.length) ||
+          (drivers && drivers.length) ? (
+            <Flex
+              vertical
+              style={{
+                marginBottom: 16,
+                borderRadius: isMobile ? 0 : 4,
+                marginTop: 16,
+                padding: "24px 0",
+                backgroundColor: COLORS.bgColorMedium,
+                border: "1px solid",
+                borderColor: COLORS.borderColorMedium,
+                boxShadow:
+                  "inset 0 10px 10px -10px #ccc, inset 0 -10px 10px -10px #ccc",
+              }}
+            >
+              {projectId || (projectsList && projectsList.length) ? (
                 <Flex
+                  align="flex-start"
+                  gap={8}
                   style={{
-                    width: (isMobile ? window.innerWidth : MAX_WIDTH) - 16,
-                    minHeight: 300,
+                    alignItems: "center",
+                    marginBottom: 16,
+                    padding: "0 8px",
                   }}
                 >
-                  <MapView
-                    projectId={projectId}
-                    projects={[projects!.find((p: any) => p._id == projectId)!]}
-                    drivers={drivers}
-                    onProjectClick={() => {}}
-                  />
-                </Flex>
-              )
-            ) : projectsList && projectsList.length ? (
-              !toggleMapView ? (
-                <ProjectsViewV2
-                  projects={projectsList.slice(0, 20)}
-                  projectClick={(projectId: string, projectName: string) => {
-                    setQuestion(`more about ${projectName}`);
-                    setQueryProcessing(true);
-                    handleRequest(`summarize this project - ${projectId}`);
-                  }}
-                ></ProjectsViewV2>
-              ) : (
-                <Flex
-                  style={{
-                    width: (isMobile ? window.innerWidth : MAX_WIDTH) - 16,
-                    minHeight: 300,
-                  }}
-                >
-                  <MapView
-                    projects={projectsList}
-                    drivers={drivers}
-                    onProjectClick={() => {
-                      setQuestion("");
-                      handleRequest(`summarize this project - ${projectId}`);
+                  {!projectId ? (
+                    queryProcessing ? (
+                      <Spin indicator={<LoadingOutlined spin />} size="small" />
+                    ) : projectsList && projectsList.length ? (
+                      <Typography.Text style={{ color: COLORS.textColorLight }}>
+                        Showing {Math.min(projectsList.length, 20)} projects
+                      </Typography.Text>
+                    ) : null
+                  ) : null}
+                  <Button
+                    size="small"
+                    icon={
+                      !toggleMapView ? (
+                        <DynamicReactIcon
+                          iconName="FaMap"
+                          color="primary"
+                          iconSet="fa"
+                          size={16}
+                        ></DynamicReactIcon>
+                      ) : (
+                        <DynamicReactIcon
+                          iconName="FaRegListAlt"
+                          iconSet="fa"
+                          size={16}
+                          color="primary"
+                        ></DynamicReactIcon>
+                      )
+                    }
+                    style={{
+                      borderRadius: 8,
+                      cursor: "pointer",
+                      fontSize: FONT_SIZE.SUB_TEXT,
+                      marginLeft: "auto",
+                      height: 28,
                     }}
-                  />
+                    onClick={() => {
+                      setToggleMapView(!toggleMapView);
+                    }}
+                  >
+                    {toggleMapView ? (projectId ? "Gallery" : "List") : "Map"}{" "}
+                    View
+                  </Button>
                 </Flex>
-              )
-            ) : drivers && drivers.length ? (
-              <Flex
-                style={{
-                  width: (isMobile ? window.innerWidth : MAX_WIDTH) - 16,
-                  minHeight: 300,
-                }}
-              >
-                <MapView projects={[]} drivers={drivers} />{" "}
-              </Flex>
-            ) : null}
-          </Flex>
+              ) : null}
+              {projectId ? (
+                !toggleMapView ? (
+                  <Flex style={{ padding: "0 8px" }}>
+                    <ProjectCard
+                      project={projects!.find((p: any) => p._id == projectId)!}
+                      showClick={false}
+                      fullWidth={true}
+                    ></ProjectCard>
+                  </Flex>
+                ) : (
+                  <Flex
+                    style={{
+                      width: (isMobile ? window.innerWidth : MAX_WIDTH) - 16,
+                      minHeight: 300,
+                    }}
+                  >
+                    <MapView
+                      projectId={projectId}
+                      projects={[
+                        projects!.find((p: any) => p._id == projectId)!,
+                      ]}
+                      drivers={drivers}
+                      onProjectClick={() => {}}
+                    />
+                  </Flex>
+                )
+              ) : projectsList && projectsList.length ? (
+                !toggleMapView ? (
+                  <Flex style={{ padding: "0 8px" }}>
+                    <ProjectsViewV2
+                      projects={projectsList.slice(0, 20)}
+                      projectClick={(
+                        projectId: string,
+                        projectName: string
+                      ) => {
+                        setQuestion(`more about ${projectName}`);
+                        setQueryProcessing(true);
+                        handleRequest(`summarize this project - ${projectId}`);
+                      }}
+                    ></ProjectsViewV2>
+                  </Flex>
+                ) : (
+                  <Flex
+                    style={{
+                      width: isMobile ? window.innerWidth : MAX_WIDTH,
+                      minHeight: 300,
+                    }}
+                  >
+                    <MapView
+                      projects={projectsList}
+                      drivers={drivers}
+                      onProjectClick={() => {
+                        setQuestion("");
+                        handleRequest(`summarize this project - ${projectId}`);
+                      }}
+                    />
+                  </Flex>
+                )
+              ) : drivers && drivers.length ? (
+                <Flex
+                  style={{
+                    width: isMobile ? window.innerWidth : MAX_WIDTH,
+                    minHeight: 300,
+                  }}
+                >
+                  <MapView projects={[]} drivers={drivers} />{" "}
+                </Flex>
+              ) : null}
+            </Flex>
+          ) : null}
         </Flex>
 
         {/* Prompts & Input */}
