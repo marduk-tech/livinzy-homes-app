@@ -372,7 +372,7 @@ const LivV2 = forwardRef(() => {
                   <Flex
                     style={{
                       width: (isMobile ? window.innerWidth : MAX_WIDTH) - 16,
-                      minHeight: 300,
+                      minHeight: 600,
                     }}
                   >
                     <MapView
@@ -404,7 +404,7 @@ const LivV2 = forwardRef(() => {
                   <Flex
                     style={{
                       width: isMobile ? window.innerWidth : MAX_WIDTH,
-                      minHeight: 300,
+                      minHeight: 600,
                     }}
                   >
                     <MapView
