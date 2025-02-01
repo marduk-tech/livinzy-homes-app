@@ -1,4 +1,4 @@
-import { Flex, Modal, Typography } from "antd";
+import { Flex, Image, Modal, Typography } from "antd";
 import React, { useMemo } from "react";
 import { useDevice } from "../hooks/use-device";
 import "../theme/gallery.css";
@@ -65,7 +65,6 @@ export const ProjectImagesGalleryModal = ({
       centered={!isMobile}
     >
       <Flex vertical gap={32}>
-        {/* each tag sectin */}
         {Object.entries(groupedImages)
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([tag, images]) => (
@@ -81,7 +80,6 @@ export const ProjectImagesGalleryModal = ({
                 {tag}
               </Typography.Title>
 
-              {/* grid */}
               <div className="gallery-grid">
                 {images.map((item, index) => {
                   const isFirstInSection = index === 0;
@@ -92,16 +90,23 @@ export const ProjectImagesGalleryModal = ({
                         isFirstInSection ? "gallery-item-large" : ""
                       }`}
                     >
-                      <img
+                      <Image
                         src={item.image!.url}
                         alt={item.image!.caption || `${tag} image ${index + 1}`}
-                        className="gallery-image"
+                        preview={{
+                          mask: (
+                            <div className="gallery-caption">
+                              {item.image!.caption ||
+                                item.image!.tags.join(", ")}
+                            </div>
+                          ),
+                        }}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
                       />
-                      {(item.image!.caption || item.image!.tags.length > 0) && (
-                        <div className="gallery-caption">
-                          {item.image!.caption || item.image!.tags.join(", ")}
-                        </div>
-                      )}
                     </div>
                   );
                 })}
