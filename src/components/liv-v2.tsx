@@ -1,20 +1,20 @@
-import { Button, Flex, Form, Input, message, Spin, Typography } from "antd";
-import Markdown from "react-markdown";
-import DynamicReactIcon from "./common/dynamic-react-icon";
-import { forwardRef, useEffect, useState } from "react";
-import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
-import { useUser } from "../hooks/use-user";
-import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
-import { useDevice } from "../hooks/use-device";
-import { makeStreamingJsonRequest } from "http-streaming-request";
-import { baseApiUrl, PlaceholderContent } from "../libs/constants";
-import { useFetchProjects } from "../hooks/use-project";
-import ProjectsViewV2 from "./projects-view-v2";
-import { ProjectCard } from "./common/project-card";
 import { LoadingOutlined } from "@ant-design/icons";
-import { MapView } from "./map-view/map-view";
+import { Button, Flex, Form, Input, message, Spin, Typography } from "antd";
+import { makeStreamingJsonRequest } from "http-streaming-request";
+import { forwardRef, useEffect, useState } from "react";
+import Markdown from "react-markdown";
+import { useDevice } from "../hooks/use-device";
+import { useFetchProjects } from "../hooks/use-project";
+import { useUser } from "../hooks/use-user";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
+import { baseApiUrl, PlaceholderContent } from "../libs/constants";
+import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
+import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { Project } from "../types/Project";
+import DynamicReactIcon from "./common/dynamic-react-icon";
+import { ProjectCard } from "./common/project-card";
+import { MapView } from "./map-view/map-view";
+import ProjectsViewV2 from "./projects-view-v2";
 const { Paragraph } = Typography;
 
 interface AICuratedProject {
@@ -122,7 +122,7 @@ const LivV2 = forwardRef(() => {
           projectId,
         },
       });
-      let streamingTimer;
+
       try {
         for await (const data of stream) {
           console.log("received stream response: ", JSON.stringify(data));
@@ -131,14 +131,7 @@ const LivV2 = forwardRef(() => {
           setDetails(answerObj.details);
           setFollowUp(answerObj.followUp || []);
 
-          // Keep the query in a loading state until we are sure there is no more response left.
-          if (streamingTimer) {
-            setQueryProcessing(true);
-            clearTimeout(streamingTimer);
-          }
-          streamingTimer = setTimeout(() => {
-            setQueryProcessing(false);
-          }, 2000);
+          setQueryProcessing(true);
 
           if (answerObj.projectId) {
             if (!projectId) {
@@ -160,10 +153,14 @@ const LivV2 = forwardRef(() => {
             }
           }
         }
+
+        console.log("Streaming completed");
+        setQueryProcessing(false);
       } catch (err) {
         if (selectedProjectPredefinedQuestion) {
           setSelectedProjectPredefinedQuestion(undefined);
         }
+        setQueryProcessing(false);
         messageApi.open({
           type: "error",
           content: "Oops. Can you please try again ?",
