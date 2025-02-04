@@ -14,6 +14,7 @@ import { ProjectCard } from "./common/project-card";
 import { LoadingOutlined } from "@ant-design/icons";
 import { MapView } from "./map-view/map-view";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
+import { Project } from "../types/Project";
 const { Paragraph } = Typography;
 
 interface AICuratedProject {
@@ -74,6 +75,35 @@ const LivV2 = forwardRef(() => {
     console.log(response);
   };
 
+  /**
+   * Filters ai curated projects and adds original project info.
+   * @param curatedProjects
+   */
+  const refineProjectList = (
+    curatedProjects: (AICuratedProject | Project)[]
+  ) => {
+    if (
+      curatedProjects &&
+      curatedProjects.length &&
+      curatedProjects[0].relevantDetails
+    ) {
+      const formattedProjects: any = [];
+      (curatedProjects as AICuratedProject[]).forEach((p: AICuratedProject) => {
+        if (p.relevancyScore >= 3) {
+          formattedProjects.push({
+            ...projects!.find((op: any) => op._id == p.projectId),
+            ...p,
+          });
+        }
+      });
+      formattedProjects.sort((a: any, b: any) => {
+        return (b.relevancyScore || 0) - (a.relevancyScore || 0);
+      });
+      return formattedProjects;
+    }
+    return curatedProjects;
+  };
+
   const handleRequest = async (question: string) => {
     try {
       captureAnalyticsEvent("question-asked", {
@@ -92,8 +122,7 @@ const LivV2 = forwardRef(() => {
           projectId,
         },
       });
-      let isStreaming = false,
-        streamingTimer;
+      let streamingTimer;
       try {
         for await (const data of stream) {
           console.log("received stream response: ", JSON.stringify(data));
@@ -102,12 +131,12 @@ const LivV2 = forwardRef(() => {
           setDetails(answerObj.details);
           setFollowUp(answerObj.followUp || []);
 
-          isStreaming = true;
+          // Keep the query in a loading state until we are sure there is no more response left.
           if (streamingTimer) {
+            setQueryProcessing(true);
             clearTimeout(streamingTimer);
           }
           streamingTimer = setTimeout(() => {
-            isStreaming = false;
             setQueryProcessing(false);
           }, 2000);
 
@@ -127,24 +156,7 @@ const LivV2 = forwardRef(() => {
               !!answerObj.projects.length
             ) {
               setProjectId("");
-              // When projects are filtered by AI, use the new list to filter existing projects.
-              const newProjects: any = [];
-              const aiProjects = answerObj.projects || [];
-              console.log(`Total projects curated: ${aiProjects.length}`);
-              aiProjects.forEach((p: AICuratedProject) => {
-                if (p.relevancyScore >= 3) {
-                  newProjects.push({
-                    ...projects!.find((op: any) => op._id == p.projectId),
-                    ...p,
-                  });
-                }
-              });
-              console.log(`Total projects filtered: ${newProjects.length}`);
-              newProjects.sort((a: any, b: any) => {
-                return (b.relevancyScore || 0) - (a.relevancyScore || 0);
-              });
-              setProjectsList(newProjects);
-              setDrivers([]);
+              setProjectsList(answerObj.projects);
             }
           }
         }
@@ -176,6 +188,7 @@ const LivV2 = forwardRef(() => {
       }}
     >
       <Flex vertical style={{ position: "relative", height: "100%" }}>
+        {/* Single session of question / answer */}
         <Flex
           vertical
           style={{
@@ -389,7 +402,7 @@ const LivV2 = forwardRef(() => {
                 !toggleMapView ? (
                   <Flex style={{ padding: "0 8px" }}>
                     <ProjectsViewV2
-                      projects={projectsList.slice(0, 20)}
+                      projects={refineProjectList(projectsList).slice(0, 20)}
                       projectClick={(
                         projectId: string,
                         projectName: string
