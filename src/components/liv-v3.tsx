@@ -15,6 +15,7 @@ import DynamicReactIcon from "./common/dynamic-react-icon";
 import { ProjectCard } from "./common/project-card";
 import { MapView } from "./map-view/map-view";
 import ProjectsViewV2 from "./projects-view-v2";
+
 const { Paragraph } = Typography;
 
 interface AICuratedProject {
@@ -28,20 +29,9 @@ export interface LivRef {
 }
 
 export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
-  // Implement ref methods
-  useEffect(() => {
-    if (ref) {
-      (ref as any).current = {
-        summarizeProject: (projectId: string) => {
-          setQuestion("");
-          setProjectId(projectId);
-          handleRequest(`summarize this project - ${projectId}`);
-        },
-      };
-    }
-  }, [ref]);
   const [projectsList, setProjectsList] = useState<any>([]);
   const [drivers, setDrivers] = useState<string[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState<string>();
   const [projectId, setProjectId] = useState<string>("");
 
   const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
@@ -51,7 +41,6 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
 
   const { user } = useUser();
 
-  const [question, setQuestion] = useState<string>();
   const { isMobile } = useDevice();
   const [query, setQuery] = useState<string>();
   const [form] = Form.useForm();
@@ -62,6 +51,19 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
 
   const [details, setDetails] = useState<string>();
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Implement ref methods
+  useEffect(() => {
+    if (ref) {
+      (ref as any).current = {
+        summarizeProject: (projectId: string) => {
+          setCurrentQuestion("");
+          setProjectId(projectId);
+          handleRequest(`summarize this project - ${projectId}`);
+        },
+      };
+    }
+  }, [ref]);
 
   // Auto scroll to bottom when new messages arrive
   useEffect(() => {
@@ -93,16 +95,42 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
   }, [user]);
 
   const fetchHistory = async (historySessionId: string) => {
-    const response = await axiosApiInstance.post("/ai/history", {
-      sessionId: historySessionId,
-    });
-    console.log(response);
+    try {
+      const response = await axiosApiInstance.post("/ai/history", {
+        sessionId: historySessionId,
+      });
+
+      if (response.data?.data) {
+        const history = response.data.data;
+        const threads: Array<{ question: string; answer: string }> = [];
+
+        //  (human question + ai answer)
+        for (let i = 0; i < history.length; i += 2) {
+          const question = history[i];
+          const answer = history[i + 1];
+
+          if (question?.role === "human" && answer?.role === "ai") {
+            try {
+              // parse the ai response which is a json string
+              const aiResponse = JSON.parse(answer.content);
+              threads.push({
+                question: question.content,
+                answer: aiResponse.details || "",
+              });
+            } catch (e) {
+              console.error("Error parsing AI response:", e);
+            }
+          }
+        }
+
+        // update livThread with historical messages
+        setLivThread(threads);
+      }
+    } catch (error) {
+      console.error("Error fetching history:", error);
+    }
   };
 
-  /**
-   * Filters ai curated projects and adds original project info.
-   * @param curatedProjects
-   */
   const refineProjectList = (
     curatedProjects: (AICuratedProject | Project)[]
   ) => {
@@ -132,8 +160,6 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
     try {
       captureAnalyticsEvent("question-asked", { projectId, question });
       setQueryProcessing(true);
-      setProjectsList([]);
-      setDrivers([]);
       setDetails("...");
 
       const stream = makeStreamingJsonRequest({
@@ -142,30 +168,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
         payload: { question, sessionId, projectId },
       });
 
-      let finalAnswer = "";
-      for await (const data of stream) {
-        console.log("received stream response: ", JSON.stringify(data));
-        const answerObj = data;
-
-        if (answerObj.details) {
-          setDetails(answerObj.details);
-          finalAnswer = answerObj.details;
-        }
-        if (answerObj.followUp) setFollowUp(answerObj.followUp);
-
-        if (answerObj.projectId && !projectId) {
-          setProjectId(answerObj.projectId);
-        } else if (answerObj.drivers?.length) {
-          setProjectId("");
-          setDrivers(answerObj.drivers);
-        } else if (answerObj.projects?.length) {
-          setProjectId("");
-          setProjectsList(answerObj.projects);
-        }
-      }
-
-      console.log("Streaming completed");
-      setLivThread((prev) => [...prev, { question, answer: finalAnswer }]);
+      await processStream(stream, question);
     } catch (error) {
       console.error("Error sending message:", error);
       messageApi.open({
@@ -178,6 +181,319 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
     }
   };
 
+  const processStream = async (
+    stream: AsyncIterableIterator<any>,
+    question: string
+  ) => {
+    let finalAnswer = "";
+    let newFollowUp: string[] = [];
+
+    for await (const data of stream) {
+      console.log("received stream response: ", JSON.stringify(data));
+      const answerObj = data;
+
+      if (answerObj.details) {
+        setDetails(answerObj.details);
+        finalAnswer = answerObj.details;
+      }
+
+      if (answerObj.followUp) {
+        newFollowUp = answerObj.followUp;
+      }
+
+      if (answerObj.projectId && !projectId) {
+        setProjectId(answerObj.projectId);
+      } else if (answerObj.drivers?.length) {
+        setProjectId("");
+        setDrivers(answerObj.drivers);
+      } else if (answerObj.projects?.length) {
+        setProjectId("");
+        // Only update projects if we have valid data
+        const validProjects = answerObj.projects.filter((p: Project) => p); // Filter out any null/undefined entries
+        if (validProjects.length > 0) {
+          setProjectsList(validProjects);
+        }
+      }
+    }
+
+    console.log("Streaming completed");
+
+    if (newFollowUp.length) {
+      setFollowUp(newFollowUp);
+    }
+    setLivThread((prev) => [...prev, { question, answer: finalAnswer }]);
+  };
+
+  const renderMessageThread = (
+    question: string,
+    answer: string,
+    isStreaming?: boolean
+  ) => (
+    <Flex
+      vertical
+      style={{ marginBottom: 16, padding: isMobile ? "0 16px" : 0 }}
+    >
+      <Flex align="center" gap={8} style={{ padding: isMobile ? "0 16px" : 0 }}>
+        {isStreaming && (
+          <img
+            src="/images/liv-streaming.gif"
+            style={{
+              height: 28,
+              width: 28,
+            }}
+          />
+        )}
+        <Typography.Text
+          style={{
+            backgroundColor: isStreaming
+              ? COLORS.bgColor
+              : COLORS.textColorDark,
+            padding: "4px 12px",
+            borderRadius: 16,
+            border: "1px solid",
+            color: isStreaming ? COLORS.textColorLight : "white",
+            borderColor: COLORS.borderColorMedium,
+            display: "inline",
+            alignSelf: "flex-start",
+            marginTop: 8,
+            marginBottom: 8,
+          }}
+        >
+          {question}
+        </Typography.Text>
+      </Flex>
+      {answer && (
+        <Flex style={{ padding: isMobile ? "0 16px" : 0 }} vertical>
+          <Markdown className="liviq-content">{answer}</Markdown>
+        </Flex>
+      )}
+    </Flex>
+  );
+
+  const renderQuestionAnswerSection = () => {
+    return (
+      <Flex
+        ref={chatContainerRef}
+        vertical
+        style={{
+          height: window.innerHeight - 60,
+          overflowY: "auto",
+          scrollbarWidth: "none",
+          paddingBottom: 150,
+          scrollBehavior: "smooth",
+        }}
+      >
+        <div>
+          <Markdown className="liviq-content">{PlaceholderContent}</Markdown>
+        </div>
+
+        <Flex
+          style={{ flexWrap: "wrap", marginTop: 0, marginBottom: 16 }}
+          gap={16}
+        >
+          {!projectId && !details
+            ? [
+                "Show me farmlands near Nandi Hills",
+                "How are the schools in the area ?",
+                "Properties with rental income ? ",
+              ].map((q) => {
+                return (
+                  <Flex>
+                    <Typography.Text
+                      onClick={() => {
+                        if (selectedProjectPredefinedQuestion == q) {
+                          return;
+                        }
+                        setCurrentQuestion(q);
+                        setSelectedProjectPredefinedQuestion(q);
+                        setQueryProcessing(true);
+                        handleRequest(q);
+                      }}
+                      style={{
+                        cursor: "pointer",
+                        backgroundColor: "white",
+                        padding: "4px 12px",
+                        color: COLORS.textColorDark,
+                        borderRadius: 16,
+                        border: "1px solid",
+                        borderColor: COLORS.textColorDark,
+                        display: "flex",
+                        fontSize: FONT_SIZE.HEADING_4,
+                      }}
+                    >
+                      {q}
+                    </Typography.Text>
+                  </Flex>
+                );
+              })
+            : null}
+        </Flex>
+
+        {/* Past Interactions */}
+        {livThread.map((thread, index) =>
+          renderMessageThread(thread.question, thread.answer)
+        )}
+        {/* {livThread.length > 0 &&
+          renderMessageThread(
+            livThread[livThread.length - 1].question,
+            livThread[livThread.length - 1].answer
+          )} */}
+
+        {/* Current Question & Answer (Only show while processing) */}
+        {queryProcessing &&
+          currentQuestion &&
+          renderMessageThread(currentQuestion, details || "", true)}
+
+        {/* Dynamic Content */}
+        {projectId ||
+        (projectsList && projectsList.length) ||
+        (drivers && drivers.length) ? (
+          <Flex
+            vertical
+            style={{
+              marginBottom: 16,
+              borderRadius: isMobile ? 0 : 4,
+              marginTop: 16,
+              padding: "24px 0",
+              backgroundColor: COLORS.bgColorMedium,
+              border: "1px solid",
+              borderColor: COLORS.borderColorMedium,
+              boxShadow:
+                "inset 0 10px 10px -10px #ccc, inset 0 -10px 10px -10px #ccc",
+            }}
+          >
+            {projectId || (projectsList && projectsList.length) ? (
+              <Flex
+                align="flex-start"
+                gap={8}
+                style={{
+                  alignItems: "center",
+                  marginBottom: 16,
+                  padding: "0 8px",
+                }}
+              >
+                {!projectId ? (
+                  queryProcessing ? (
+                    <Spin indicator={<LoadingOutlined spin />} size="small" />
+                  ) : projectsList && projectsList.length ? (
+                    <Typography.Text style={{ color: COLORS.textColorLight }}>
+                      Showing {Math.min(projectsList.length, 20)} projects
+                    </Typography.Text>
+                  ) : null
+                ) : null}
+                <Button
+                  size="small"
+                  icon={
+                    !toggleMapView ? (
+                      <DynamicReactIcon
+                        iconName="FaMap"
+                        color="primary"
+                        iconSet="fa"
+                        size={16}
+                      ></DynamicReactIcon>
+                    ) : (
+                      <DynamicReactIcon
+                        iconName="FaRegListAlt"
+                        iconSet="fa"
+                        size={16}
+                        color="primary"
+                      ></DynamicReactIcon>
+                    )
+                  }
+                  style={{
+                    borderRadius: 8,
+                    cursor: "pointer",
+                    fontSize: FONT_SIZE.SUB_TEXT,
+                    marginLeft: "auto",
+                    height: 28,
+                  }}
+                  onClick={() => {
+                    setToggleMapView(!toggleMapView);
+                  }}
+                >
+                  {toggleMapView ? (projectId ? "Gallery" : "List") : "Map"}{" "}
+                  View
+                </Button>
+              </Flex>
+            ) : null}
+            {projectId ? (
+              !toggleMapView ? (
+                <Flex style={{ padding: "0 8px" }}>
+                  <ProjectCard
+                    project={projects!.find((p: any) => p._id == projectId)!}
+                    showClick={false}
+                    fullWidth={true}
+                  ></ProjectCard>
+                </Flex>
+              ) : (
+                <Flex
+                  style={{
+                    width: (isMobile ? window.innerWidth : MAX_WIDTH) - 16,
+                    minHeight: 600,
+                  }}
+                >
+                  <MapView
+                    projectId={projectId}
+                    projects={[projects!.find((p: any) => p._id == projectId)!]}
+                    drivers={drivers}
+                    onProjectClick={(clickedProjectId: string) => {
+                      setProjectId(clickedProjectId);
+                      setCurrentQuestion("");
+                      handleRequest(
+                        `summarize this project - ${clickedProjectId}`
+                      );
+                    }}
+                  />
+                </Flex>
+              )
+            ) : projectsList && projectsList.length ? (
+              !toggleMapView ? (
+                <Flex style={{ padding: "0 8px" }}>
+                  <ProjectsViewV2
+                    projects={refineProjectList(projectsList).slice(0, 20)}
+                    projectClick={(projectId: string, projectName: string) => {
+                      setCurrentQuestion(`more about ${projectName}`);
+                      setQueryProcessing(true);
+                      handleRequest(`summarize this project - ${projectId}`);
+                    }}
+                  ></ProjectsViewV2>
+                </Flex>
+              ) : (
+                <Flex
+                  style={{
+                    width: isMobile ? window.innerWidth : MAX_WIDTH,
+                    minHeight: 600,
+                  }}
+                >
+                  <MapView
+                    projects={projectsList}
+                    drivers={drivers}
+                    onProjectClick={(clickedProjectId: string) => {
+                      setProjectId(clickedProjectId);
+                      setCurrentQuestion("");
+                      handleRequest(
+                        `summarize this project - ${clickedProjectId}`
+                      );
+                    }}
+                  />
+                </Flex>
+              )
+            ) : drivers && drivers.length ? (
+              <Flex
+                style={{
+                  width: isMobile ? window.innerWidth : MAX_WIDTH,
+                  minHeight: 300,
+                }}
+              >
+                <MapView projects={[]} drivers={drivers} />
+              </Flex>
+            ) : null}
+          </Flex>
+        ) : null}
+      </Flex>
+    );
+  };
+
   return (
     <Flex
       vertical
@@ -186,279 +502,8 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
       }}
     >
       <Flex vertical style={{ position: "relative", height: "100%" }}>
-        {livThread.length === 0 && !queryProcessing && (
-          <Markdown className="liviq-content">{PlaceholderContent}</Markdown>
-        )}
-
         {/* Single session of question / answer */}
-        <Flex
-          ref={chatContainerRef}
-          vertical
-          style={{
-            height: window.innerHeight - 60,
-            overflowY: "auto",
-            scrollbarWidth: "none",
-            paddingBottom: 150,
-            scrollBehavior: "smooth",
-          }}
-        >
-          {/* Past Interactions */}
-          {livThread.map((thread, index) => (
-            <Flex
-              key={index}
-              vertical
-              style={{ marginBottom: 16, padding: isMobile ? "0 16px" : 0 }}
-            >
-              <Typography.Text
-                style={{
-                  backgroundColor: COLORS.textColorDark,
-                  padding: "4px 12px",
-                  borderRadius: 16,
-                  border: "1px solid",
-                  color: "white",
-                  borderColor: COLORS.borderColorMedium,
-                  display: "inline",
-                  alignSelf: "flex-start",
-                  marginTop: 8,
-                  marginBottom: 8,
-                }}
-              >
-                {thread.question}
-              </Typography.Text>
-              <Flex style={{ padding: isMobile ? "0 16px" : 0 }} vertical>
-                <Markdown className="liviq-content">
-                  {thread.answer || ""}
-                </Markdown>
-              </Flex>
-            </Flex>
-          ))}
-
-          {/* Current Question & Answer (Only show while processing) */}
-          {queryProcessing && question && (
-            <Flex vertical style={{ marginBottom: 16 }}>
-              {/* Question */}
-              <Flex
-                align="center"
-                gap={8}
-                style={{ padding: isMobile ? "0 16px" : 0 }}
-              >
-                <img
-                  src="/images/liv-streaming.gif"
-                  style={{
-                    height: 28,
-                    width: 28,
-                  }}
-                />
-                <Typography.Text
-                  style={{
-                    backgroundColor: COLORS.bgColor,
-                    padding: "4px 12px",
-                    borderRadius: 16,
-                    border: "1px solid",
-                    color: COLORS.textColorLight,
-                    borderColor: COLORS.borderColorMedium,
-                    display: "inline",
-                    marginTop: 8,
-                    marginBottom: 8,
-                  }}
-                >
-                  {question}
-                </Typography.Text>
-              </Flex>
-              {/* Answer */}
-              {details && (
-                <Flex style={{ padding: isMobile ? "0 16px" : 0 }} vertical>
-                  <Markdown className="liviq-content">{details}</Markdown>
-                </Flex>
-              )}
-            </Flex>
-          )}
-
-          <Flex
-            style={{ flexWrap: "wrap", marginTop: 0, marginBottom: 16 }}
-            gap={16}
-          >
-            {!projectId && !details
-              ? [
-                  "Show me farmlands near Nandi Hills",
-                  "How are the schools in the area ?",
-                  "Properties with rental income ? ",
-                ].map((q, index) => {
-                  return (
-                    <Flex key={index}>
-                      <Typography.Text
-                        onClick={() => {
-                          if (selectedProjectPredefinedQuestion == q) {
-                            return;
-                          }
-                          setQuestion(q);
-                          setSelectedProjectPredefinedQuestion(q);
-                          setQueryProcessing(true);
-                          handleRequest(q);
-                        }}
-                        style={{
-                          cursor: "pointer",
-                          backgroundColor: "white",
-                          padding: "4px 12px",
-                          color: COLORS.textColorDark,
-                          borderRadius: 16,
-                          border: "1px solid",
-                          borderColor: COLORS.textColorDark,
-                          display: "flex",
-                          fontSize: FONT_SIZE.HEADING_4,
-                        }}
-                      >
-                        {q}
-                      </Typography.Text>
-                    </Flex>
-                  );
-                })
-              : null}
-          </Flex>
-
-          {/* Dynamic Content */}
-          {projectId ||
-          (projectsList && projectsList.length) ||
-          (drivers && drivers.length) ? (
-            <Flex
-              vertical
-              style={{
-                marginBottom: 16,
-                borderRadius: isMobile ? 0 : 4,
-                marginTop: 16,
-                padding: "24px 0",
-                backgroundColor: COLORS.bgColorMedium,
-                border: "1px solid",
-                borderColor: COLORS.borderColorMedium,
-                boxShadow:
-                  "inset 0 10px 10px -10px #ccc, inset 0 -10px 10px -10px #ccc",
-              }}
-            >
-              {projectId || (projectsList && projectsList.length) ? (
-                <Flex
-                  align="flex-start"
-                  gap={8}
-                  style={{
-                    alignItems: "center",
-                    marginBottom: 16,
-                    padding: "0 8px",
-                  }}
-                >
-                  {!projectId ? (
-                    queryProcessing ? (
-                      <Spin indicator={<LoadingOutlined spin />} size="small" />
-                    ) : projectsList && projectsList.length ? (
-                      <Typography.Text style={{ color: COLORS.textColorLight }}>
-                        Showing {Math.min(projectsList.length, 20)} projects
-                      </Typography.Text>
-                    ) : null
-                  ) : null}
-                  <Button
-                    size="small"
-                    icon={
-                      !toggleMapView ? (
-                        <DynamicReactIcon
-                          iconName="FaMap"
-                          color="primary"
-                          iconSet="fa"
-                          size={16}
-                        ></DynamicReactIcon>
-                      ) : (
-                        <DynamicReactIcon
-                          iconName="FaRegListAlt"
-                          iconSet="fa"
-                          size={16}
-                          color="primary"
-                        ></DynamicReactIcon>
-                      )
-                    }
-                    style={{
-                      borderRadius: 8,
-                      cursor: "pointer",
-                      fontSize: FONT_SIZE.SUB_TEXT,
-                      marginLeft: "auto",
-                      height: 28,
-                    }}
-                    onClick={() => {
-                      setToggleMapView(!toggleMapView);
-                    }}
-                  >
-                    {toggleMapView ? (projectId ? "Gallery" : "List") : "Map"}{" "}
-                    View
-                  </Button>
-                </Flex>
-              ) : null}
-              {projectId ? (
-                !toggleMapView ? (
-                  <Flex style={{ padding: "0 8px" }}>
-                    <ProjectCard
-                      project={projects!.find((p: any) => p._id == projectId)!}
-                      showClick={false}
-                      fullWidth={true}
-                    ></ProjectCard>
-                  </Flex>
-                ) : (
-                  <Flex
-                    style={{
-                      width: (isMobile ? window.innerWidth : MAX_WIDTH) - 16,
-                      minHeight: 600,
-                    }}
-                  >
-                    <MapView
-                      projectId={projectId}
-                      projects={[
-                        projects!.find((p: any) => p._id == projectId)!,
-                      ]}
-                      drivers={drivers}
-                      onProjectClick={() => {}}
-                    />
-                  </Flex>
-                )
-              ) : projectsList && projectsList.length ? (
-                !toggleMapView ? (
-                  <Flex style={{ padding: "0 8px" }}>
-                    <ProjectsViewV2
-                      projects={refineProjectList(projectsList).slice(0, 20)}
-                      projectClick={(
-                        projectId: string,
-                        projectName: string
-                      ) => {
-                        setQuestion(`more about ${projectName}`);
-                        setQueryProcessing(true);
-                        handleRequest(`summarize this project - ${projectId}`);
-                      }}
-                    ></ProjectsViewV2>
-                  </Flex>
-                ) : (
-                  <Flex
-                    style={{
-                      width: isMobile ? window.innerWidth : MAX_WIDTH,
-                      minHeight: 600,
-                    }}
-                  >
-                    <MapView
-                      projects={projectsList}
-                      drivers={drivers}
-                      onProjectClick={() => {
-                        setQuestion("");
-                        handleRequest(`summarize this project - ${projectId}`);
-                      }}
-                    />
-                  </Flex>
-                )
-              ) : drivers && drivers.length ? (
-                <Flex
-                  style={{
-                    width: isMobile ? window.innerWidth : MAX_WIDTH,
-                    minHeight: 300,
-                  }}
-                >
-                  <MapView projects={[]} drivers={drivers} />{" "}
-                </Flex>
-              ) : null}
-            </Flex>
-          ) : null}
-        </Flex>
+        {renderQuestionAnswerSection()}
 
         {/* Prompts & Input */}
         <Flex
@@ -475,7 +520,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
           }}
           vertical
         >
-          {!queryProcessing && (projectId || !question) ? (
+          {!queryProcessing && (projectId || !currentQuestion) ? (
             <Flex
               style={{
                 overflowX: "scroll",
@@ -501,7 +546,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
                       if (selectedProjectPredefinedQuestion == q) {
                         return;
                       }
-                      setQuestion(q);
+                      setCurrentQuestion(q);
                       setSelectedProjectPredefinedQuestion(q);
                       setQueryProcessing(true);
                       handleRequest(q);
@@ -530,7 +575,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
             onFinish={async (value) => {
               form.resetFields();
               const { question } = value;
-              setQuestion(question);
+              setCurrentQuestion(question);
               setQueryProcessing(true);
               handleRequest(question);
             }}
@@ -588,3 +633,5 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
     </Flex>
   );
 });
+
+export default LivV3;
