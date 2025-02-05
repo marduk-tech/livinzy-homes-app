@@ -10,6 +10,8 @@ import { ProfilePage } from "../pages/profile-page";
 import { SignUpForm } from "../pages/signup";
 
 import LivV2 from "../components/liv-v2";
+import { LivV3 } from "../components/liv-v3";
+
 export const Router = () => {
   return (
     <Routes>
@@ -19,7 +21,7 @@ export const Router = () => {
       />
       <Route element={<DashboardLayout />}>
         <Route path="/livindex-places" element={<LivindexPlaces />} />
-        <Route path="/" element={<LivV2 />} />
+        <Route path="/" element={<LivV3 />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/*" element={<div>404</div>} />{" "}
       </Route>
