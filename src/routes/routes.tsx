@@ -9,8 +9,7 @@ import { LivindexPlaces } from "../pages/livindex-places";
 import { ProfilePage } from "../pages/profile-page";
 import { SignUpForm } from "../pages/signup";
 
-import LivV2 from "../components/liv-v2";
-import { LivV3 } from "../components/liv-v3";
+import { LivV3 } from "../components/liv/liv-v3";
 
 export const Router = () => {
   return (
