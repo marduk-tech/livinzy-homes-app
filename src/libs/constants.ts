@@ -234,7 +234,7 @@ export enum ProjectHomeType {
   PENTHOUSE = "penthouse",
 }
 
-export const PlaceholderContent = `### We built an AI Intelligent Assistant for North Bengaluru. We call it Liv.
+export const PlaceholderContent = `# Liv is the AI Agent for Real Estate.
 
 **Liv** is here to make your property search effortless for North Bengaluru which is rapidly emerging as a real estate hotspot, fueled by its proximity to the **Airport, KIADB Hi-Tech Park, Metro, Highways, the upcoming Foxconn Factory** and more.  
 

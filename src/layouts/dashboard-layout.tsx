@@ -1,14 +1,14 @@
 import { Drawer, Flex, Image, Layout, Modal, Typography } from "antd";
 import React, { useEffect, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { LoginForm } from "../components/login-forms";
 import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
+import { LocalStorageKeys } from "../libs/constants";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { NavLink } from "../types/Common";
-import { LocalStorageKeys } from "../libs/constants";
 
 const { Header, Content } = Layout;
 
@@ -18,6 +18,7 @@ export const DashboardLayout: React.FC = () => {
   const { user } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const userItem = localStorage.getItem(LocalStorageKeys.user);
@@ -42,6 +43,11 @@ export const DashboardLayout: React.FC = () => {
       icon: { name: "FaRegUserCircle", set: "fa" },
     },
     {
+      title: "Chat History",
+      link: "/user-sessions",
+      icon: { name: "RiHistoryLine", set: "ri" },
+    },
+    {
       title: "Learn",
       link: "https://learn.livinzy.com/",
       icon: { src: "./images/livology-icon.png" },
@@ -63,7 +69,8 @@ export const DashboardLayout: React.FC = () => {
     return (
       <>
         {navLinks
-          .filter((l) => l.title == "Profile")
+          .filter((l) => l.title === "Profile" || l.title === "Chat History")
+
           .map((link) => (
             <Link
               key={link.title}
@@ -131,16 +138,22 @@ export const DashboardLayout: React.FC = () => {
               borderBottomColor: COLORS.borderColor,
             }}
           >
-            <Flex align="center" justify="space-between" style={{ height: 60 }}>
-              <Link
-                to="/"
+            <Flex
+              align="center"
+              justify="space-between"
+              style={{ height: 60, cursor: "pointer" }}
+            >
+              <Flex
+                onClick={() => {
+                  window.location.replace("/");
+                }}
                 style={{ height: 60, display: "flex", alignItems: "center" }}
               >
                 <img
                   src="/logo-name.png"
                   style={{ height: 30, width: "auto", marginLeft: -8 }}
                 ></img>
-              </Link>
+              </Flex>
 
               {user && (
                 <Flex
@@ -190,7 +203,6 @@ export const DashboardLayout: React.FC = () => {
               width: "100%",
             }}
           >
-            {/* <Menu mode="horizontal" items={menuItems} /> */}
             <CustomErrorBoundary>
               <Outlet />
             </CustomErrorBoundary>
