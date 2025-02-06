@@ -6,9 +6,9 @@ import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { LoginForm } from "../components/login-forms";
 import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
+import { LocalStorageKeys } from "../libs/constants";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { NavLink } from "../types/Common";
-import { LocalStorageKeys } from "../libs/constants";
 
 const { Header, Content } = Layout;
 
@@ -42,6 +42,11 @@ export const DashboardLayout: React.FC = () => {
       icon: { name: "FaRegUserCircle", set: "fa" },
     },
     {
+      title: "Chat History",
+      link: "/user-sessions",
+      icon: { name: "RiHistoryLine", set: "ri" },
+    },
+    {
       title: "Learn",
       link: "https://learn.livinzy.com/",
       icon: { src: "./images/livology-icon.png" },
@@ -63,7 +68,8 @@ export const DashboardLayout: React.FC = () => {
     return (
       <>
         {navLinks
-          .filter((l) => l.title == "Profile")
+          .filter((l) => l.title === "Profile" || l.title === "Chat History")
+
           .map((link) => (
             <Link
               key={link.title}
@@ -190,7 +196,6 @@ export const DashboardLayout: React.FC = () => {
               width: "100%",
             }}
           >
-            {/* <Menu mode="horizontal" items={menuItems} /> */}
             <CustomErrorBoundary>
               <Outlet />
             </CustomErrorBoundary>

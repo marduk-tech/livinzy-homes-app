@@ -3,6 +3,7 @@ import { Button, Flex, Form, Input, message, Spin, Typography } from "antd";
 import { makeStreamingJsonRequest } from "http-streaming-request";
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
+import { v4 as uuidv4 } from "uuid";
 import { useDevice } from "../hooks/use-device";
 import { useFetchProjects } from "../hooks/use-project";
 import { useUser } from "../hooks/use-user";
@@ -36,7 +37,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
 
   const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
 
-  const [sessionId, setSessionId] = useState<string>();
+  const [sessionId, setSessionId] = useState<string>(() => uuidv4());
   const [queryProcessing, setQueryProcessing] = useState<boolean>(false);
 
   const { user } = useUser();
@@ -89,7 +90,6 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
 
   useEffect(() => {
     if (user && user?._id) {
-      setSessionId(user._id);
       fetchHistory(user._id);
     }
   }, [user]);
@@ -156,11 +156,28 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
     return curatedProjects;
   };
 
+  // Track if first question in session
+  const [isFirstQuestion, setIsFirstQuestion] = useState<boolean>(true);
+
   const handleRequest = async (question: string) => {
     try {
       captureAnalyticsEvent("question-asked", { projectId, question });
       setQueryProcessing(true);
       setDetails("...");
+
+      // If this is first question, store session info
+      if (isFirstQuestion && user?._id) {
+        try {
+          await axiosApiInstance.put(`/user/${user._id}/chat-session`, {
+            userId: user._id,
+            sessionId,
+            startingQuestion: question,
+          });
+          setIsFirstQuestion(false);
+        } catch (error) {
+          console.log("Error saving chat session:", error);
+        }
+      }
 
       const stream = makeStreamingJsonRequest({
         url: `${baseApiUrl}ai/ask-stream`,

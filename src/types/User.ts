@@ -1,3 +1,9 @@
+export interface ChatSession {
+  sessionId: string;
+  startingQuestion: string;
+  createdAt: string;
+}
+
 export interface User {
   _id: string;
   mobile: string;
@@ -7,6 +13,7 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   savedProjects: string[];
+  chatSessions: ChatSession[];
   profile: Profile;
 }
 
