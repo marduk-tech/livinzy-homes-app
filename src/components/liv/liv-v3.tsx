@@ -12,6 +12,8 @@ import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import ThreadMsg from "./thread-msg";
+import { useParams } from "react-router-dom";
+import { Loader } from "../common/loader";
 
 const { Paragraph } = Typography;
 
@@ -37,8 +39,12 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
 
   const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
 
-  const [sessionId, setSessionId] = useState<string>(() => uuidv4());
+  const [currentSessionId, setCurrentSessionId] = useState<string>(() =>
+    uuidv4()
+  );
   const [queryStreaming, setQueryStreaming] = useState<boolean>(false);
+  const { sessionId } = useParams();
+  const [loadingLivThread, setLoadingLivThread] = useState(false);
 
   const { user } = useUser();
 
@@ -60,20 +66,21 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
   ] = useState<string>();
 
   useEffect(() => {
-    if (user && user?._id) {
-      // fetchHistory(user._id);
+    if (sessionId && !livThread.length && !loadingLivThread) {
+      fetchHistory(sessionId);
     }
-  }, [user]);
+  }, [sessionId]);
 
   const fetchHistory = async (historySessionId: string) => {
     try {
+      setLoadingLivThread(true);
       const response = await axiosApiInstance.post("/ai/history", {
         sessionId: historySessionId,
       });
 
       if (response.data?.data) {
         const history = response.data.data;
-        const threads: Array<{ question: string; answer: string }> = [];
+        const threads: Array<{ question: string; answer: LivAnswer }> = [];
 
         //  (human question + ai answer)
         for (let i = 0; i < history.length; i += 2) {
@@ -86,7 +93,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
               const aiResponse = JSON.parse(answer.content);
               threads.push({
                 question: question.content,
-                answer: aiResponse.details || "",
+                answer: aiResponse,
               });
             } catch (e) {
               console.error("Error parsing AI response:", e);
@@ -97,6 +104,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
         // update livThread with historical messages
         setLivThread(threads);
       }
+      setLoadingLivThread(false);
     } catch (error) {
       console.error("Error fetching history:", error);
     }
@@ -128,7 +136,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
         try {
           await axiosApiInstance.put(`/user/${user._id}/chat-session`, {
             userId: user._id,
-            sessionId,
+            sessionId: currentSessionId,
             startingQuestion: question,
           });
           setIsFirstQuestion(false);
@@ -140,7 +148,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
       const stream = makeStreamingJsonRequest({
         url: `${baseApiUrl}ai/ask-stream`,
         method: "POST",
-        payload: { question, sessionId },
+        payload: { question, sessionId: currentSessionId },
       });
 
       for await (const data of stream) {
@@ -268,6 +276,10 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
       </Flex>
     );
   };
+
+  if (loadingLivThread) {
+    return <Loader></Loader>;
+  }
 
   return (
     <Flex

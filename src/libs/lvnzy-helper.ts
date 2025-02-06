@@ -1,5 +1,6 @@
 import posthog from "posthog-js";
 import { env } from "./constants";
+import { useLocation } from "react-router-dom";
 
 export const nestedPropertyAccessor = (
   record: any,
@@ -14,6 +15,10 @@ export const nestedPropertyAccessor = (
     return record[keys];
   }
 };
+
+export function useUrlParams() {
+  return new URLSearchParams(useLocation().search);
+}
 
 export const capitalize = (input: string) => {
   if (!input) {

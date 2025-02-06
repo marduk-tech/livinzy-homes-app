@@ -1,6 +1,6 @@
 import { Drawer, Flex, Image, Layout, Modal, Typography } from "antd";
 import React, { useEffect, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { LoginForm } from "../components/login-forms";
@@ -18,6 +18,7 @@ export const DashboardLayout: React.FC = () => {
   const { user } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const userItem = localStorage.getItem(LocalStorageKeys.user);
@@ -137,16 +138,22 @@ export const DashboardLayout: React.FC = () => {
               borderBottomColor: COLORS.borderColor,
             }}
           >
-            <Flex align="center" justify="space-between" style={{ height: 60 }}>
-              <Link
-                to="/"
+            <Flex
+              align="center"
+              justify="space-between"
+              style={{ height: 60, cursor: "pointer" }}
+            >
+              <Flex
+                onClick={() => {
+                  window.location.replace("/");
+                }}
                 style={{ height: 60, display: "flex", alignItems: "center" }}
               >
                 <img
                   src="/logo-name.png"
                   style={{ height: 30, width: "auto", marginLeft: -8 }}
                 ></img>
-              </Link>
+              </Flex>
 
               {user && (
                 <Flex

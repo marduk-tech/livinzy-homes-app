@@ -21,7 +21,7 @@ export const Router = () => {
       />
       <Route element={<DashboardLayout />}>
         <Route path="/livindex-places" element={<LivindexPlaces />} />
-        <Route path="/" element={<LivV3 />} />
+        <Route path="/:sessionId?" element={<LivV3 />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/user-sessions" element={<UserSessions />} />
         <Route path="/*" element={<div>404</div>} />

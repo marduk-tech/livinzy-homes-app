@@ -2,6 +2,8 @@ import { RightOutlined } from "@ant-design/icons";
 import { Empty, List, Spin, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../hooks/use-user";
+import { FONT_SIZE } from "../theme/style-constants";
+import DateObject from "react-date-object";
 
 const { Paragraph } = Typography;
 
@@ -42,9 +44,9 @@ export default function UserSessions() {
     <div style={{ padding: "24px", maxWidth: "800px", margin: "0 auto" }}>
       <div style={{ marginBottom: "24px" }}>
         <Typography.Title level={2}>Your Chat History</Typography.Title>
-        <Typography.Text type="secondary">
+        {/* <Typography.Text type="secondary">
           Here are all your previous conversations with Liv
-        </Typography.Text>
+        </Typography.Text> */}
       </div>
       <List
         size="large"
@@ -52,15 +54,18 @@ export default function UserSessions() {
         style={{
           backgroundColor: "#fff",
           borderRadius: "8px",
+          height: 500,
+          scrollbarWidth: "none",
+          overflowY: "scroll",
         }}
         dataSource={sortedSessions}
         renderItem={(session) => (
           <List.Item
             style={{
-              padding: "16px 24px",
+              padding: 16,
               cursor: "pointer",
             }}
-            onClick={() => navigate(`/?sessionId=${session.sessionId}`)}
+            onClick={() => navigate(`/${session.sessionId}`)}
             actions={[
               <RightOutlined key="open" style={{ color: "#8c8c8c" }} />,
             ]}
@@ -68,19 +73,23 @@ export default function UserSessions() {
             <List.Item.Meta
               title={
                 <Paragraph
-                  ellipsis={{ rows: 2 }}
+                  ellipsis={{ rows: 1 }}
                   style={{
                     margin: 0,
-                    fontSize: "16px",
-                    color: "#262626",
+                    fontSize: FONT_SIZE.HEADING_4,
                   }}
                 >
                   {session.startingQuestion}
                 </Paragraph>
               }
               description={
-                <Typography.Text type="secondary" style={{ fontSize: "14px" }}>
-                  {new Date(session.createdAt).toLocaleString()}
+                <Typography.Text
+                  type="secondary"
+                  style={{ fontSize: FONT_SIZE.PARA }}
+                >
+                  {new DateObject(session.createdAt).format(
+                    "dddd DD MMM, hh:mm a"
+                  )}
                 </Typography.Text>
               }
             />
