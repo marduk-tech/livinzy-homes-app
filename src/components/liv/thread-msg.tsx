@@ -62,10 +62,7 @@ const ThreadMsg: React.FC<{
   }, [question]);
 
   return (
-    <Flex
-      vertical
-      style={{ marginBottom: 16, padding: isMobile ? "0 16px" : 0 }}
-    >
+    <Flex vertical style={{ marginBottom: 16, padding: 0 }}>
       <Flex align="center" gap={8} style={{ padding: isMobile ? "0 16px" : 0 }}>
         {streaming && (
           <img

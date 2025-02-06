@@ -1,13 +1,12 @@
 import { Button, Flex, Form, Input, message, Typography } from "antd";
 import { makeStreamingJsonRequest } from "http-streaming-request";
 import { forwardRef, useEffect, useRef, useState } from "react";
-import Markdown from "react-markdown";
 import { v4 as uuidv4 } from "uuid";
 import { useDevice } from "../../hooks/use-device";
 import { useFetchProjects } from "../../hooks/use-project";
 import { useUser } from "../../hooks/use-user";
 import { axiosApiInstance } from "../../libs/axios-api-Instance";
-import { baseApiUrl, PlaceholderContent } from "../../libs/constants";
+import { baseApiUrl } from "../../libs/constants";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
@@ -211,13 +210,38 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
             )}
           </>
         ) : (
-          <>
+          <Flex vertical style={{ padding: isMobile ? "0 16px" : 0 }}>
             {" "}
-            <div>
-              <Markdown className="liviq-content">
-                {PlaceholderContent}
-              </Markdown>
-            </div>
+            <Flex vertical>
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.HEADING_1,
+                  lineHeight: "120%",
+                  marginBottom: 16,
+                  marginTop: 8,
+                }}
+              >
+                Liv is an AI intelligent Real Estate Agent.
+              </Typography.Text>
+              <Typography.Text
+                style={{ fontSize: FONT_SIZE.HEADING_4, marginBottom: 16 }}
+              >
+                Liv is here to make your property search effortless for{" "}
+                <b>North Bengaluru</b> which is rapidly emerging as a real
+                estate hotspot, fueled by its proximity to the
+                <b>&nbsp; Airport, KIADB Hi-Tech Park, Metro</b>, Highways, the
+                upcoming Foxconn Factory and more.
+              </Typography.Text>
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.HEADING_2,
+                  marginBottom: 16,
+                  marginTop: 16,
+                }}
+              >
+                💡 Ask Liv anything
+              </Typography.Text>
+            </Flex>
             <Flex
               style={{ flexWrap: "wrap", marginTop: 0, marginBottom: 16 }}
               gap={16}
@@ -244,7 +268,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
                         color: COLORS.textColorDark,
                         borderRadius: 16,
                         border: "1px solid",
-                        borderColor: COLORS.textColorDark,
+                        borderColor: COLORS.primaryColor,
                         display: "flex",
                         fontSize: FONT_SIZE.HEADING_4,
                       }}
@@ -271,7 +295,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
                 handleRequest(`summarize this project - ${clickedProjectId}`);
               }}
             ></ThreadMsg>
-          </>
+          </Flex>
         )}
       </Flex>
     );
