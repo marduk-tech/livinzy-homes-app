@@ -34,7 +34,7 @@ export default function UserSessions() {
     );
   }
 
-  const sortedSessions = [...user.chatSessions].sort(
+  const sortedSessions = [...(user.chatSessions || [])].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
