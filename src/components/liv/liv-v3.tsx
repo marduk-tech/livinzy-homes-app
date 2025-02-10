@@ -67,6 +67,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
   useEffect(() => {
     if (sessionId && !livThread.length && !loadingLivThread) {
       fetchHistory(sessionId);
+      setCurrentSessionId(sessionId);
     }
   }, [sessionId]);
 
