@@ -75,3 +75,22 @@ body {
 .ant-modal-content {
   padding: 16px !important;
 }
+
+.full-width-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .ant-modal {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    height: 95vh !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ant-modal-content {
+    height: 95vh;
+    border-radius: 8px;
+  }
+}

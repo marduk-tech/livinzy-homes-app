@@ -222,7 +222,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
                   marginTop: 8,
                 }}
               >
-                Liv is an AI Intelligent Real Estate Agent.
+                Liv is an AI Powered Real Estate Agent.
               </Typography.Text>
               <Typography.Text
                 style={{ fontSize: FONT_SIZE.HEADING_4, marginBottom: 16 }}

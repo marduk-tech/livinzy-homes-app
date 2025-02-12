@@ -1,15 +1,15 @@
-import { Button, Flex, Spin, Typography } from "antd";
-import { AICuratedProject, LivAnswer } from "./liv-v3";
+import { LoadingOutlined } from "@ant-design/icons";
+import { Button, Flex, Modal, Spin, Typography } from "antd";
+import { useEffect, useState } from "react";
+import Markdown from "react-markdown";
 import { useDevice } from "../../hooks/use-device";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../../theme/style-constants";
-import Markdown from "react-markdown";
-import { LoadingOutlined } from "@ant-design/icons";
+import { Project } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { ProjectCard } from "../common/project-card";
-import { Project } from "../../types/Project";
 import { MapView } from "../map-view/map-view";
-import { useEffect, useState } from "react";
 import ProjectsViewV2 from "../projects-view-v2";
+import { AICuratedProject, LivAnswer } from "./liv-v3";
 
 const ID_MATCH_REGEX = /([a-f0-9]{24})/;
 
@@ -22,6 +22,7 @@ const ThreadMsg: React.FC<{
 }> = ({ question, answer, streaming, allProjects, handleProjectClick }) => {
   const { isMobile } = useDevice();
   const [toggleMapView, setToggleMapView] = useState(false);
+  const [isMapFullScreen, setIsMapFullScreen] = useState(false);
   const [questionToDisplay, setQuestionToDisplay] = useState<string>("");
 
   const refineProjectList = (
@@ -60,6 +61,34 @@ const ThreadMsg: React.FC<{
       }
     }
   }, [question]);
+
+  const renderMapView = (fullScreen: boolean = false) => {
+    const projects = answer.projectId
+      ? [allProjects!.find((p: any) => p._id == answer.projectId)!]
+      : answer.projects && answer.projects.length
+      ? refineProjectList(answer.projects).slice(0, 20)
+      : [];
+
+    return (
+      <Flex
+        style={{
+          width: fullScreen ? "95vw" : isMobile ? window.innerWidth : MAX_WIDTH,
+          height: fullScreen ? "calc(95vh - 55px)" : 350,
+          maxWidth: fullScreen ? "95vw" : undefined,
+        }}
+      >
+        <MapView
+          projects={projects}
+          drivers={answer.drivers || []}
+          onProjectClick={(clickedProjectId: string) => {
+            if (!streaming) {
+              handleProjectClick(clickedProjectId);
+            }
+          }}
+        />
+      </Flex>
+    );
+  };
 
   return (
     <Flex vertical style={{ marginBottom: 16, padding: 0 }}>
@@ -137,43 +166,66 @@ const ThreadMsg: React.FC<{
                   </Typography.Text>
                 ) : null
               ) : null}
-              <Button
-                size="small"
-                icon={
-                  !toggleMapView ? (
-                    <DynamicReactIcon
-                      iconName="FaMap"
-                      color="primary"
-                      iconSet="fa"
-                      size={16}
-                    ></DynamicReactIcon>
-                  ) : (
-                    <DynamicReactIcon
-                      iconName="FaRegListAlt"
-                      iconSet="fa"
-                      size={16}
-                      color="primary"
-                    ></DynamicReactIcon>
-                  )
-                }
-                style={{
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  fontSize: FONT_SIZE.SUB_TEXT,
-                  marginLeft: "auto",
-                  height: 28,
-                }}
-                onClick={() => {
-                  setToggleMapView(!toggleMapView);
-                }}
-              >
-                {toggleMapView
-                  ? answer.projectId
-                    ? "Gallery"
-                    : "List"
-                  : "Map"}{" "}
-                View
-              </Button>
+              <Flex gap={8} style={{ marginLeft: "auto" }}>
+                {toggleMapView && (
+                  <Button
+                    size="small"
+                    icon={
+                      <DynamicReactIcon
+                        iconName="FaExpand"
+                        color="primary"
+                        iconSet="fa"
+                        size={16}
+                      />
+                    }
+                    style={{
+                      borderRadius: 8,
+                      cursor: "pointer",
+                      fontSize: FONT_SIZE.SUB_TEXT,
+                      height: 28,
+                    }}
+                    onClick={() => setIsMapFullScreen(true)}
+                  >
+                    Expand
+                  </Button>
+                )}
+                <Button
+                  size="small"
+                  icon={
+                    !toggleMapView ? (
+                      <DynamicReactIcon
+                        iconName="FaMap"
+                        color="primary"
+                        iconSet="fa"
+                        size={16}
+                      />
+                    ) : (
+                      <DynamicReactIcon
+                        iconName="FaRegListAlt"
+                        iconSet="fa"
+                        size={16}
+                        color="primary"
+                      />
+                    )
+                  }
+                  style={{
+                    borderRadius: 8,
+                    cursor: "pointer",
+                    fontSize: FONT_SIZE.SUB_TEXT,
+                    height: 28,
+                  }}
+                  onClick={() => {
+                    setToggleMapView(!toggleMapView);
+                  }}
+                >
+                  {toggleMapView
+                    ? answer.projectId
+                      ? "Gallery"
+                      : "List"
+                    : "Map"}{" "}
+                  View
+                </Button>
+              </Flex>
             </Flex>
           ) : null}
           {answer.projectId ? (
@@ -185,26 +237,10 @@ const ThreadMsg: React.FC<{
                   }
                   showClick={false}
                   fullWidth={true}
-                ></ProjectCard>
-              </Flex>
-            ) : (
-              <Flex
-                style={{
-                  width: (isMobile ? window.innerWidth : MAX_WIDTH) - 16,
-                  minHeight: 350,
-                }}
-              >
-                <MapView
-                  projectId={answer.projectId}
-                  projects={[
-                    allProjects!.find((p: any) => p._id == answer.projectId)!,
-                  ]}
-                  drivers={answer.drivers || []}
-                  onProjectClick={(clickedProjectId: string) => {
-                    // Ignore
-                  }}
                 />
               </Flex>
+            ) : (
+              renderMapView()
             )
           ) : answer.projects && answer.projects.length ? (
             !toggleMapView ? (
@@ -219,38 +255,37 @@ const ThreadMsg: React.FC<{
                       handleProjectClick(clickedProjectId);
                     }
                   }}
-                ></ProjectsViewV2>
-              </Flex>
-            ) : (
-              <Flex
-                style={{
-                  width: isMobile ? window.innerWidth : MAX_WIDTH,
-                  minHeight: 350,
-                }}
-              >
-                <MapView
-                  projects={refineProjectList(answer.projects).slice(0, 20)}
-                  drivers={answer.drivers || []}
-                  onProjectClick={(clickedProjectId: string) => {
-                    if (!streaming) {
-                      handleProjectClick(clickedProjectId);
-                    }
-                  }}
                 />
               </Flex>
+            ) : (
+              renderMapView()
             )
           ) : answer.drivers && answer.drivers.length ? (
-            <Flex
-              style={{
-                width: isMobile ? window.innerWidth : MAX_WIDTH,
-                minHeight: 350,
-              }}
-            >
-              <MapView projects={[]} drivers={answer.drivers} />
-            </Flex>
+            renderMapView()
           ) : null}
         </Flex>
       ) : null}
+
+      <Modal
+        title="Map View"
+        open={isMapFullScreen}
+        onCancel={() => setIsMapFullScreen(false)}
+        footer={null}
+        style={{
+          top: 5,
+        }}
+        styles={{
+          body: {
+            height: "calc(95vh - 70px)",
+            padding: 0,
+            overflow: "hidden",
+            borderRadius: 10,
+          },
+        }}
+        wrapClassName="full-width-modal"
+      >
+        {renderMapView(true)}
+      </Modal>
     </Flex>
   );
 };
