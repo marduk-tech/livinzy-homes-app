@@ -1,6 +1,7 @@
 import { Button, Flex, Form, Input, message, Typography } from "antd";
 import { makeStreamingJsonRequest } from "http-streaming-request";
 import { forwardRef, useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { useDevice } from "../../hooks/use-device";
 import { useFetchProjects } from "../../hooks/use-project";
@@ -10,9 +11,8 @@ import { baseApiUrl } from "../../libs/constants";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
-import ThreadMsg from "./thread-msg";
-import { useParams } from "react-router-dom";
 import { Loader } from "../common/loader";
+import ThreadMsg from "./thread-msg";
 
 const { Paragraph } = Typography;
 
@@ -148,7 +148,7 @@ export const LivV3 = forwardRef<LivRef, {}>((props, ref) => {
       const stream = makeStreamingJsonRequest({
         url: `${baseApiUrl}ai/ask-stream`,
         method: "POST",
-        payload: { question, sessionId: currentSessionId },
+        payload: { question, sessionId: currentSessionId, userId: user?._id },
       });
 
       for await (const data of stream) {
