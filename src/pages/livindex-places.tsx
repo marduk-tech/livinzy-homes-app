@@ -1,5 +1,5 @@
 import { Flex } from "antd";
-import { LivIndexAllMapView } from "../components/map-view/liv-index-all/livindex-all-map-view";
+import { LivIndexFull } from "../components/map-view/liv-index-all/livindex-full";
 
 export function LivindexPlaces() {
   return (
@@ -12,7 +12,7 @@ export function LivindexPlaces() {
         overflow: "hidden",
       }}
     >
-      <LivIndexAllMapView></LivIndexAllMapView>
+      <LivIndexFull></LivIndexFull>
     </Flex>
   );
 }

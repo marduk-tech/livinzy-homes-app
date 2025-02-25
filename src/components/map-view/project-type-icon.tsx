@@ -1,7 +1,7 @@
 import { ProjectHomeType } from "../../libs/constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 
-export function getProjectTypeIcon(homeType: ProjectHomeType) {
+export function getProjectTypeIcon(homeType: ProjectHomeType, color?: string) {
   let iconName = "IoHome",
     iconSet: any = "io5",
     overrideIcon;
@@ -28,7 +28,7 @@ export function getProjectTypeIcon(homeType: ProjectHomeType) {
   return (
     <DynamicReactIcon
       size={20}
-      color="white"
+      color={color || "white"}
       iconName={iconName}
       iconSet={iconSet}
     ></DynamicReactIcon>
