@@ -42,7 +42,11 @@ export function LivIndexFull() {
   let { data: projects, isLoading: projectIsLoading } = useFetchProjects();
 
   let [homeTypeFilter, setHomeTypeFilter] = useState("apartment");
-  let [driverFilters, setDriverFilters] = useState<string[]>([]);
+  let [driverFilters, setDriverFilters] = useState<string[]>([
+    "industrial-hitech",
+    "airport",
+    "commercial",
+  ]);
 
   let [filteredProjects, setFilteredProjects] = useState(projects);
   let [filteredDrivers, setFilteredDrivers] = useState<IDriverPlace[]>([]);
@@ -104,19 +108,14 @@ export function LivIndexFull() {
           <Select
             style={{ width: 350 }}
             mode="multiple"
+            defaultValue={["industrial-hitech", "airport"]}
             showSearch
             maxTagCount="responsive"
             onChange={handleDriverSelect}
             options={Object.keys(LivIndexDriversConfig).map((k: string) => {
               return {
                 value: k,
-                label: (
-                  <Flex gap={4}>
-                    <Typography.Text>
-                      {capitalize((LivIndexDriversConfig as any)[k].label)}
-                    </Typography.Text>
-                  </Flex>
-                ),
+                label: capitalize((LivIndexDriversConfig as any)[k].label),
               };
             })}
           />
