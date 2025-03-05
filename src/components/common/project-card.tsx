@@ -50,9 +50,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 ellipsis={{ rows: 1, expandable: false }}
                 style={{
                   margin: 0,
-                  fontSize: fullWidth
-                    ? FONT_SIZE.HEADING_2
-                    : FONT_SIZE.HEADING_3,
+                  fontSize: FONT_SIZE.HEADING_3,
                   lineHeight: "100%",
                   fontWeight: 500,
                 }}
@@ -94,7 +92,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             </Flex>
           ) : null}
 
-          {project.ui && project.ui.oneLiner ? (
+          {/* {project.ui && project.ui.oneLiner ? (
             <Tooltip title={project.relevantDetails || project.ui.oneLiner}>
               <Paragraph
                 ellipsis={{ rows: 2, expandable: false }}
@@ -110,33 +108,28 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 {project.relevantDetails || project.ui.oneLiner}
               </Paragraph>
             </Tooltip>
-          ) : null}
-          {/* {project.relevantDetails ? (
-                <Typography.Text
-                  style={{
-                    backgroundColor: COLORS.bgColor,
-                    borderRadius: 8,
-                    border: "1px solid",
-                    borderColor: COLORS.borderColorMedium,
-                    whiteSpace: "wrap",
-                    lineHeight: "110%",
-                    marginTop: 4,
-                    padding: 4,
-                    fontSize: FONT_SIZE.SUB_TEXT,
-                    fontStyle: "italic",
-                  }}
-                >
-                  {project.relevantDetails || project.ui.oneLiner.split(" · ").slice(1).join(" · ")}
-                </Typography.Text>
-              ) : null} */}
+          ) : null} */}
 
-          {/* <Flex gap={7} color={COLORS.textColorLight} align="center">
-           
-      
-                <SeparatorDot />
-                <DescText text={`₹${randomPrice}Lacs`} />
-              </Flex> */}
+          {project.ui && project.ui.costingDetails ? (
+            <Paragraph
+              ellipsis={{ rows: 2, expandable: false }}
+              style={{
+                whiteSpace: "wrap",
+                lineHeight: "120%",
+                backgroundColor: COLORS.bgColorMedium,
+                padding: 4,
+                borderRadius: 8,
+                marginTop: 4,
+                marginBottom: 8,
+                fontSize: FONT_SIZE.SUB_TEXT,
+                color: COLORS.textColorLight,
+              }}
+            >
+              {project.ui.costingDetails.configurations}
+            </Paragraph>
+          ) : null}
         </Flex>
+
         {fullWidth ? (
           <ProjectGallery media={project.media}></ProjectGallery>
         ) : (
