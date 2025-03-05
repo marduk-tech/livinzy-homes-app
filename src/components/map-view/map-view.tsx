@@ -16,6 +16,12 @@ import { LivIndexMarker } from "./liv-index-marker";
 import { getProjectsMapData } from "./map-util";
 import { ProjectMarker } from "./project-marker";
 import { useFetchProjectById } from "../../hooks/use-project";
+import { useFetchCorridors } from "../../hooks/use-corridors";
+import { Corridor } from "../../types/Corridor";
+import { Circle } from "./shapes/circle";
+import DynamicReactIcon from "../common/dynamic-react-icon";
+import { COLORS } from "../../theme/style-constants";
+import { Tooltip } from "antd";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -89,6 +95,20 @@ export const MapView = ({
   const { data: livIndexPlaces } = useFetchAllLivindexPlaces();
   const { data: projectData } = useFetchProjectById(projectId!);
   const [mapDrivers, setMapDrivers] = useState<string[]>();
+  const { data: corridors, isLoading: isCorridorsDataLoading } =
+    useFetchCorridors();
+
+  const [projectsData, setProjectsData] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (projects && projects.length) {
+      setProjectsData(
+        getProjectsMapData({ projects: projects })
+          .sort((a, b) => b.position!.lat - a.position!.lat)
+          .map((dataItem, index) => ({ ...dataItem, zIndex: index }))
+      );
+    }
+  }, [projects]);
 
   useEffect(() => {
     if (drivers && drivers.length) {
@@ -121,14 +141,6 @@ export const MapView = ({
     }
   }, [projectId, drivers, projectData]);
 
-  const projectsData = getProjectsMapData({ projects: projects })
-    .sort((a, b) => b.position!.lat - a.position!.lat)
-    .map((dataItem, index) => ({ ...dataItem, zIndex: index }));
-
-  const Z_INDEX_SELECTED = projectsData.length;
-  const Z_INDEX_HOVER = projectsData.length + 1;
-
-  const [markers] = useState(projectsData);
   const [anchorPoint] = useState<AnchorPointName>("BOTTOM");
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -220,54 +232,101 @@ export const MapView = ({
               );
             })} */}
 
+          {/* Corridors */}
+          {corridors &&
+            corridors.map((c: Corridor) => {
+              return (
+                <Circle
+                  fillOpacity={0.2}
+                  strokeColor="transparent"
+                  center={{ lat: c.location.lat, lng: c.location.lng }}
+                  radius={10000}
+                  zIndex={-999}
+                />
+              );
+            })}
+
+          {/* Corridors */}
+          {corridors &&
+            corridors.map((c: Corridor) => {
+              return (
+                <React.Fragment key={c._id}>
+                  <Tooltip title={c.name}>
+                    <AdvancedMarkerWithRef
+                      anchorPoint={AdvancedMarkerAnchorPoint.BOTTOM}
+                      className="custom-marker boun"
+                      position={c.location}
+                      zIndex={1}
+                      onMarkerClick={() => {}}
+                      onMouseEnter={() => onMouseEnter(c._id)}
+                      onMouseLeave={onMouseLeave}
+                      style={{
+                        transform: `scale(${hoverId === c._id ? 1.05 : 1})`,
+                        animation: "bounceAnimation 1s infinite",
+                      }}
+                    >
+                      <DynamicReactIcon
+                        iconName="FaMapLocation"
+                        iconSet="fa6"
+                        size={24}
+                        color={COLORS.borderColorDark}
+                      ></DynamicReactIcon>
+                    </AdvancedMarkerWithRef>
+                  </Tooltip>
+                </React.Fragment>
+              );
+            })}
+
           {/* Project Markers */}
-          {markers.map(({ id, zIndex: zIndexDefault, position, project }) => {
-            let zIndex = zIndexDefault;
+          {projectsData.map(
+            ({ id, zIndex: zIndexDefault, position, project }) => {
+              let zIndex = zIndexDefault;
 
-            if (hoverId === id) {
-              zIndex = Z_INDEX_HOVER;
-            }
+              if (hoverId === id) {
+                zIndex = projectsData.length + 1;
+              }
 
-            if (selectedId === id) {
-              zIndex = Z_INDEX_SELECTED;
-            }
+              if (selectedId === id) {
+                zIndex = projectsData.length;
+              }
 
-            return (
-              <React.Fragment key={id}>
-                <AdvancedMarkerWithRef
-                  anchorPoint={AdvancedMarkerAnchorPoint[anchorPoint]}
-                  className="custom-marker"
-                  position={position}
-                  zIndex={zIndex}
-                  onMarkerClick={(
-                    marker: google.maps.marker.AdvancedMarkerElement
-                  ) => {
-                    console.log(id, marker);
-                  }}
-                  onMouseEnter={() => onMouseEnter(id)}
-                  onMouseLeave={onMouseLeave}
-                  style={{
-                    transform: `scale(${
-                      [hoverId, selectedId].includes(id) ? 1.05 : 1
-                    })`,
-                    animation: projectId
-                      ? "none bounceAnimation 1s infinite"
-                      : "none",
-                  }}
-                >
-                  <ProjectMarker
-                    disableModal={!!projectId}
-                    project={project}
-                    isExpanded={expandedId === id}
-                    showClick={projects && projects.length > 1}
-                    onProjectClick={() => {
-                      onProjectClick(project._id);
+              return (
+                <React.Fragment key={id}>
+                  <AdvancedMarkerWithRef
+                    anchorPoint={AdvancedMarkerAnchorPoint[anchorPoint]}
+                    className="custom-marker"
+                    position={position}
+                    zIndex={zIndex}
+                    onMarkerClick={(
+                      marker: google.maps.marker.AdvancedMarkerElement
+                    ) => {
+                      console.log(id, marker);
                     }}
-                  />
-                </AdvancedMarkerWithRef>
-              </React.Fragment>
-            );
-          })}
+                    onMouseEnter={() => onMouseEnter(id)}
+                    onMouseLeave={onMouseLeave}
+                    style={{
+                      transform: `scale(${
+                        [hoverId, selectedId].includes(id) ? 1.05 : 1
+                      })`,
+                      animation: projectId
+                        ? "none bounceAnimation 1s infinite"
+                        : "none",
+                    }}
+                  >
+                    <ProjectMarker
+                      disableModal={!!projectId}
+                      project={project}
+                      isExpanded={expandedId === id}
+                      showClick={projects && projects.length > 1}
+                      onProjectClick={() => {
+                        onProjectClick(project._id);
+                      }}
+                    />
+                  </AdvancedMarkerWithRef>
+                </React.Fragment>
+              );
+            }
+          )}
 
           {/* LivIndex Markers */}
           {livIndexPlaces
@@ -275,8 +334,8 @@ export const MapView = ({
               (place) =>
                 place.driver !== "highway" &&
                 place.driver !== "transit" &&
-                ((mapDrivers && mapDrivers.includes(place._id)) ||
-                  (place.parameters && place.parameters.growthLever === true))
+                mapDrivers &&
+                mapDrivers.includes(place._id)
             )
             .map((place) => (
               <React.Fragment key={place._id}>

@@ -30,6 +30,11 @@ export interface ILocation {
   lng: number;
 }
 
+export interface IProjectCorridor {
+  corridorId: string;
+  haversineDistance: number;
+}
+
 export interface IMetadata {
   _id: string;
   name: string;
@@ -39,6 +44,7 @@ export interface IMetadata {
   description: string;
   summary: string;
   homeType: ProjectHomeType;
+  corridors: IProjectCorridor[];
 }
 
 export interface ILand {

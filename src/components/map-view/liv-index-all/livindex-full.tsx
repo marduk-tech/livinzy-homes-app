@@ -4,11 +4,16 @@ import { Loader } from "../../common/loader";
 import brightColorsStyles from "../map-styles/bright-colors";
 import { useFetchProjects } from "../../../hooks/use-project";
 import { MapView } from "../map-view";
-import { Flex, Typography } from "antd";
-import { ProjectHomeType } from "../../../libs/constants";
+import { Flex, Select, Typography } from "antd";
+import {
+  LivIndexDriversConfig,
+  ProjectHomeType,
+} from "../../../libs/constants";
 import { capitalize } from "../../../libs/lvnzy-helper";
 import { getProjectTypeIcon } from "../project-type-icon";
 import { COLORS } from "../../../theme/style-constants";
+import { useEffect, useState } from "react";
+import { IDriverPlace } from "../../../types/Project";
 
 export type CastleFeatureProps = {
   name?: string;
@@ -34,36 +39,92 @@ export function LivIndexFull() {
   const { data: livindexPlaces, isLoading: livindexPlacesLoading } =
     useFetchAllLivindexPlaces();
 
-  const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
+  let { data: projects, isLoading: projectIsLoading } = useFetchProjects();
+
+  let [homeTypeFilter, setHomeTypeFilter] = useState("apartment");
+  let [driverFilters, setDriverFilters] = useState<string[]>([]);
+
+  let [filteredProjects, setFilteredProjects] = useState(projects);
+  let [filteredDrivers, setFilteredDrivers] = useState<IDriverPlace[]>([]);
+
+  useEffect(() => {
+    if (projects && projects.length) {
+      setFilteredProjects(
+        projects.filter((p) => p.metadata.homeType.includes(homeTypeFilter))
+      );
+    }
+  }, [projects, homeTypeFilter]);
+  useEffect(() => {
+    if (livindexPlaces && livindexPlaces.length) {
+      setFilteredDrivers(
+        livindexPlaces.filter((p) => driverFilters.includes(p.driver))
+      );
+    }
+  }, [livindexPlaces, driverFilters]);
+
+  const handleHomeTypeSelect = (value: string) => {
+    setHomeTypeFilter(value);
+  };
+  const handleDriverSelect = (value: string[]) => {
+    setDriverFilters(value);
+  };
 
   if (livindexPlacesLoading) {
     return <Loader />;
   }
 
   if (livindexPlaces && projects) {
+    projects = projects.filter(
+      (p) => p.metadata.corridors && p.metadata.corridors.length
+    );
     return (
       <Flex vertical>
         <Flex gap={16} style={{ marginBottom: 8 }}>
-          {Object.keys(ProjectHomeType).map((k: string) => {
-            return (
-              <Flex gap={4}>
-                {getProjectTypeIcon(
-                  (ProjectHomeType as any)[k],
-                  COLORS.primaryColor
-                )}
-                <Typography.Text>
-                  {capitalize((ProjectHomeType as any)[k])}
-                </Typography.Text>
-              </Flex>
-            );
-          })}
+          <Select
+            defaultValue="apartment"
+            style={{ width: 200 }}
+            onChange={handleHomeTypeSelect}
+            options={Object.keys(ProjectHomeType).map((k: string) => {
+              return {
+                value: (ProjectHomeType as any)[k],
+                label: (
+                  <Flex gap={4}>
+                    {getProjectTypeIcon(
+                      (ProjectHomeType as any)[k],
+                      COLORS.primaryColor
+                    )}
+                    <Typography.Text>
+                      {capitalize((ProjectHomeType as any)[k])}
+                    </Typography.Text>
+                  </Flex>
+                ),
+              };
+            })}
+          />
+          <Select
+            style={{ width: 350 }}
+            mode="multiple"
+            onChange={handleDriverSelect}
+            options={Object.keys(LivIndexDriversConfig).map((k: string) => {
+              return {
+                value: k,
+                label: (
+                  <Flex gap={4}>
+                    <Typography.Text>
+                      {capitalize((LivIndexDriversConfig as any)[k].label)}
+                    </Typography.Text>
+                  </Flex>
+                ),
+              };
+            })}
+          />
+
+          {}
         </Flex>
         <Flex style={{ height: 800 }}>
           <MapView
-            drivers={livindexPlaces
-              .filter((p) => p.driver !== "hospital")
-              .map((p) => p._id)}
-            projects={projects!}
+            drivers={filteredDrivers.map((p) => p._id)}
+            projects={filteredProjects!}
           ></MapView>
         </Flex>
       </Flex>

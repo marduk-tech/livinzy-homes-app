@@ -24,7 +24,9 @@ const renderIcon = (place: IDriverPlace) => {
       iconSet={icon.set}
       size={18}
       color={
-        place.parameters && place.parameters.growthLever ? "white" : "black"
+        place.parameters && place.parameters.growthLever && false
+          ? "white"
+          : "black"
       }
     ></DynamicReactIcon>
   );
@@ -122,7 +124,7 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
         }}
         style={{
           backgroundColor:
-            place.parameters && place.parameters.growthLever
+            place.parameters && place.parameters.growthLever && false
               ? COLORS.textColorDark
               : "rgba(255,255,255, 1)",
           borderRadius: "50%",
