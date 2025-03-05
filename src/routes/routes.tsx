@@ -20,7 +20,7 @@ export const Router = () => {
         element={<LandMeasurementConvertor />}
       />
       <Route element={<DashboardLayout />}>
-        <Route path="/livindex-places" element={<LivindexPlaces />} />
+        <Route path="/map" element={<LivindexPlaces />} />
         <Route path="/:sessionId?" element={<LivV3 />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/user-sessions" element={<UserSessions />} />
