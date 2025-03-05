@@ -9,7 +9,7 @@ import {
 } from "../libs/api/corridors";
 import { queryKeys } from "../libs/constants";
 import { queryClient } from "../libs/query-client";
-import { ICorridor } from "../types/corridor";
+import { Corridor } from "../types/Corridor";
 
 export function useFetchCorridors() {
   return useQuery({
@@ -26,7 +26,7 @@ export function useUpdateCorridorMutation({
   enableToasts?: boolean;
 }) {
   return useMutation({
-    mutationFn: ({ corridorData }: { corridorData: Partial<ICorridor> }) => {
+    mutationFn: ({ corridorData }: { corridorData: Partial<Corridor> }) => {
       return updateCorridor(corridorId, corridorData);
     },
 
@@ -56,7 +56,7 @@ export function useUpdateCorridorMutation({
 
 export function useCreateCorridorMutation() {
   return useMutation({
-    mutationFn: (corridorData: Partial<ICorridor>) => {
+    mutationFn: (corridorData: Partial<Corridor>) => {
       return createCorridor(corridorData);
     },
 

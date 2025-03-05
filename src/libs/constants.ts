@@ -6,6 +6,7 @@ export const queryKeys = {
   projects: "projects",
   getProjectById: "getProjectById",
   getAllPlaces: "getAllPlaces",
+  getAllCorridors: "getAllCorridors",
   user: "user",
 };
 
