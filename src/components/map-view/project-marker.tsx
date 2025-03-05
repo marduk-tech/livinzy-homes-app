@@ -1,10 +1,10 @@
 import { CloseOutlined } from "@ant-design/icons";
-import { Flex, Modal } from "antd";
-import React, { useState } from "react";
+import { Flex, Modal, Typography } from "antd";
+import React, { useEffect, useState } from "react";
 import { Project } from "../../types/Project";
 import { ProjectCard } from "../common/project-card";
 import { getProjectTypeIcon } from "./project-type-icon";
-import { COLORS } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 
 export const ProjectMarker = ({
   project,
@@ -20,6 +20,22 @@ export const ProjectMarker = ({
   disableModal: boolean;
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
+
+  const [sqftRate, setSqftRate] = useState(0);
+  useEffect(() => {
+    if (project.ui) {
+      const costingDetails = project.ui.costingDetails;
+      if (costingDetails && costingDetails.singleUnitCost) {
+        setSqftRate(
+          Math.round(
+            costingDetails.singleUnitCost /
+              parseInt(costingDetails.singleUnitSize)
+          )
+        );
+      }
+    }
+  }, [project]);
+
   return (
     <Flex>
       <Modal
@@ -56,6 +72,11 @@ export const ProjectMarker = ({
         <div style={{ marginTop: isExpanded ? "24px" : "0px" }}>
           <Flex justify="space-between" align="center">
             {getProjectTypeIcon(project.metadata.homeType)}
+            <Typography.Text
+              style={{ color: "white", fontSize: FONT_SIZE.PARA }}
+            >
+              {sqftRate ? `${sqftRate} /sqft` : ""}
+            </Typography.Text>
           </Flex>
         </div>
       </div>
