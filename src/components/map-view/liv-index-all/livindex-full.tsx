@@ -104,6 +104,8 @@ export function LivIndexFull() {
           <Select
             style={{ width: 350 }}
             mode="multiple"
+            showSearch
+            maxTagCount="responsive"
             onChange={handleDriverSelect}
             options={Object.keys(LivIndexDriversConfig).map((k: string) => {
               return {
