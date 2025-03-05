@@ -20,8 +20,8 @@ import { useFetchCorridors } from "../../hooks/use-corridors";
 import { Corridor } from "../../types/Corridor";
 import { Circle } from "./shapes/circle";
 import DynamicReactIcon from "../common/dynamic-react-icon";
-import { COLORS } from "../../theme/style-constants";
-import { Tooltip } from "antd";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { Flex, Tooltip, Typography } from "antd";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -251,7 +251,29 @@ export const MapView = ({
             corridors.map((c: Corridor) => {
               return (
                 <React.Fragment key={c._id}>
-                  <Tooltip title={c.name}>
+                  <Tooltip
+                    title={
+                      <Flex vertical>
+                        <Typography.Text
+                          style={{
+                            fontSize: FONT_SIZE.HEADING_4,
+                            color: "white",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {c.name}
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{
+                            fontSize: FONT_SIZE.PARA,
+                            color: COLORS.bgColor,
+                          }}
+                        >
+                          {c.description}
+                        </Typography.Text>
+                      </Flex>
+                    }
+                  >
                     <AdvancedMarkerWithRef
                       anchorPoint={AdvancedMarkerAnchorPoint.BOTTOM}
                       className="custom-marker boun"
