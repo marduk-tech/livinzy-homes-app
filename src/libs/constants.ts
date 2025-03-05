@@ -68,22 +68,6 @@ export const LivIndexDriversConfig = {
     label: "Transit Network",
     icon: { name: "MdOutlineDirectionsTransit", set: "md" },
   },
-  "tier-1-city": {
-    label: "Tier 1 City",
-    icon: { name: "PiCityBold", set: "pi" },
-  },
-  "tier-2-city": {
-    label: "Tier 2 City",
-    icon: { name: "FaMountainCity", set: "fa" },
-  },
-  "tourist-city": {
-    label: "Tourist Destination",
-    icon: { name: "MdModeOfTravel", set: "md" },
-  },
-  "satellite-city": {
-    label: "Satellite Towns",
-    icon: { name: "PiCityBold", set: "pi" },
-  },
 };
 
 export const LivestIndexConfig = [
