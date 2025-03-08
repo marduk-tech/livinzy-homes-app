@@ -92,7 +92,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             </Flex>
           ) : null}
 
-          {/* {project.ui && project.ui.oneLiner ? (
+          {project.ui && project.ui.oneLiner ? (
             <Tooltip title={project.relevantDetails || project.ui.oneLiner}>
               <Paragraph
                 ellipsis={{ rows: 2, expandable: false }}
@@ -100,6 +100,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                   whiteSpace: "wrap",
                   lineHeight: "110%",
                   marginTop: 4,
+                  height: 32,
                   marginBottom: 8,
                   fontSize: fullWidth ? FONT_SIZE.HEADING_3 : FONT_SIZE.PARA,
                   color: COLORS.textColorLight,
@@ -108,25 +109,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 {project.relevantDetails || project.ui.oneLiner}
               </Paragraph>
             </Tooltip>
-          ) : null} */}
-
-          {project.ui && project.ui.costingDetails ? (
-            <Paragraph
-              ellipsis={{ rows: 2, expandable: false }}
-              style={{
-                whiteSpace: "wrap",
-                lineHeight: "120%",
-                backgroundColor: COLORS.bgColorMedium,
-                padding: 4,
-                borderRadius: 8,
-                marginTop: 4,
-                marginBottom: 8,
-                fontSize: FONT_SIZE.SUB_TEXT,
-                color: COLORS.textColorLight,
-              }}
-            >
-              {project.ui.costingDetails.configurations}
-            </Paragraph>
           ) : null}
         </Flex>
 

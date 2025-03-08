@@ -5,6 +5,8 @@ import Markdown from "react-markdown";
 import { useDevice } from "../../hooks/use-device";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../../theme/style-constants";
 import { Project } from "../../types/Project";
+import remarkGfm from "remark-gfm";
+
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { ProjectCard } from "../common/project-card";
 import { MapView } from "../map-view/map-view";
@@ -125,7 +127,9 @@ const ThreadMsg: React.FC<{
       </Flex>
       {answer.details && (
         <Flex style={{ padding: isMobile ? "0 16px" : 0 }} vertical>
-          <Markdown className="liviq-content">{answer.details}</Markdown>
+          <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
+            {answer.details}
+          </Markdown>
         </Flex>
       )}
 
@@ -140,11 +144,8 @@ const ThreadMsg: React.FC<{
             borderRadius: isMobile ? 0 : 4,
             marginTop: 16,
             padding: "24px 0",
-            backgroundColor: COLORS.bgColorMedium,
-            border: "1px solid",
-            borderColor: COLORS.borderColorMedium,
-            boxShadow:
-              "inset 0 10px 10px -10px #ccc, inset 0 -10px 10px -10px #ccc",
+            borderTop: "1px solid",
+            borderTopColor: COLORS.borderColorMedium,
           }}
         >
           {answer.projectId || (answer.projects && answer.projects.length) ? (
