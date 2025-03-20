@@ -3,8 +3,8 @@ import { useFetchLvnzyProjectById } from "../hooks/use-lvnzy-project";
 import { useParams } from "react-router-dom";
 import { Loader } from "../components/common/loader";
 import { useEffect, useState } from "react";
-import { FONT_SIZE } from "../theme/style-constants";
-import { capitalize } from "../libs/lvnzy-helper";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { POP_STAR_DATA_POINTS } from "../libs/constants";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -59,8 +59,9 @@ export function PropStar() {
     <Flex
       vertical
       style={{
+        padding: 16,
         borderRadius: 16,
-        height: "80vh",
+        height: "90vh",
         width: "100%",
         margin: "auto",
         maxWidth: 700,
@@ -68,10 +69,38 @@ export function PropStar() {
         overflowY: "auto",
       }}
     >
-      <Typography.Title level={2}>
+      <Typography.Title level={2} style={{ margin: 0 }}>
         {lvnzyProject?.originalProjectId.metadata.name}
       </Typography.Title>
-      <Flex style={{ marginBottom: 24 }}>
+      <Typography.Text
+        style={{
+          fontSize: FONT_SIZE.HEADING_4,
+          margin: "8px 0",
+          color: COLORS.textColorLight,
+        }}
+      >
+        {lvnzyProject?.meta.oneLiner}
+      </Typography.Text>
+      <Typography.Text
+        style={{ fontSize: FONT_SIZE.HEADING_2, margin: "8px 0" }}
+      >
+        {rupeeAmountFormat(lvnzyProject?.meta.costingDetails.minimumUnitCost)}
+        &nbsp;(
+        {Math.round(
+          lvnzyProject?.meta.costingDetails.minimumUnitCost /
+            lvnzyProject?.meta.costingDetails.singleUnitSize
+        )}{" "}
+        /sqft )
+      </Typography.Text>
+      <Flex
+        style={{
+          marginBottom: 24,
+          marginTop: 24,
+          width: "100%",
+          flexWrap: "wrap",
+        }}
+        gap={8}
+      >
         <Tag>RERA</Tag>
         <Tag>Open Street</Tag>
         <Tag>Google Maps</Tag>
@@ -107,7 +136,7 @@ export function PropStar() {
                     >
                       <Flex align="center" style={{ width: "100%" }}>
                         <Typography.Text
-                          style={{ fontSize: FONT_SIZE.HEADING_4 }}
+                          style={{ fontSize: FONT_SIZE.HEADING_3 }}
                         >
                           {capitalize(
                             (POP_STAR_DATA_POINTS as any)[sc.key.toLowerCase()][
@@ -116,7 +145,7 @@ export function PropStar() {
                           )}
                         </Typography.Text>
                         <Rate
-                          style={{ marginLeft: "auto" }}
+                          style={{ marginLeft: "auto", fontSize: 20 }}
                           disabled
                           allowHalf
                           defaultValue={
