@@ -5,6 +5,7 @@ export const baseApiUrl = import.meta.env.VITE_API_URL;
 export const queryKeys = {
   projects: "projects",
   getProjectById: "getProjectById",
+  getLvnzyProjectById: "getLvnzyProjectById",
   getAllPlaces: "getAllPlaces",
   getAllCorridors: "getAllCorridors",
   user: "user",
@@ -226,3 +227,34 @@ export const PlaceholderContent = `# Liv is the AI Agent for Real Estate.
 
 ### 💡 Ask Liv anything
 `;
+
+export const POP_STAR_DATA_POINTS = {
+  property: {
+    amenities: "Amenities",
+    densityRating: "Density",
+    openAreaRating: "Open Area",
+    surroundings: "Surroundings",
+  },
+  developer: {
+    experience: "Past Experience",
+    timeCommitment: "Time Committment",
+  },
+  neighborhood: {
+    schools: "Schools",
+    hospitals: "Hospitals",
+    food: "Dining",
+    commercial: "Commercial",
+    industrial: "Industrial",
+  },
+  connectivity: {
+    connectingRoads: "Immediate Connectivity",
+    transit: "Transit",
+    drive: "Drive",
+  },
+  investment: {
+    priceAppreciation: "Price Appreciation",
+    rentalIncome: "Rental Income",
+    corridorPricePoint: "Corridor Price Point",
+    cityPricePoint: "City Level Price Point",
+  },
+};
