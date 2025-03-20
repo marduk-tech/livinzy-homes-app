@@ -12,6 +12,7 @@ import UserSessions from "../pages/user-sessions";
 
 import { LivV3 } from "../components/liv/liv-v3";
 import LivProjectPro from "../components/liv-project-pro";
+import { PropStar } from "../pages/prop-star";
 
 export const Router = () => {
   return (
@@ -25,6 +26,7 @@ export const Router = () => {
         <Route path="/:sessionId?" element={<LivV3 />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/pro/:projectId?" element={<LivProjectPro />} />
+        <Route path="/propstar/:lvnzyProjectId?" element={<PropStar />} />
         <Route path="/user-sessions" element={<UserSessions />} />
         <Route path="/*" element={<div>404</div>} />
       </Route>
