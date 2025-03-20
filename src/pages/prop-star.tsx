@@ -142,7 +142,7 @@ export function PropStar() {
         footer={null}
       >
         <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
-          {selectedDataPoint.reasoning}
+          {selectedDataPoint ? selectedDataPoint.reasoning : ""}
         </Markdown>
       </Modal>
     </Flex>
