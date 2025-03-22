@@ -9,6 +9,7 @@ export const queryKeys = {
   getAllPlaces: "getAllPlaces",
   getAllCorridors: "getAllCorridors",
   user: "user",
+  paymentById: "paymentById",
 };
 
 export const LocalStorageKeys = {

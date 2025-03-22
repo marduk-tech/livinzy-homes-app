@@ -10,8 +10,9 @@ import { ProfilePage } from "../pages/profile-page";
 import { SignUpForm } from "../pages/signup";
 import UserSessions from "../pages/user-sessions";
 
-import { LivV3 } from "../components/liv/liv-v3";
 import LivProjectPro from "../components/liv-project-pro";
+import { LivV3 } from "../components/liv/liv-v3";
+import { PaymentCallbackPage } from "../pages/payment-callback";
 import { PropStar } from "../pages/prop-star";
 
 export const Router = () => {
@@ -28,8 +29,11 @@ export const Router = () => {
         <Route path="/pro/:projectId?" element={<LivProjectPro />} />
         <Route path="/propstar/:lvnzyProjectId?" element={<PropStar />} />
         <Route path="/user-sessions" element={<UserSessions />} />
-        <Route path="/*" element={<div>404</div>} />
       </Route>
+
+      <Route path="/payments/callback" element={<PaymentCallbackPage />} />
+
+      <Route path="/*" element={<div>404</div>} />
       <Route path="/sign-up" element={<SignUpForm />} />
     </Routes>
   );
