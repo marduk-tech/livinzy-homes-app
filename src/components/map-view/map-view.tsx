@@ -113,8 +113,7 @@ export const MapView = ({
   useEffect(() => {
     if (drivers && drivers.length) {
       setMapDrivers(drivers);
-    }
-    if (projectId) {
+    } else if (projectId) {
       if (projectData) {
         if (!drivers || !drivers.length) {
           // If no drivers are passed, show project drivers.
@@ -172,11 +171,7 @@ export const MapView = ({
       .filter(
         (place) => place.driver === "highway" || place.driver === "transit"
       )
-      .filter(
-        (place) =>
-          (mapDrivers && mapDrivers.includes(place._id)) ||
-          (place.parameters && place.parameters.growthLever === true)
-      );
+      .filter((place) => mapDrivers && mapDrivers.includes(place._id));
 
     return (
       <APIProvider
@@ -193,8 +188,8 @@ export const MapView = ({
           style={{
             width: "100%",
           }}
-          defaultZoom={11}
-          minZoom={10}
+          defaultZoom={9}
+          minZoom={7}
           defaultCenter={
             projectId &&
             projectData &&
@@ -234,70 +229,106 @@ export const MapView = ({
 
           {/* Corridors */}
           {corridors &&
-            corridors.map((c: Corridor) => {
-              return (
-                <Circle
-                  fillOpacity={0.2}
-                  strokeColor="transparent"
-                  center={{ lat: c.location.lat, lng: c.location.lng }}
-                  radius={10000}
-                  zIndex={-999}
-                />
-              );
-            })}
+            corridors
+              .filter((c) =>
+                projectData?.metadata.corridors
+                  .map((cc) => cc.corridorId)
+                  .includes(c._id)
+              )
+              .map((c: Corridor) => {
+                return (
+                  <Circle
+                    fillOpacity={0.2}
+                    strokeColor="transparent"
+                    center={{ lat: c.location.lat, lng: c.location.lng }}
+                    radius={10000}
+                    zIndex={-999}
+                  />
+                );
+              })}
 
           {/* Corridors */}
           {corridors &&
-            corridors.map((c: Corridor) => {
-              return (
-                <React.Fragment key={c._id}>
-                  <Tooltip
-                    title={
-                      <Flex vertical>
-                        <Typography.Text
-                          style={{
-                            fontSize: FONT_SIZE.HEADING_4,
-                            color: "white",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {c.name}
-                        </Typography.Text>
-                        <Typography.Text
-                          style={{
-                            fontSize: FONT_SIZE.PARA,
-                            color: COLORS.bgColor,
-                          }}
-                        >
-                          {c.description}
-                        </Typography.Text>
-                      </Flex>
-                    }
-                  >
-                    <AdvancedMarkerWithRef
-                      anchorPoint={AdvancedMarkerAnchorPoint.BOTTOM}
-                      className="custom-marker boun"
-                      position={c.location}
-                      zIndex={1}
-                      onMarkerClick={() => {}}
-                      onMouseEnter={() => onMouseEnter(c._id)}
-                      onMouseLeave={onMouseLeave}
-                      style={{
-                        transform: `scale(${hoverId === c._id ? 1.05 : 1})`,
-                        animation: "bounceAnimation 1s infinite",
-                      }}
+            corridors
+              .filter((c) =>
+                projectData?.metadata.corridors
+                  .map((cc) => cc.corridorId)
+                  .includes(c._id)
+              )
+              .map((c: Corridor) => {
+                return (
+                  <React.Fragment key={c._id}>
+                    <Tooltip
+                      title={
+                        <Flex vertical>
+                          <Typography.Text
+                            style={{
+                              fontSize: FONT_SIZE.HEADING_4,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {c.name}
+                          </Typography.Text>
+                          <Typography.Text
+                            style={{
+                              fontSize: FONT_SIZE.PARA,
+                              color: COLORS.bgColor,
+                            }}
+                          >
+                            {c.description}
+                          </Typography.Text>
+                        </Flex>
+                      }
                     >
-                      <DynamicReactIcon
-                        iconName="FaMapLocation"
-                        iconSet="fa6"
-                        size={24}
-                        color={COLORS.borderColorDark}
-                      ></DynamicReactIcon>
-                    </AdvancedMarkerWithRef>
-                  </Tooltip>
-                </React.Fragment>
-              );
-            })}
+                      <AdvancedMarkerWithRef
+                        anchorPoint={AdvancedMarkerAnchorPoint.BOTTOM}
+                        className="custom-marker boun"
+                        position={c.location}
+                        zIndex={1}
+                        onMarkerClick={() => {}}
+                        onMouseEnter={() => onMouseEnter(c._id)}
+                        onMouseLeave={onMouseLeave}
+                        style={{
+                          transform: `scale(${hoverId === c._id ? 1.05 : 1})`,
+                          animation: "bounceAnimation 1s infinite",
+                        }}
+                      >
+                        <DynamicReactIcon
+                          iconName="FaMapLocation"
+                          iconSet="fa6"
+                          size={24}
+                          color={COLORS.borderColorDark}
+                        ></DynamicReactIcon>
+                      </AdvancedMarkerWithRef>
+                    </Tooltip>
+                  </React.Fragment>
+                );
+              })}
+
+          {/** Current Project Marker */}
+          {projectData && (
+            <AdvancedMarkerWithRef
+              anchorPoint={AdvancedMarkerAnchorPoint.BOTTOM}
+              className="custom-marker boun"
+              position={projectData?.metadata.location}
+              zIndex={1}
+              onMarkerClick={() => {}}
+              onMouseEnter={() => onMouseEnter(projectData._id)}
+              onMouseLeave={onMouseLeave}
+              style={{
+                transform: `scale(${hoverId === projectData._id ? 1.05 : 1})`,
+                animation: "bounceAnimation 1s infinite",
+              }}
+            >
+              <DynamicReactIcon
+                iconName="IoLocation"
+                iconSet="io5"
+                size={48}
+                color={COLORS.textColorDark}
+              ></DynamicReactIcon>
+            </AdvancedMarkerWithRef>
+          )}
 
           {/* Project Markers */}
           {projectsData.map(

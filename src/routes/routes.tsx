@@ -11,9 +11,9 @@ import { SignUpForm } from "../pages/signup";
 import UserSessions from "../pages/user-sessions";
 
 import LivProjectPro from "../components/liv-project-pro";
-import { LivV3 } from "../components/liv/liv-v3";
+import { Brick360 } from "../pages/brick360";
 import { PaymentCallbackPage } from "../pages/payment-callback";
-import { PropStar } from "../pages/prop-star";
+import LivV3 from "../components/liv/liv-v3";
 
 export const Router = () => {
   return (
@@ -27,7 +27,7 @@ export const Router = () => {
         <Route path="/:sessionId?" element={<LivV3 />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/pro/:projectId?" element={<LivProjectPro />} />
-        <Route path="/propstar/:lvnzyProjectId?" element={<PropStar />} />
+        <Route path="/brick360/:lvnzyProjectId?" element={<Brick360 />} />
         <Route path="/user-sessions" element={<UserSessions />} />
       </Route>
 

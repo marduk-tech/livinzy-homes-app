@@ -150,8 +150,8 @@ export const DashboardLayout: React.FC = () => {
                 style={{ height: 60, display: "flex", alignItems: "center" }}
               >
                 <img
-                  src="/logo-name.png"
-                  style={{ height: 30, width: "auto", marginLeft: -8 }}
+                  src="/images/brickalytics-logo.png"
+                  style={{ height: 28, width: "auto", marginLeft: 0 }}
                 ></img>
               </Flex>
 
@@ -198,7 +198,6 @@ export const DashboardLayout: React.FC = () => {
           <Content
             style={{
               margin: "auto",
-              marginTop: 16,
               maxWidth: MAX_WIDTH,
               width: "100%",
             }}
