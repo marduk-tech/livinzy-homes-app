@@ -10,9 +10,6 @@ export const queryKeys = {
   getAllCorridors: "getAllCorridors",
   user: "user",
   paymentById: "paymentById",
-
-  getAllDevelopers: "getAllDevelopers",
-  getDeveloperById: "getDeveloperById",
 };
 
 export const LocalStorageKeys = {
