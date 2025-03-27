@@ -239,6 +239,7 @@ export const POP_STAR_DATA_POINTS = {
   developer: {
     experience: "Past Experience",
     timeCommitment: "Time Committment",
+    customerSatisfaction: "Customer Satisfaction",
   },
   neighborhood: {
     schools: "Schools",

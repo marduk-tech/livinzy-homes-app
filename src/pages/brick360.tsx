@@ -7,6 +7,7 @@ import {
   Modal,
   Progress,
   Select,
+  Space,
   Tag,
   Typography,
 } from "antd";
@@ -396,8 +397,23 @@ export function Brick360() {
           maxWidth: 900,
           marginLeft: isMobile ? 0 : "calc(50% - 450px)",
         }}
-        height={700}
+        extra={
+          <Space>
+            <Button
+              onClick={() => {
+                setDetailsModalOpen(false);
+                if (!isMapFullScreen) {
+                  chatRef.current?.clearChatData();
+                  setMapDrivers([]);
+                }
+              }}
+            >
+              Close
+            </Button>
+          </Space>
+        }
         closable={false}
+        height={Math.min(700, window.innerHeight * 0.8)}
         onClose={() => {
           setDetailsModalOpen(false);
           if (!isMapFullScreen) {
@@ -415,6 +431,11 @@ export function Brick360() {
             paddingBottom: 64,
           }}
         >
+          {selectedDataPointCategory == "developer" && (
+            <Typography.Title level={4}>
+              {lvnzyProject?.originalProjectId.metadata.developerId.name}
+            </Typography.Title>
+          )}
           <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
             {selectedDataPoint ? selectedDataPoint.reasoning : ""}
           </Markdown>
