@@ -13,6 +13,7 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   savedProjects: string[];
+  savedLvnzyProjects: any[];
   chatSessions: ChatSession[];
   profile: Profile;
 }

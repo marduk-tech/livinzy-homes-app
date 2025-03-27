@@ -222,10 +222,10 @@ export function Brick360() {
         <Typography.Text
           style={{ fontSize: FONT_SIZE.HEADING_2, marginTop: 16 }}
         >
-          {rupeeAmountFormat(lvnzyProject?.meta.costingDetails.minimumUnitCost)}
+          {rupeeAmountFormat(lvnzyProject?.meta.costingDetails.singleUnitCost)}
           &nbsp;(
           {Math.round(
-            lvnzyProject?.meta.costingDetails.minimumUnitCost /
+            lvnzyProject?.meta.costingDetails.singleUnitCost /
               lvnzyProject?.meta.costingDetails.singleUnitSize
           )}{" "}
           /sqft )
