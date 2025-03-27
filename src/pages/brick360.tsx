@@ -238,6 +238,17 @@ export function Brick360() {
         >
           {lvnzyProject?.meta.oneLiner}
         </Typography.Text>
+        {lvnzyProject?.meta.projectTimelines &&
+        lvnzyProject?.meta.projectTimelines.length ? (
+          <Typography.Text
+            style={{
+              fontSize: FONT_SIZE.PARA,
+              color: COLORS.textColorLight,
+            }}
+          >
+            Completion: {lvnzyProject?.meta.projectTimelines[0].completionDate}
+          </Typography.Text>
+        ) : null}
       </Flex>
       <Flex
         style={{
