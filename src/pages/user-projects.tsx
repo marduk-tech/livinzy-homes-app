@@ -4,10 +4,24 @@ import { useUser } from "../hooks/use-user";
 import { useNavigate } from "react-router-dom";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { rupeeAmountFormat } from "../libs/lvnzy-helper";
+import { useEffect, useState } from "react";
 
 export function UserProjects() {
   const { user } = useUser();
   const navigate = useNavigate();
+  const [corridorWiseProjects, setCorridorWiseProjects] = useState<any>();
+
+  useEffect(() => {
+    const corrProjects: any = {};
+    if (user?.savedLvnzyProjects && user.savedLvnzyProjects.length) {
+      user.savedLvnzyProjects.forEach((p) => {
+        corrProjects[p.meta.projectCorridor] =
+          corrProjects[p.meta.projectCorridor] || [];
+        corrProjects[p.meta.projectCorridor].push(p);
+      });
+      setCorridorWiseProjects(corrProjects);
+    }
+  }, [user]);
 
   const renderLvnzyProject = (itemInfo: any) => {
     return (
@@ -34,7 +48,7 @@ export function UserProjects() {
     );
   };
 
-  if (!user) {
+  if (!user || !corridorWiseProjects) {
     return <Loader></Loader>;
   }
 
@@ -44,19 +58,24 @@ export function UserProjects() {
         width: "100%",
         padding: 16,
       }}
+      vertical
     >
-      <List
-        size="large"
-        style={{
-          width: "100%",
-          height: "85vh",
-          overflowY: "scroll",
-          scrollbarWidth: "none",
-        }}
-        bordered
-        dataSource={user.savedLvnzyProjects}
-        renderItem={renderLvnzyProject}
-      />
+      {Object.keys(corridorWiseProjects).map((corridor: string) => {
+        return (
+          <Flex vertical>
+            <Typography.Title level={4}>{corridor}</Typography.Title>
+            <List
+              size="large"
+              style={{
+                width: "100%",
+              }}
+              bordered
+              dataSource={corridorWiseProjects[corridor]}
+              renderItem={renderLvnzyProject}
+            />
+          </Flex>
+        );
+      })}
     </Flex>
   );
 }

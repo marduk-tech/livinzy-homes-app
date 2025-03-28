@@ -201,13 +201,10 @@ export function Brick360() {
       vertical
       style={{
         borderRadius: 16,
-        height: "90vh",
         width: "100%",
         margin: "auto",
         maxWidth: 900,
         overflowX: "hidden",
-        scrollbarWidth: "none",
-        overflowY: "auto",
       }}
     >
       <Flex vertical style={{ padding: 16 }}>

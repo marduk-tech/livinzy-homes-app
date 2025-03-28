@@ -200,6 +200,9 @@ export const DashboardLayout: React.FC = () => {
               margin: "auto",
               maxWidth: MAX_WIDTH,
               width: "100%",
+              height: "calc(100vh - 60px)",
+              overflowY: "scroll",
+              scrollbarWidth: "none",
             }}
           >
             <CustomErrorBoundary>
