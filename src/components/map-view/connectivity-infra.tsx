@@ -278,14 +278,16 @@ export const ConnectivityInfra: React.FC<any> = ({ connectivityData }) => {
               {selectedLine.dashConfig ? "Under Construction" : "Operational"}
             </Tag>
           </Flex>
-          <Paragraph
-            style={{
-              fontSize: FONT_SIZE.PARA,
-            }}
-            ellipsis={{ rows: 5, expandable: true, symbol: "more" }}
-          >
-            {connectivityData?.details.oneLiner}
-          </Paragraph>
+          {connectivityData.details && connectivityData.details.oneLiner ? (
+            <Paragraph
+              style={{
+                fontSize: FONT_SIZE.PARA,
+              }}
+              ellipsis={{ rows: 5, expandable: true, symbol: "more" }}
+            >
+              {connectivityData?.details.oneLiner}
+            </Paragraph>
+          ) : null}
         </div>
       ) : null}
     </Modal>
