@@ -57,6 +57,7 @@ export function UserProjects() {
       style={{
         width: "100%",
         padding: 16,
+        paddingBottom: 100,
       }}
       vertical
     >
