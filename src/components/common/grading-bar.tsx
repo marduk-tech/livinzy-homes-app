@@ -1,11 +1,12 @@
 import React from "react";
-import { COLORS } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 
 type GradientBarProps = {
   value: number;
+  text?: string;
 };
 
-const GradientBar: React.FC<GradientBarProps> = ({ value }) => {
+const GradientBar: React.FC<GradientBarProps> = ({ value, text }) => {
   const interpolate = (start: number, end: number, factor: number): number => {
     return Math.round(start + (end - start) * factor);
   };
@@ -67,15 +68,19 @@ const GradientBar: React.FC<GradientBarProps> = ({ value }) => {
       >
         <div
           style={{
-            width: `${value}%`,
+            width: text ? "100%" : `${value}%`,
             backgroundColor: getGradientColor(value),
             height: "100%",
             border: "1px solid",
             borderRadius: 24,
+            fontSize: FONT_SIZE.SUB_TEXT,
+            color: "white",
+            padding: "0 4px",
+            textAlign: "center",
             borderColor: COLORS.borderColor,
           }}
         >
-          {" "}
+          {text || ""}
         </div>
       </div>
     </div>

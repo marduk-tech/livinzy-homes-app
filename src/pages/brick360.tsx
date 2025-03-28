@@ -25,6 +25,7 @@ import Brick360Chat from "../components/liv/brick360-chat";
 import { MapView } from "../components/map-view/map-view";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 const FAKE_TIMER_SECS = 1000;
+const { Paragraph, Text } = Typography;
 
 export function Brick360() {
   const { lvnzyProjectId } = useParams();
@@ -246,6 +247,22 @@ export function Brick360() {
             Completion: {lvnzyProject?.meta.projectTimelines[0].completionDate}
           </Typography.Text>
         ) : null}
+        <Flex
+          style={{
+            flexWrap: "wrap",
+            width: "100%",
+            backgroundColor: COLORS.bgColor,
+            padding: 8,
+            borderRadius: 8,
+            border: "1px solid",
+            borderColor: COLORS.borderColor,
+            marginTop: 4,
+          }}
+        >
+          <Paragraph ellipsis={{ rows: 2, expandable: true }}>
+            {lvnzyProject!.meta.costingDetails.configurations}
+          </Paragraph>
+        </Flex>
       </Flex>
       <Flex
         style={{
@@ -310,16 +327,6 @@ export function Brick360() {
                             ]
                           )}
                         </Typography.Text>
-                        {/* <Rate
-                          style={{ marginLeft: "auto", fontSize: 20 }}
-                          disabled
-                          allowHalf
-                          defaultValue={
-                            Math.round(
-                              ((item as any)[1].rating / 100) * 5 * 2
-                            ) / 2
-                          }
-                        /> */}
                         <Flex
                           style={{
                             width: "35%",

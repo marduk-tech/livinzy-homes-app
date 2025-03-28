@@ -70,6 +70,10 @@ export const LivIndexDriversConfig = {
     label: "Transit Network",
     icon: { name: "MdOutlineDirectionsTransit", set: "md" },
   },
+  food: {
+    label: "Dining options",
+    icon: { name: "IoFastFood", set: "io5" },
+  },
 };
 
 export const LivestIndexConfig = [

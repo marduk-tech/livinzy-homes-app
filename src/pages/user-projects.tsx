@@ -3,14 +3,26 @@ import { Loader } from "../components/common/loader";
 import { useUser } from "../hooks/use-user";
 import { useNavigate } from "react-router-dom";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { rupeeAmountFormat } from "../libs/lvnzy-helper";
+import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { useEffect, useState } from "react";
+import GradientBar from "../components/common/grading-bar";
 
 export function UserProjects() {
   const { user } = useUser();
   const navigate = useNavigate();
   const [corridorWiseProjects, setCorridorWiseProjects] = useState<any>();
 
+  const getDataPtOverallRating = (dataPt: any) => {
+    let totRating = 0,
+      ct = 0;
+    Object.keys(dataPt).forEach((subPt) => {
+      if (dataPt[subPt].rating) {
+        totRating += dataPt[subPt].rating;
+        ct++;
+      }
+    });
+    return totRating / ct;
+  };
   useEffect(() => {
     const corrProjects: any = {};
     if (user?.savedLvnzyProjects && user.savedLvnzyProjects.length) {
@@ -43,6 +55,24 @@ export function UserProjects() {
             {rupeeAmountFormat(itemInfo.meta.costingDetails.singleUnitCost)} /{" "}
             {itemInfo.meta.costingDetails.singleUnitSize} sqft
           </Typography.Text>
+          <Flex gap={4} style={{ flexWrap: "wrap" }}>
+            {[
+              "property",
+              "developer",
+              "investment",
+              "connectivity",
+              "neighborhood",
+            ].map((d: string) => {
+              return (
+                <Flex style={{ width: 100, height: 24 }}>
+                  <GradientBar
+                    text={capitalize(d)}
+                    value={getDataPtOverallRating(itemInfo.score[d])}
+                  ></GradientBar>
+                </Flex>
+              );
+            })}
+          </Flex>
         </Flex>
       </List.Item>
     );
