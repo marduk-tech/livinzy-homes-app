@@ -22,6 +22,7 @@ import { Circle } from "./shapes/circle";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { Flex, Tooltip, Typography } from "antd";
+import { Loader } from "../common/loader";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 
@@ -86,13 +87,15 @@ export const MapView = ({
   projects,
   drivers,
   onProjectClick,
+  mapTitle,
 }: {
   projectId?: string;
   projects: Project[];
   drivers: string[];
   onProjectClick?: any;
+  mapTitle?: string;
 }) => {
-  const { data: livIndexPlaces } = useFetchAllLivindexPlaces();
+  const { data: livIndexPlaces } = useFetchAllLivindexPlaces(drivers, mapTitle);
   const { data: projectData } = useFetchProjectById(projectId!);
   const [mapDrivers, setMapDrivers] = useState<string[]>();
   const { data: corridors, isLoading: isCorridorsDataLoading } =
@@ -165,6 +168,15 @@ export const MapView = ({
   const handleLivIndexExpand = useCallback((id: string) => {
     setExpandedLivIndexId((prevId) => (prevId === id ? null : id));
   }, []);
+
+  if (!livIndexPlaces) {
+    return (
+      <Flex align="center" style={{ width: "100%" }} justify="center" gap={8}>
+        <Loader size="small"></Loader>
+        <Typography.Text>Loading map..</Typography.Text>
+      </Flex>
+    );
+  }
 
   if (projectsData && projects && livIndexPlaces) {
     const connectivityData = livIndexPlaces

@@ -351,6 +351,7 @@ export function Brick360() {
         open={isMapFullScreen}
         onCancel={() => {
           setDetailsModalOpen(false);
+          setSelectedDriverTypes([]);
         }}
         closeIcon={null}
         footer={null}
@@ -383,6 +384,7 @@ export function Brick360() {
               onClick={() => {
                 setIsMapFullScreen(false);
                 setDetailsModalOpen(true);
+                setSelectedDriverTypes([]);
               }}
               style={{ marginLeft: "auto" }}
             >
@@ -395,6 +397,7 @@ export function Brick360() {
           <MapView
             projectId={lvnzyProject?.originalProjectId._id}
             projects={[]}
+            mapTitle={`${lvnzyProject?.meta.projectName}: ${selectedDataPointCategory}`}
             drivers={mapDrivers
               .filter(
                 (d) =>
@@ -494,6 +497,7 @@ export function Brick360() {
                 <MapView
                   projectId={lvnzyProject?.originalProjectId._id}
                   projects={[]}
+                  mapTitle={`${lvnzyProject?.meta.projectName}: ${selectedDataPointCategory}`}
                   drivers={mapDrivers.map((d) => d.driverId._id)}
                 ></MapView>
               </Flex>
