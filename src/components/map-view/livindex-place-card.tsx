@@ -4,13 +4,14 @@ import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { useState } from "react";
+import { capitalize } from "../../libs/lvnzy-helper";
 const { Paragraph } = Typography;
 
 interface LivIndexPlaceCardProps {
   place: IDriverPlace;
 }
 
-const renderIcon = (place: IDriverPlace) => {
+const renderIcon = (place: IDriverPlace, isUnderConstruction?: boolean) => {
   if (place.details && place.details.icon) {
     return <img src={place.details.icon} height={24} width={24}></img>;
   }
@@ -24,9 +25,7 @@ const renderIcon = (place: IDriverPlace) => {
       iconSet={icon.set}
       size={18}
       color={
-        place.parameters && place.parameters.growthLever && false
-          ? "white"
-          : "black"
+        isUnderConstruction ? COLORS.yellowIdentifier : COLORS.textColorDark
       }
     ></DynamicReactIcon>
   );
@@ -88,7 +87,7 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
                   fontSize: FONT_SIZE.SUB_TEXT,
                 }}
               >
-                Under Construction
+                {capitalize(place.status)}
               </Tag>
             ) : null}
             {place.parameters && place.parameters.growthLever ? (
@@ -123,21 +122,20 @@ export const LivIndexPlaceCard: React.FC<LivIndexPlaceCardProps> = ({
           setModalOpen(true);
         }}
         style={{
-          backgroundColor:
-            place.parameters && place.parameters.growthLever && false
-              ? COLORS.textColorDark
-              : "rgba(255,255,255, 1)",
+          backgroundColor: isUnderConstruction
+            ? "rgba(255,255,255, 0.7)"
+            : "rgba(255,255,255, 1)",
           borderRadius: "50%",
-          padding: 8,
-          borderWidth: "1px",
+          padding: 4,
+          borderWidth: "3px",
           borderColor: isUnderConstruction
-            ? COLORS.borderColorDark
+            ? COLORS.yellowIdentifier
             : COLORS.borderColorDark,
           borderStyle: isUnderConstruction ? "dotted" : "solid",
           animation: "none",
         }}
       >
-        {renderIcon(place)}
+        {renderIcon(place, isUnderConstruction)}
       </Flex>
     </Flex>
   );
