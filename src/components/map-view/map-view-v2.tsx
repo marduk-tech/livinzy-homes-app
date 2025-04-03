@@ -1,12 +1,10 @@
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 
 const MapViewV2 = () => {
-  const position = [12.9716, 77.5946]; // Example: Bangalore
-
   return (
     <MapContainer
-      center={position}
+      center={[12.9716, 77.5946]}
       zoom={13}
       style={{ height: "500px", width: "100%" }}
     >
@@ -16,7 +14,7 @@ const MapViewV2 = () => {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
       {/* Marker Example */}
-      <Marker position={position}>
+      <Marker position={[12.9716, 77.5946]}>
         <Popup>Foxconn (Example Location)</Popup>
       </Marker>
     </MapContainer>
