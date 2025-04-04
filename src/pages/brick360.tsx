@@ -204,6 +204,7 @@ export function Brick360() {
       style={{
         borderRadius: 16,
         width: "100%",
+        paddingBottom: 75,
         margin: "auto",
         maxWidth: 900,
         overflowX: "hidden",
@@ -260,7 +261,7 @@ export function Brick360() {
             marginTop: 4,
           }}
         >
-          <Paragraph ellipsis={{ rows: 2, expandable: true }}>
+          <Paragraph ellipsis={{ rows: 1, expandable: true }}>
             {lvnzyProject!.meta.costingDetails.configurations
               .map((c: any) => `₹${rupeeAmountFormat(c.cost)} (${c.config})`)
               .join(", ")}
@@ -418,6 +419,14 @@ export function Brick360() {
       <Drawer
         title={selectedDataPointTitle}
         placement="bottom"
+        styles={{
+          body: {
+            padding: 0,
+          },
+          header: {
+            padding: 16,
+          },
+        }}
         rootStyle={{
           maxWidth: 900,
           marginLeft: isMobile ? 0 : "calc(50% - 450px)",
@@ -456,18 +465,16 @@ export function Brick360() {
             paddingBottom: 64,
           }}
         >
-          {selectedDataPointCategory == "developer" && (
-            <Typography.Title level={4}>
-              {lvnzyProject?.originalProjectId.info.developerId.name}
-            </Typography.Title>
-          )}
-          <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
-            {selectedDataPoint ? selectedDataPoint.reasoning : ""}
-          </Markdown>
-
           {mapDrivers && mapDrivers.length ? (
-            <Flex vertical>
-              <Flex>
+            <Flex vertical style={{ position: "relative" }}>
+              <Flex
+                style={{
+                  position: "absolute",
+                  bottom: 16,
+                  right: 16,
+                  zIndex: 9999,
+                }}
+              >
                 <Button
                   size="small"
                   icon={
@@ -510,15 +517,26 @@ export function Brick360() {
               </Flex>
             </Flex>
           ) : null}
-          <Divider></Divider>
+          <Flex vertical style={{ padding: 16 }}>
+            {selectedDataPointCategory == "developer" && (
+              <Typography.Title level={4}>
+                {lvnzyProject?.originalProjectId.info.developerId.name}
+              </Typography.Title>
+            )}
+            <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
+              {selectedDataPoint ? selectedDataPoint.reasoning : ""}
+            </Markdown>
 
-          <Flex style={{ width: "100%" }}>
-            <Brick360Chat
-              ref={chatRef}
-              lvnzyProjectId={lvnzyProjectId!}
-              dataPointCategory={selectedDataPointCategory}
-              dataPoint={selectedDataPointTitle}
-            ></Brick360Chat>
+            <Divider></Divider>
+
+            <Flex style={{ width: "100%" }}>
+              <Brick360Chat
+                ref={chatRef}
+                lvnzyProjectId={lvnzyProjectId!}
+                dataPointCategory={selectedDataPointCategory}
+                dataPoint={selectedDataPointTitle}
+              ></Brick360Chat>
+            </Flex>
           </Flex>
         </Flex>
       </Drawer>
