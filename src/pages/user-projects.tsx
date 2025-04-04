@@ -30,7 +30,9 @@ export function UserProjects() {
       const collections = user.savedLvnzyProjects.map((c) => c.collectionName);
       setCollectionNames(collections);
       setSelectedCollection(
-        user.savedLvnzyProjects.find((c) => c.collectionName == collections[1])
+        user.savedLvnzyProjects.find(
+          (c) => c.collectionName == collections[collections.length > 1 ? 1 : 0]
+        )
       );
     }
   }, [user]);
@@ -104,22 +106,25 @@ export function UserProjects() {
       }}
       vertical
     >
-      <Select
-        placeholder="Select a person"
-        defaultValue={collectionNames ? collectionNames[1] : ""}
-        optionFilterProp="label"
-        onChange={(value: string) => {
-          setSelectedCollection(
-            user.savedLvnzyProjects.find((c) => c.collectionName == value)
-          );
-        }}
-        options={collectionNames?.map((c) => {
-          return {
-            value: c,
-            label: c,
-          };
-        })}
-      />
+      {collectionNames && collectionNames.length > 1 ? (
+        <Select
+          placeholder="Select a person"
+          defaultValue={collectionNames ? collectionNames[1] : ""}
+          optionFilterProp="label"
+          onChange={(value: string) => {
+            setSelectedCollection(
+              user.savedLvnzyProjects.find((c) => c.collectionName == value)
+            );
+          }}
+          options={collectionNames?.map((c) => {
+            return {
+              value: c,
+              label: c,
+            };
+          })}
+        />
+      ) : null}
+
       {Object.keys(corridorWiseProjects).map((corridor: string) => {
         return (
           <Flex vertical>
