@@ -125,6 +125,7 @@ export interface IUI {
 
 export interface Project {
   _id: string;
+  info: any;
   metadata: IMetadata;
   land: ILand;
   plots: IPlots;

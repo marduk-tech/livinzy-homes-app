@@ -236,8 +236,7 @@ export const PlaceholderContent = `# Liv is the AI Agent for Real Estate.
 export const POP_STAR_DATA_POINTS = {
   property: {
     amenities: "Amenities",
-    densityRating: "Density",
-    openAreaRating: "Open Area",
+    density: "Density",
     surroundings: "Surroundings",
   },
   developer: {
@@ -260,7 +259,7 @@ export const POP_STAR_DATA_POINTS = {
   investment: {
     priceAppreciation: "Price Appreciation",
     rentalIncome: "Rental Income",
-    corridorPricePoint: "Corridor Price Point",
-    cityPricePoint: "City Level Price Point",
+    investorFriendly: "Investor Friendly",
+    pricePoint: "Price Point",
   },
 };

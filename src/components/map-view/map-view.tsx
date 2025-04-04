@@ -205,11 +205,11 @@ export const MapView = ({
           defaultCenter={
             projectId &&
             projectData &&
-            projectData.metadata.location &&
-            projectData.metadata.location.lat
+            projectData.info.location &&
+            projectData.info.location.lat
               ? {
-                  lat: projectData.metadata.location.lat,
-                  lng: projectData.metadata.location.lng,
+                  lat: projectData.info.location.lat,
+                  lng: projectData.info.location.lng,
                 }
               : { lat: 13.201304, lng: 77.602374 }
           }
@@ -243,8 +243,8 @@ export const MapView = ({
           {corridors &&
             corridors
               .filter((c) =>
-                projectData?.metadata.corridors
-                  .map((cc) => cc.corridorId)
+                projectData?.info.corridors
+                  .map((cc: any) => cc.corridorId)
                   .includes(c._id)
               )
               .map((c: Corridor) => {
@@ -263,8 +263,8 @@ export const MapView = ({
           {corridors &&
             corridors
               .filter((c) =>
-                projectData?.metadata.corridors
-                  .map((cc) => cc.corridorId)
+                projectData?.info.corridors
+                  .map((cc: any) => cc.corridorId)
                   .includes(c._id)
               )
               .map((c: Corridor) => {
@@ -323,7 +323,7 @@ export const MapView = ({
             <AdvancedMarkerWithRef
               anchorPoint={AdvancedMarkerAnchorPoint.BOTTOM}
               className="custom-marker boun"
-              position={projectData?.metadata.location}
+              position={projectData?.info.location}
               zIndex={1}
               onMarkerClick={() => {}}
               onMouseEnter={() => onMouseEnter(projectData._id)}

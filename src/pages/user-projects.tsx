@@ -1,4 +1,4 @@
-import { Flex, List, Typography } from "antd";
+import { Flex, List, Select, Typography } from "antd";
 import { Loader } from "../components/common/loader";
 import { useUser } from "../hooks/use-user";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,8 @@ export function UserProjects() {
   const { user } = useUser();
   const navigate = useNavigate();
   const [corridorWiseProjects, setCorridorWiseProjects] = useState<any>();
+  const [collectionNames, setCollectionNames] = useState<string[]>();
+  const [selectedCollection, setSelectedCollection] = useState<any>();
 
   const getDataPtOverallRating = (dataPt: any) => {
     let totRating = 0,
@@ -24,16 +26,27 @@ export function UserProjects() {
     return totRating / ct;
   };
   useEffect(() => {
-    const corrProjects: any = {};
     if (user?.savedLvnzyProjects && user.savedLvnzyProjects.length) {
-      user.savedLvnzyProjects.forEach((p) => {
-        corrProjects[p.meta.projectCorridor] =
-          corrProjects[p.meta.projectCorridor] || [];
-        corrProjects[p.meta.projectCorridor].push(p);
-      });
-      setCorridorWiseProjects(corrProjects);
+      const collections = user.savedLvnzyProjects.map((c) => c.collectionName);
+      setCollectionNames(collections);
+      setSelectedCollection(
+        user.savedLvnzyProjects.find((c) => c.collectionName == collections[1])
+      );
     }
   }, [user]);
+
+  useEffect(() => {
+    if (!selectedCollection) {
+      return;
+    }
+    const corrProjects: any = {};
+    selectedCollection.projects.forEach((p: any) => {
+      corrProjects[p.meta.projectCorridor] =
+        corrProjects[p.meta.projectCorridor] || [];
+      corrProjects[p.meta.projectCorridor].push(p);
+    });
+    setCorridorWiseProjects(corrProjects);
+  }, [selectedCollection]);
 
   const renderLvnzyProject = (itemInfo: any) => {
     return (
@@ -52,8 +65,8 @@ export function UserProjects() {
           <Typography.Text
             style={{ fontSize: FONT_SIZE.PARA, color: COLORS.textColorLight }}
           >
-            {rupeeAmountFormat(itemInfo.meta.costingDetails.singleUnitCost)} /{" "}
-            {itemInfo.meta.costingDetails.singleUnitSize} sqft
+            {rupeeAmountFormat(itemInfo.meta.costingDetails.minimumUnitCost)} /{" "}
+            {itemInfo.meta.costingDetails.minimumUnitSize} sqft
           </Typography.Text>
           <Flex gap={4} style={{ flexWrap: "wrap" }}>
             {[
@@ -91,6 +104,22 @@ export function UserProjects() {
       }}
       vertical
     >
+      <Select
+        placeholder="Select a person"
+        defaultValue={collectionNames ? collectionNames[1] : ""}
+        optionFilterProp="label"
+        onChange={(value: string) => {
+          setSelectedCollection(
+            user.savedLvnzyProjects.find((c) => c.collectionName == value)
+          );
+        }}
+        options={collectionNames?.map((c) => {
+          return {
+            value: c,
+            label: c,
+          };
+        })}
+      />
       {Object.keys(corridorWiseProjects).map((corridor: string) => {
         return (
           <Flex vertical>

@@ -148,10 +148,11 @@ export function Brick360() {
           left: `calc(50% - ${progressWidth / 2}px)`,
         }}
       >
+        {/* <ProjectGallery ></ProjectGallery> */}
         <Typography.Title
           style={{ margin: 0, marginBottom: 32, textAlign: "center" }}
         >
-          {lvnzyProject?.originalProjectId.metadata.name}
+          {lvnzyProject?.meta.projectName}
         </Typography.Title>
         <Progress percent={fakeTimeoutProgress} />
         <Flex vertical>
@@ -210,7 +211,7 @@ export function Brick360() {
     >
       <Flex vertical style={{ padding: 16 }}>
         <Typography.Title level={2} style={{ margin: 0 }}>
-          {lvnzyProject?.originalProjectId.metadata.name}
+          {lvnzyProject?.meta.projectName}
         </Typography.Title>
         <Flex>
           <Tag style={{ color: COLORS.textColorLight }}>
@@ -221,11 +222,11 @@ export function Brick360() {
         <Typography.Text
           style={{ fontSize: FONT_SIZE.HEADING_2, marginTop: 16 }}
         >
-          {rupeeAmountFormat(lvnzyProject?.meta.costingDetails.singleUnitCost)}
+          {rupeeAmountFormat(lvnzyProject?.meta.costingDetails.minimumUnitCost)}
           &nbsp;(
           {Math.round(
-            lvnzyProject?.meta.costingDetails.singleUnitCost /
-              lvnzyProject?.meta.costingDetails.singleUnitSize
+            lvnzyProject?.meta.costingDetails.minimumUnitCost /
+              lvnzyProject?.meta.costingDetails.minimumUnitSize
           )}{" "}
           /sqft )
         </Typography.Text>
@@ -260,7 +261,9 @@ export function Brick360() {
           }}
         >
           <Paragraph ellipsis={{ rows: 2, expandable: true }}>
-            {lvnzyProject!.meta.costingDetails.configurations}
+            {lvnzyProject!.meta.costingDetails.configurations
+              .map((c: any) => `₹${rupeeAmountFormat(c.cost)} (${c.config})`)
+              .join(", ")}
           </Paragraph>
         </Flex>
       </Flex>
@@ -295,7 +298,7 @@ export function Brick360() {
                 <List
                   size="large"
                   dataSource={sc.dataPoints.filter(
-                    (dp: any[]) => dp[0] !== "_id"
+                    (dp: any[]) => !["_id", "openAreaRating"].includes(dp[0])
                   )}
                   renderItem={(item) => (
                     <List.Item
@@ -319,6 +322,10 @@ export function Brick360() {
                           style={{
                             fontSize: FONT_SIZE.HEADING_3,
                             width: "65%",
+                            color:
+                              (item as any)[1].rating > 0
+                                ? COLORS.textColorDark
+                                : COLORS.textColorLight,
                           }}
                         >
                           {capitalize(
@@ -451,7 +458,7 @@ export function Brick360() {
         >
           {selectedDataPointCategory == "developer" && (
             <Typography.Title level={4}>
-              {lvnzyProject?.originalProjectId.metadata.developerId.name}
+              {lvnzyProject?.originalProjectId.info.developerId.name}
             </Typography.Title>
           )}
           <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">

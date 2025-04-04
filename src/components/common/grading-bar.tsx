@@ -55,34 +55,36 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, text }) => {
       }}
     >
       {/* Gradient Background */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundColor: COLORS.bgColorMedium,
-          width: "100%",
-          height: "100%",
-          borderRadius: 24,
-          border: "1px solid",
-          borderColor: COLORS.borderColor,
-        }}
-      >
+      {value > 0 ? (
         <div
+          className="absolute inset-0"
           style={{
-            width: text ? "100%" : `${value}%`,
-            backgroundColor: getGradientColor(value),
+            backgroundColor: COLORS.bgColorMedium,
+            width: "100%",
             height: "100%",
-            border: "1px solid",
             borderRadius: 24,
-            fontSize: FONT_SIZE.SUB_TEXT,
-            color: "white",
-            padding: "0 4px",
-            textAlign: "center",
+            border: "1px solid",
             borderColor: COLORS.borderColor,
           }}
         >
-          {text || ""}
+          <div
+            style={{
+              width: text ? "100%" : `${value}%`,
+              backgroundColor: getGradientColor(value),
+              height: "100%",
+              border: "1px solid",
+              borderRadius: 24,
+              fontSize: FONT_SIZE.SUB_TEXT,
+              color: "white",
+              padding: "0 4px",
+              textAlign: "center",
+              borderColor: COLORS.borderColor,
+            }}
+          >
+            {text || ""}
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 };
