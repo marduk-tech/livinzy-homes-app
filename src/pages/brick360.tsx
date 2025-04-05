@@ -325,26 +325,30 @@ export function Brick360() {
             </Typography.Text>
           </Flex>
         ) : null}
-        <Flex
-          style={{
-            flexWrap: "wrap",
-            width: "100%",
-            backgroundColor: COLORS.bgColor,
-            padding: 8,
-            borderRadius: 8,
-            border: "1px solid",
-            borderColor: COLORS.borderColor,
-            marginTop: 4,
-          }}
-        >
-          <Paragraph
-            ellipsis={{ rows: 2, expandable: true }}
-            style={{ margin: 0 }}
+        <Flex>
+          <Flex
+            style={{
+              backgroundColor: COLORS.bgColor,
+              border: "1px solid",
+              marginTop: 4,
+              borderColor: COLORS.borderColorDark,
+            }}
           >
-            {lvnzyProject!.meta.costingDetails.configurations
-              .map((c: any) => `₹${rupeeAmountFormat(c.cost)} (${c.config})`)
-              .join(", ")}
-          </Paragraph>
+            {lvnzyProject!.meta.costingDetails.configurations.map((c: any) => {
+              return (
+                <Flex
+                  style={{
+                    borderRight: "1px solid",
+                    borderColor: COLORS.borderColorDark,
+                    padding: 4,
+                    paddingRight: 8,
+                  }}
+                >
+                  ₹{rupeeAmountFormat(c.cost)} / {c.config}
+                </Flex>
+              );
+            })}
+          </Flex>
         </Flex>
       </Flex>
       <Flex
@@ -352,8 +356,8 @@ export function Brick360() {
           marginBottom: 16,
           borderRadius: isMobile ? 0 : 8,
           marginTop: 8,
-          width: "100%",
-          flexWrap: "wrap",
+          width: "96%",
+          margin: "0 2%",
           backgroundColor: COLORS.textColorDark,
           padding: "16px",
         }}
