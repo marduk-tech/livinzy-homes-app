@@ -1,4 +1,4 @@
-import { Flex, List, Select, Typography } from "antd";
+import { Flex, List, Select, Tag, Typography } from "antd";
 import { Loader } from "../components/common/loader";
 import { useUser } from "../hooks/use-user";
 import { useNavigate } from "react-router-dom";
@@ -51,6 +51,10 @@ export function UserProjects() {
   }, [selectedCollection]);
 
   const renderLvnzyProject = (itemInfo: any) => {
+    const oneLinerBreakup = itemInfo.meta.oneLiner
+      ? itemInfo.meta.oneLiner.split(" · ")
+      : [];
+
     return (
       <List.Item
         onClick={() => {
@@ -61,9 +65,22 @@ export function UserProjects() {
           <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
             {itemInfo.meta.projectName}
           </Typography.Text>
-          <Typography.Text style={{ fontSize: FONT_SIZE.PARA }}>
-            {itemInfo.meta.oneLiner}
-          </Typography.Text>
+          <Flex gap={4} align="center">
+            {oneLinerBreakup.length && (
+              <Typography.Text style={{ fontSize: FONT_SIZE.PARA }}>
+                {oneLinerBreakup.slice(0, 3).join(" · ")}
+              </Typography.Text>
+            )}
+            {oneLinerBreakup.length > 3 && (
+              <Tag style={{ fontSize: FONT_SIZE.PARA }} color="blue">
+                {oneLinerBreakup
+                  .slice(3, 4)
+                  .join("")
+                  .replace("(", "")
+                  .replace(")", "")}
+              </Tag>
+            )}
+          </Flex>
           <Typography.Text
             style={{ fontSize: FONT_SIZE.PARA, color: COLORS.textColorLight }}
           >
