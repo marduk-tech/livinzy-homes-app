@@ -16,7 +16,7 @@ const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
           width: "100%",
           overflowX: "scroll",
           whiteSpace: "nowrap",
-          height: 165,
+          height: 125,
           scrollbarWidth: "none",
         }}
       >
@@ -36,7 +36,7 @@ const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
                   overflow: "hidden",
                   borderRadius: 8,
                   width: 200,
-                  height: 165,
+                  height: 125,
                   marginRight: 8,
                   position: "relative",
                   filter:

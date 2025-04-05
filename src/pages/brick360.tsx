@@ -24,6 +24,7 @@ import remarkGfm from "remark-gfm";
 import Brick360Chat from "../components/liv/brick360-chat";
 import { MapView } from "../components/map-view/map-view";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
+import ProjectGallery from "../components/project-gallery";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -64,6 +65,44 @@ export function Brick360() {
 
   const [isMapFullScreen, setIsMapFullScreen] = useState(false);
 
+  // Renders the drawer close button
+  const renderDrawerCloseBtn = () => {
+    return (
+      <Flex
+        style={{
+          position: "absolute",
+          top: 16,
+          right: 16,
+          zIndex: 99999,
+        }}
+        onClick={() => {
+          setDetailsModalOpen(false);
+          if (!isMapFullScreen) {
+            chatRef.current?.clearChatData();
+            setMapDrivers([]);
+          }
+        }}
+      >
+        <DynamicReactIcon
+          iconName="IoCloseCircle"
+          iconSet="io5"
+          size={32}
+        ></DynamicReactIcon>
+      </Flex>
+    );
+  };
+
+  // Get data category icon
+  const getDataCategoryIcon = (iconName: string, iconSet: any) => {
+    return (
+      <DynamicReactIcon
+        iconName={iconName}
+        iconSet={iconSet}
+        color={COLORS.textColorDark}
+      ></DynamicReactIcon>
+    );
+  };
+  // Fake timeout and progress
   useEffect(() => {
     const interval = setInterval(() => {
       setFakeTimeoutProgress((prevFakeTimeoutProgress: any) => {
@@ -77,6 +116,7 @@ export function Brick360() {
     }, FAKE_TIMER_SECS);
   });
 
+  // Setting map drivers based on selected data point
   useEffect(() => {
     if (
       lvnzyProject &&
@@ -100,37 +140,46 @@ export function Brick360() {
     }
   }, [lvnzyProject, selectedDataPointCategory, selectedDataPointSubCategory]);
 
+  // Setting main data points category
   useEffect(() => {
     if (lvnzyProject) {
       const params = [];
       params.push({
         title: "Property",
         key: "property",
+        icon: getDataCategoryIcon("MdOutlineMapsHomeWork", "md"),
         dataPoints: Object.entries(lvnzyProject.score.property),
       });
+
       params.push({
         title: "Developer",
         key: "developer",
+        icon: getDataCategoryIcon("FaPeopleGroup", "fa6"),
         dataPoints: Object.entries(lvnzyProject.score.developer),
-      });
-      params.push({
-        title: "Neighborhood",
-        key: "neighborhood",
-        dataPoints: Object.entries(lvnzyProject.score.neighborhood),
-      });
-      params.push({
-        title: "Connectivity",
-        key: "connectivity",
-        dataPoints: Object.entries(lvnzyProject.score.connectivity),
       });
       params.push({
         title: "Investment",
         key: "investment",
+        icon: getDataCategoryIcon("GiTakeMyMoney", "gi"),
         dataPoints: Object.entries(lvnzyProject.score.investment),
       });
+      params.push({
+        title: "Connectivity",
+        key: "connectivity",
+        icon: getDataCategoryIcon("GiPathDistance", "gi"),
+        dataPoints: Object.entries(lvnzyProject.score.connectivity),
+      });
+      params.push({
+        title: "Neighborhood",
+        key: "neighborhood",
+        icon: getDataCategoryIcon("AiTwotoneShop", "ai"),
+        dataPoints: Object.entries(lvnzyProject.score.neighborhood),
+      });
+
       setScoreParams(params);
     }
   }, [lvnzyProject]);
+
   const progressWidth = isMobile ? 300 : 500;
 
   if (lvnzyProjectIsLoading) {
@@ -210,19 +259,32 @@ export function Brick360() {
         overflowX: "hidden",
       }}
     >
+      {/* Main project upfront score card including metadata */}
       <Flex vertical style={{ padding: 16 }}>
-        <Typography.Title level={2} style={{ margin: 0 }}>
-          {lvnzyProject?.meta.projectName}
-        </Typography.Title>
-        <Flex>
-          <Tag style={{ color: COLORS.textColorLight }}>
+        {/* Project Gallery */}
+        <ProjectGallery
+          media={lvnzyProject?.originalProjectId.media}
+        ></ProjectGallery>
+        {/* Name */}{" "}
+        <Flex style={{ alignItems: "flex-end", margin: "16px 0" }} gap={8}>
+          <Typography.Title
+            level={2}
+            style={{ margin: "0", lineHeight: "100%" }}
+          >
+            {lvnzyProject?.meta.projectName}
+          </Typography.Title>
+
+          <Tag
+            style={{
+              color: COLORS.textColorLight,
+              fontSize: FONT_SIZE.SUB_TEXT,
+            }}
+          >
             Brick<i>360</i>
           </Tag>
         </Flex>
-
-        <Typography.Text
-          style={{ fontSize: FONT_SIZE.HEADING_2, marginTop: 16 }}
-        >
+        {/* Sqft cost */}
+        <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
           {rupeeAmountFormat(lvnzyProject?.meta.costingDetails.minimumUnitCost)}
           &nbsp;(
           {Math.round(
@@ -231,6 +293,7 @@ export function Brick360() {
           )}{" "}
           /sqft )
         </Typography.Text>
+        {/* One Liner */}
         <Typography.Text
           style={{
             fontSize: FONT_SIZE.HEADING_4,
@@ -238,16 +301,30 @@ export function Brick360() {
         >
           {lvnzyProject?.meta.oneLiner}
         </Typography.Text>
+        {/* Completion timeline */}
         {lvnzyProject?.meta.projectTimelines &&
         lvnzyProject?.meta.projectTimelines.length ? (
-          <Typography.Text
-            style={{
-              fontSize: FONT_SIZE.PARA,
-              color: COLORS.textColorLight,
-            }}
-          >
-            Completion: {lvnzyProject?.meta.projectTimelines[0].completionDate}
-          </Typography.Text>
+          <Flex>
+            <Typography.Text
+              style={{
+                fontSize: FONT_SIZE.PARA,
+                color: COLORS.textColorLight,
+              }}
+            >
+              Launched: {lvnzyProject?.meta.projectTimelines[0].startDate} |
+            </Typography.Text>
+
+            <Typography.Text
+              style={{
+                fontSize: FONT_SIZE.PARA,
+                color: COLORS.textColorLight,
+                marginLeft: 4,
+              }}
+            >
+              Completion:{" "}
+              {lvnzyProject?.meta.projectTimelines[0].completionDate}
+            </Typography.Text>
+          </Flex>
         ) : null}
         <Flex
           style={{
@@ -261,7 +338,10 @@ export function Brick360() {
             marginTop: 4,
           }}
         >
-          <Paragraph ellipsis={{ rows: 1, expandable: true }}>
+          <Paragraph
+            ellipsis={{ rows: 2, expandable: true }}
+            style={{ margin: 0 }}
+          >
             {lvnzyProject!.meta.costingDetails.configurations
               .map((c: any) => `₹${rupeeAmountFormat(c.cost)} (${c.config})`)
               .join(", ")}
@@ -289,12 +369,15 @@ export function Brick360() {
           scoreParams.map((sc) => {
             return (
               <Flex vertical>
-                <Typography.Title
-                  level={4}
-                  style={{ margin: 0, marginBottom: 8 }}
-                >
-                  {sc.title}
-                </Typography.Title>
+                <Flex gap={8} align="center" style={{ marginBottom: 8 }}>
+                  {sc.icon ? sc.icon : null}
+                  <Typography.Title
+                    level={4}
+                    style={{ margin: 0, marginBottom: 0 }}
+                  >
+                    {sc.title}
+                  </Typography.Title>
+                </Flex>
 
                 <List
                   size="large"
@@ -354,6 +437,8 @@ export function Brick360() {
             );
           })}
       </Flex>
+
+      {/* Full map view modal */}
       <Modal
         title={null}
         open={isMapFullScreen}
@@ -416,8 +501,10 @@ export function Brick360() {
           ></MapView>
         </Flex>
       </Modal>
+
+      {/* Bottom drawer to show a selected data point */}
       <Drawer
-        title={selectedDataPointTitle}
+        title={null}
         placement="bottom"
         styles={{
           body: {
@@ -465,8 +552,10 @@ export function Brick360() {
             paddingBottom: 64,
           }}
         >
+          {/* Map view including expand button and drawer close icon button */}
           {mapDrivers && mapDrivers.length ? (
             <Flex vertical style={{ position: "relative" }}>
+              {renderDrawerCloseBtn()}
               <Flex
                 style={{
                   position: "absolute",
@@ -517,9 +606,17 @@ export function Brick360() {
               </Flex>
             </Flex>
           ) : null}
+
+          {/* Close button when map view is absent */}
+          {!mapDrivers || !mapDrivers.length ? renderDrawerCloseBtn() : null}
+
+          {/* Rest of the content including title, markdown content and chatbox */}
           <Flex vertical style={{ padding: 16 }}>
+            <Typography.Title level={4} style={{ margin: "8px 0" }}>
+              {selectedDataPointTitle}
+            </Typography.Title>
             {selectedDataPointCategory == "developer" && (
-              <Typography.Title level={4}>
+              <Typography.Title level={5} style={{ margin: "8px 0" }}>
                 {lvnzyProject?.originalProjectId.info.developerId.name}
               </Typography.Title>
             )}

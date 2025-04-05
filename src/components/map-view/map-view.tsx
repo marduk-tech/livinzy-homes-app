@@ -200,7 +200,7 @@ export const MapView = ({
           style={{
             width: "100%",
           }}
-          defaultZoom={9}
+          defaultZoom={12}
           minZoom={7}
           defaultCenter={
             projectId &&
