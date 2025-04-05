@@ -6,6 +6,7 @@ import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { useEffect, useState } from "react";
 import GradientBar from "../components/common/grading-bar";
+import { useDevice } from "../hooks/use-device";
 
 export function UserProjects() {
   const { user } = useUser();
@@ -13,6 +14,7 @@ export function UserProjects() {
   const [corridorWiseProjects, setCorridorWiseProjects] = useState<any>();
   const [collectionNames, setCollectionNames] = useState<string[]>();
   const [selectedCollection, setSelectedCollection] = useState<any>();
+  const { isMobile } = useDevice();
 
   const getDataPtOverallRating = (dataPt: any) => {
     let totRating = 0,
@@ -65,7 +67,12 @@ export function UserProjects() {
           <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
             {itemInfo.meta.projectName}
           </Typography.Text>
-          <Flex gap={4} align="center">
+          <Flex
+            vertical={isMobile}
+            gap={4}
+            style={{ marginBottom: isMobile ? 8 : 0 }}
+            align={isMobile ? "flex-start" : "center"}
+          >
             {oneLinerBreakup.length && (
               <Typography.Text style={{ fontSize: FONT_SIZE.PARA }}>
                 {oneLinerBreakup.slice(0, 3).join(" · ")}
