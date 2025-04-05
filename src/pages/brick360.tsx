@@ -150,7 +150,6 @@ export function Brick360() {
         icon: getDataCategoryIcon("MdOutlineMapsHomeWork", "md"),
         dataPoints: Object.entries(lvnzyProject.score.property),
       });
-
       params.push({
         title: "Developer",
         key: "developer",

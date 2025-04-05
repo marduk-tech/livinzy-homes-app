@@ -259,7 +259,7 @@ export const POP_STAR_DATA_POINTS = {
   investment: {
     priceAppreciation: "Price Appreciation",
     rentalIncome: "Rental Income",
-    investorFriendly: "Investor Friendly",
+    investorFriendly: "Payment Plan",
     pricePoint: "Price Point",
   },
 };

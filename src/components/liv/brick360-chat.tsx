@@ -334,6 +334,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                 <Input
                   disabled={queryStreaming}
                   style={{
+                    boxShadow: "0 0 8px rgba(41, 181, 232, 0.9)",
                     height: 50,
                     paddingRight: 0,
                     backgroundColor: "white",
