@@ -159,7 +159,7 @@ export function SignUpForm() {
                   Explore Farmlands For Sale Near Bangalore
                 </Typography.Text>
                 <Typography.Text>
-                  Sign Up for Exclusive Access to Livinzy
+                  Sign Up for Exclusive Access to Brickfi
                 </Typography.Text>
               </Flex>
               <Form

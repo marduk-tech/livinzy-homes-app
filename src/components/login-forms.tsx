@@ -119,7 +119,7 @@ export function LoginForm() {
           <Typography.Text
             style={{ fontSize: FONT_SIZE.HEADING_1, fontWeight: "bold" }}
           >
-            Welcome To Livinzy
+            Welcome To Brickfi
           </Typography.Text>
           <Typography.Text
             style={{
@@ -129,7 +129,7 @@ export function LoginForm() {
           >
             {showUserDetailsForm
               ? "Please update your basic details"
-              : "Livinzy is only available for private access right now."}
+              : "Brickfi is only available for private access right now."}
           </Typography.Text>
           {/* <Typography.Text
 style={{

@@ -150,8 +150,8 @@ export const DashboardLayout: React.FC = () => {
                 style={{ height: 60, display: "flex", alignItems: "center" }}
               >
                 <img
-                  src="/logo-name.png"
-                  style={{ height: 28, width: "auto", marginLeft: 0 }}
+                  src="/images/brickfi-logo.png"
+                  style={{ height: 20, width: "auto", marginLeft: 16 }}
                 ></img>
               </Flex>
 
