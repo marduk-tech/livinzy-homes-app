@@ -259,7 +259,7 @@ export function Brick360() {
       }}
     >
       {/* Main project upfront score card including metadata */}
-      <Flex vertical style={{ padding: 16 }}>
+      <Flex vertical style={{ padding: "16px 16px 0 16px" }}>
         {/* Project Gallery */}
         <ProjectGallery
           media={lvnzyProject?.originalProjectId.media}
@@ -272,16 +272,36 @@ export function Brick360() {
           >
             {lvnzyProject?.meta.projectName}
           </Typography.Title>
-
-          <Tag
-            style={{
-              color: COLORS.textColorLight,
-              fontSize: FONT_SIZE.SUB_TEXT,
-            }}
-          >
-            Brick<i>360</i>
-          </Tag>
         </Flex>
+      </Flex>
+      <Flex
+        vertical
+        style={{
+          marginBottom: 16,
+          borderRadius: isMobile ? 0 : 8,
+          marginTop: 8,
+          width: isMobile ? "100%" : "96%",
+          margin: isMobile ? 0 : "0 2%",
+          backgroundColor: COLORS.textColorDark,
+          padding: "8px 16px",
+        }}
+        gap={8}
+      >
+        <Typography.Text
+          style={{
+            color: "white",
+            fontSize: FONT_SIZE.HEADING_4,
+          }}
+        >
+          Brick<i>360</i> Report
+        </Typography.Text>
+        <Flex style={{ flexWrap: "wrap" }} gap={8}>
+          {dataSets.map((d) => (
+            <Tag style={{ fontSize: FONT_SIZE.SUB_TEXT }}>{d}</Tag>
+          ))}
+        </Flex>
+      </Flex>
+      <Flex vertical style={{ padding: 16 }}>
         {/* Sqft cost */}
         <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
           {rupeeAmountFormat(lvnzyProject?.meta.costingDetails.minimumUnitCost)}
@@ -347,23 +367,7 @@ export function Brick360() {
           </Flex>
         </Flex>
       </Flex>
-      <Flex
-        style={{
-          marginBottom: 16,
-          borderRadius: isMobile ? 0 : 8,
-          marginTop: 8,
-          width: isMobile ? "100%" : "96%",
-          margin: isMobile ? 0 : "0 2%",
-          backgroundColor: COLORS.textColorDark,
-          padding: "16px",
-          flexWrap: "wrap",
-        }}
-        gap={8}
-      >
-        {dataSets.map((d) => (
-          <Tag style={{ fontSize: FONT_SIZE.PARA }}>{d}</Tag>
-        ))}
-      </Flex>
+
       <Flex vertical gap={32} style={{ padding: 16 }}>
         {scoreParams &&
           scoreParams.map((sc) => {
@@ -386,7 +390,13 @@ export function Brick360() {
                   )}
                   renderItem={(item) => (
                     <List.Item
-                      style={{ padding: "8px 0" }}
+                      style={{
+                        padding: "8px",
+                        border: "1px solid",
+                        borderRadius: 8,
+                        borderColor: COLORS.borderColorMedium,
+                        marginBottom: 16,
+                      }}
                       onClick={() => {
                         setDetailsModalOpen(true);
                         setSelectedDataPointCategory(sc.title.toLowerCase());

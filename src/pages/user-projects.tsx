@@ -3,14 +3,17 @@ import { Loader } from "../components/common/loader";
 import { useUser } from "../hooks/use-user";
 import { useNavigate } from "react-router-dom";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
+import { rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { useEffect, useState } from "react";
-import GradientBar from "../components/common/grading-bar";
 import { useDevice } from "../hooks/use-device";
+import { useFetchCorridors } from "../hooks/use-corridors";
+const { Paragraph } = Typography;
 
 export function UserProjects() {
   const { user } = useUser();
   const navigate = useNavigate();
+  const { data: corridors, isLoading: isCorridorsDataLoading } =
+    useFetchCorridors();
   const [corridorWiseProjects, setCorridorWiseProjects] = useState<any>();
   const [collectionNames, setCollectionNames] = useState<string[]>();
   const [selectedCollection, setSelectedCollection] = useState<any>();
@@ -59,6 +62,7 @@ export function UserProjects() {
 
     return (
       <List.Item
+        style={{ padding: 4, marginBottom: 16, border: 0 }}
         onClick={() => {
           navigate(`/brick360/${itemInfo._id}`);
         }}
@@ -94,7 +98,7 @@ export function UserProjects() {
             {rupeeAmountFormat(itemInfo.meta.costingDetails.minimumUnitCost)} /{" "}
             {itemInfo.meta.costingDetails.minimumUnitSize} sqft
           </Typography.Text>
-          <Flex gap={4} style={{ flexWrap: "wrap" }}>
+          {/* <Flex gap={4} style={{ flexWrap: "wrap" }}>
             {[
               "property",
               "developer",
@@ -111,7 +115,7 @@ export function UserProjects() {
                 </Flex>
               );
             })}
-          </Flex>
+          </Flex> */}
         </Flex>
       </List.Item>
     );
@@ -127,12 +131,13 @@ export function UserProjects() {
         width: "100%",
         padding: 16,
         paddingBottom: 100,
+        border: 0,
       }}
       vertical
     >
       {collectionNames && collectionNames.length > 1 ? (
         <Select
-          placeholder="Select a person"
+          placeholder="Select project list"
           defaultValue={collectionNames ? collectionNames[1] : ""}
           optionFilterProp="label"
           onChange={(value: string) => {
@@ -151,14 +156,29 @@ export function UserProjects() {
 
       {Object.keys(corridorWiseProjects).map((corridor: string) => {
         return (
-          <Flex vertical>
-            <Typography.Title level={4}>{corridor}</Typography.Title>
+          <Flex vertical style={{}}>
+            <Flex vertical style={{ marginTop: 24 }}>
+              <Typography.Title level={3} style={{ margin: 0 }}>
+                {corridor}
+              </Typography.Title>
+              {corridor && corridors && corridors.length ? (
+                <Paragraph
+                  ellipsis={{ rows: 2, expandable: true }}
+                  style={{ color: COLORS.textColorLight }}
+                >
+                  {corridors.find((c) => c.name == corridor)!.description}
+                </Paragraph>
+              ) : null}
+            </Flex>
             <List
               size="large"
               style={{
                 width: "100%",
+                border: "1px solid",
+                padding: 8,
+                borderRadius: 8,
+                borderColor: COLORS.borderColorMedium,
               }}
-              bordered
               dataSource={corridorWiseProjects[corridor]}
               renderItem={renderLvnzyProject}
             />
