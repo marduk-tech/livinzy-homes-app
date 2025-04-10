@@ -25,6 +25,7 @@ import Brick360Chat from "../components/liv/brick360-chat";
 import { MapView } from "../components/map-view/map-view";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import ProjectGallery from "../components/project-gallery";
+import { Loader } from "../components/common/loader";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -182,7 +183,7 @@ export function Brick360() {
   const progressWidth = isMobile ? 300 : 500;
 
   if (lvnzyProjectIsLoading) {
-    return "";
+    return <Loader></Loader>;
   }
 
   if (fakeTimeoutProgress < 130) {
@@ -318,7 +319,7 @@ export function Brick360() {
             fontSize: FONT_SIZE.HEADING_4,
           }}
         >
-          {lvnzyProject?.meta.oneLiner}
+          {lvnzyProject?.meta.oneLiner.split(" · ").slice(0, 3).join(" · ")}
         </Typography.Text>
         {/* Completion timeline */}
         {lvnzyProject?.meta.projectTimelines &&
