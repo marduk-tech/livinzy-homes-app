@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
 
 // Colors
-$primary-theme: #29e0e0;
+$primary-theme: #2bcbf2;
 
 /* latin-ext */
 @font-face {
@@ -96,6 +96,19 @@ body {
   }
   to {
     opacity: 100;
+  }
+}
+
+.reasoning {
+  line-height: 145%;
+  b {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .highlight {
+    background-color: rgba(43, 203, 242, 0.3);
   }
 }
 

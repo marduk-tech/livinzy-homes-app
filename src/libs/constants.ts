@@ -244,22 +244,13 @@ export const POP_STAR_DATA_POINTS = {
     timeCommitment: "Time Committment",
     customerSatisfaction: "Customer Satisfaction",
   },
-  neighborhood: {
-    schools: "Schools",
-    hospitals: "Hospitals",
-    food: "Dining",
-    commercial: "Commercial",
-    industrial: "Industrial",
-  },
-  connectivity: {
-    connectingRoads: "Immediate Connectivity",
-    transit: "Transit",
-    drive: "Drive",
+  areaConnectivity: {
+    schoolsOffices: "Schools/Offices",
+    conveniences: "Conveniences",
+    transport: "Transport",
   },
   investment: {
-    priceAppreciation: "Price Appreciation",
-    rentalIncome: "Rental Income",
-    investorFriendly: "Payment Plan",
+    growthDrivers: "Growth Drivers",
     pricePoint: "Price Point",
   },
 };

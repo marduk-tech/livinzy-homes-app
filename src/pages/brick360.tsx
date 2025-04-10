@@ -19,8 +19,6 @@ import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { LivIndexDriversConfig, POP_STAR_DATA_POINTS } from "../libs/constants";
 import GradientBar from "../components/common/grading-bar";
 import { useDevice } from "../hooks/use-device";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import Brick360Chat from "../components/liv/brick360-chat";
 import { MapView } from "../components/map-view/map-view";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
@@ -164,16 +162,10 @@ export function Brick360() {
         dataPoints: Object.entries(lvnzyProject.score.investment),
       });
       params.push({
-        title: "Connectivity",
-        key: "connectivity",
+        title: "Area & Connectivity",
+        key: "areaConnectivity",
         icon: getDataCategoryIcon("GiPathDistance", "gi"),
-        dataPoints: Object.entries(lvnzyProject.score.connectivity),
-      });
-      params.push({
-        title: "Neighborhood",
-        key: "neighborhood",
-        icon: getDataCategoryIcon("AiTwotoneShop", "ai"),
-        dataPoints: Object.entries(lvnzyProject.score.neighborhood),
+        dataPoints: Object.entries(lvnzyProject.score.areaConnectivity),
       });
 
       setScoreParams(params);
@@ -405,7 +397,7 @@ export function Brick360() {
                         setSelectedDataPoint((item as any)[1]);
                         setSelectedDataPointTitle(
                           `${sc.title} > ${
-                            (POP_STAR_DATA_POINTS as any)[sc.key.toLowerCase()][
+                            (POP_STAR_DATA_POINTS as any)[sc.key][
                               (item as any)[0]
                             ]
                           }`
@@ -424,7 +416,7 @@ export function Brick360() {
                           }}
                         >
                           {capitalize(
-                            (POP_STAR_DATA_POINTS as any)[sc.key.toLowerCase()][
+                            (POP_STAR_DATA_POINTS as any)[sc.key][
                               (item as any)[0]
                             ]
                           )}
@@ -631,9 +623,29 @@ export function Brick360() {
                 {lvnzyProject?.originalProjectId.info.developerId.name}
               </Typography.Title>
             )}
-            <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
-              {selectedDataPoint ? selectedDataPoint.reasoning : ""}
-            </Markdown>
+            <Flex vertical gap={16}>
+              {selectedDataPoint
+                ? selectedDataPoint.reasoning.map((r: string) => {
+                    return (
+                      <Flex
+                        style={{
+                          maxWidth: 500,
+                          backgroundColor: COLORS.bgColorMedium,
+                          borderRadius: 8,
+                          borderColor: COLORS.borderColorMedium,
+                          padding: 8,
+                        }}
+                      >
+                        <div
+                          dangerouslySetInnerHTML={{ __html: r }}
+                          className="reasoning"
+                          style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
+                        ></div>
+                      </Flex>
+                    );
+                  })
+                : ""}
+            </Flex>
 
             <Divider></Divider>
 
