@@ -15,8 +15,6 @@ import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { Loader } from "../common/loader";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { sha256 } from "js-sha256";
 
 const { Paragraph } = Typography;
@@ -217,9 +215,24 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
               </Typography.Text>
             </Flex>
           </Flex>
-          <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
+          {/* <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
             {a}
-          </Markdown>
+          </Markdown> */}
+          <Flex
+            style={{
+              maxWidth: 500,
+              backgroundColor: COLORS.bgColorMedium,
+              borderRadius: 8,
+              borderColor: COLORS.borderColorMedium,
+              padding: 8,
+            }}
+          >
+            <div
+              dangerouslySetInnerHTML={{ __html: a }}
+              className="reasoning"
+              style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
+            ></div>
+          </Flex>
         </Flex>
       );
     };
