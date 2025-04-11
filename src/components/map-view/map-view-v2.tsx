@@ -1,7 +1,7 @@
 import { Flex, Modal } from "antd";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
-import { MapContainer, Marker, Polyline, TileLayer } from "react-leaflet";
+import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import L from "leaflet";
 
 import { renderToString } from "react-dom/server";
@@ -55,10 +55,18 @@ async function getIcon(iconName: string, iconSet: any) {
 const MapViewV2 = ({ drivers }: { drivers?: string[] }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
 
-  const [selectedDriver, setSelectedDriver] = useState<IDriverPlace | null>(
-    null
-  );
+  /**
+   * Modal content which opens on click of any rendered map element
+   */
+  const [modalContent, setModalContent] = useState<{
+    title: string;
+    tags?: [{ label: string; color: string }];
+    content: string;
+  }>();
 
+  /**
+   * Fetching driver data for selected drivers
+   */
   const { data: driversData } = useFetchAllLivindexPlaces(
     drivers || [
       "674058ba3bf3e819be852d0c",
@@ -67,8 +75,14 @@ const MapViewV2 = ({ drivers }: { drivers?: string[] }) => {
     ]
   );
 
-  const [driverMarkersIcons, setDriverMarkersIcons] = useState<any[]>([]);
+  /**
+   * Icons for simple drivermarkers
+   */
+  const [simpleDriverMarkerIcons, setSimpleDriverMarkerIcons] = useState<any[]>(
+    []
+  );
 
+  // Setting icons for simple drivermarkers
   useEffect(() => {
     async function fetchDriverIcons() {
       if (driversData && driversData.length > 0) {
@@ -83,11 +97,36 @@ const MapViewV2 = ({ drivers }: { drivers?: string[] }) => {
             return icon ? { icon, driverId: driver._id } : null;
           })
         );
-        setDriverMarkersIcons(icons.filter(Boolean));
+        setSimpleDriverMarkerIcons(icons.filter(Boolean));
       }
     }
     fetchDriverIcons();
   }, [driversData]);
+
+  // Rendering simple drivermarkers
+  const renderSimpleDriverMarkers = () => {
+    return driversData?.map((driver: IDriverPlace) => {
+      const icon = simpleDriverMarkerIcons.find(
+        (icon: any) => icon.driverId === driver._id
+      )?.icon;
+      return icon ? (
+        <Marker
+          key={driver._id}
+          position={[driver.location!.lat, driver.location!.lng]}
+          icon={icon}
+          eventHandlers={{
+            click: () => {
+              setModalContent({
+                title: driver.name,
+                content: driver.details?.description || "",
+              });
+              setInfoModalOpen(true);
+            },
+          }}
+        ></Marker>
+      ) : null;
+    });
+  };
 
   return (
     <>
@@ -97,52 +136,17 @@ const MapViewV2 = ({ drivers }: { drivers?: string[] }) => {
         minZoom={12}
         style={{ height: "500px", width: "100%" }}
       >
-        {/* OpenStreetMap Tiles */}
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {/* Marker Example */}
-        {driversData?.map((driver: IDriverPlace) => {
-          const icon = driverMarkersIcons.find(
-            (icon: any) => icon.driverId === driver._id
-          )?.icon;
-          return icon ? (
-            <Marker
-              key={driver._id}
-              position={[driver.location!.lat, driver.location!.lng]}
-              icon={icon}
-              eventHandlers={{
-                click: () => {
-                  setSelectedDriver(driver);
-                  setInfoModalOpen(true);
-                },
-              }}
-            ></Marker>
-          ) : null;
-        })}
-        <Polyline
-          eventHandlers={{
-            click: () => {
-              setInfoModalOpen(true);
-            },
-          }}
-          pathOptions={{ fillColor: "blue" }}
-          positions={[
-            [12.929406, 77.7187604],
-            [12.9280279, 77.7181055],
-            [12.9279415, 77.7180612],
-            [12.9274208, 77.7175952],
-            [12.9267947, 77.7169546],
-            [12.9266102, 77.7167986],
-            [12.9265114, 77.7167399],
-            [12.926234, 77.7165972],
-            [12.9256832, 77.7163253],
-          ]}
-        ></Polyline>
+        {/* Simple point based drivers */}
+        {renderSimpleDriverMarkers()}
       </MapContainer>
+
+      {/* Modal to show any marker details */}
       <Modal
-        title={selectedDriver?.name}
+        title={modalContent?.title}
         closable={true}
         open={infoModalOpen}
         footer={null}
@@ -162,7 +166,7 @@ const MapViewV2 = ({ drivers }: { drivers?: string[] }) => {
           }}
         >
           <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
-            {selectedDriver?.details?.description}
+            {modalContent?.content}
           </Markdown>
         </Flex>
       </Modal>
