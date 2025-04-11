@@ -26,7 +26,7 @@ interface IconProps {
 }
 
 // Mapping for dynamic imports of icon sets
-const dynamicImportMap = {
+export const dynamicImportMap: any = {
   fa: () => import("react-icons/fa"),
   bi: () => import("react-icons/bi"),
   fc: () => import("react-icons/fc"),
