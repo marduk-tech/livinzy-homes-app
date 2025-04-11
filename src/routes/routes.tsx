@@ -13,7 +13,7 @@ import UserSessions from "../pages/user-sessions";
 import LivProjectPro from "../components/liv-project-pro";
 import { Brick360 } from "../pages/brick360";
 import { PaymentCallbackPage } from "../pages/payment-callback";
-import { Maintenance } from "../pages/maintenance";
+import { UserProjects } from "../pages/user-projects";
 
 export const Router = () => {
   return (
@@ -25,7 +25,7 @@ export const Router = () => {
       <Route element={<DashboardLayout />}>
         <Route path="/map" element={<LivindexPlaces />} />
         {/* <Route path="/:sessionId?" element={<LivV3 />} /> */}
-        <Route path="/" element={<Maintenance />} />
+        <Route path="/" element={<UserProjects />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/pro/:projectId?" element={<LivProjectPro />} />
         <Route path="/brick360/:lvnzyProjectId?" element={<Brick360 />} />
