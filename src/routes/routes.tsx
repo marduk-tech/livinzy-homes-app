@@ -15,6 +15,7 @@ import { Brick360 } from "../pages/brick360";
 import { PaymentCallbackPage } from "../pages/payment-callback";
 import { UserProjects } from "../pages/user-projects";
 import MapViewV2 from "../components/map-view/map-view-v2";
+import { Brick360Full } from "../pages/brick360-full";
 
 export const Router = () => {
   return (
@@ -31,6 +32,10 @@ export const Router = () => {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/pro/:projectId?" element={<LivProjectPro />} />
         <Route path="/brick360/:lvnzyProjectId?" element={<Brick360 />} />
+        <Route
+          path="/brick360-full/:lvnzyProjectId?"
+          element={<Brick360Full />}
+        />
         <Route path="/user-sessions" element={<UserSessions />} />
       </Route>
 
