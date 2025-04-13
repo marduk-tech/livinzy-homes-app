@@ -122,19 +122,24 @@ export function Brick360() {
       selectedDataPointSubCategory &&
       selectedDataPointCategory
     ) {
-      const catData = (lvnzyProject as any)[selectedDataPointCategory];
-      if (catData && (catData.drivers || catData.growthLevers)) {
-        const drivers = catData.drivers || catData.growthLevers;
-        if (drivers && drivers.length) {
-          setMapDrivers(drivers);
-          let uniqTypes: string[] = [];
-          drivers.forEach((d: any) => {
-            if (!uniqTypes.includes(d.driverId.driver)) {
-              uniqTypes.push(d.driverId.driver);
-            }
-          });
-          setUniqueDriverTypes(uniqTypes);
-        }
+      let drivers;
+      if (selectedDataPointCategory == "area & connectivity") {
+        drivers = [
+          ...(lvnzyProject as any)["neighborhood"].drivers,
+          ...(lvnzyProject as any)["connectivity"].drivers,
+        ];
+      } else if (selectedDataPointCategory == "investment") {
+        drivers = (lvnzyProject as any)["investment"].growthLevers;
+      }
+      if (drivers && drivers.length) {
+        setMapDrivers(drivers);
+        let uniqTypes: string[] = [];
+        drivers.forEach((d: any) => {
+          if (!uniqTypes.includes(d.driverId.driver)) {
+            uniqTypes.push(d.driverId.driver);
+          }
+        });
+        setUniqueDriverTypes(uniqTypes);
       }
     }
   }, [lvnzyProject, selectedDataPointCategory, selectedDataPointSubCategory]);
