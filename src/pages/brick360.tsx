@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Divider,
   Drawer,
@@ -381,66 +382,76 @@ export function Brick360() {
                   </Typography.Title>
                 </Flex>
 
-                <List
-                  size="large"
-                  dataSource={sc.dataPoints.filter(
-                    (dp: any[]) => !["_id", "openAreaRating"].includes(dp[0])
-                  )}
-                  renderItem={(item) => (
-                    <List.Item
-                      style={{
-                        padding: "8px",
-                        border: "1px solid",
-                        borderRadius: 8,
-                        borderColor: COLORS.borderColorMedium,
-                        marginBottom: 16,
-                      }}
-                      onClick={() => {
-                        setDetailsModalOpen(true);
-                        setSelectedDataPointCategory(sc.title.toLowerCase());
-                        setSelectedDataPointSubCategory((item as any)[0]);
-                        setSelectedDataPoint((item as any)[1]);
-                        setSelectedDataPointTitle(
-                          `${sc.title} > ${
-                            (POP_STAR_DATA_POINTS as any)[sc.key][
-                              (item as any)[0]
-                            ]
-                          }`
-                        );
-                      }}
-                    >
-                      <Flex align="center" style={{ width: "100%" }}>
-                        <Typography.Text
-                          style={{
-                            fontSize: FONT_SIZE.HEADING_3,
-                            width: "65%",
-                            color:
-                              (item as any)[1].rating > 0
-                                ? COLORS.textColorDark
-                                : COLORS.textColorLight,
-                          }}
-                        >
-                          {capitalize(
-                            (POP_STAR_DATA_POINTS as any)[sc.key][
-                              (item as any)[0]
-                            ]
-                          )}
-                        </Typography.Text>
-                        <Flex
-                          style={{
-                            width: "35%",
-                            height: 24,
-                            marginLeft: "auto",
-                          }}
-                        >
-                          <GradientBar
-                            value={(item as any)[1].rating}
-                          ></GradientBar>
+                {sc.dataPoints &&
+                sc.dataPoints.filter(
+                  (dp: any[]) => !["_id", "openAreaRating"].includes(dp[0])
+                ).length ? (
+                  <List
+                    size="large"
+                    dataSource={sc.dataPoints.filter(
+                      (dp: any[]) => !["_id", "openAreaRating"].includes(dp[0])
+                    )}
+                    renderItem={(item) => (
+                      <List.Item
+                        style={{
+                          padding: "8px",
+                          border: "1px solid",
+                          borderRadius: 8,
+                          borderColor: COLORS.borderColorMedium,
+                          marginBottom: 16,
+                        }}
+                        onClick={() => {
+                          setDetailsModalOpen(true);
+                          setSelectedDataPointCategory(sc.title.toLowerCase());
+                          setSelectedDataPointSubCategory((item as any)[0]);
+                          setSelectedDataPoint((item as any)[1]);
+                          setSelectedDataPointTitle(
+                            `${sc.title} > ${
+                              (POP_STAR_DATA_POINTS as any)[sc.key][
+                                (item as any)[0]
+                              ]
+                            }`
+                          );
+                        }}
+                      >
+                        <Flex align="center" style={{ width: "100%" }}>
+                          <Typography.Text
+                            style={{
+                              fontSize: FONT_SIZE.HEADING_3,
+                              width: "65%",
+                              color:
+                                (item as any)[1].rating > 0
+                                  ? COLORS.textColorDark
+                                  : COLORS.textColorLight,
+                            }}
+                          >
+                            {capitalize(
+                              (POP_STAR_DATA_POINTS as any)[sc.key][
+                                (item as any)[0]
+                              ]
+                            )}
+                          </Typography.Text>
+                          <Flex
+                            style={{
+                              width: "35%",
+                              height: 24,
+                              marginLeft: "auto",
+                            }}
+                          >
+                            <GradientBar
+                              value={(item as any)[1].rating}
+                            ></GradientBar>
+                          </Flex>
                         </Flex>
-                      </Flex>
-                    </List.Item>
-                  )}
-                />
+                      </List.Item>
+                    )}
+                  />
+                ) : (
+                  <Alert
+                    message="There are no other projects by the developer in the state of Karnataka yet. Please make sure to check track record in other states.   "
+                    type="warning"
+                  />
+                )}
               </Flex>
             );
           })}
