@@ -69,7 +69,7 @@ export const DashboardLayout: React.FC = () => {
     return (
       <>
         {navLinks
-          .filter((l) => l.title === "Profile" || l.title === "Chat History")
+          .filter((l) => l.title === "Profile")
 
           .map((link) => (
             <Link

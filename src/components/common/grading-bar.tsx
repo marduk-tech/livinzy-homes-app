@@ -1,12 +1,14 @@
 import React from "react";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { Flex } from "antd";
+import DynamicReactIcon from "./dynamic-react-icon";
 
 type GradientBarProps = {
   value: number;
-  text?: string;
+  showBadgeOnly?: boolean;
 };
 
-const GradientBar: React.FC<GradientBarProps> = ({ value, text }) => {
+const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
   const interpolate = (start: number, end: number, factor: number): number => {
     return Math.round(start + (end - start) * factor);
   };
@@ -16,11 +18,11 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, text }) => {
 
     // Define color stops
     const colors = [
-      { stop: 0, color: [255, 105, 97] }, // Red-Orange
-      { stop: 25, color: [255, 181, 76] }, // Orange-Yellow
-      { stop: 50, color: [248, 214, 109] }, // Light Yellow
-      { stop: 75, color: [122, 189, 126] }, // Greenish
-      { stop: 100, color: [140, 212, 126] }, // Light Green
+      { stop: 0, color: [255, 76, 5] }, // Red-Orange
+      { stop: 25, color: [255, 149, 107] }, // Orange-Yellow
+      { stop: 50, color: [248, 237, 140] }, // Yellow Greenish
+      { stop: 75, color: [144, 198, 124] }, // Greenish
+      { stop: 100, color: [50, 142, 110] }, // Dark Green
     ];
 
     // Find two nearest stops
@@ -43,6 +45,55 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, text }) => {
     return "rgb(255, 105, 97)";
   };
 
+  const getSmileyIcon = (value: number): any => {
+    let iconName = "FaRegLaugh",
+      iconSet: any = "fa",
+      size = 22;
+    if (value > 80) {
+      iconName = "FaRegLaugh";
+      iconSet = "fa";
+      size = 19;
+    } else if (value < 80 && value >= 65) {
+      iconName = "PiSmileyBold";
+      iconSet = "pi";
+    } else if (value < 65 && value >= 40) {
+      iconName = "PiSmileyMehBold";
+      iconSet = "pi";
+    } else if (value < 40) {
+      iconName = "PiSmileySadBold";
+      iconSet = "pi";
+    }
+    return (
+      <DynamicReactIcon
+        iconName={iconName}
+        iconSet={iconSet}
+        size={size}
+      ></DynamicReactIcon>
+    );
+  };
+  if (!value) {
+    return null;
+  }
+
+  if (showBadgeOnly) {
+    return (
+      <Flex
+        style={{
+          borderColor: COLORS.bgColorDark,
+          color: COLORS.textColorDark,
+          backgroundColor: "transparent",
+          padding: "1px 4px",
+          borderRadius: 6,
+        }}
+        gap={2}
+        align="center"
+      >
+        <Flex>{Math.round(value * 5) / 100}</Flex>
+        {getSmileyIcon(value)}
+      </Flex>
+    );
+  }
+
   return (
     <div
       style={{
@@ -59,7 +110,7 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, text }) => {
         <div
           className="absolute inset-0"
           style={{
-            backgroundColor: COLORS.bgColorMedium,
+            backgroundColor: COLORS.borderColorMedium,
             width: "100%",
             height: "100%",
             borderRadius: 24,
@@ -69,7 +120,7 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, text }) => {
         >
           <div
             style={{
-              width: text ? "100%" : `${value}%`,
+              width: `${value}%`,
               backgroundColor: getGradientColor(value),
               height: "100%",
               border: "1px solid",
@@ -80,9 +131,7 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, text }) => {
               textAlign: "center",
               borderColor: COLORS.borderColor,
             }}
-          >
-            {text || ""}
-          </div>
+          ></div>
         </div>
       ) : null}
     </div>

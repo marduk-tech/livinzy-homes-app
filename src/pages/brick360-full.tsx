@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
-import { LivIndexDriversConfig, POP_STAR_DATA_POINTS } from "../libs/constants";
+import { LivIndexDriversConfig, Brick360DataPoints } from "../libs/constants";
 import GradientBar from "../components/common/grading-bar";
 import { useDevice } from "../hooks/use-device";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
@@ -361,7 +361,7 @@ export function Brick360Full() {
                             }}
                           >
                             {capitalize(
-                              (POP_STAR_DATA_POINTS as any)[sc.key][
+                              (Brick360DataPoints as any)[sc.key][
                                 (item as any)[0]
                               ]
                             )}

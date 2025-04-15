@@ -233,21 +233,54 @@ export const PlaceholderContent = `# Liv is the AI Agent for Real Estate.
 ### 💡 Ask Liv anything
 `;
 
-export const POP_STAR_DATA_POINTS = {
+export enum BRICK360_CATEGORY {
+  property = "property",
+  areaConnectivity = "areaConnectivity",
+  developer = "developer",
+  investment = "investment",
+}
+
+export const Brick360CategoryInfo: Record<
+  BRICK360_CATEGORY,
+  { title: string; iconName: string; iconSet: string }
+> = {
+  property: {
+    title: "Property",
+    iconName: "MdOutlineMapsHomeWork",
+    iconSet: "md",
+  },
+  investment: {
+    title: "Investment",
+    iconName: "GiTakeMyMoney",
+    iconSet: "gi",
+  },
+  areaConnectivity: {
+    title: "Area/Connectivity",
+    iconName: "GiPathDistance",
+    iconSet: "gi",
+  },
+  developer: {
+    title: "Developer",
+    iconName: "FaPeopleGroup",
+    iconSet: "fa6",
+  },
+};
+
+export const Brick360DataPoints = {
   property: {
     amenities: "Amenities",
     density: "Density",
     surroundings: "Surroundings",
   },
-  developer: {
-    experience: "Past Experience",
-    timeCommitment: "Time Committment",
-    customerSatisfaction: "Customer Satisfaction",
-  },
   areaConnectivity: {
     schoolsOffices: "Schools/Offices",
     conveniences: "Conveniences",
     transport: "Transport",
+  },
+  developer: {
+    experience: "Past Experience",
+    timeCommitment: "Time Committment",
+    customerSatisfaction: "Customer Satisfaction",
   },
   investment: {
     growthDrivers: "Growth Drivers",

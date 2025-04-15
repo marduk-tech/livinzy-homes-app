@@ -16,8 +16,17 @@ import { useFetchLvnzyProjectById } from "../hooks/use-lvnzy-project";
 import { useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { capitalize, rupeeAmountFormat } from "../libs/lvnzy-helper";
-import { LivIndexDriversConfig, POP_STAR_DATA_POINTS } from "../libs/constants";
+import {
+  capitalize,
+  getCategoryScore,
+  rupeeAmountFormat,
+} from "../libs/lvnzy-helper";
+import {
+  LivIndexDriversConfig,
+  Brick360DataPoints,
+  BRICK360_CATEGORY,
+  Brick360CategoryInfo,
+} from "../libs/constants";
 import GradientBar from "../components/common/grading-bar";
 import { useDevice } from "../hooks/use-device";
 import Brick360Chat from "../components/liv/brick360-chat";
@@ -25,6 +34,7 @@ import { MapView } from "../components/map-view/map-view";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import ProjectGallery from "../components/project-gallery";
 import { Loader } from "../components/common/loader";
+import RatingBar from "../components/common/rating-bar";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -124,7 +134,7 @@ export function Brick360() {
       selectedDataPointCategory
     ) {
       let drivers;
-      if (selectedDataPointCategory == "area & connectivity") {
+      if (selectedDataPointCategory == "area/connectivity") {
         drivers = [
           ...(lvnzyProject as any)["neighborhood"].drivers,
           ...(lvnzyProject as any)["connectivity"].drivers,
@@ -149,31 +159,17 @@ export function Brick360() {
   useEffect(() => {
     if (lvnzyProject) {
       const params = [];
-      params.push({
-        title: "Property",
-        key: "property",
-        icon: getDataCategoryIcon("MdOutlineMapsHomeWork", "md"),
-        dataPoints: Object.entries(lvnzyProject.score.property),
-      });
-      params.push({
-        title: "Developer",
-        key: "developer",
-        icon: getDataCategoryIcon("FaPeopleGroup", "fa6"),
-        dataPoints: Object.entries(lvnzyProject.score.developer),
-      });
-      params.push({
-        title: "Investment",
-        key: "investment",
-        icon: getDataCategoryIcon("GiTakeMyMoney", "gi"),
-        dataPoints: Object.entries(lvnzyProject.score.investment),
-      });
-      params.push({
-        title: "Area & Connectivity",
-        key: "areaConnectivity",
-        icon: getDataCategoryIcon("GiPathDistance", "gi"),
-        dataPoints: Object.entries(lvnzyProject.score.areaConnectivity),
-      });
 
+      for (const key in BRICK360_CATEGORY) {
+        const cat = BRICK360_CATEGORY[key as keyof typeof BRICK360_CATEGORY];
+        const catInfo = Brick360CategoryInfo[cat];
+        params.push({
+          title: catInfo.title,
+          key: key,
+          icon: getDataCategoryIcon(catInfo.iconName, catInfo.iconSet),
+          dataPoints: Object.entries(lvnzyProject.score[cat]),
+        });
+      }
       setScoreParams(params);
     }
   }, [lvnzyProject]);
@@ -284,7 +280,7 @@ export function Brick360() {
           backgroundColor: COLORS.textColorDark,
           padding: "8px 16px",
         }}
-        gap={8}
+        gap={4}
       >
         <Typography.Text
           style={{
@@ -325,7 +321,7 @@ export function Brick360() {
           <Flex>
             <Typography.Text
               style={{
-                fontSize: FONT_SIZE.PARA,
+                fontSize: FONT_SIZE.SUB_TEXT,
                 color: COLORS.textColorLight,
               }}
             >
@@ -334,7 +330,7 @@ export function Brick360() {
 
             <Typography.Text
               style={{
-                fontSize: FONT_SIZE.PARA,
+                fontSize: FONT_SIZE.SUB_TEXT,
                 color: COLORS.textColorLight,
                 marginLeft: 4,
               }}
@@ -357,7 +353,11 @@ export function Brick360() {
           >
             <Paragraph
               ellipsis={{ rows: 1, expandable: true }}
-              style={{ whiteSpace: "pre-line", marginBottom: 0 }}
+              style={{
+                whiteSpace: "pre-line",
+                marginBottom: 0,
+                fontSize: FONT_SIZE.PARA,
+              }}
             >
               {lvnzyProject!.meta.costingDetails.configurations
                 .map((c: any) => `₹${rupeeAmountFormat(c.cost)} / ${c.config}`)
@@ -380,6 +380,10 @@ export function Brick360() {
                   >
                     {sc.title}
                   </Typography.Title>
+                  <GradientBar
+                    value={getCategoryScore(lvnzyProject!.score[sc.key])}
+                    showBadgeOnly={true}
+                  ></GradientBar>
                 </Flex>
 
                 {sc.dataPoints &&
@@ -388,9 +392,11 @@ export function Brick360() {
                 ).length ? (
                   <List
                     size="large"
-                    dataSource={sc.dataPoints.filter(
-                      (dp: any[]) => !["_id", "openAreaRating"].includes(dp[0])
-                    )}
+                    dataSource={Object.keys(
+                      (Brick360DataPoints as any)[sc.key]
+                    ).map((d) => {
+                      return sc.dataPoints.find((dp: any) => dp[0] == d);
+                    })}
                     renderItem={(item) => (
                       <List.Item
                         style={{
@@ -398,7 +404,7 @@ export function Brick360() {
                           border: "1px solid",
                           borderRadius: 8,
                           borderColor: COLORS.borderColorMedium,
-                          marginBottom: 16,
+                          marginBottom: 8,
                         }}
                         onClick={() => {
                           setDetailsModalOpen(true);
@@ -407,7 +413,7 @@ export function Brick360() {
                           setSelectedDataPoint((item as any)[1]);
                           setSelectedDataPointTitle(
                             `${sc.title} > ${
-                              (POP_STAR_DATA_POINTS as any)[sc.key][
+                              (Brick360DataPoints as any)[sc.key][
                                 (item as any)[0]
                               ]
                             }`
@@ -417,8 +423,8 @@ export function Brick360() {
                         <Flex align="center" style={{ width: "100%" }}>
                           <Typography.Text
                             style={{
-                              fontSize: FONT_SIZE.HEADING_3,
-                              width: "65%",
+                              fontSize: FONT_SIZE.HEADING_4,
+                              width: "60%",
                               color:
                                 (item as any)[1].rating > 0
                                   ? COLORS.textColorDark
@@ -426,21 +432,21 @@ export function Brick360() {
                             }}
                           >
                             {capitalize(
-                              (POP_STAR_DATA_POINTS as any)[sc.key][
+                              (Brick360DataPoints as any)[sc.key][
                                 (item as any)[0]
                               ]
                             )}
                           </Typography.Text>
                           <Flex
                             style={{
-                              width: "35%",
+                              width: "40%",
                               height: 24,
-                              marginLeft: "auto",
+                              justifyContent: "flex-end",
                             }}
                           >
-                            <GradientBar
+                            <RatingBar
                               value={(item as any)[1].rating}
-                            ></GradientBar>
+                            ></RatingBar>
                           </Flex>
                         </Flex>
                       </List.Item>

@@ -1,12 +1,14 @@
-import { Flex, List, Select, Tag, Typography } from "antd";
+import { Col, Flex, List, Row, Select, Tag, Typography } from "antd";
 import { Loader } from "../components/common/loader";
 import { useUser } from "../hooks/use-user";
 import { useNavigate } from "react-router-dom";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { rupeeAmountFormat } from "../libs/lvnzy-helper";
+import { getCategoryScore, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { useEffect, useState } from "react";
 import { useDevice } from "../hooks/use-device";
 import { useFetchCorridors } from "../hooks/use-corridors";
+import { BRICK360_CATEGORY, Brick360CategoryInfo } from "../libs/constants";
+import GradientBar from "../components/common/grading-bar";
 const { Paragraph } = Typography;
 
 export function UserProjects() {
@@ -19,17 +21,6 @@ export function UserProjects() {
   const [selectedCollection, setSelectedCollection] = useState<any>();
   const { isMobile } = useDevice();
 
-  const getDataPtOverallRating = (dataPt: any) => {
-    let totRating = 0,
-      ct = 0;
-    Object.keys(dataPt).forEach((subPt) => {
-      if (dataPt[subPt].rating) {
-        totRating += dataPt[subPt].rating;
-        ct++;
-      }
-    });
-    return totRating / ct;
-  };
   useEffect(() => {
     if (user?.savedLvnzyProjects && user.savedLvnzyProjects.length) {
       const collections = user.savedLvnzyProjects.map((c) => c.collectionName);
@@ -60,62 +51,120 @@ export function UserProjects() {
       ? itemInfo.meta.oneLiner.split(" · ")
       : [];
 
+    const previewImage =
+      itemInfo && itemInfo.originalProjectId && itemInfo.originalProjectId.media
+        ? itemInfo.originalProjectId.media[0].image.url!
+        : "";
     return (
       <List.Item
-        style={{ padding: 4, marginBottom: 16, border: 0 }}
+        style={{
+          padding: 4,
+          marginBottom: 16,
+          borderBottom: "1px solid",
+          borderBottomColor: COLORS.borderColor,
+          borderRadius: 8,
+          paddingBottom: 16,
+        }}
         onClick={() => {
           navigate(`/brick360/${itemInfo._id}`);
         }}
       >
-        <Flex vertical>
-          <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
-            {itemInfo.meta.projectName}
-          </Typography.Text>
-          <Flex
-            vertical={isMobile}
-            gap={4}
-            style={{ marginBottom: isMobile ? 8 : 0 }}
-            align={isMobile ? "flex-start" : "center"}
-          >
-            {oneLinerBreakup.length && (
-              <Typography.Text style={{ fontSize: FONT_SIZE.PARA }}>
-                {oneLinerBreakup.slice(0, 3).join(" · ")}
-              </Typography.Text>
-            )}
-            {oneLinerBreakup.length > 3 && (
-              <Tag style={{ fontSize: FONT_SIZE.PARA }} color="blue">
-                {oneLinerBreakup
-                  .slice(3, 4)
-                  .join("")
-                  .replace("(", "")
-                  .replace(")", "")}
-              </Tag>
-            )}
+        <Flex vertical align="flex-start" gap={8} style={{ width: "100%" }}>
+          {/* <div
+            style={{
+              width: "100%",
+              height: 150,
+              backgroundImage: `url(${previewImage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              borderRadius: 8,
+              backgroundRepeat: "no-repeat",
+              marginTop: 4,
+            }}
+          ></div> */}
+          {/* <ProjectGallery
+            media={itemInfo.originalProjectId.media}
+          ></ProjectGallery> */}
+
+          <Flex vertical>
+            <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
+              {itemInfo.meta.projectName}
+            </Typography.Text>
+            <Flex
+              vertical={isMobile}
+              gap={4}
+              align={isMobile ? "flex-start" : "center"}
+            >
+              {oneLinerBreakup.length && (
+                <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_4 }}>
+                  {oneLinerBreakup.slice(0, 3).join(" · ")}
+                </Typography.Text>
+              )}
+              {oneLinerBreakup.length > 3 && (
+                <Tag style={{ fontSize: FONT_SIZE.PARA }} color="blue">
+                  {oneLinerBreakup
+                    .slice(3, 4)
+                    .join("")
+                    .replace("(", "")
+                    .replace(")", "")}
+                </Tag>
+              )}
+            </Flex>
+            <Typography.Text
+              style={{ fontSize: FONT_SIZE.PARA, color: COLORS.textColorLight }}
+            >
+              Starts:{" "}
+              {rupeeAmountFormat(itemInfo.meta.costingDetails.minimumUnitCost)}{" "}
+              / {itemInfo.meta.costingDetails.minimumUnitSize} sqft
+            </Typography.Text>
+            {/* <Flex gap={4} style={{ flexWrap: "wrap" }}>
+              {["property", "developer", "investment", "areaConnectivity"].map(
+                (d: string) => {
+                  return (
+                    <Flex style={{ width: 120, height: 24 }}>
+                      <GradientBar
+                        text={capitalize(d)}
+                        value={getDataPtOverallRating(itemInfo.score[d])}
+                      ></GradientBar>
+                    </Flex>
+                  );
+                }
+              )}
+            </Flex> */}
+            <Row
+              style={{
+                marginTop: 8,
+                backgroundColor: COLORS.bgColor,
+                padding: 4,
+              }}
+              gutter={[4, 4]}
+            >
+              {Object.values(BRICK360_CATEGORY).map((item, index) => (
+                <Col span={12} key={index}>
+                  <Flex
+                    style={{
+                      borderColor: COLORS.borderColor,
+                      borderRadius: 8,
+                      padding: 4,
+                      fontSize: FONT_SIZE.SUB_TEXT,
+                    }}
+                  >
+                    <Flex style={{ width: "100%" }}>
+                      <Typography.Text style={{ fontSize: FONT_SIZE.SUB_TEXT }}>
+                        {Brick360CategoryInfo[item].title}
+                      </Typography.Text>
+                      <Flex style={{ marginLeft: "auto" }}>
+                        <GradientBar
+                          value={getCategoryScore(itemInfo.score[item])}
+                          showBadgeOnly={true}
+                        ></GradientBar>
+                      </Flex>
+                    </Flex>
+                  </Flex>
+                </Col>
+              ))}
+            </Row>
           </Flex>
-          <Typography.Text
-            style={{ fontSize: FONT_SIZE.PARA, color: COLORS.textColorLight }}
-          >
-            {rupeeAmountFormat(itemInfo.meta.costingDetails.minimumUnitCost)} /{" "}
-            {itemInfo.meta.costingDetails.minimumUnitSize} sqft
-          </Typography.Text>
-          {/* <Flex gap={4} style={{ flexWrap: "wrap" }}>
-            {[
-              "property",
-              "developer",
-              "investment",
-              "connectivity",
-              "neighborhood",
-            ].map((d: string) => {
-              return (
-                <Flex style={{ width: 100, height: 24 }}>
-                  <GradientBar
-                    text={capitalize(d)}
-                    value={getDataPtOverallRating(itemInfo.score[d])}
-                  ></GradientBar>
-                </Flex>
-              );
-            })}
-          </Flex> */}
         </Flex>
       </List.Item>
     );
@@ -129,7 +178,7 @@ export function UserProjects() {
     <Flex
       style={{
         width: "100%",
-        padding: 16,
+        padding: 8,
         paddingBottom: 100,
         border: 0,
       }}
@@ -158,26 +207,27 @@ export function UserProjects() {
         return (
           <Flex vertical style={{}}>
             <Flex vertical style={{ marginTop: 24 }}>
-              <Typography.Title level={3} style={{ margin: 0 }}>
-                {corridor}
-              </Typography.Title>
-              {corridor && corridors && corridors.length ? (
+              <Flex style={{ marginBottom: 8 }}>
+                <Tag
+                  color={COLORS.bgColorDark}
+                  style={{ fontSize: FONT_SIZE.HEADING_4, padding: 4 }}
+                >
+                  {corridor}
+                </Tag>
+              </Flex>
+              {/* {corridor && corridors && corridors.length ? (
                 <Paragraph
                   ellipsis={{ rows: 2, expandable: true }}
                   style={{ color: COLORS.textColorLight }}
                 >
                   {corridors.find((c) => c.name == corridor)!.description}
                 </Paragraph>
-              ) : null}
+              ) : null} */}
             </Flex>
             <List
               size="large"
               style={{
                 width: "100%",
-                border: "1px solid",
-                padding: 8,
-                borderRadius: 8,
-                borderColor: COLORS.borderColorMedium,
               }}
               dataSource={corridorWiseProjects[corridor]}
               renderItem={renderLvnzyProject}
