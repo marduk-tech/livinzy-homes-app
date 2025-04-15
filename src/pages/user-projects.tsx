@@ -58,12 +58,12 @@ export function UserProjects() {
     return (
       <List.Item
         style={{
-          padding: 4,
           marginBottom: 16,
-          borderBottom: "1px solid",
-          borderBottomColor: COLORS.borderColor,
+          border: "1px solid",
+          backgroundColor: "white",
+          borderColor: COLORS.borderColorMedium,
           borderRadius: 8,
-          paddingBottom: 16,
+          padding: 8,
         }}
         onClick={() => {
           navigate(`/brick360/${itemInfo._id}`);
@@ -87,7 +87,9 @@ export function UserProjects() {
           ></ProjectGallery> */}
 
           <Flex vertical>
-            <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
+            <Typography.Text
+              style={{ fontSize: FONT_SIZE.HEADING_2, fontWeight: 500 }}
+            >
               {itemInfo.meta.projectName}
             </Typography.Text>
             <Flex
@@ -134,8 +136,9 @@ export function UserProjects() {
             <Row
               style={{
                 marginTop: 8,
-                backgroundColor: COLORS.bgColor,
-                padding: 4,
+                paddingTop: 8,
+                borderTop: "1px solid",
+                borderTopColor: COLORS.borderColor,
               }}
               gutter={[4, 4]}
             >
@@ -145,11 +148,10 @@ export function UserProjects() {
                     style={{
                       borderColor: COLORS.borderColor,
                       borderRadius: 8,
-                      padding: 4,
                       fontSize: FONT_SIZE.SUB_TEXT,
                     }}
                   >
-                    <Flex style={{ width: "100%" }}>
+                    <Flex style={{ width: "100%" }} align="center">
                       <Typography.Text style={{ fontSize: FONT_SIZE.SUB_TEXT }}>
                         {Brick360CategoryInfo[item].title}
                       </Typography.Text>
@@ -180,6 +182,7 @@ export function UserProjects() {
         width: "100%",
         padding: 8,
         paddingBottom: 100,
+        backgroundColor: COLORS.bgColor,
         border: 0,
       }}
       vertical
