@@ -1,20 +1,20 @@
 import { Flex, Modal } from "antd";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { renderToString } from "react-dom/server";
 import {
   CircleMarker,
   MapContainer,
   Marker,
   Polyline,
   TileLayer,
+  useMap,
 } from "react-leaflet";
-
-import { renderToString } from "react-dom/server";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
-import { useFetchProjectById, useFetchProjects } from "../../hooks/use-project";
+import { useFetchProjectById } from "../../hooks/use-project";
 import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
 import { COLORS } from "../../theme/style-constants";
 import { IDriverPlace } from "../../types/Project";
@@ -43,9 +43,7 @@ type RoadDriverPlace = IDriverPlace & {
   features: GeoJSONFeature[];
   status: PLACE_TIMELINE;
 };
-// reuse your dynamic import map
 
-// Need a different way to get the react icon
 async function getIcon(iconName: string, iconSet: any) {
   let IconComp = null;
   if (!dynamicImportMap[iconSet]) {
@@ -84,32 +82,57 @@ async function getIcon(iconName: string, iconSet: any) {
   return leafletIcon!;
 }
 
-const DEFAULT_DRIVER_IDS = [
-  "674058ba3bf3e819be852d0c",
-  "674058ba3bf3e819be852d1b",
-  "676e4e06d23c140473c2cc80",
-];
-
 const DEFAULT_PROJECT = "66f6442e3696885ef13d55ca";
+
+//  handle map resizing
+const MapResizeHandler = () => {
+  const map = useMap();
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const containerRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    // map container
+    containerRef.current = map.getContainer();
+
+    if (containerRef.current) {
+      // resize observer
+      resizeObserverRef.current = new ResizeObserver(() => {
+        // need to use a larger delay to ensre modal animation completes
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 300);
+      });
+
+      // Start observing
+      resizeObserverRef.current.observe(containerRef.current);
+    }
+
+    return () => {
+      if (resizeObserverRef.current && containerRef.current) {
+        resizeObserverRef.current.unobserve(containerRef.current);
+      }
+    };
+  }, [map]);
+
+  return null;
+};
 
 const MapViewV2 = ({
   drivers,
   projectId = DEFAULT_PROJECT,
+  selectedDriverTypes = [],
 }: {
   drivers?: string[];
   projectId?: string;
+  selectedDriverTypes?: string[];
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
 
-  /**
-   * Modal content which opens on click of any rendered map element
-   */
   const [modalContent, setModalContent] = useState<{
     title: string;
     tags?: [{ label: string; color: string }];
     content: string;
   }>();
-
   /**
    * Fetching driver data for selected drivers
    */
@@ -157,13 +180,6 @@ const MapViewV2 = ({
     fetchProjectIcon();
   }, []);
 
-  // Rendering  drivermarkers
-  /**
-   * Render road infrastructure using polylines
-   */
-  /**
-   * Processes road features and returns array of coordinate pairs with properties
-   */
   const processRoadFeatures = (features: GeoJSONFeature[]) => {
     return features.flatMap((feature) => {
       // Handle geometry if present
@@ -199,29 +215,25 @@ const MapViewV2 = ({
     });
   };
 
-  /**
-   * Render road infrastructure using polylines
-   */
   const renderRoadDrivers = () => {
     return driversData
       ?.filter(
         (driver): driver is RoadDriverPlace =>
           driver.driver === "highway" &&
           !!driver.features &&
-          typeof driver.status === "string"
+          typeof driver.status === "string" &&
+          (selectedDriverTypes.length === 0 ||
+            selectedDriverTypes.includes(driver.driver))
       )
       .flatMap((driver) => {
         const processedFeatures = processRoadFeatures(driver.features);
 
         return processedFeatures.map((feature, lineIndex) => {
-          // Convert [lng, lat] to [lat, lng] for Leaflet
           const positions = feature.coordinates.map(
             ([lng, lat]) => [lat, lng] as [number, number]
           );
 
-          // Determine line style based on status
           const featureStatus = feature.properties?.status || driver.status;
-
           const isDashed = ![
             PLACE_TIMELINE.LAUNCHED,
             PLACE_TIMELINE.POST_LAUNCH,
@@ -259,16 +271,15 @@ const MapViewV2 = ({
       });
   };
 
-  /**
-   * Render transit infrastructure using polylines and circle markers for stations
-   */
   const renderTransitDrivers = () => {
     return driversData
       ?.filter(
         (driver): driver is RoadDriverPlace =>
           driver.driver === "transit" &&
           !!driver.features &&
-          typeof driver.status === "string"
+          typeof driver.status === "string" &&
+          (selectedDriverTypes.length === 0 ||
+            selectedDriverTypes.includes(driver.driver))
       )
       .flatMap((driver) => {
         const processedFeatures = processRoadFeatures(driver.features);
@@ -276,12 +287,10 @@ const MapViewV2 = ({
         return [
           // Render transit lines
           ...processedFeatures.map((feature, lineIndex) => {
-            // Convert [lng, lat] to [lat, lng] for Leaflet
             const positions = feature.coordinates.map(
               ([lng, lat]) => [lat, lng] as [number, number]
             );
 
-            // Determine line style based on status
             const featureStatus = feature.properties?.status || driver.status;
             const isDashed = ![
               PLACE_TIMELINE.LAUNCHED,
@@ -350,109 +359,95 @@ const MapViewV2 = ({
       });
   };
 
-  /**
-   * Render simple point-based drivers
-   */
   const renderSimpleDriverMarkers = () => {
-    return driversData?.map((driver: IDriverPlace) => {
-      // Skip if no location data
-      if (!driver.location?.lat || !driver.location?.lng) {
-        return null;
-      }
+    return driversData
+      ?.filter(
+        (driver) =>
+          selectedDriverTypes.length === 0 ||
+          selectedDriverTypes.includes(driver.driver)
+      )
+      .map((driver: IDriverPlace) => {
+        if (!driver.location?.lat || !driver.location?.lng) {
+          return null;
+        }
 
-      const icon = simpleDriverMarkerIcons.find(
-        (icon: any) => icon.driverId === driver._id
-      )?.icon;
+        const icon = simpleDriverMarkerIcons.find(
+          (icon: any) => icon.driverId === driver._id
+        )?.icon;
 
-      // Skip if no icon
-      if (!icon) {
-        return null;
-      }
+        if (!icon) {
+          return null;
+        }
 
+        return (
+          <Marker
+            key={driver._id}
+            position={[driver.location.lat, driver.location.lng]}
+            icon={icon}
+            eventHandlers={{
+              click: () => {
+                setModalContent({
+                  title: driver.name,
+                  content: driver.details?.description || "",
+                });
+                setInfoModalOpen(true);
+              },
+            }}
+          />
+        );
+      });
+  };
+
+  const renderProjectMarkers = () => {
+    if (projectId && projectData?.info?.location && projectMarkerIcon) {
       return (
         <Marker
-          key={driver._id}
-          position={[driver.location.lat, driver.location.lng]}
-          icon={icon}
+          key={projectData._id}
+          position={[
+            projectData.info.location.lat,
+            projectData.info.location.lng,
+          ]}
+          icon={projectMarkerIcon}
           eventHandlers={{
             click: () => {
               setModalContent({
-                title: driver.name,
-                content: driver.details?.description || "",
+                title: projectData.info.name,
+                content: projectData.info.description || "",
               });
               setInfoModalOpen(true);
             },
           }}
         />
       );
-    });
-  };
-
-  /**
-   * Render project markers - single project
-   */
-  const renderProjectMarkers = () => {
-    if (projectId) {
-      return (
-        projectData?.info?.location &&
-        projectMarkerIcon && (
-          <Marker
-            key={projectData._id}
-            position={[
-              projectData.info.location.lat,
-              projectData.info.location.lng,
-            ]}
-            icon={projectMarkerIcon}
-            eventHandlers={{
-              click: () => {
-                setModalContent({
-                  title: projectData.info.name,
-                  content: projectData.info.description || "",
-                });
-                setInfoModalOpen(true);
-              },
-            }}
-          />
-        )
-      );
     }
+    return null;
   };
 
   return (
-    <>
+    <div style={{ height: "100%", width: "100%" }}>
       <MapContainer
         center={[12.9716, 77.5946]}
         zoom={80}
         minZoom={12}
-        style={{ height: "1100px", width: "100%" }}
+        style={{ height: "100%", width: "100%" }}
       >
+        <MapResizeHandler />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {/* Simple point based drivers */}
-        {/* Infrastructure layers */}
         {renderRoadDrivers()}
         {renderTransitDrivers()}
-        {/* Point based drivers */}
         {renderSimpleDriverMarkers()}
-
-        {/* Project Markers */}
         {renderProjectMarkers()}
       </MapContainer>
 
-      {/* Modal to show any marker details */}
       <Modal
         title={modalContent?.title}
         closable={true}
         open={infoModalOpen}
         footer={null}
-        onCancel={() => {
-          setInfoModalOpen(false);
-        }}
-        onClose={() => {
-          setInfoModalOpen(false);
-        }}
+        onCancel={() => setInfoModalOpen(false)}
       >
         <Flex
           vertical
@@ -467,7 +462,7 @@ const MapViewV2 = ({
           </Markdown>
         </Flex>
       </Modal>
-    </>
+    </div>
   );
 };
 

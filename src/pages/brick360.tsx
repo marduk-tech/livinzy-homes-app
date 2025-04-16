@@ -12,29 +12,29 @@ import {
   Tag,
   Typography,
 } from "antd";
-import { useFetchLvnzyProjectById } from "../hooks/use-lvnzy-project";
-import { useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { useParams } from "react-router-dom";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
+import GradientBar from "../components/common/grading-bar";
+import { Loader } from "../components/common/loader";
+import RatingBar from "../components/common/rating-bar";
+import Brick360Chat from "../components/liv/brick360-chat";
+import MapViewV2 from "../components/map-view/map-view-v2";
+import ProjectGallery from "../components/project-gallery";
+import { useDevice } from "../hooks/use-device";
+import { useFetchLvnzyProjectById } from "../hooks/use-lvnzy-project";
+import {
+  BRICK360_CATEGORY,
+  Brick360CategoryInfo,
+  Brick360DataPoints,
+  LivIndexDriversConfig,
+} from "../libs/constants";
 import {
   capitalize,
   getCategoryScore,
   rupeeAmountFormat,
 } from "../libs/lvnzy-helper";
-import {
-  LivIndexDriversConfig,
-  Brick360DataPoints,
-  BRICK360_CATEGORY,
-  Brick360CategoryInfo,
-} from "../libs/constants";
-import GradientBar from "../components/common/grading-bar";
-import { useDevice } from "../hooks/use-device";
-import Brick360Chat from "../components/liv/brick360-chat";
-import { MapView } from "../components/map-view/map-view";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
-import ProjectGallery from "../components/project-gallery";
-import { Loader } from "../components/common/loader";
-import RatingBar from "../components/common/rating-bar";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -43,7 +43,7 @@ export function Brick360() {
 
   const { isMobile } = useDevice();
 
-  let { data: lvnzyProject, isLoading: lvnzyProjectIsLoading } =
+  const { data: lvnzyProject, isLoading: lvnzyProjectIsLoading } =
     useFetchLvnzyProjectById(lvnzyProjectId!);
 
   const dataSets = [
@@ -144,7 +144,7 @@ export function Brick360() {
       }
       if (drivers && drivers.length) {
         setMapDrivers(drivers);
-        let uniqTypes: string[] = [];
+        const uniqTypes: string[] = [];
         drivers.forEach((d: any) => {
           if (!uniqTypes.includes(d.driverId.driver)) {
             uniqTypes.push(d.driverId.driver);
@@ -468,8 +468,8 @@ export function Brick360() {
         title={null}
         open={isMapFullScreen}
         onCancel={() => {
-          setDetailsModalOpen(false);
-          setSelectedDriverTypes([]);
+          setIsMapFullScreen(false);
+          setDetailsModalOpen(true);
         }}
         closeIcon={null}
         footer={null}
@@ -502,7 +502,6 @@ export function Brick360() {
               onClick={() => {
                 setIsMapFullScreen(false);
                 setDetailsModalOpen(true);
-                setSelectedDriverTypes([]);
               }}
               style={{ marginLeft: "auto" }}
             >
@@ -512,18 +511,11 @@ export function Brick360() {
               ></DynamicReactIcon>
             </Flex>
           </Flex>
-          <MapView
+          <MapViewV2
             projectId={lvnzyProject?.originalProjectId._id}
-            projects={[]}
-            mapTitle={`${lvnzyProject?.meta.projectName}: ${selectedDataPointCategory}`}
-            drivers={mapDrivers
-              .filter(
-                (d) =>
-                  !selectedDriverTypes?.length ||
-                  selectedDriverTypes?.includes(d.driverId.driver)
-              )
-              .map((d) => d.driverId._id)}
-          ></MapView>
+            drivers={mapDrivers.map((d) => d.driverId._id)}
+            selectedDriverTypes={selectedDriverTypes}
+          />
         </Flex>
       </Modal>
 
@@ -622,12 +614,11 @@ export function Brick360() {
                   borderRadius: 16,
                 }}
               >
-                <MapView
+                <MapViewV2
                   projectId={lvnzyProject?.originalProjectId._id}
-                  projects={[]}
-                  mapTitle={`${lvnzyProject?.meta.projectName}: ${selectedDataPointCategory}`}
                   drivers={mapDrivers.map((d) => d.driverId._id)}
-                ></MapView>
+                  selectedDriverTypes={selectedDriverTypes}
+                />
               </Flex>
             </Flex>
           ) : null}
