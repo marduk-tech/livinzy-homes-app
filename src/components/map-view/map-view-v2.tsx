@@ -85,6 +85,21 @@ async function getIcon(iconName: string, iconSet: any) {
 const DEFAULT_PROJECT = "66f6442e3696885ef13d55ca";
 
 //  handle map resizing
+const MapCenterHandler = ({ projectData }: { projectData: any }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (projectData?.info?.location) {
+      map.setView(
+        [projectData.info.location.lat, projectData.info.location.lng],
+        15
+      );
+    }
+  }, [projectData, map]);
+
+  return null;
+};
+
 const MapResizeHandler = () => {
   const map = useMap();
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
@@ -426,12 +441,17 @@ const MapViewV2 = ({
   return (
     <div style={{ height: "100%", width: "100%" }}>
       <MapContainer
-        center={[12.9716, 77.5946]}
-        zoom={80}
+        center={
+          projectData?.info?.location
+            ? [projectData.info.location.lat, projectData.info.location.lng]
+            : [12.9716, 77.5946]
+        }
+        zoom={15}
         minZoom={12}
         style={{ height: "100%", width: "100%" }}
       >
         <MapResizeHandler />
+        <MapCenterHandler projectData={projectData} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
