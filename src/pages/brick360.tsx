@@ -134,7 +134,7 @@ export function Brick360() {
       selectedDataPointCategory
     ) {
       let drivers;
-      if (selectedDataPointCategory == "area/connectivity") {
+      if (selectedDataPointCategory == "areaConnectivity") {
         drivers = [
           ...(lvnzyProject as any)["neighborhood"].drivers,
           ...(lvnzyProject as any)["connectivity"].drivers,
@@ -408,7 +408,7 @@ export function Brick360() {
                         }}
                         onClick={() => {
                           setDetailsModalOpen(true);
-                          setSelectedDataPointCategory(sc.title.toLowerCase());
+                          setSelectedDataPointCategory(sc.key);
                           setSelectedDataPointSubCategory((item as any)[0]);
                           setSelectedDataPoint((item as any)[1]);
                           setSelectedDataPointTitle(
