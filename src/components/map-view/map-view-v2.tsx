@@ -26,17 +26,36 @@ import DynamicReactIcon, {
 type Coordinate = [number, number];
 type LineString = Coordinate[];
 
+type GeoJSONCoordinate = [number, number];
+type GeoJSONLineString = GeoJSONCoordinate[];
+type GeoJSONMultiLineString = GeoJSONLineString[];
+
+interface GeoJSONGeometry {
+  type: "Point" | "LineString" | "MultiLineString";
+  coordinates: GeoJSONCoordinate | GeoJSONLineString | GeoJSONMultiLineString;
+}
+
 interface GeoJSONFeature {
-  type: "LineString" | "MultiLineString";
+  type: "Feature";
   properties?: {
     strokeColor?: string;
     name?: string;
     status?: string;
   };
-  coordinates: number[][];
-  geometry?: {
-    type: string;
-    coordinates: number[][] | number[][][];
+  geometry: GeoJSONGeometry;
+}
+
+interface GeoJSONLineFeature extends GeoJSONFeature {
+  geometry: {
+    type: "LineString" | "MultiLineString";
+    coordinates: GeoJSONLineString | GeoJSONMultiLineString;
+  };
+}
+
+interface GeoJSONPointFeature extends GeoJSONFeature {
+  geometry: {
+    type: "Point";
+    coordinates: GeoJSONCoordinate;
   };
 }
 
@@ -198,35 +217,23 @@ const MapViewV2 = ({
 
   const processRoadFeatures = (features: GeoJSONFeature[]) => {
     return features.flatMap((feature) => {
-      // Handle geometry if present
-      if (feature.geometry) {
+      if (feature.type === "Feature" && feature.geometry) {
         if (feature.geometry.type === "LineString") {
+          const coords = feature.geometry.coordinates as [number, number][];
           return [
             {
-              coordinates: feature.geometry.coordinates as [number, number][],
+              coordinates: coords,
               properties: feature.properties,
             },
           ];
         } else if (feature.geometry.type === "MultiLineString") {
-          return (feature.geometry.coordinates as [number, number][][]).map(
-            (line) => ({
-              coordinates: line,
-              properties: feature.properties,
-            })
-          );
+          const coords = feature.geometry.coordinates as [number, number][][];
+          return coords.map((line) => ({
+            coordinates: line,
+            properties: feature.properties,
+          }));
         }
       }
-
-      // Fallback to feature coordinates
-      if (feature.type === "LineString") {
-        return [
-          {
-            coordinates: feature.coordinates as [number, number][],
-            properties: feature.properties,
-          },
-        ];
-      }
-
       return [];
     });
   };
@@ -299,11 +306,21 @@ const MapViewV2 = ({
             selectedDriverTypes.includes(driver.driver))
       )
       .flatMap((driver) => {
-        const processedFeatures = processRoadFeatures(driver.features);
+        //  points from lines
+        const pointFeatures = driver.features.filter(
+          (f): f is GeoJSONPointFeature =>
+            f.type === "Feature" && f.geometry.type === "Point"
+        );
+
+        const lineFeatures = processRoadFeatures(
+          driver.features.filter(
+            (f) => f.type === "Feature" && f.geometry?.type !== "Point"
+          )
+        );
 
         return [
           // Render transit lines
-          ...processedFeatures.map((feature, lineIndex) => {
+          ...lineFeatures.map((feature, lineIndex) => {
             const positions = feature.coordinates.map(
               ([lng, lat]) => [lat, lng] as [number, number]
             );
@@ -326,7 +343,6 @@ const MapViewV2 = ({
                   opacity: 0.8,
                   dashArray: isDashed ? "10, 10" : undefined,
                 }}
-                interactive={false}
                 eventHandlers={{
                   click: () => {
                     setModalContent({
@@ -347,32 +363,35 @@ const MapViewV2 = ({
               />
             );
           }),
-          // Render station points
-          ...processedFeatures.flatMap((feature) =>
-            feature.coordinates.map((coord, stationIndex) => (
-              <CircleMarker
-                key={`${driver._id}-station-${stationIndex}`}
-                center={[coord[1], coord[0]]}
-                radius={6}
-                pathOptions={{
-                  fillColor:
-                    feature.properties?.strokeColor || COLORS.textColorDark,
-                  fillOpacity: 1,
-                  color: "#fff",
-                  weight: 2,
-                }}
-                eventHandlers={{
-                  click: () => {
-                    setModalContent({
-                      title: `${driver.name} Station`,
-                      content: driver.details?.description || "",
-                    });
-                    setInfoModalOpen(true);
-                  },
-                }}
-              />
-            ))
-          ),
+          // Render point stations
+          ...pointFeatures.map((feature, pointIndex) => (
+            <CircleMarker
+              key={`${driver._id}-point-${pointIndex}`}
+              center={
+                [
+                  feature.geometry.coordinates[1] as number,
+                  feature.geometry.coordinates[0] as number,
+                ] as [number, number]
+              }
+              radius={6}
+              pathOptions={{
+                fillColor:
+                  feature.properties?.strokeColor || COLORS.textColorDark,
+                fillOpacity: 1,
+                color: "#fff",
+                weight: 2,
+              }}
+              eventHandlers={{
+                click: () => {
+                  setModalContent({
+                    title: feature.properties?.name || driver.name,
+                    content: driver.details?.description || "",
+                  });
+                  setInfoModalOpen(true);
+                },
+              }}
+            />
+          )),
         ];
       });
   };
