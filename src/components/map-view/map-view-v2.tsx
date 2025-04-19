@@ -7,6 +7,7 @@ import {
   CircleMarker,
   MapContainer,
   Marker,
+  Polygon,
   Polyline,
   TileLayer,
   useMap,
@@ -265,6 +266,7 @@ const MapViewV2 = ({
                 opacity: 0.8,
                 dashArray: isDashed ? "10, 10" : undefined,
               }}
+              interactive={false}
               eventHandlers={{
                 click: () => {
                   setModalContent({
@@ -324,6 +326,7 @@ const MapViewV2 = ({
                   opacity: 0.8,
                   dashArray: isDashed ? "10, 10" : undefined,
                 }}
+                interactive={false}
                 eventHandlers={{
                   click: () => {
                     setModalContent({
@@ -372,6 +375,130 @@ const MapViewV2 = ({
           ),
         ];
       });
+  };
+
+  const MapPolygons = ({
+    driversData,
+    selectedDriverTypes,
+    setModalContent,
+    setInfoModalOpen,
+  }: {
+    driversData: any[];
+    selectedDriverTypes: string[];
+    setModalContent: (content: any) => void;
+    setInfoModalOpen: (open: boolean) => void;
+  }) => {
+    const map = useMap();
+    const [visiblePolygons, setVisiblePolygons] = useState<
+      Array<{
+        id: string;
+        positions: [number, number][];
+        name: string;
+        description: string;
+      }>
+    >([]);
+
+    const updateVisiblePolygons = () => {
+      const zoom = map.getZoom();
+      const bounds = map.getBounds();
+
+      if (zoom >= 14) {
+        const polygons = driversData
+          ?.filter(
+            (driver) =>
+              driver.details?.osm?.geojson &&
+              (selectedDriverTypes.length === 0 ||
+                selectedDriverTypes.includes(driver.driver))
+          )
+          .map((driver) => {
+            try {
+              console.log("GeoJSON data:", driver.details.osm.geojson);
+
+              // Handle case where geojson might be string or object
+              const geojson =
+                typeof driver.details.osm.geojson === "string"
+                  ? JSON.parse(driver.details.osm.geojson)
+                  : driver.details.osm.geojson;
+
+              if (!geojson || geojson.type !== "Polygon") {
+                console.log("Invalid polygon data:", geojson);
+                return null;
+              }
+
+              const positions = geojson.coordinates[0].map(
+                ([lng, lat]: [number, number]) => [lat, lng] as [number, number]
+              );
+
+              // Check if any point is within bounds
+              if (
+                positions.some((pos: [number, number]) => bounds.contains(pos))
+              ) {
+                return {
+                  id: driver._id,
+                  positions,
+                  name: driver.name,
+                  description: driver.details?.description || "",
+                };
+              }
+            } catch (error) {
+              console.error("Error parsing GeoJSON:", error);
+            }
+            return null;
+          })
+          .filter(
+            (
+              p
+            ): p is {
+              id: string;
+              positions: [number, number][];
+              name: string;
+              description: string;
+            } => p !== null
+          );
+
+        setVisiblePolygons(polygons || []);
+      } else {
+        setVisiblePolygons([]);
+      }
+    };
+
+    useEffect(() => {
+      updateVisiblePolygons(); // Initial update
+
+      map.on("zoomend", updateVisiblePolygons);
+      map.on("moveend", updateVisiblePolygons);
+
+      return () => {
+        map.off("zoomend", updateVisiblePolygons);
+        map.off("moveend", updateVisiblePolygons);
+      };
+    }, [map, driversData, selectedDriverTypes]);
+
+    return (
+      <>
+        {visiblePolygons.map((poly) => (
+          <Polygon
+            key={`polygon-${poly.id}`}
+            positions={poly.positions}
+            pathOptions={{
+              color: "#ff0000",
+              weight: 3,
+              fillOpacity: 0.4,
+              fillColor: "#ff0000",
+            }}
+            eventHandlers={{
+              click: () => {
+                setModalContent({
+                  title: poly.name,
+                  content: poly.description,
+                });
+                setInfoModalOpen(true);
+              },
+            }}
+          />
+        ))}
+      </>
+    );
   };
 
   const renderSimpleDriverMarkers = () => {
@@ -441,11 +568,7 @@ const MapViewV2 = ({
   return (
     <div style={{ height: "100%", width: "100%" }}>
       <MapContainer
-        center={
-          projectData?.info?.location
-            ? [projectData.info.location.lat, projectData.info.location.lng]
-            : [12.9716, 77.5946]
-        }
+        center={[13.110274, 77.6009443]}
         zoom={15}
         minZoom={12}
         style={{ height: "100%", width: "100%" }}
@@ -460,6 +583,12 @@ const MapViewV2 = ({
         {renderTransitDrivers()}
         {renderSimpleDriverMarkers()}
         {renderProjectMarkers()}
+        <MapPolygons
+          driversData={driversData || []}
+          selectedDriverTypes={selectedDriverTypes}
+          setModalContent={setModalContent}
+          setInfoModalOpen={setInfoModalOpen}
+        />
       </MapContainer>
 
       <Modal
