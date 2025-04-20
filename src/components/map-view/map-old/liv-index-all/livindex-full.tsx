@@ -1,19 +1,19 @@
 import { FeatureCollection, Point } from "geojson";
-import { useFetchAllLivindexPlaces } from "../../../hooks/use-livindex-places";
-import { Loader } from "../../common/loader";
+import { useFetchAllLivindexPlaces } from "../../../../hooks/use-livindex-places";
+import { Loader } from "../../../common/loader";
 import brightColorsStyles from "../map-styles/bright-colors";
-import { useFetchProjects } from "../../../hooks/use-project";
-import { MapView } from "../map-view";
+import { useFetchProjects } from "../../../../hooks/use-project";
+import { MapView } from "../../map-old/map-view";
 import { Flex, Select, Typography } from "antd";
 import {
   LivIndexDriversConfig,
   ProjectHomeType,
-} from "../../../libs/constants";
-import { capitalize } from "../../../libs/lvnzy-helper";
-import { getProjectTypeIcon } from "../project-type-icon";
-import { COLORS } from "../../../theme/style-constants";
+} from "../../../../libs/constants";
+import { capitalize } from "../../../../libs/lvnzy-helper";
+import { getProjectTypeIcon } from "../../map-old/project-type-icon";
+import { COLORS } from "../../../../theme/style-constants";
 import { useEffect, useState } from "react";
-import { IDriverPlace } from "../../../types/Project";
+import { IDriverPlace } from "../../../../types/Project";
 
 export type CastleFeatureProps = {
   name?: string;

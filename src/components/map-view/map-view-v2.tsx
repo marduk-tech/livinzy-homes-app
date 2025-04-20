@@ -1,4 +1,4 @@
-import { Flex, Modal } from "antd";
+import { Flex, Modal, Tag, Typography } from "antd";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";
@@ -7,7 +7,6 @@ import {
   CircleMarker,
   MapContainer,
   Marker,
-  Polygon,
   Polyline,
   TileLayer,
   useMap,
@@ -17,11 +16,11 @@ import remarkGfm from "remark-gfm";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
 import { useFetchProjectById } from "../../hooks/use-project";
 import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
-import { COLORS } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace } from "../../types/Project";
-import DynamicReactIcon, {
-  dynamicImportMap,
-} from "../common/dynamic-react-icon";
+import { dynamicImportMap } from "../common/dynamic-react-icon";
+import { capitalize } from "../../libs/lvnzy-helper";
+import { MapPolygons } from "./map-polygons";
 
 type Coordinate = [number, number];
 type LineString = Coordinate[];
@@ -64,11 +63,25 @@ type RoadDriverPlace = IDriverPlace & {
   status: PLACE_TIMELINE;
 };
 
-async function getIcon(iconName: string, iconSet: any) {
+async function getIcon(
+  iconName: string,
+  iconSet: any,
+  isProjectIcon?: boolean,
+  duration?: number,
+  driver?: IDriverPlace
+) {
   let IconComp = null;
   if (!dynamicImportMap[iconSet]) {
     console.warn(`Icon set ${iconSet} not found.`);
     return null;
+  }
+  let isUnderConstruction = false;
+  if (driver) {
+    isUnderConstruction = ![
+      PLACE_TIMELINE.LAUNCHED,
+      PLACE_TIMELINE.PARTIAL_LAUNCH,
+      PLACE_TIMELINE.POST_LAUNCH,
+    ].includes(driver.status as any);
   }
 
   try {
@@ -81,16 +94,40 @@ async function getIcon(iconName: string, iconSet: any) {
     <div
       style={{
         backgroundColor: "white",
-        borderRadius: "50%",
-        width: "32px",
-        height: "32px",
+        borderRadius: duration ? "24px" : "50%",
+        padding: duration ? 4 : 0,
+        height: duration ? "auto" : 32,
+        width: duration ? 80 : 32,
         display: "flex",
         alignItems: "center",
+        borderColor: isUnderConstruction
+          ? COLORS.yellowIdentifier
+          : COLORS.borderColorDark,
+        borderStyle: isUnderConstruction ? "dotted" : "solid",
         justifyContent: "center",
+        animation: isProjectIcon ? "bounceAnimation 1s infinite" : "none",
         boxShadow: "0 0 6px rgba(0,0,0,0.3)",
       }}
     >
-      <IconComp size={20} color="black" />
+      <IconComp
+        size={20}
+        color={
+          isUnderConstruction
+            ? COLORS.yellowIdentifier
+            : isProjectIcon
+            ? COLORS.primaryColor
+            : COLORS.textColorDark
+        }
+      />
+      {duration ? (
+        <Flex style={{ marginLeft: 4 }}>
+          <Typography.Text
+            style={{ fontSize: FONT_SIZE.PARA, fontWeight: 500 }}
+          >
+            {duration} mins
+          </Typography.Text>
+        </Flex>
+      ) : null}
     </div>
   );
   const leafletIcon = L.divIcon({
@@ -155,13 +192,15 @@ const MapResizeHandler = () => {
 const MapViewV2 = ({
   drivers,
   projectId = DEFAULT_PROJECT,
-  selectedDriverTypes = [],
+  fullSize,
 }: {
-  drivers?: string[];
+  drivers?: any[];
   projectId?: string;
-  selectedDriverTypes?: string[];
+  fullSize: boolean;
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
+  const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
+  const [selectedDriverTypes, setSelectedDriverTypes] = useState<string[]>([]);
 
   const [modalContent, setModalContent] = useState<{
     title: string;
@@ -171,7 +210,9 @@ const MapViewV2 = ({
   /**
    * Fetching driver data for selected drivers
    */
-  const { data: driversData } = useFetchAllLivindexPlaces(drivers);
+  const { data: driversData } = useFetchAllLivindexPlaces(
+    drivers?.map((d) => d.id)
+  );
   // Always fetch data, use conditionally in render
   const { data: projectData } = useFetchProjectById(projectId || "");
 
@@ -192,10 +233,16 @@ const MapViewV2 = ({
         const icons = await Promise.all(
           driversData.map(async (driver) => {
             const iconConfig = (LivIndexDriversConfig as any)[driver.driver];
+            const projectSpecificDetails = drivers?.find(
+              (d) => d.id == driver._id
+            );
 
             const icon = await getIcon(
               iconConfig ? iconConfig.icon.name : "BiSolidFactory",
-              iconConfig ? iconConfig.icon.set : "bi"
+              iconConfig ? iconConfig.icon.set : "bi",
+              false,
+              projectSpecificDetails.duration,
+              driver
             );
             return icon ? { icon, driverId: driver._id } : null;
           })
@@ -204,12 +251,21 @@ const MapViewV2 = ({
       }
     }
     fetchDriverIcons();
+    if (driversData && driversData.length) {
+      const uniqTypes: string[] = [];
+      driversData.forEach((d: any) => {
+        if (!uniqTypes.includes(d.driver)) {
+          uniqTypes.push(d.driver);
+        }
+      });
+      setUniqueDriverTypes(uniqTypes);
+    }
   }, [driversData]);
 
   // Setting icon for project marker
   useEffect(() => {
     async function fetchProjectIcon() {
-      const icon = await getIcon("IoLocation", "io5");
+      const icon = await getIcon("IoLocation", "io5", true);
       setProjectMarkerIcon(icon);
     }
     fetchProjectIcon();
@@ -396,130 +452,7 @@ const MapViewV2 = ({
       });
   };
 
-  const MapPolygons = ({
-    driversData,
-    selectedDriverTypes,
-    setModalContent,
-    setInfoModalOpen,
-  }: {
-    driversData: any[];
-    selectedDriverTypes: string[];
-    setModalContent: (content: any) => void;
-    setInfoModalOpen: (open: boolean) => void;
-  }) => {
-    const map = useMap();
-    const [visiblePolygons, setVisiblePolygons] = useState<
-      Array<{
-        id: string;
-        positions: [number, number][];
-        name: string;
-        description: string;
-      }>
-    >([]);
-
-    const updateVisiblePolygons = () => {
-      const zoom = map.getZoom();
-      const bounds = map.getBounds();
-
-      if (zoom >= 14) {
-        const polygons = driversData
-          ?.filter(
-            (driver) =>
-              driver.details?.osm?.geojson &&
-              (selectedDriverTypes.length === 0 ||
-                selectedDriverTypes.includes(driver.driver))
-          )
-          .map((driver) => {
-            try {
-              console.log("GeoJSON data:", driver.details.osm.geojson);
-
-              // Handle case where geojson might be string or object
-              const geojson =
-                typeof driver.details.osm.geojson === "string"
-                  ? JSON.parse(driver.details.osm.geojson)
-                  : driver.details.osm.geojson;
-
-              if (!geojson || geojson.type !== "Polygon") {
-                console.log("Invalid polygon data:", geojson);
-                return null;
-              }
-
-              const positions = geojson.coordinates[0].map(
-                ([lng, lat]: [number, number]) => [lat, lng] as [number, number]
-              );
-
-              // Check if any point is within bounds
-              if (
-                positions.some((pos: [number, number]) => bounds.contains(pos))
-              ) {
-                return {
-                  id: driver._id,
-                  positions,
-                  name: driver.name,
-                  description: driver.details?.description || "",
-                };
-              }
-            } catch (error) {
-              console.error("Error parsing GeoJSON:", error);
-            }
-            return null;
-          })
-          .filter(
-            (
-              p
-            ): p is {
-              id: string;
-              positions: [number, number][];
-              name: string;
-              description: string;
-            } => p !== null
-          );
-
-        setVisiblePolygons(polygons || []);
-      } else {
-        setVisiblePolygons([]);
-      }
-    };
-
-    useEffect(() => {
-      updateVisiblePolygons(); // Initial update
-
-      map.on("zoomend", updateVisiblePolygons);
-      map.on("moveend", updateVisiblePolygons);
-
-      return () => {
-        map.off("zoomend", updateVisiblePolygons);
-        map.off("moveend", updateVisiblePolygons);
-      };
-    }, [map, driversData, selectedDriverTypes]);
-
-    return (
-      <>
-        {visiblePolygons.map((poly) => (
-          <Polygon
-            key={`polygon-${poly.id}`}
-            positions={poly.positions}
-            pathOptions={{
-              color: "#ff0000",
-              weight: 3,
-              fillOpacity: 0.4,
-              fillColor: "#ff0000",
-            }}
-            eventHandlers={{
-              click: () => {
-                setModalContent({
-                  title: poly.name,
-                  content: poly.description,
-                });
-                setInfoModalOpen(true);
-              },
-            }}
-          />
-        ))}
-      </>
-    );
-  };
-
+  /** Renders driver markers */
   const renderSimpleDriverMarkers = () => {
     return driversData
       ?.filter(
@@ -539,6 +472,22 @@ const MapViewV2 = ({
         if (!icon) {
           return null;
         }
+        const statusText =
+          driver.status == PLACE_TIMELINE.CONSTRUCTION
+            ? "Under Construction"
+            : [
+                PLACE_TIMELINE.LAUNCHED,
+                PLACE_TIMELINE.POST_LAUNCH,
+                PLACE_TIMELINE.PARTIAL_LAUNCH,
+              ].includes(driver.status as PLACE_TIMELINE)
+            ? "Operational"
+            : "Planning Stage";
+
+        const isDashed = ![
+          PLACE_TIMELINE.LAUNCHED,
+          PLACE_TIMELINE.POST_LAUNCH,
+          PLACE_TIMELINE.PARTIAL_LAUNCH,
+        ].includes(driver.status as PLACE_TIMELINE);
 
         return (
           <Marker
@@ -550,6 +499,14 @@ const MapViewV2 = ({
                 setModalContent({
                   title: driver.name,
                   content: driver.details?.description || "",
+                  tags: [
+                    {
+                      label: statusText,
+                      color: isDashed
+                        ? COLORS.yellowIdentifier
+                        : COLORS.primaryColor,
+                    },
+                  ],
                 });
                 setInfoModalOpen(true);
               },
@@ -559,6 +516,7 @@ const MapViewV2 = ({
       });
   };
 
+  /**Renders marker for a particular project */
   const renderProjectMarkers = () => {
     if (projectId && projectData?.info?.location && projectMarkerIcon) {
       return (
@@ -585,33 +543,73 @@ const MapViewV2 = ({
   };
 
   return (
-    <div style={{ height: "100%", width: "100%" }}>
-      <MapContainer
-        center={[13.110274, 77.6009443]}
-        zoom={15}
-        minZoom={12}
-        style={{ height: "100%", width: "100%" }}
-      >
-        <MapResizeHandler />
-        <MapCenterHandler projectData={projectData} />
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        {renderRoadDrivers()}
-        {renderTransitDrivers()}
-        {renderSimpleDriverMarkers()}
-        {renderProjectMarkers()}
-        <MapPolygons
-          driversData={driversData || []}
-          selectedDriverTypes={selectedDriverTypes}
-          setModalContent={setModalContent}
-          setInfoModalOpen={setInfoModalOpen}
-        />
-      </MapContainer>
-
+    <div style={{ width: "100%", height: "100%" }}>
+      {fullSize && uniqueDriverTypes && (
+        <Flex
+          style={{
+            width: "100%",
+            overflowX: "scroll",
+            marginBottom: 16,
+            scrollbarWidth: "none",
+          }}
+        >
+          {uniqueDriverTypes.map((k: string) => {
+            const itemIndex = selectedDriverTypes.indexOf(k);
+            return (
+              <Tag
+                style={{
+                  borderRadius: 16,
+                  padding: 4,
+                  backgroundColor:
+                    itemIndex > -1 ? COLORS.primaryColor : "initial",
+                  color: itemIndex > -1 ? "white" : "initial",
+                }}
+                onClick={() => {
+                  const selDriverTypes = [...selectedDriverTypes];
+                  const indexOfItem = selDriverTypes.indexOf(k);
+                  if (indexOfItem > -1) {
+                    selDriverTypes.splice(indexOfItem, 1);
+                  } else {
+                    selDriverTypes.push(k);
+                  }
+                  setSelectedDriverTypes(selDriverTypes);
+                }}
+              >
+                {(LivIndexDriversConfig as any)[k]
+                  ? capitalize((LivIndexDriversConfig as any)[k].label)
+                  : ""}
+              </Tag>
+            );
+          })}
+        </Flex>
+      )}
+      <Flex style={{ height: "100%", width: "100%" }}>
+        <MapContainer
+          center={[13.110274, 77.6009443]}
+          zoom={15}
+          minZoom={12}
+          style={{ height: "90%", width: "100%" }}
+        >
+          <MapResizeHandler />
+          <MapCenterHandler projectData={projectData} />
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          {renderRoadDrivers()}
+          {renderTransitDrivers()}
+          {renderSimpleDriverMarkers()}
+          {renderProjectMarkers()}
+          <MapPolygons
+            driversData={driversData || []}
+            selectedDriverTypes={selectedDriverTypes}
+            setModalContent={setModalContent}
+            setInfoModalOpen={setInfoModalOpen}
+          />
+        </MapContainer>
+      </Flex>
       <Modal
-        title={modalContent?.title}
+        title={null}
         closable={true}
         open={infoModalOpen}
         footer={null}
@@ -621,13 +619,28 @@ const MapViewV2 = ({
           vertical
           style={{
             maxHeight: 500,
+            minHeight: 50,
             overflowY: "scroll",
             scrollbarWidth: "none",
           }}
         >
-          <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
-            {modalContent?.content}
-          </Markdown>
+          <Typography.Text
+            style={{ fontSize: FONT_SIZE.HEADING_3, fontWeight: 500 }}
+          >
+            {modalContent?.title}
+          </Typography.Text>
+          {modalContent?.tags ? (
+            <Flex>
+              {modalContent?.tags.map((t) => (
+                <Tag color={t.color}>{t.label}</Tag>
+              ))}
+            </Flex>
+          ) : null}
+          {modalContent && modalContent.content ? (
+            <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
+              {modalContent?.content}
+            </Markdown>
+          ) : null}
         </Flex>
       </Modal>
     </div>

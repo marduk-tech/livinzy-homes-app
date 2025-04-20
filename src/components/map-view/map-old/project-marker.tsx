@@ -1,10 +1,10 @@
 import { CloseOutlined } from "@ant-design/icons";
 import { Flex, Modal, Typography } from "antd";
 import React, { useEffect, useState } from "react";
-import { Project } from "../../types/Project";
-import { ProjectCard } from "../common/project-card";
+import { Project } from "../../../types/Project";
+import { ProjectCard } from "../../common/project-card";
 import { getProjectTypeIcon } from "./project-type-icon";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../../theme/style-constants";
 
 export const ProjectMarker = ({
   project,

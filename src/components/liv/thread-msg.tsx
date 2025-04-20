@@ -9,7 +9,7 @@ import remarkGfm from "remark-gfm";
 
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { ProjectCard } from "../common/project-card";
-import { MapView } from "../map-view/map-view";
+import { MapView } from "../map-view/map-old/map-view";
 import ProjectsViewV2 from "../projects-view-v2";
 import { AICuratedProject, LivAnswer } from "./liv-v3";
 

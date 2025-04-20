@@ -15,7 +15,7 @@ import { CalendlyPopup } from "./calendly-popup";
 import DynamicReactIcon from "./common/dynamic-react-icon";
 import LivestIndexRange from "./common/livest-index-range";
 import { Loader } from "./common/loader";
-import { ProjectMapView } from "./map-view/project-map-view";
+import { ProjectMapView } from "./map-view/map-old/project-map-view";
 import { useDevice } from "../hooks/use-device";
 import { useFetchAllLivindexPlaces } from "../hooks/use-livindex-places";
 import { useFetchProjectById } from "../hooks/use-project";

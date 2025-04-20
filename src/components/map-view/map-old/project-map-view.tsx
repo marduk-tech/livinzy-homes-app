@@ -9,15 +9,15 @@ import {
 } from "@vis.gl/react-google-maps";
 import { Flex, Tag, Tooltip, Typography } from "antd";
 import React, { useCallback, useState } from "react";
-import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../../libs/constants";
+import { COLORS, FONT_SIZE } from "../../../theme/style-constants";
 import {
   IDriverPlace,
   IProjectDriver,
   IScoreBreakup,
   Project,
-} from "../../types/Project";
-import DynamicReactIcon from "../common/dynamic-react-icon";
+} from "../../../types/Project";
+import DynamicReactIcon from "../../common/dynamic-react-icon";
 import { ConnectivityInfra } from "./connectivity-infra";
 const { Paragraph } = Typography;
 

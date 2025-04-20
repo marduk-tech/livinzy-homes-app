@@ -7,7 +7,6 @@ import {
   List,
   Modal,
   Progress,
-  Select,
   Space,
   Tag,
   Typography,
@@ -27,7 +26,6 @@ import {
   BRICK360_CATEGORY,
   Brick360CategoryInfo,
   Brick360DataPoints,
-  LivIndexDriversConfig,
 } from "../libs/constants";
 import {
   capitalize,
@@ -66,8 +64,6 @@ export function Brick360() {
     useState<any>();
 
   const [mapDrivers, setMapDrivers] = useState<any[]>([]);
-  const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
-  const [selectedDriverTypes, setSelectedDriverTypes] = useState<string[]>([]);
 
   const [selectedDataPoint, setSelectedDataPoint] = useState<any>();
   const [fakeTimeoutProgress, setFakeTimeoutProgress] = useState<any>(10);
@@ -144,13 +140,6 @@ export function Brick360() {
       }
       if (drivers && drivers.length) {
         setMapDrivers(drivers);
-        const uniqTypes: string[] = [];
-        drivers.forEach((d: any) => {
-          if (!uniqTypes.includes(d.driverId.driver)) {
-            uniqTypes.push(d.driverId.driver);
-          }
-        });
-        setUniqueDriverTypes(uniqTypes);
       }
     }
   }, [lvnzyProject, selectedDataPointCategory, selectedDataPointSubCategory]);
@@ -476,45 +465,27 @@ export function Brick360() {
         width={isMobile ? "100%" : 900}
       >
         <Flex style={{ height: 600 }} vertical gap={8}>
-          <Flex>
-            {uniqueDriverTypes && (
-              <Select
-                style={{ width: "80%" }}
-                mode="multiple"
-                showSearch
-                placeholder="Filter place"
-                maxTagCount="responsive"
-                onChange={(driverTypes: string[]) => {
-                  setSelectedDriverTypes(driverTypes);
-                }}
-                options={uniqueDriverTypes.map((k: string) => {
-                  return {
-                    value: k,
-                    label: (LivIndexDriversConfig as any)[k]
-                      ? capitalize((LivIndexDriversConfig as any)[k].label)
-                      : "",
-                  };
-                })}
-              />
-            )}
-
-            <Flex
-              onClick={() => {
-                setIsMapFullScreen(false);
-                setDetailsModalOpen(true);
-              }}
-              style={{ marginLeft: "auto" }}
-            >
-              <DynamicReactIcon
-                iconName="IoMdCloseCircle"
-                iconSet="io"
-              ></DynamicReactIcon>
-            </Flex>
+          <Flex
+            onClick={() => {
+              setIsMapFullScreen(false);
+              setDetailsModalOpen(true);
+            }}
+            style={{ marginLeft: "auto" }}
+          >
+            <DynamicReactIcon
+              iconName="IoMdCloseCircle"
+              iconSet="io"
+            ></DynamicReactIcon>
           </Flex>
           <MapViewV2
+            fullSize={true}
             projectId={lvnzyProject?.originalProjectId._id}
-            drivers={mapDrivers.map((d) => d.driverId._id)}
-            selectedDriverTypes={selectedDriverTypes}
+            drivers={mapDrivers.map((d) => {
+              return {
+                id: d.driverId._id,
+                duration: Math.round(d.mapsDurationSeconds / 60),
+              };
+            })}
           />
         </Flex>
       </Modal>
@@ -616,8 +587,13 @@ export function Brick360() {
               >
                 <MapViewV2
                   projectId={lvnzyProject?.originalProjectId._id}
-                  drivers={mapDrivers.map((d) => d.driverId._id)}
-                  selectedDriverTypes={selectedDriverTypes}
+                  drivers={mapDrivers.map((d) => {
+                    return {
+                      id: d.driverId._id,
+                      duration: Math.round(d.mapsDurationSeconds / 60),
+                    };
+                  })}
+                  fullSize={false}
                 />
               </Flex>
             </Flex>
