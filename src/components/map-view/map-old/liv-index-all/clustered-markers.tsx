@@ -7,9 +7,9 @@ import { Flex, Typography } from "antd";
 import { FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { useCallback, useEffect, useMemo } from "react";
 import Supercluster, { ClusterProperties } from "supercluster";
-import { useSupercluster } from "../../../hooks/use-supercluster";
-import { LivIndexDriversConfig } from "../../../libs/constants";
-import { LivIndexPlaceCard } from "../map-old/livindex-place-card";
+import { useSupercluster } from "../../../../hooks/use-supercluster";
+import { LivIndexDriversConfig } from "../../../../libs/constants";
+import { LivIndexPlaceCard } from "../../map-old/livindex-place-card";
 
 type ClusteredMarkersProps = {
   geojson: FeatureCollection<Point>;

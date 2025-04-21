@@ -1,10 +1,10 @@
 import { APIProvider, Map } from "@vis.gl/react-google-maps";
 import { FeatureCollection, Point } from "geojson";
 import { useEffect, useState } from "react";
-import { useFetchAllLivindexPlaces } from "../../../hooks/use-livindex-places";
-import { Loader } from "../../common/loader";
+import { useFetchAllLivindexPlaces } from "../../../../hooks/use-livindex-places";
+import { Loader } from "../../../common/loader";
 import { ClusteredMarkers } from "./clustered-markers";
-import { ConnectivityInfra } from "../map-old/connectivity-infra";
+import { ConnectivityInfra } from "../../map-old/connectivity-infra";
 import brightColorsStyles from "../map-styles/bright-colors";
 
 export type CastleFeatureProps = {
