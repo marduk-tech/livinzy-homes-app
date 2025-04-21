@@ -14,7 +14,6 @@ import LivProjectPro from "../components/liv-project-pro";
 import { Brick360 } from "../pages/brick360";
 import { PaymentCallbackPage } from "../pages/payment-callback";
 import { UserProjects } from "../pages/user-projects";
-import MapViewV2 from "../components/map-view/map-view-v2";
 import { Brick360Full } from "../pages/brick360-full";
 
 export const Router = () => {
@@ -26,7 +25,6 @@ export const Router = () => {
       />
       <Route element={<DashboardLayout />}>
         <Route path="/map" element={<LivindexPlaces />} />
-        <Route path="/mapv2" element={<MapViewV2 />} />
         {/* <Route path="/:sessionId?" element={<LivV3 />} /> */}
         <Route path="/" element={<UserProjects />} />
         <Route path="/profile" element={<ProfilePage />} />

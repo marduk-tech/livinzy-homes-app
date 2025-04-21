@@ -7,22 +7,22 @@ import {
   useAdvancedMarkerRef,
 } from "@vis.gl/react-google-maps";
 import React, { useCallback, useEffect, useState } from "react";
-import { useDevice } from "../../hooks/use-device";
-import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
-import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
-import { IProjectDriver, Project } from "../../types/Project";
+import { useDevice } from "../../../hooks/use-device";
+import { useFetchAllLivindexPlaces } from "../../../hooks/use-livindex-places";
+import { captureAnalyticsEvent } from "../../../libs/lvnzy-helper";
+import { IProjectDriver, Project } from "../../../types/Project";
 import { ConnectivityInfra } from "./connectivity-infra";
 import { LivIndexMarker } from "./liv-index-marker";
 import { getProjectsMapData } from "./map-util";
 import { ProjectMarker } from "./project-marker";
-import { useFetchProjectById } from "../../hooks/use-project";
-import { useFetchCorridors } from "../../hooks/use-corridors";
-import { Corridor } from "../../types/Corridor";
+import { useFetchProjectById } from "../../../hooks/use-project";
+import { useFetchCorridors } from "../../../hooks/use-corridors";
+import { Corridor } from "../../../types/Corridor";
 import { Circle } from "./shapes/circle";
-import DynamicReactIcon from "../common/dynamic-react-icon";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import DynamicReactIcon from "../../common/dynamic-react-icon";
+import { COLORS, FONT_SIZE } from "../../../theme/style-constants";
 import { Flex, Tooltip, Typography } from "antd";
-import { Loader } from "../common/loader";
+import { Loader } from "../../common/loader";
 
 export type AnchorPointName = keyof typeof AdvancedMarkerAnchorPoint;
 

@@ -1,5 +1,5 @@
-import { ProjectHomeType } from "../../libs/constants";
-import DynamicReactIcon from "../common/dynamic-react-icon";
+import { ProjectHomeType } from "../../../libs/constants";
+import DynamicReactIcon from "../../common/dynamic-react-icon";
 
 export function getProjectTypeIcon(homeType: ProjectHomeType, color?: string) {
   let iconName = "IoHome",

@@ -2,10 +2,10 @@ import { ArrowRightOutlined, CloseOutlined } from "@ant-design/icons";
 import { Button, Flex, Typography } from "antd";
 import React from "react";
 import { Link } from "react-router-dom";
-import { FONT_SIZE } from "../../theme/style-constants";
-import { ILivIndexPlaces } from "../../types/Common";
+import { FONT_SIZE } from "../../../theme/style-constants";
+import { ILivIndexPlaces } from "../../../types/Common";
 import { LivIndexPlaceCard } from "./livindex-place-card";
-import { IDriverPlace } from "../../types/Project";
+import { IDriverPlace } from "../../../types/Project";
 
 export const PlaceCard = ({
   place,

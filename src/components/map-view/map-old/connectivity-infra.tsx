@@ -1,8 +1,8 @@
 import { useMap } from "@vis.gl/react-google-maps";
 import { Flex, Modal, Tag, Typography } from "antd";
 import { useEffect, useState } from "react";
-import { PLACE_TIMELINE } from "../../libs/constants";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { PLACE_TIMELINE } from "../../../libs/constants";
+import { COLORS, FONT_SIZE } from "../../../theme/style-constants";
 
 const { Paragraph } = Typography;
 

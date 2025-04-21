@@ -1,10 +1,10 @@
 import { Flex, Modal, Tag, Typography } from "antd";
-import { IDriverPlace } from "../../types/Project";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
-import DynamicReactIcon from "../common/dynamic-react-icon";
+import { IDriverPlace } from "../../../types/Project";
+import { COLORS, FONT_SIZE } from "../../../theme/style-constants";
+import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../../libs/constants";
+import DynamicReactIcon from "../../common/dynamic-react-icon";
 import { useState } from "react";
-import { capitalize } from "../../libs/lvnzy-helper";
+import { capitalize } from "../../../libs/lvnzy-helper";
 const { Paragraph } = Typography;
 
 interface LivIndexPlaceCardProps {

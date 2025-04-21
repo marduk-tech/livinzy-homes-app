@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import DynamicReactIcon from "./common/dynamic-react-icon";
 import { ProjectCard } from "./common/project-card";
 import { LocationAndPriceFilters } from "./location-price-filter";
-import { MapView } from "./map-view/map-view";
+import { MapView } from "./map-view/map-old/map-view";
 import { useDevice } from "../hooks/use-device";
 import { captureAnalyticsEvent } from "../libs/lvnzy-helper";
 import { Project } from "../types/Project";
