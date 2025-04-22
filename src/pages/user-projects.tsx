@@ -1,4 +1,4 @@
-import { Col, Flex, List, Row, Select, Tag, Typography } from "antd";
+import { Col, Flex, Row, Select, Tag, Typography } from "antd";
 import { Loader } from "../components/common/loader";
 import { useUser } from "../hooks/use-user";
 import { useNavigate } from "react-router-dom";
@@ -56,20 +56,23 @@ export function UserProjects() {
         ? itemInfo.originalProjectId.media[0].image.url!
         : "";
     return (
-      <List.Item
+      <Flex
         style={{
           marginBottom: 16,
-          border: "1px solid",
+          border: "2px solid",
+          cursor: "pointer",
           backgroundColor: "white",
           borderColor: COLORS.borderColorMedium,
           borderRadius: 8,
           padding: 8,
+          minWidth: isMobile ? "100%" : 320,
+          maxWidth: isMobile ? "100%" : 320,
         }}
         onClick={() => {
           navigate(`/brick360/${itemInfo._id}`);
         }}
       >
-        <Flex vertical align="flex-start" gap={8} style={{ width: "100%" }}>
+        <Flex vertical gap={8} style={{ width: "100%" }}>
           <div
             style={{
               width: "100%",
@@ -92,6 +95,8 @@ export function UserProjects() {
                 fontSize: FONT_SIZE.HEADING_2,
                 fontWeight: 500,
                 lineHeight: "120%",
+                width: "100%",
+                textWrap: "wrap",
               }}
             >
               {itemInfo.meta.projectName}
@@ -100,6 +105,7 @@ export function UserProjects() {
               vertical={isMobile}
               gap={4}
               align={isMobile ? "flex-start" : "center"}
+              style={{ width: "100%", textWrap: "wrap" }}
             >
               {oneLinerBreakup.length && (
                 <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_4 }}>
@@ -123,20 +129,8 @@ export function UserProjects() {
               {rupeeAmountFormat(itemInfo.meta.costingDetails.minimumUnitCost)}{" "}
               / {itemInfo.meta.costingDetails.minimumUnitSize} sqft
             </Typography.Text>
-            {/* <Flex gap={4} style={{ flexWrap: "wrap" }}>
-              {["property", "developer", "investment", "areaConnectivity"].map(
-                (d: string) => {
-                  return (
-                    <Flex style={{ width: 120, height: 24 }}>
-                      <GradientBar
-                        text={capitalize(d)}
-                        value={getDataPtOverallRating(itemInfo.score[d])}
-                      ></GradientBar>
-                    </Flex>
-                  );
-                }
-              )}
-            </Flex> */}
+          </Flex>
+          <Flex>
             <Row
               style={{
                 marginTop: 8,
@@ -172,7 +166,7 @@ export function UserProjects() {
             </Row>
           </Flex>
         </Flex>
-      </List.Item>
+      </Flex>
     );
   };
 
@@ -186,7 +180,7 @@ export function UserProjects() {
         width: "100%",
         padding: 8,
         paddingBottom: 100,
-        backgroundColor: COLORS.bgColor,
+        backgroundColor: isMobile ? COLORS.bgColorMedium : "white",
         border: 0,
       }}
       vertical
@@ -214,7 +208,7 @@ export function UserProjects() {
 
       {Object.keys(corridorWiseProjects).map((corridor: string) => {
         return (
-          <Flex vertical style={{}}>
+          <Flex vertical>
             <Flex vertical style={{ marginTop: 24 }}>
               <Flex style={{ marginBottom: 8 }}>
                 <Tag
@@ -233,14 +227,19 @@ export function UserProjects() {
                 </Paragraph>
               ) : null} */}
             </Flex>
-            <List
-              size="large"
+            <Flex
               style={{
                 width: "100%",
+                overflowX: "scroll",
+                whiteSpace: "nowrap",
               }}
-              dataSource={corridorWiseProjects[corridor]}
-              renderItem={renderLvnzyProject}
-            />
+              vertical={isMobile}
+              gap={16}
+            >
+              {corridorWiseProjects[corridor].map((p: any) => {
+                return renderLvnzyProject(p);
+              })}
+            </Flex>
           </Flex>
         );
       })}

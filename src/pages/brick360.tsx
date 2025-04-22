@@ -259,6 +259,7 @@ export function Brick360() {
         margin: "auto",
         maxWidth: 900,
         overflowX: "hidden",
+        backgroundColor: isMobile ? COLORS.bgColorMedium : "white",
       }}
     >
       {/* Main project upfront score card including metadata */}
@@ -357,6 +358,7 @@ export function Brick360() {
               border: "1px solid",
               borderColor: COLORS.borderColorMedium,
               borderRadius: 8,
+              width: "100%",
             }}
           >
             <Paragraph
@@ -411,6 +413,7 @@ export function Brick360() {
                         style={{
                           padding: "8px",
                           border: "1px solid",
+                          backgroundColor: "white",
                           borderRadius: 8,
                           borderColor: COLORS.borderColorMedium,
                           marginBottom: 8,

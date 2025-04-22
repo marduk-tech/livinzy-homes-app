@@ -255,7 +255,7 @@ export const Brick360CategoryInfo: Record<
     iconSet: "gi",
   },
   areaConnectivity: {
-    title: "Area/Connectivity",
+    title: "Location",
     iconName: "GiPathDistance",
     iconSet: "gi",
   },
