@@ -253,13 +253,12 @@ export function Brick360() {
     <Flex
       vertical
       style={{
-        borderRadius: 16,
         width: "100%",
         paddingBottom: 75,
         margin: "auto",
         maxWidth: 900,
         overflowX: "hidden",
-        backgroundColor: isMobile ? COLORS.bgColorMedium : "white",
+        backgroundColor: isMobile ? COLORS.bgColor : "white",
       }}
     >
       {/* Main project upfront score card including metadata */}
@@ -412,10 +411,11 @@ export function Brick360() {
                       <List.Item
                         style={{
                           padding: "8px",
-                          border: "1px solid",
-                          backgroundColor: "white",
-                          borderRadius: 8,
+                          border: "1.5px solid",
                           borderColor: COLORS.borderColorMedium,
+                          backgroundColor: "white",
+
+                          borderRadius: 8,
                           marginBottom: 8,
                         }}
                         onClick={() => {
