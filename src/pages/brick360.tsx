@@ -376,6 +376,13 @@ export function Brick360() {
         </Flex>
       </Flex>
 
+      <Alert
+        message="Click each rating to see more details"
+        type="info"
+        showIcon
+        closable
+        style={{ margin: 16 }}
+      />
       {/* All the data points */}
       <Flex vertical gap={32} style={{ padding: 16 }}>
         {scoreParams &&
@@ -411,12 +418,9 @@ export function Brick360() {
                       <List.Item
                         style={{
                           padding: "8px",
-                          border: "1.5px solid",
-                          borderColor: COLORS.borderColorMedium,
+                          borderBottom: "1px solid",
+                          borderBottomColor: COLORS.borderColor,
                           backgroundColor: "white",
-
-                          borderRadius: 8,
-                          marginBottom: 8,
                         }}
                         onClick={() => {
                           setDetailsModalOpen(true);
