@@ -726,6 +726,9 @@ const MapViewV2 = ({
   };
 
   const renderDriverTypesTag = (k: string, selected: boolean) => {
+    if (!(LivIndexDriversConfig as any)[k]) {
+      return null;
+    }
     return (
       <Tag
         style={{
@@ -768,7 +771,12 @@ const MapViewV2 = ({
   }, [corridors]);
 
   return (
-    <div style={{ width: "100%", height: "100%" }}>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+      }}
+    >
       {fullSize && uniqueDriverTypes && (
         <Flex
           style={{
@@ -784,7 +792,7 @@ const MapViewV2 = ({
             return renderDriverTypesTag(k, true);
           })}
           {uniqueDriverTypes
-            .filter((d) => !selectedDriverTypes.includes(d))
+            .filter((d) => !!d && !selectedDriverTypes.includes(d))
             .map((k: string) => {
               return renderDriverTypesTag(k, false);
             })}

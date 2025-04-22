@@ -492,9 +492,16 @@ export function Brick360() {
         footer={null}
         width={isMobile ? "100%" : 900}
         style={{ padding: 0 }}
-        styles={{ content: { padding: 0 } }}
+        styles={{
+          content: {
+            padding: 0,
+            backgroundColor: COLORS.bgColorMedium,
+            borderRadius: 8,
+            overflowY: "hidden",
+          },
+        }}
       >
-        <Flex style={{ height: 600 }} vertical gap={8}>
+        <Flex style={{ height: 700 }} vertical gap={8}>
           <Flex
             onClick={() => {
               setIsMapFullScreen(false);
