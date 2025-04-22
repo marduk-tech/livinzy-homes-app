@@ -249,7 +249,9 @@ const MapViewV2 = ({
               iconConfig ? iconConfig.icon.name : "BiSolidFactory",
               iconConfig ? iconConfig.icon.set : "bi",
               false,
-              `${projectSpecificDetails.duration} mins`,
+              projectSpecificDetails
+                ? `${projectSpecificDetails.duration} mins`
+                : undefined,
               driver
             );
             return icon ? { icon, driverId: driver._id } : null;
@@ -325,7 +327,7 @@ const MapViewV2 = ({
             cy="100"
             r="10"
             fill="none"
-            stroke={COLORS.primaryColor}
+            stroke={COLORS.textColorDark}
             stroke-width="2"
           >
             <animate
@@ -348,7 +350,7 @@ const MapViewV2 = ({
             cy="100"
             r="10"
             fill="none"
-            stroke={COLORS.primaryColor}
+            stroke={COLORS.textColorDark}
             stroke-width="2"
           >
             <animate
@@ -373,7 +375,7 @@ const MapViewV2 = ({
             cy="100"
             r="10"
             fill="none"
-            stroke={COLORS.primaryColor}
+            stroke={COLORS.textColorDark}
             stroke-width="2"
           >
             <animate
@@ -398,7 +400,7 @@ const MapViewV2 = ({
             cy="100"
             r="10"
             fill="none"
-            stroke={COLORS.primaryColor}
+            stroke={COLORS.textColorDark}
             stroke-width="2"
           >
             <animate
@@ -439,7 +441,7 @@ const MapViewV2 = ({
                 title: c.name,
                 content: c.description || "",
                 tags: [
-                  { label: "Growth corridor", color: COLORS.primaryColor },
+                  { label: "Growth corridor", color: COLORS.textColorDark },
                 ],
               });
               setInfoModalOpen(true);
@@ -480,17 +482,20 @@ const MapViewV2 = ({
               positions={positions}
               pathOptions={{
                 color: feature.properties?.strokeColor || COLORS.textColorDark,
-                weight: 4,
-                opacity: 0.8,
+                weight: 5,
+                opacity: 0.5,
                 dashArray: isDashed ? "10, 10" : undefined,
               }}
-              interactive={false}
               eventHandlers={{
                 click: () => {
                   setModalContent({
-                    title: feature.properties?.name || driver.name,
+                    title: driver.name,
                     content: driver.details?.description || "",
                     tags: [
+                      {
+                        label: "Road",
+                        color: COLORS.primaryColor,
+                      },
                       {
                         label: isDashed ? "Under Construction" : "Operational",
                         color: isDashed ? "warning" : "success",
@@ -528,19 +533,18 @@ const MapViewV2 = ({
           )
         );
 
+        const isDashed = ![
+          PLACE_TIMELINE.LAUNCHED,
+          PLACE_TIMELINE.POST_LAUNCH,
+          PLACE_TIMELINE.PARTIAL_LAUNCH,
+        ].includes(driver.status as PLACE_TIMELINE);
+
         return [
           // Render transit lines
           ...lineFeatures.map((feature, lineIndex) => {
             const positions = feature.coordinates.map(
               ([lng, lat]) => [lat, lng] as [number, number]
             );
-
-            const featureStatus = feature.properties?.status || driver.status;
-            const isDashed = ![
-              PLACE_TIMELINE.LAUNCHED,
-              PLACE_TIMELINE.POST_LAUNCH,
-              PLACE_TIMELINE.PARTIAL_LAUNCH,
-            ].includes(featureStatus as PLACE_TIMELINE);
 
             return (
               <Polyline
@@ -556,7 +560,7 @@ const MapViewV2 = ({
                 eventHandlers={{
                   click: () => {
                     setModalContent({
-                      title: feature.properties?.name || driver.name,
+                      title: driver.name,
                       content: driver.details?.description || "",
                       tags: [
                         {
@@ -594,8 +598,25 @@ const MapViewV2 = ({
               eventHandlers={{
                 click: () => {
                   setModalContent({
-                    title: feature.properties?.name || driver.name,
+                    title: `${driver.name}${
+                      feature.properties?.name
+                        ? ", Station: " + feature.properties?.name
+                        : ""
+                    }`,
                     content: driver.details?.description || "",
+                    tags: [
+                      {
+                        label:
+                          driver.name.toLowerCase().indexOf("suburban") > -1
+                            ? "Suburban Rail"
+                            : "Namma Metro",
+                        color: COLORS.primaryColor,
+                      },
+                      {
+                        label: isDashed ? "Under Construction" : "Operational",
+                        color: isDashed ? "warning" : "success",
+                      },
+                    ],
                   });
                   setInfoModalOpen(true);
                 },
