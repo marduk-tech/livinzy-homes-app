@@ -11,8 +11,6 @@ import {
   TileLayer,
   useMap,
 } from "react-leaflet";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
 import { useFetchProjectById } from "../../hooks/use-project";
 import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
@@ -21,6 +19,7 @@ import { IDriverPlace } from "../../types/Project";
 import { dynamicImportMap } from "../common/dynamic-react-icon";
 import { capitalize } from "../../libs/lvnzy-helper";
 import { MapPolygons } from "./map-polygons";
+import { useFetchCorridors } from "../../hooks/use-corridors";
 
 type Coordinate = [number, number];
 type LineString = Coordinate[];
@@ -66,9 +65,10 @@ type RoadDriverPlace = IDriverPlace & {
 async function getIcon(
   iconName: string,
   iconSet: any,
-  isProjectIcon?: boolean,
-  duration?: number,
-  driver?: IDriverPlace
+  toBounce?: boolean,
+  text?: string,
+  driver?: IDriverPlace,
+  style?: { iconColor: string; iconBgColor: string; iconSize?: number }
 ) {
   let IconComp = null;
   if (!dynamicImportMap[iconSet]) {
@@ -93,11 +93,11 @@ async function getIcon(
   const iconMarkup = renderToString(
     <div
       style={{
-        backgroundColor: "white",
-        borderRadius: duration ? "24px" : "50%",
-        padding: duration ? 4 : 0,
-        height: duration ? "auto" : 32,
-        width: duration ? 80 : 32,
+        backgroundColor: style?.iconBgColor || "white",
+        borderRadius: text ? "24px" : "50%",
+        padding: text ? 4 : 0,
+        height: text ? "auto" : (style?.iconSize || 20) * 1.6,
+        width: text ? 80 : (style?.iconSize || 20) * 1.6,
         display: "flex",
         alignItems: "center",
         borderColor: isUnderConstruction
@@ -105,26 +105,30 @@ async function getIcon(
           : COLORS.borderColorDark,
         borderStyle: isUnderConstruction ? "dotted" : "solid",
         justifyContent: "center",
-        animation: isProjectIcon ? "bounceAnimation 1s infinite" : "none",
+        animation: toBounce ? "bounceAnimation 1s infinite" : "none",
         boxShadow: "0 0 6px rgba(0,0,0,0.3)",
       }}
     >
       <IconComp
-        size={20}
+        size={style?.iconSize || 20}
         color={
-          isUnderConstruction
+          style?.iconColor
+            ? style.iconColor
+            : isUnderConstruction
             ? COLORS.yellowIdentifier
-            : isProjectIcon
-            ? COLORS.primaryColor
             : COLORS.textColorDark
         }
       />
-      {duration ? (
+      {text ? (
         <Flex style={{ marginLeft: 4 }}>
           <Typography.Text
-            style={{ fontSize: FONT_SIZE.PARA, fontWeight: 500 }}
+            style={{
+              fontSize: FONT_SIZE.PARA,
+              fontWeight: 500,
+              color: style?.iconColor || COLORS.textColorDark,
+            }}
           >
-            {duration} mins
+            {text}
           </Typography.Text>
         </Flex>
       ) : null}
@@ -149,7 +153,7 @@ const MapCenterHandler = ({ projectData }: { projectData: any }) => {
     if (projectData?.info?.location) {
       map.setView(
         [projectData.info.location.lat, projectData.info.location.lng],
-        15
+        13
       );
     }
   }, [projectData, map]);
@@ -193,18 +197,22 @@ const MapViewV2 = ({
   drivers,
   projectId = DEFAULT_PROJECT,
   fullSize,
+  defaultSelectedDriverTypes,
 }: {
   drivers?: any[];
   projectId?: string;
   fullSize: boolean;
+  defaultSelectedDriverTypes?: string[];
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
+  const { data: corridors, isLoading: isCorridorsDataLoading } =
+    useFetchCorridors();
   const [selectedDriverTypes, setSelectedDriverTypes] = useState<string[]>([]);
 
   const [modalContent, setModalContent] = useState<{
     title: string;
-    tags?: [{ label: string; color: string }];
+    tags?: { label: string; color: string }[];
     content: string;
   }>();
   /**
@@ -241,7 +249,7 @@ const MapViewV2 = ({
               iconConfig ? iconConfig.icon.name : "BiSolidFactory",
               iconConfig ? iconConfig.icon.set : "bi",
               false,
-              projectSpecificDetails.duration,
+              `${projectSpecificDetails.duration} mins`,
               driver
             );
             return icon ? { icon, driverId: driver._id } : null;
@@ -259,13 +267,27 @@ const MapViewV2 = ({
         }
       });
       setUniqueDriverTypes(uniqTypes);
+      setSelectedDriverTypes(
+        defaultSelectedDriverTypes || uniqTypes.slice(0, 1)
+      );
     }
   }, [driversData]);
 
   // Setting icon for project marker
   useEffect(() => {
     async function fetchProjectIcon() {
-      const icon = await getIcon("IoLocation", "io5", true);
+      const icon = await getIcon(
+        "IoLocation",
+        "io5",
+        true,
+        undefined,
+        undefined,
+        {
+          iconBgColor: COLORS.primaryColor,
+          iconColor: "white",
+          iconSize: 24,
+        }
+      );
       setProjectMarkerIcon(icon);
     }
     fetchProjectIcon();
@@ -294,6 +316,140 @@ const MapViewV2 = ({
     });
   };
 
+  const renderCorridors = () => {
+    const RippleSVG = () => (
+      <div style={{ width: "100px", height: "150px" }}>
+        <svg width="150" height="150" viewBox="0 0 200 200">
+          <circle
+            cx="100"
+            cy="100"
+            r="10"
+            fill="none"
+            stroke={COLORS.primaryColor}
+            stroke-width="2"
+          >
+            <animate
+              attributeName="r"
+              from="10"
+              to="90"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              from="1"
+              to="0"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </circle>
+          <circle
+            cx="100"
+            cy="100"
+            r="10"
+            fill="none"
+            stroke={COLORS.primaryColor}
+            stroke-width="2"
+          >
+            <animate
+              attributeName="r"
+              from="10"
+              to="90"
+              begin="0.5s"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              from="1"
+              to="0"
+              begin="0.5s"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </circle>
+          <circle
+            cx="100"
+            cy="100"
+            r="10"
+            fill="none"
+            stroke={COLORS.primaryColor}
+            stroke-width="2"
+          >
+            <animate
+              attributeName="r"
+              from="10"
+              to="90"
+              begin="1s"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              from="1"
+              to="0"
+              begin="1s"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </circle>
+          <circle
+            cx="100"
+            cy="100"
+            r="10"
+            fill="none"
+            stroke={COLORS.primaryColor}
+            stroke-width="2"
+          >
+            <animate
+              attributeName="r"
+              from="10"
+              to="90"
+              begin="1.5s"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              from="1"
+              to="0"
+              begin="1.5s"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </circle>
+        </svg>
+      </div>
+    );
+    const RippleIcon = L.divIcon({
+      className: "", // prevent default icon styles
+      html: renderToString(<RippleSVG />),
+      iconSize: [100, 100],
+      iconAnchor: [50, 50],
+    });
+    return corridors!.map(async (c) => {
+      return (
+        <Marker
+          key={c._id}
+          icon={RippleIcon}
+          position={[c.location.lat, c.location.lng]}
+          eventHandlers={{
+            click: () => {
+              setModalContent({
+                title: c.name,
+                content: c.description || "",
+                tags: [
+                  { label: "Growth corridor", color: COLORS.primaryColor },
+                ],
+              });
+              setInfoModalOpen(true);
+            },
+          }}
+        />
+      );
+    });
+  };
+
   const renderRoadDrivers = () => {
     return driversData
       ?.filter(
@@ -301,8 +457,7 @@ const MapViewV2 = ({
           driver.driver === "highway" &&
           !!driver.features &&
           typeof driver.status === "string" &&
-          (selectedDriverTypes.length === 0 ||
-            selectedDriverTypes.includes(driver.driver))
+          selectedDriverTypes.includes(driver.driver)
       )
       .flatMap((driver) => {
         const processedFeatures = processRoadFeatures(driver.features);
@@ -358,8 +513,7 @@ const MapViewV2 = ({
           driver.driver === "transit" &&
           !!driver.features &&
           typeof driver.status === "string" &&
-          (selectedDriverTypes.length === 0 ||
-            selectedDriverTypes.includes(driver.driver))
+          selectedDriverTypes.includes(driver.driver)
       )
       .flatMap((driver) => {
         //  points from lines
@@ -455,11 +609,7 @@ const MapViewV2 = ({
   /** Renders driver markers */
   const renderSimpleDriverMarkers = () => {
     return driversData
-      ?.filter(
-        (driver) =>
-          selectedDriverTypes.length === 0 ||
-          selectedDriverTypes.includes(driver.driver)
-      )
+      ?.filter((driver) => selectedDriverTypes.includes(driver.driver))
       .map((driver: IDriverPlace) => {
         if (!driver.location?.lat || !driver.location?.lng) {
           return null;
@@ -496,15 +646,27 @@ const MapViewV2 = ({
             icon={icon}
             eventHandlers={{
               click: () => {
+                const projectSpecificDetails = drivers?.find(
+                  (d) => d.id == driver._id
+                );
                 setModalContent({
                   title: driver.name,
                   content: driver.details?.description || "",
                   tags: [
                     {
+                      label: (LivIndexDriversConfig as any)[driver.driver]
+                        .label,
+                      color: COLORS.primaryColor,
+                    },
+                    {
                       label: statusText,
                       color: isDashed
                         ? COLORS.yellowIdentifier
-                        : COLORS.primaryColor,
+                        : COLORS.greenIdentifier,
+                    },
+                    {
+                      label: `${projectSpecificDetails.duration} mins`,
+                      color: COLORS.textColorDark,
                     },
                   ],
                 });
@@ -542,6 +704,48 @@ const MapViewV2 = ({
     return null;
   };
 
+  const renderDriverTypesTag = (k: string, selected: boolean) => {
+    return (
+      <Tag
+        style={{
+          borderRadius: 16,
+          padding: 4,
+          backgroundColor: selected ? COLORS.primaryColor : "initial",
+          color: selected ? "white" : "initial",
+          marginLeft: 4,
+        }}
+        onClick={() => {
+          const selDriverTypes = [...selectedDriverTypes];
+          const indexOfItem = selDriverTypes.indexOf(k);
+          if (indexOfItem > -1) {
+            selDriverTypes.splice(indexOfItem, 1);
+          } else {
+            selDriverTypes.push(k);
+          }
+          setSelectedDriverTypes(selDriverTypes);
+        }}
+      >
+        {(LivIndexDriversConfig as any)[k]
+          ? capitalize((LivIndexDriversConfig as any)[k].label)
+          : ""}
+      </Tag>
+    );
+  };
+
+  const [corridorElements, setCorridorElements] = useState<React.ReactNode[]>(
+    []
+  );
+
+  useEffect(() => {
+    async function fetchCorridorElements() {
+      if (corridors && corridors.length) {
+        const elements = await Promise.all(renderCorridors());
+        setCorridorElements(elements);
+      }
+    }
+    fetchCorridorElements();
+  }, [corridors]);
+
   return (
     <div style={{ width: "100%", height: "100%" }}>
       {fullSize && uniqueDriverTypes && (
@@ -549,44 +753,26 @@ const MapViewV2 = ({
           style={{
             width: "100%",
             overflowX: "scroll",
+            padding: "8px 0",
+            backgroundColor: COLORS.bgColorMedium,
             marginBottom: 16,
             scrollbarWidth: "none",
           }}
         >
-          {uniqueDriverTypes.map((k: string) => {
-            const itemIndex = selectedDriverTypes.indexOf(k);
-            return (
-              <Tag
-                style={{
-                  borderRadius: 16,
-                  padding: 4,
-                  backgroundColor:
-                    itemIndex > -1 ? COLORS.primaryColor : "initial",
-                  color: itemIndex > -1 ? "white" : "initial",
-                }}
-                onClick={() => {
-                  const selDriverTypes = [...selectedDriverTypes];
-                  const indexOfItem = selDriverTypes.indexOf(k);
-                  if (indexOfItem > -1) {
-                    selDriverTypes.splice(indexOfItem, 1);
-                  } else {
-                    selDriverTypes.push(k);
-                  }
-                  setSelectedDriverTypes(selDriverTypes);
-                }}
-              >
-                {(LivIndexDriversConfig as any)[k]
-                  ? capitalize((LivIndexDriversConfig as any)[k].label)
-                  : ""}
-              </Tag>
-            );
+          {selectedDriverTypes.map((k: string) => {
+            return renderDriverTypesTag(k, true);
           })}
+          {uniqueDriverTypes
+            .filter((d) => !selectedDriverTypes.includes(d))
+            .map((k: string) => {
+              return renderDriverTypesTag(k, false);
+            })}
         </Flex>
       )}
       <Flex style={{ height: "100%", width: "100%" }}>
         <MapContainer
           center={[13.110274, 77.6009443]}
-          zoom={15}
+          zoom={12}
           minZoom={12}
           style={{ height: "90%", width: "100%" }}
         >
@@ -600,6 +786,7 @@ const MapViewV2 = ({
           {renderTransitDrivers()}
           {renderSimpleDriverMarkers()}
           {renderProjectMarkers()}
+          {corridorElements}
           <MapPolygons
             driversData={driversData || []}
             selectedDriverTypes={selectedDriverTypes}
@@ -624,23 +811,35 @@ const MapViewV2 = ({
             scrollbarWidth: "none",
           }}
         >
-          <Typography.Text
-            style={{ fontSize: FONT_SIZE.HEADING_3, fontWeight: 500 }}
-          >
-            {modalContent?.title}
-          </Typography.Text>
           {modalContent?.tags ? (
-            <Flex>
+            <Flex
+              style={{ marginTop: 32, width: "100%", flexWrap: "wrap" }}
+              gap={8}
+            >
               {modalContent?.tags.map((t) => (
-                <Tag color={t.color}>{t.label}</Tag>
+                <Tag style={{ margin: 0 }} color={t.color}>
+                  {t.label}
+                </Tag>
               ))}
             </Flex>
           ) : null}
-          {modalContent && modalContent.content ? (
+          <Typography.Text
+            style={{
+              fontSize: FONT_SIZE.HEADING_1,
+              fontWeight: 500,
+              lineHeight: "120%",
+              marginBottom: 16,
+              marginTop: 16,
+            }}
+          >
+            {modalContent?.title}
+          </Typography.Text>
+
+          {/* {modalContent && modalContent.content ? (
             <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
               {modalContent?.content}
             </Markdown>
-          ) : null}
+          ) : null} */}
         </Flex>
       </Modal>
     </div>

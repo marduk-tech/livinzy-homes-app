@@ -39,27 +39,27 @@ export const enum PLACE_TIMELINE {
 }
 
 export const LivIndexDriversConfig = {
-  highway: { label: "Road Network", icon: { name: "FaRoad", set: "fa" } },
-  school: { label: "Schools", icon: { name: "IoMdSchool", set: "io" } },
+  highway: { label: "Roads", icon: { name: "FaRoad", set: "fa" } },
+  school: { label: "School", icon: { name: "IoMdSchool", set: "io" } },
   university: {
-    label: "Universities",
+    label: "University",
     icon: { name: "IoMdSchool", set: "io" },
   },
-  hospital: { label: "Hospitals", icon: { name: "FaRegHospital", set: "fa" } },
+  hospital: { label: "Hospital", icon: { name: "FaRegHospital", set: "fa" } },
   leisure: {
     label: "Leisure/Tourism",
     icon: { name: "GiMountainRoad", set: "gi" },
   },
   commercial: {
-    label: "Commercial Infra",
+    label: "Commercial",
     icon: { name: "FaStore", set: "fa" },
   },
   "industrial-hitech": {
-    label: "Hitech Industrial Parks",
+    label: "Business Tech Park",
     icon: { name: "BiSolidFactory", set: "bi" },
   },
   "industrial-general": {
-    label: "Industrial Parks",
+    label: "Industrial Area",
     icon: { name: "RiStore3Fill", set: "ri" },
   },
   airport: {
@@ -67,11 +67,11 @@ export const LivIndexDriversConfig = {
     icon: { name: "MdLocalAirport", set: "md" },
   },
   transit: {
-    label: "Transit Network",
+    label: "Transit",
     icon: { name: "MdOutlineDirectionsTransit", set: "md" },
   },
   food: {
-    label: "Dining options",
+    label: "Dining",
     icon: { name: "IoFastFood", set: "io5" },
   },
 };

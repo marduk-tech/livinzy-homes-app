@@ -27,7 +27,7 @@ export function UserProjects() {
       setCollectionNames(collections);
       setSelectedCollection(
         user.savedLvnzyProjects.find(
-          (c) => c.collectionName == collections[collections.length > 1 ? 1 : 0]
+          (c) => c.collectionName == collections[collections.length - 1]
         )
       );
     }
@@ -70,7 +70,7 @@ export function UserProjects() {
         }}
       >
         <Flex vertical align="flex-start" gap={8} style={{ width: "100%" }}>
-          {/* <div
+          <div
             style={{
               width: "100%",
               height: 150,
@@ -81,14 +81,18 @@ export function UserProjects() {
               backgroundRepeat: "no-repeat",
               marginTop: 4,
             }}
-          ></div> */}
+          ></div>
           {/* <ProjectGallery
             media={itemInfo.originalProjectId.media}
           ></ProjectGallery> */}
 
           <Flex vertical>
             <Typography.Text
-              style={{ fontSize: FONT_SIZE.HEADING_2, fontWeight: 500 }}
+              style={{
+                fontSize: FONT_SIZE.HEADING_2,
+                fontWeight: 500,
+                lineHeight: "120%",
+              }}
             >
               {itemInfo.meta.projectName}
             </Typography.Text>
@@ -190,7 +194,9 @@ export function UserProjects() {
       {collectionNames && collectionNames.length > 1 ? (
         <Select
           placeholder="Select project list"
-          defaultValue={collectionNames ? collectionNames[1] : ""}
+          defaultValue={
+            collectionNames ? collectionNames[collectionNames.length - 1] : ""
+          }
           optionFilterProp="label"
           onChange={(value: string) => {
             setSelectedCollection(

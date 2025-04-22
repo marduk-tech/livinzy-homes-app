@@ -63,6 +63,8 @@ export function Brick360() {
   const [selectedDataPointSubCategory, setSelectedDataPointSubCategory] =
     useState<any>();
 
+  const [selectedDriverTypes, setSelectedDriverTypes] = useState<any>();
+
   const [mapDrivers, setMapDrivers] = useState<any[]>([]);
 
   const [selectedDataPoint, setSelectedDataPoint] = useState<any>();
@@ -135,8 +137,24 @@ export function Brick360() {
           ...(lvnzyProject as any)["neighborhood"].drivers,
           ...(lvnzyProject as any)["connectivity"].drivers,
         ];
+        if (selectedDataPointSubCategory == "schoolsOffices") {
+          setSelectedDriverTypes([
+            "school",
+            "industrial-hitech",
+            "industrial-general",
+          ]);
+        } else if (selectedDataPointSubCategory == "conveniences") {
+          setSelectedDriverTypes(["food", "hospital"]);
+        } else if (selectedDataPointSubCategory == "transport") {
+          setSelectedDriverTypes(["transit", "highway"]);
+        }
       } else if (selectedDataPointCategory == "investment") {
         drivers = (lvnzyProject as any)["investment"].growthLevers;
+        setSelectedDriverTypes([
+          "school",
+          "industrial-hitech",
+          "industrial-general",
+        ]);
       }
       if (drivers && drivers.length) {
         setMapDrivers(drivers);
@@ -169,6 +187,7 @@ export function Brick360() {
     return <Loader></Loader>;
   }
 
+  // Fake progress bar
   if (fakeTimeoutProgress < 130) {
     return (
       <Flex
@@ -356,6 +375,7 @@ export function Brick360() {
         </Flex>
       </Flex>
 
+      {/* All the data points */}
       <Flex vertical gap={32} style={{ padding: 16 }}>
         {scoreParams &&
           scoreParams.map((sc) => {
@@ -460,9 +480,12 @@ export function Brick360() {
           setIsMapFullScreen(false);
           setDetailsModalOpen(true);
         }}
+        forceRender
         closeIcon={null}
         footer={null}
         width={isMobile ? "100%" : 900}
+        style={{ padding: 0 }}
+        styles={{ content: { padding: 0 } }}
       >
         <Flex style={{ height: 600 }} vertical gap={8}>
           <Flex
@@ -479,6 +502,7 @@ export function Brick360() {
           </Flex>
           <MapViewV2
             fullSize={true}
+            defaultSelectedDriverTypes={selectedDriverTypes}
             projectId={lvnzyProject?.originalProjectId._id}
             drivers={mapDrivers.map((d) => {
               return {
@@ -587,6 +611,7 @@ export function Brick360() {
               >
                 <MapViewV2
                   projectId={lvnzyProject?.originalProjectId._id}
+                  defaultSelectedDriverTypes={selectedDriverTypes}
                   drivers={mapDrivers.map((d) => {
                     return {
                       id: d.driverId._id,

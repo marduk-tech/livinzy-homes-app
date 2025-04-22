@@ -48,11 +48,12 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
   const getSmileyIcon = (value: number): any => {
     let iconName = "FaRegLaugh",
       iconSet: any = "fa",
-      size = 22;
+      size = 22,
+      color = getGradientColor(value);
     if (value > 80) {
       iconName = "FaRegLaugh";
       iconSet = "fa";
-      size = 19;
+      size = 18;
     } else if (value < 80 && value >= 65) {
       iconName = "PiSmileyBold";
       iconSet = "pi";
@@ -68,6 +69,7 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
         iconName={iconName}
         iconSet={iconSet}
         size={size}
+        color={color}
       ></DynamicReactIcon>
     );
   };
