@@ -95,7 +95,7 @@ async function getIcon(
       style={{
         backgroundColor: style?.iconBgColor || "white",
         borderRadius: text ? "24px" : "50%",
-        padding: text ? 4 : 0,
+        padding: text ? 2 : 0,
         height: text ? "auto" : (style?.iconSize || 20) * 1.6,
         width: text ? 80 : (style?.iconSize || 20) * 1.6,
         display: "flex",
@@ -110,7 +110,7 @@ async function getIcon(
       }}
     >
       <IconComp
-        size={style?.iconSize || 20}
+        size={style?.iconSize || 16}
         color={
           style?.iconColor
             ? style.iconColor
@@ -120,10 +120,10 @@ async function getIcon(
         }
       />
       {text ? (
-        <Flex style={{ marginLeft: 4 }}>
+        <Flex style={{ marginLeft: 2 }}>
           <Typography.Text
             style={{
-              fontSize: FONT_SIZE.PARA,
+              fontSize: FONT_SIZE.SUB_TEXT,
               fontWeight: 500,
               color: style?.iconColor || COLORS.textColorDark,
             }}
@@ -777,33 +777,12 @@ const MapViewV2 = ({
         height: "100%",
       }}
     >
-      {fullSize && uniqueDriverTypes && (
-        <Flex
-          style={{
-            width: "100%",
-            overflowX: "scroll",
-            padding: "8px 0",
-            backgroundColor: COLORS.bgColorMedium,
-            marginBottom: 16,
-            scrollbarWidth: "none",
-          }}
-        >
-          {selectedDriverTypes.map((k: string) => {
-            return renderDriverTypesTag(k, true);
-          })}
-          {uniqueDriverTypes
-            .filter((d) => !!d && !selectedDriverTypes.includes(d))
-            .map((k: string) => {
-              return renderDriverTypesTag(k, false);
-            })}
-        </Flex>
-      )}
-      <Flex style={{ height: "100%", width: "100%" }}>
+      <Flex style={{ height: "88%", width: "100%" }}>
         <MapContainer
           center={[13.110274, 77.6009443]}
           zoom={12}
           minZoom={12}
-          style={{ height: "90%", width: "100%" }}
+          style={{ height: "100%", width: "100%" }}
         >
           <MapResizeHandler />
           <MapCenterHandler projectData={projectData} />
@@ -824,6 +803,27 @@ const MapViewV2 = ({
           />
         </MapContainer>
       </Flex>
+      {fullSize && uniqueDriverTypes && (
+        <Flex
+          style={{
+            width: "100%",
+            overflowX: "scroll",
+            padding: "8px 0",
+            backgroundColor: COLORS.bgColorMedium,
+            marginTop: 16,
+            scrollbarWidth: "none",
+          }}
+        >
+          {selectedDriverTypes.map((k: string) => {
+            return renderDriverTypesTag(k, true);
+          })}
+          {uniqueDriverTypes
+            .filter((d) => !!d && !selectedDriverTypes.includes(d))
+            .map((k: string) => {
+              return renderDriverTypesTag(k, false);
+            })}
+        </Flex>
+      )}
       <Modal
         title={null}
         closable={true}

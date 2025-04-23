@@ -23,12 +23,12 @@ export const FONTS = {
 
 const isMobile = !!window.matchMedia("((max-width: 576px))").matches;
 export const FONT_SIZE = {
-  SUB_TEXT: 14,
-  PARA: 16,
-  HEADING_1: isMobile ? 32 : 32,
-  HEADING_2: isMobile ? 26 : 28,
-  HEADING_3: 20,
-  HEADING_4: 18,
+  SUB_TEXT: 13,
+  PARA: 15,
+  HEADING_1: isMobile ? 30 : 32,
+  HEADING_2: isMobile ? 24 : 26,
+  HEADING_3: 19,
+  HEADING_4: 15,
 };
 
 export const MOBILE_MARGIN = 16;

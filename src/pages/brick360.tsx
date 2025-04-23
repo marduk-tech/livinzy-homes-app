@@ -483,7 +483,7 @@ export function Brick360() {
         closeIcon={null}
         footer={null}
         width={isMobile ? "100%" : 900}
-        style={{ padding: 0 }}
+        style={{ padding: 0, top: 40 }}
         styles={{
           content: {
             padding: 0,
@@ -499,11 +499,13 @@ export function Brick360() {
               setIsMapFullScreen(false);
               setDetailsModalOpen(true);
             }}
-            style={{ marginLeft: "auto" }}
+            style={{ marginRight: 8, marginTop: 8, marginLeft: "auto" }}
           >
             <DynamicReactIcon
               iconName="IoMdCloseCircle"
               iconSet="io"
+              size={32}
+              color={COLORS.textColorLight}
             ></DynamicReactIcon>
           </Flex>
           <MapViewV2
