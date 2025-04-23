@@ -1,4 +1,4 @@
-import { Col, Flex, Row, Select, Tag, Typography } from "antd";
+import { Flex, Select, Tag, Typography } from "antd";
 import { Loader } from "../components/common/loader";
 import { useUser } from "../hooks/use-user";
 import { useNavigate } from "react-router-dom";
@@ -135,44 +135,43 @@ export function UserProjects() {
             </Typography.Text>
           </Flex>
           <Flex style={{ padding: 8 }}>
-            <Row
+            <Flex
               style={{
                 marginTop: 8,
                 paddingTop: 8,
                 borderTop: "1px solid",
                 borderTopColor: COLORS.borderColor,
+                justifyContent: "space-between",
+                width: "100%",
               }}
-              gutter={[4, 4]}
             >
-              {Object.values(BRICK360_CATEGORY).map((item, index) => (
-                <Col span={12} key={index}>
-                  <Flex
-                    style={{
-                      borderColor: COLORS.borderColor,
-                      borderRadius: 8,
-                      fontSize: FONT_SIZE.PARA,
-                    }}
-                  >
-                    <Flex style={{ width: "100%" }} align="center">
-                      <Typography.Text
-                        style={{
-                          fontSize: FONT_SIZE.PARA,
-                          color: COLORS.textColorLight,
-                        }}
-                      >
-                        {Brick360CategoryInfo[item].title}
-                      </Typography.Text>
-                      <Flex style={{ marginLeft: "auto" }}>
-                        <GradientBar
-                          value={getCategoryScore(itemInfo.score[item])}
-                          showBadgeOnly={true}
-                        ></GradientBar>
-                      </Flex>
+              {Object.keys(BRICK360_CATEGORY).map((item, index) => (
+                <Flex
+                  style={{
+                    borderColor: COLORS.borderColor,
+                    borderRadius: 8,
+                    fontSize: FONT_SIZE.PARA,
+                  }}
+                >
+                  <Flex vertical style={{ width: "100%" }}>
+                    <Typography.Text
+                      style={{
+                        fontSize: FONT_SIZE.PARA,
+                        color: COLORS.textColorLight,
+                      }}
+                    >
+                      {(Brick360CategoryInfo as any)[item].title}
+                    </Typography.Text>
+                    <Flex>
+                      <GradientBar
+                        value={getCategoryScore(itemInfo.score[item])}
+                        showBadgeOnly={true}
+                      ></GradientBar>
                     </Flex>
                   </Flex>
-                </Col>
+                </Flex>
               ))}
-            </Row>
+            </Flex>
           </Flex>
         </Flex>
       </Flex>

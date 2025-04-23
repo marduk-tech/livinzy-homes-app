@@ -84,7 +84,7 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
           borderColor: COLORS.bgColorDark,
           color: COLORS.textColorDark,
           backgroundColor: "transparent",
-          padding: "1px 4px",
+          padding: "1px 0",
           borderRadius: 6,
         }}
         gap={2}

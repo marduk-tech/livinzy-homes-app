@@ -237,7 +237,6 @@ export enum BRICK360_CATEGORY {
   property = "property",
   areaConnectivity = "areaConnectivity",
   developer = "developer",
-  investment = "investment",
 }
 
 export const Brick360CategoryInfo: Record<
@@ -248,12 +247,6 @@ export const Brick360CategoryInfo: Record<
     title: "Property",
     iconName: "MdOutlineMapsHomeWork",
     iconSet: "md",
-  },
-  investment: {
-    disabled: true,
-    title: "Investment",
-    iconName: "GiTakeMyMoney",
-    iconSet: "gi",
   },
   areaConnectivity: {
     title: "Location",
