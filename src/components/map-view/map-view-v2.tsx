@@ -20,7 +20,9 @@ import {
 } from "../../libs/constants";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace, ISurroundingElement } from "../../types/Project";
-import { dynamicImportMap } from "../common/dynamic-react-icon";
+import DynamicReactIcon, {
+  dynamicImportMap,
+} from "../common/dynamic-react-icon";
 import { capitalize } from "../../libs/lvnzy-helper";
 import { MapPolygons } from "./map-polygons";
 import { useFetchCorridors } from "../../hooks/use-corridors";
@@ -786,15 +788,19 @@ const MapViewV2 = ({
     if (!(LivIndexDriversConfig as any)[k]) {
       return null;
     }
+    const icon = (LivIndexDriversConfig as any)[k].icon;
     return (
       <Tag
         style={{
+          display: "flex",
+          alignItems: "center",
           borderRadius: 16,
-          padding: 4,
+          padding: "4px 8px",
           backgroundColor: selected ? COLORS.primaryColor : "initial",
           color: selected ? "white" : "initial",
           marginLeft: 4,
           fontSize: FONT_SIZE.HEADING_3,
+          cursor: "pointer",
         }}
         onClick={() => {
           const selDriverTypes = [...selectedDriverTypes];
@@ -807,9 +813,22 @@ const MapViewV2 = ({
           setSelectedDriverTypes(selDriverTypes);
         }}
       >
-        {(LivIndexDriversConfig as any)[k]
-          ? capitalize((LivIndexDriversConfig as any)[k].label)
-          : ""}
+        <DynamicReactIcon
+          iconName={icon.name}
+          iconSet={icon.set}
+          size={20}
+          color={selected ? "white" : COLORS.textColorDark}
+        ></DynamicReactIcon>
+        <Typography.Text
+          style={{
+            color: selected ? "white" : COLORS.textColorDark,
+            marginLeft: 8,
+          }}
+        >
+          {(LivIndexDriversConfig as any)[k]
+            ? capitalize((LivIndexDriversConfig as any)[k].label)
+            : ""}
+        </Typography.Text>
       </Tag>
     );
   };
@@ -833,9 +852,46 @@ const MapViewV2 = ({
       style={{
         width: "100%",
         height: "100%",
+        overflowY: "hidden",
       }}
     >
-      <Flex style={{ height: "88%", width: "100%" }}>
+      {drivers && drivers.length && fullSize ? (
+        <Flex vertical style={{ padding: "8px 8px", marginBottom: 16 }}>
+          <Flex
+            style={{
+              width: "100%",
+              overflowX: "scroll",
+              backgroundColor: COLORS.bgColorMedium,
+              scrollbarWidth: "none",
+              height: 32,
+            }}
+          >
+            {uniqueDriverTypes
+              .filter((d) => !!d)
+              .map((k: string) => {
+                return renderDriverTypesTag(k, selectedDriverTypes.includes(k));
+              })}
+          </Flex>
+          {/* <Typography.Text
+            style={{
+              fontSize: FONT_SIZE.PARA,
+              paddingLeft: 8,
+              color: COLORS.textColorLight,
+            }}
+          >
+            {selectedDriverTypes.length} selected.
+          </Typography.Text> */}
+        </Flex>
+      ) : null}
+      <Flex
+        style={{
+          height:
+            drivers && drivers.length && fullSize
+              ? "calc(100% - 48px)"
+              : "100%",
+          width: "100%",
+        }}
+      >
         <MapContainer
           center={[13.110274, 77.6009443]}
           zoom={12}
@@ -862,27 +918,7 @@ const MapViewV2 = ({
           />
         </MapContainer>
       </Flex>
-      {fullSize && uniqueDriverTypes && drivers && drivers.length ? (
-        <Flex
-          style={{
-            width: "100%",
-            overflowX: "scroll",
-            padding: "8px 0",
-            backgroundColor: COLORS.bgColorMedium,
-            marginTop: 16,
-            scrollbarWidth: "none",
-          }}
-        >
-          {selectedDriverTypes.map((k: string) => {
-            return renderDriverTypesTag(k, true);
-          })}
-          {uniqueDriverTypes
-            .filter((d) => !!d && !selectedDriverTypes.includes(d))
-            .map((k: string) => {
-              return renderDriverTypesTag(k, false);
-            })}
-        </Flex>
-      ) : null}
+
       <Modal
         title={null}
         closable={true}

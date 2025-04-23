@@ -178,6 +178,7 @@ export function Brick360() {
         setSurroundingElements(surrElements);
         setMapVisible(true);
         setMapDrivers([]);
+        setSelectedDriverTypes([]);
       } else {
         setMapVisible(false);
         setMapDrivers([]);
@@ -326,19 +327,17 @@ export function Brick360() {
           </Flex>
         ) : null}
       </Flex>
+      <Divider style={{ margin: "16px 16px 0 16px" }}></Divider>
+
       {/* Configurations and costing */}
       <Flex
         vertical
         style={{
-          backgroundColor: COLORS.bgColor,
           margin: 16,
-          padding: 8,
-          border: "1px solid",
-          borderRadius: 8,
-          borderColor: COLORS.borderColorMedium,
+          marginBottom: 8,
         }}
       >
-        <Flex style={{ marginBottom: 8 }}>
+        <Flex vertical style={{ marginBottom: 8 }}>
           <Typography.Text
             style={{
               borderRadius: 8,
@@ -356,7 +355,7 @@ export function Brick360() {
             </Typography.Text>
             <Typography.Text
               style={{
-                color: COLORS.textColorDark,
+                color: COLORS.textColorLight,
                 fontSize: FONT_SIZE.HEADING_4,
                 fontWeight: 500,
               }}
@@ -369,27 +368,29 @@ export function Brick360() {
               )}{" "}
             </Typography.Text>
           </Typography.Text>
+          <Paragraph
+            ellipsis={{
+              rows: 1,
+              expandable: true,
+              symbol: `${
+                lvnzyProject!.meta.costingDetails.configurations.length
+              } more`,
+            }}
+            style={{
+              whiteSpace: "pre-line",
+              marginBottom: 0,
+              width: "100%",
+              fontSize: FONT_SIZE.HEADING_3,
+            }}
+          >
+            {lvnzyProject!.meta.costingDetails.configurations
+              .map((c: any) => `₹${rupeeAmountFormat(c.cost)} | ${c.config} `)
+              .join("\n")}
+          </Paragraph>
         </Flex>
-        <Paragraph
-          ellipsis={{
-            rows: 1,
-            expandable: true,
-            symbol: `${
-              lvnzyProject!.meta.costingDetails.configurations.length
-            } more`,
-          }}
-          style={{
-            whiteSpace: "pre-line",
-            marginBottom: 0,
-            width: "100%",
-            fontSize: FONT_SIZE.HEADING_4,
-          }}
-        >
-          {lvnzyProject!.meta.costingDetails.configurations
-            .map((c: any) => `${c.config} : ${rupeeAmountFormat(c.cost)}`)
-            .join("\n")}
-        </Paragraph>
       </Flex>
+
+      <Divider style={{ margin: "0 16px 16px 16px" }}></Divider>
       <Flex style={{ padding: "0 16px" }}>
         <DataSources></DataSources>
       </Flex>
@@ -397,11 +398,10 @@ export function Brick360() {
         <Flex
           style={{
             margin: "0 16px",
-            padding: "12px 4px",
-            border: "1px solid",
-            borderColor: COLORS.borderColor,
+            padding: "12px 8px 12px 8px",
             backgroundColor: "white",
             borderRadius: 8,
+            cursor: "pointer",
           }}
           onClick={() => {
             setQuickSnapshotDialogOpen(true);
@@ -409,20 +409,29 @@ export function Brick360() {
         >
           <Flex style={{ width: "100%" }}>
             <Flex vertical style={{ width: "80%" }}>
-              <Flex align="center" gap={2}>
-                <DynamicReactIcon
-                  iconName="GiTakeMyMoney"
-                  iconSet="gi"
-                  size={18}
-                  color={COLORS.textColorDark}
-                ></DynamicReactIcon>
-                <Typography.Text
+              <Flex align="center" gap={4}>
+                <Flex
                   style={{
-                    fontSize: FONT_SIZE.HEADING_4,
-                    color: COLORS.textColorDark,
+                    width: 24,
+                    height: 24,
+                    borderRadius: "50%",
+                    backgroundColor: "white",
+                    border: "1px solid",
                   }}
                 >
-                  Quick Investment Snapshot
+                  <DynamicReactIcon
+                    iconName="GiReceiveMoney"
+                    iconSet="gi"
+                    size={18}
+                    color={COLORS.textColorDark}
+                  ></DynamicReactIcon>
+                </Flex>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.HEADING_3,
+                  }}
+                >
+                  Investment Snapshot
                 </Typography.Text>
               </Flex>
               {/* <Typography.Text
@@ -443,13 +452,20 @@ export function Brick360() {
             >
               <Tag
                 color={COLORS.greenIdentifier}
-                style={{ fontSize: FONT_SIZE.SUB_TEXT }}
+                style={{
+                  fontSize: FONT_SIZE.SUB_TEXT,
+                  marginRight: 0,
+                }}
               >
                 {lvnzyProject?.score.summary.pros.length} pros
               </Tag>
               <Tag
                 color={COLORS.redIdentifier}
-                style={{ fontSize: FONT_SIZE.SUB_TEXT }}
+                style={{
+                  fontSize: FONT_SIZE.SUB_TEXT,
+                  marginLeft: 4,
+                  marginRight: 0,
+                }}
               >
                 {lvnzyProject?.score.summary.cons.length} cons
               </Tag>
@@ -491,7 +507,7 @@ export function Brick360() {
                 ).length ? (
                   <List
                     size="large"
-                    style={{ borderRadius: 16 }}
+                    style={{ borderRadius: 16, cursor: "pointer" }}
                     dataSource={Object.keys(
                       (Brick360DataPoints as any)[sc.key]
                     ).map((d) => {
@@ -606,7 +622,12 @@ export function Brick360() {
               setIsMapFullScreen(false);
               setDetailsModalOpen(true);
             }}
-            style={{ marginRight: 8, marginTop: 8, marginLeft: "auto" }}
+            style={{
+              marginRight: 8,
+              marginTop: 8,
+              marginLeft: "auto",
+              cursor: "pointer",
+            }}
           >
             <DynamicReactIcon
               iconName="IoMdCloseCircle"
@@ -637,6 +658,7 @@ export function Brick360() {
           height={600}
           open={quickSnapshotDialogOpen}
           closable={true}
+          style={{ top: 40 }}
           onCancel={() => {
             setQuickSnapshotDialogOpen(false);
           }}
@@ -648,12 +670,21 @@ export function Brick360() {
             vertical
             style={{ overflowY: "scroll", height: 600, scrollbarWidth: "none" }}
           >
-            <Typography.Title level={3} style={{ margin: 0, marginBottom: 16 }}>
-              Quick Investment Snapshot
+            <Typography.Title level={3} style={{ margin: 0, marginBottom: 0 }}>
+              Investment Snapshot
             </Typography.Title>
+            <Typography.Text
+              style={{
+                fontSize: FONT_SIZE.PARA,
+                marginBottom: 16,
+                color: COLORS.textColorLight,
+              }}
+            >
+              A quick investment summary of this project.
+            </Typography.Text>
             <Flex gap={8} vertical>
               <Flex>
-                <Tag color={COLORS.greenIdentifier}>Pros</Tag>
+                <Tag color={COLORS.greenIdentifier}>PROS</Tag>
               </Flex>
               {lvnzyProject?.score.summary.pros.map((pro: string) => {
                 return (
@@ -674,8 +705,8 @@ export function Brick360() {
                   </Flex>
                 );
               })}
-              <Flex>
-                <Tag color={COLORS.redIdentifier}>Cons</Tag>
+              <Flex style={{ marginTop: 24 }}>
+                <Tag color={COLORS.redIdentifier}>CONS</Tag>
               </Flex>
               {lvnzyProject?.score.summary.cons.map((pro: string) => {
                 return (
@@ -768,7 +799,7 @@ export function Brick360() {
                   icon={
                     <DynamicReactIcon
                       iconName="FaExpand"
-                      color="primary"
+                      color="white"
                       iconSet="fa"
                       size={16}
                     />
@@ -778,6 +809,8 @@ export function Brick360() {
                     marginBottom: 8,
                     borderRadius: 8,
                     cursor: "pointer",
+                    backgroundColor: COLORS.textColorDark,
+                    color: "white",
                     fontSize: FONT_SIZE.SUB_TEXT,
                     height: 28,
                   }}
