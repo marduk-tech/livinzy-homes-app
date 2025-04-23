@@ -323,7 +323,7 @@ export function Brick360() {
               {moment(
                 lvnzyProject?.meta.projectTimelines[0].startDate,
                 "DD-MM-YYYY"
-              ).format("MMMM YYYY")}{" "}
+              ).format("MMM YYYY")}{" "}
               |
             </Typography.Text>
 
@@ -338,7 +338,7 @@ export function Brick360() {
               {moment(
                 lvnzyProject?.meta.projectTimelines[0].completionDate,
                 "DD-MM-YYYY"
-              ).format("MMMM YYYY")}
+              ).format("MMM YYYY")}
             </Typography.Text>
           </Flex>
         ) : null}
@@ -524,13 +524,14 @@ export function Brick360() {
                   <List
                     size="large"
                     style={{ borderRadius: 16, cursor: "pointer" }}
-                    dataSource={Object.keys(
-                      (Brick360DataPoints as any)[sc.key]
-                    ).map((d) => {
-                      return sc.dataPoints.find((dp: any) => dp[0] == d);
-                    })}
+                    dataSource={Object.keys((Brick360DataPoints as any)[sc.key])
+                      .map((d) => {
+                        return sc.dataPoints.find((dp: any) => dp[0] == d);
+                      })
+                      .filter((d) => !!d)}
                     renderItem={(item, index) => (
                       <List.Item
+                        key={`p-${index}`}
                         style={{
                           padding: "8px",
                           borderBottom: "1px solid",
