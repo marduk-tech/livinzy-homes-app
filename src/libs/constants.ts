@@ -289,3 +289,11 @@ export const Brick360DataPoints = {
     pricePoint: "Price Point",
   },
 };
+
+export const SurroundingElementLabels = {
+  runway_strip: "Airport/Runwway Strip",
+  lake: "Lake/Waterbody",
+  railway: "Railway Line",
+  power: "High Tension Line",
+  road: "Highway/Expressway",
+};

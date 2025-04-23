@@ -160,6 +160,12 @@ export interface IDriverConfig {
   zIndex: number;
 }
 
+export interface ISurroundingElement {
+  type: string;
+  description: string;
+  geometry: any;
+}
+
 export interface IDriverPlace {
   _id: string;
   name: string;

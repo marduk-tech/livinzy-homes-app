@@ -13,9 +13,13 @@ import {
 } from "react-leaflet";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
 import { useFetchProjectById } from "../../hooks/use-project";
-import { LivIndexDriversConfig, PLACE_TIMELINE } from "../../libs/constants";
+import {
+  LivIndexDriversConfig,
+  PLACE_TIMELINE,
+  SurroundingElementLabels,
+} from "../../libs/constants";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { IDriverPlace } from "../../types/Project";
+import { IDriverPlace, ISurroundingElement } from "../../types/Project";
 import { dynamicImportMap } from "../common/dynamic-react-icon";
 import { capitalize } from "../../libs/lvnzy-helper";
 import { MapPolygons } from "./map-polygons";
@@ -198,11 +202,13 @@ const MapViewV2 = ({
   projectId = DEFAULT_PROJECT,
   fullSize,
   defaultSelectedDriverTypes,
+  surroundingElements,
 }: {
   drivers?: any[];
   projectId?: string;
   fullSize: boolean;
   defaultSelectedDriverTypes?: string[];
+  surroundingElements?: ISurroundingElement[];
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
@@ -237,7 +243,7 @@ const MapViewV2 = ({
   // Setting icons for simple drivermarkers
   useEffect(() => {
     async function fetchDriverIcons() {
-      if (driversData && driversData.length > 0) {
+      if (drivers && drivers.length && driversData && driversData.length > 0) {
         const icons = await Promise.all(
           driversData.map(async (driver) => {
             const iconConfig = (LivIndexDriversConfig as any)[driver.driver];
@@ -452,7 +458,52 @@ const MapViewV2 = ({
     });
   };
 
+  const renderSurroundings = () => {
+    if (!surroundingElements || !surroundingElements.length) {
+      return null;
+    }
+    return surroundingElements?.map(
+      (element: ISurroundingElement, index: number) => {
+        const positions = element.geometry.map((g: any) => {
+          if (Array.isArray(g)) {
+            return g.map((subG) => {
+              return [subG.lat, subG.lon];
+            });
+          } else {
+            return [g.lat, g.lon];
+          }
+        });
+        return (
+          <Polyline
+            key={index}
+            positions={positions}
+            pathOptions={{
+              color: COLORS.textColorDark,
+              weight: 8,
+              opacity: 0.8,
+            }}
+            eventHandlers={{
+              click: () => {
+                setModalContent({
+                  title:
+                    (SurroundingElementLabels as any)[element.type] ||
+                    element.type,
+                  content: element.description || "",
+                  tags: [],
+                });
+                setInfoModalOpen(true);
+              },
+            }}
+          />
+        );
+      }
+    );
+  };
+
   const renderRoadDrivers = () => {
+    if (!drivers || !drivers.length) {
+      return;
+    }
     return driversData
       ?.filter(
         (driver): driver is RoadDriverPlace =>
@@ -512,6 +563,9 @@ const MapViewV2 = ({
   };
 
   const renderTransitDrivers = () => {
+    if (!drivers || !drivers.length) {
+      return;
+    }
     return driversData
       ?.filter(
         (driver): driver is RoadDriverPlace =>
@@ -629,6 +683,9 @@ const MapViewV2 = ({
 
   /** Renders driver markers */
   const renderSimpleDriverMarkers = () => {
+    if (!drivers || !drivers.length) {
+      return;
+    }
     return driversData
       ?.filter((driver) => selectedDriverTypes.includes(driver.driver))
       .map((driver: IDriverPlace) => {
@@ -796,6 +853,7 @@ const MapViewV2 = ({
           {renderSimpleDriverMarkers()}
           {renderProjectMarkers()}
           {corridorElements}
+          {renderSurroundings()}
           <MapPolygons
             driversData={driversData || []}
             selectedDriverTypes={selectedDriverTypes}
@@ -804,7 +862,7 @@ const MapViewV2 = ({
           />
         </MapContainer>
       </Flex>
-      {fullSize && uniqueDriverTypes && (
+      {fullSize && uniqueDriverTypes && drivers && drivers.length ? (
         <Flex
           style={{
             width: "100%",
@@ -824,7 +882,7 @@ const MapViewV2 = ({
               return renderDriverTypesTag(k, false);
             })}
         </Flex>
-      )}
+      ) : null}
       <Modal
         title={null}
         closable={true}

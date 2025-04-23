@@ -36,6 +36,7 @@ import {
 } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { DataSources } from "../components/common/data-sources";
+import { ISurroundingElement } from "../types/Project";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -70,8 +71,11 @@ export function Brick360() {
 
   const [selectedDriverTypes, setSelectedDriverTypes] = useState<any>();
 
-  const [mapDrivers, setMapDrivers] = useState<any[]>([]);
+  const [mapVisible, setMapVisible] = useState<boolean>(false);
 
+  const [mapDrivers, setMapDrivers] = useState<any[]>([]);
+  const [surroundingElements, setSurroundingElements] =
+    useState<ISurroundingElement[]>();
   const [selectedDataPoint, setSelectedDataPoint] = useState<any>();
   const [fakeTimeoutProgress, setFakeTimeoutProgress] = useState<any>(10);
   const [selectedDataPointTitle, setSelectedDataPointTitle] = useState("");
@@ -136,7 +140,7 @@ export function Brick360() {
       selectedDataPointSubCategory &&
       selectedDataPointCategory
     ) {
-      let drivers;
+      let drivers, surrElements;
       if (selectedDataPointCategory == "areaConnectivity") {
         drivers = [
           ...(lvnzyProject as any)["neighborhood"].drivers,
@@ -160,9 +164,24 @@ export function Brick360() {
           "industrial-hitech",
           "industrial-general",
         ]);
+      } else if (
+        selectedDataPointCategory == "property" &&
+        selectedDataPointSubCategory == "surroundings"
+      ) {
+        surrElements = (lvnzyProject as any)["property"].surroundings;
       }
       if (drivers && drivers.length) {
         setMapDrivers(drivers);
+        setSurroundingElements([]);
+        setMapVisible(true);
+      } else if (surrElements && surrElements.length) {
+        setSurroundingElements(surrElements);
+        setMapVisible(true);
+        setMapDrivers([]);
+      } else {
+        setMapVisible(false);
+        setMapDrivers([]);
+        setSurroundingElements([]);
       }
     }
   }, [lvnzyProject, selectedDataPointCategory, selectedDataPointSubCategory]);
@@ -575,6 +594,7 @@ export function Brick360() {
           </Flex>
           <MapViewV2
             fullSize={true}
+            surroundingElements={surroundingElements}
             defaultSelectedDriverTypes={selectedDriverTypes}
             projectId={lvnzyProject?.originalProjectId._id}
             drivers={mapDrivers.map((d) => {
@@ -709,7 +729,7 @@ export function Brick360() {
           }}
         >
           {/* Map view including expand button and drawer close icon button */}
-          {mapDrivers && mapDrivers.length ? (
+          {mapVisible ? (
             <Flex vertical style={{ position: "relative" }}>
               {renderDrawerCloseBtn()}
               <Flex
@@ -756,6 +776,7 @@ export function Brick360() {
                 <MapViewV2
                   projectId={lvnzyProject?.originalProjectId._id}
                   defaultSelectedDriverTypes={selectedDriverTypes}
+                  surroundingElements={surroundingElements}
                   drivers={mapDrivers.map((d) => {
                     return {
                       id: d.driverId._id,
