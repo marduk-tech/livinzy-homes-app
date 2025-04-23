@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useDevice } from "../hooks/use-device";
 import { IMedia } from "../types/Project";
 import { ProjectImagesGalleryModal } from "./project-images-gallery-modal";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 
 const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
   const { isMobile } = useDevice();
@@ -35,6 +36,8 @@ const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
                 style={{
                   overflow: "hidden",
                   borderRadius: 8,
+                  border: "1px solid",
+                  borderColor: COLORS.borderColor,
                   width: 200,
                   height: 125,
                   marginRight: 8,
@@ -52,11 +55,12 @@ const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
                     position: "absolute",
                     left: 0,
                     bottom: 0,
-                    color: "white",
+                    color: COLORS.textColorVeryLight,
                     textTransform: "capitalize",
                     borderTopRightRadius: 8,
+                    fontSize: FONT_SIZE.SUB_TEXT,
                     borderBottomLeftRadius: 8,
-                    padding: "8px 16px",
+                    padding: "4px 8px",
                     backgroundColor: "rgba(0,0,0,0.3)",
                   }}
                 >

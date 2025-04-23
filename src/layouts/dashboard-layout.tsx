@@ -121,7 +121,6 @@ export const DashboardLayout: React.FC = () => {
       <Layout
         style={{
           minHeight: "100vh",
-          backgroundColor: "transparent",
         }}
       >
         <Layout
@@ -134,8 +133,6 @@ export const DashboardLayout: React.FC = () => {
               background: "transparent",
               height: "60px",
               padding: "0 12px",
-              borderBottom: "1px solid",
-              borderBottomColor: COLORS.borderColor,
             }}
           >
             <Flex
@@ -198,6 +195,7 @@ export const DashboardLayout: React.FC = () => {
           <Content
             style={{
               margin: "auto",
+              backgroundColor: COLORS.bgColorMedium,
               maxWidth: MAX_WIDTH,
               width: "100%",
               height: "calc(100vh - 60px)",

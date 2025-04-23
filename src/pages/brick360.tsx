@@ -8,7 +8,6 @@ import {
   Modal,
   Progress,
   Space,
-  Tag,
   Typography,
 } from "antd";
 import { useEffect, useRef, useState } from "react";
@@ -22,6 +21,8 @@ import MapViewV2 from "../components/map-view/map-view-v2";
 import ProjectGallery from "../components/project-gallery";
 import { useDevice } from "../hooks/use-device";
 import { useFetchLvnzyProjectById } from "../hooks/use-lvnzy-project";
+import moment from "moment";
+
 import {
   BRICK360_CATEGORY,
   Brick360CategoryInfo,
@@ -33,6 +34,7 @@ import {
   rupeeAmountFormat,
 } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { DataSources } from "../components/common/data-sources";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -181,7 +183,7 @@ export function Brick360() {
     }
   }, [lvnzyProject]);
 
-  const progressWidth = isMobile ? 300 : 500;
+  const progressWidth = isMobile ? window.innerWidth : 800;
 
   if (lvnzyProjectIsLoading) {
     return <Loader></Loader>;
@@ -199,51 +201,30 @@ export function Brick360() {
           left: `calc(50% - ${progressWidth / 2}px)`,
         }}
       >
+        <Flex vertical>
+          <DataSources disableDetailsDialog={true}></DataSources>
+        </Flex>
         {/* <ProjectGallery ></ProjectGallery> */}
         <Typography.Title
-          style={{ margin: 0, marginBottom: 32, textAlign: "center" }}
+          level={2}
+          style={{
+            margin: 0,
+            marginTop: 16,
+            padding: 8,
+          }}
         >
           {lvnzyProject?.meta.projectName}
         </Typography.Title>
-        <Progress percent={fakeTimeoutProgress} />
-        <Flex vertical>
-          <Typography.Text style={{ textAlign: "center" }}>
+        <Flex vertical style={{ marginTop: 16 }}>
+          {" "}
+          <Typography.Text style={{ padding: "0 8px" }}>
             {fakeTimeoutProgress < 20
               ? "Starting up"
               : fakeTimeoutProgress < 80
               ? "Collecting Data"
               : "Finishing up"}
           </Typography.Text>
-
-          <Flex
-            vertical
-            style={{
-              border: "1px solid",
-              borderColor: COLORS.borderColor,
-              backgroundColor: COLORS.bgColor,
-              padding: 16,
-              borderRadius: 16,
-              marginTop: 32,
-            }}
-          >
-            <Typography.Title
-              level={4}
-              style={{ textAlign: "center", margin: 0 }}
-            >
-              Data Sources
-            </Typography.Title>
-            <Flex
-              justify="center"
-              style={{ flexWrap: "wrap", marginTop: 32 }}
-              gap={12}
-            >
-              {dataSets.map((d) => (
-                <Flex>
-                  <Tag style={{ fontSize: FONT_SIZE.HEADING_4 }}>{d}</Tag>
-                </Flex>
-              ))}
-            </Flex>
-          </Flex>
+          <Progress percent={fakeTimeoutProgress} style={{ padding: 8 }} />
         </Flex>
       </Flex>
     );
@@ -258,7 +239,6 @@ export function Brick360() {
         margin: "auto",
         maxWidth: 900,
         overflowX: "hidden",
-        backgroundColor: isMobile ? COLORS.bgColor : "white",
       }}
     >
       {/* Main project upfront score card including metadata */}
@@ -268,7 +248,7 @@ export function Brick360() {
           media={lvnzyProject?.originalProjectId.media}
         ></ProjectGallery>
         {/* Name */}{" "}
-        <Flex style={{ alignItems: "flex-end", margin: "16px 0" }} gap={8}>
+        <Flex style={{ alignItems: "flex-end", margin: "8px 0" }} gap={8}>
           <Typography.Title
             level={2}
             style={{ margin: "0", lineHeight: "100%" }}
@@ -277,104 +257,116 @@ export function Brick360() {
           </Typography.Title>
         </Flex>
       </Flex>
-      <Flex
-        vertical
-        style={{
-          marginBottom: 16,
-          borderRadius: isMobile ? 0 : 8,
-          marginTop: 8,
-          width: isMobile ? "100%" : "96%",
-          margin: isMobile ? 0 : "0 2%",
-          backgroundColor: COLORS.textColorDark,
-          padding: "8px 16px",
-        }}
-        gap={4}
-      >
+
+      {/* One liner & timeline */}
+      <Flex vertical style={{ padding: "0 16px" }}>
         <Typography.Text
           style={{
-            color: "white",
-            fontSize: FONT_SIZE.HEADING_4,
-          }}
-        >
-          Brick<i>360</i> Report
-        </Typography.Text>
-        <Flex style={{ flexWrap: "wrap" }} gap={8}>
-          {dataSets.map((d) => (
-            <Tag style={{ fontSize: FONT_SIZE.SUB_TEXT }}>{d}</Tag>
-          ))}
-        </Flex>
-      </Flex>
-      <Flex vertical style={{ padding: 16 }}>
-        {/* Sqft cost */}
-        <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
-          {rupeeAmountFormat(lvnzyProject?.meta.costingDetails.minimumUnitCost)}
-          &nbsp;(
-          {Math.round(
-            lvnzyProject?.meta.costingDetails.minimumUnitCost /
-              lvnzyProject?.meta.costingDetails.minimumUnitSize
-          )}{" "}
-          /sqft )
-        </Typography.Text>
-        {/* One Liner */}
-        <Typography.Text
-          style={{
-            fontSize: FONT_SIZE.HEADING_4,
+            fontSize: FONT_SIZE.PARA,
+            margin: 0,
+            color: COLORS.textColorLight,
           }}
         >
           {lvnzyProject?.meta.oneLiner.split(" · ").slice(0, 3).join(" · ")}
         </Typography.Text>
-        {/* Completion timeline */}
         {lvnzyProject?.meta.projectTimelines &&
         lvnzyProject?.meta.projectTimelines.length ? (
           <Flex>
             <Typography.Text
               style={{
-                fontSize: FONT_SIZE.SUB_TEXT,
+                fontSize: FONT_SIZE.PARA,
                 color: COLORS.textColorLight,
               }}
             >
-              Launched: {lvnzyProject?.meta.projectTimelines[0].startDate} |
+              Launched:{" "}
+              {moment(
+                lvnzyProject?.meta.projectTimelines[0].startDate,
+                "DD-MM-YYYY"
+              ).format("MMMM YYYY")}{" "}
+              |
             </Typography.Text>
 
             <Typography.Text
               style={{
-                fontSize: FONT_SIZE.SUB_TEXT,
+                fontSize: FONT_SIZE.PARA,
                 color: COLORS.textColorLight,
                 marginLeft: 4,
               }}
             >
               Completion:{" "}
-              {lvnzyProject?.meta.projectTimelines[0].completionDate}
+              {moment(
+                lvnzyProject?.meta.projectTimelines[0].completionDate,
+                "DD-MM-YYYY"
+              ).format("MMMM YYYY")}
             </Typography.Text>
           </Flex>
         ) : null}
-        <Flex>
-          <Flex
+      </Flex>
+      {/* Configurations and costing */}
+      <Flex
+        vertical
+        style={{
+          backgroundColor: COLORS.bgColor,
+          margin: 16,
+          padding: 8,
+          border: "1px solid",
+          borderRadius: 8,
+          borderColor: COLORS.borderColorMedium,
+        }}
+      >
+        <Flex style={{ marginBottom: 8 }}>
+          <Typography.Text
             style={{
-              backgroundColor: COLORS.bgColor,
-              marginTop: 4,
-              padding: 8,
-              border: "1px solid",
-              borderColor: COLORS.borderColorMedium,
               borderRadius: 8,
-              width: "100%",
+              color: "white",
             }}
           >
-            <Paragraph
-              ellipsis={{ rows: 1, expandable: true }}
+            <Typography.Text
               style={{
-                whiteSpace: "pre-line",
-                marginBottom: 0,
-                fontSize: FONT_SIZE.PARA,
+                fontSize: FONT_SIZE.HEADING_4,
+                marginRight: 8,
+                color: COLORS.textColorLight,
               }}
             >
-              {lvnzyProject!.meta.costingDetails.configurations
-                .map((c: any) => `₹${rupeeAmountFormat(c.cost)} / ${c.config}`)
-                .join("\n")}
-            </Paragraph>
-          </Flex>
+              Per Sqft:
+            </Typography.Text>
+            <Typography.Text
+              style={{
+                color: COLORS.textColorDark,
+                fontSize: FONT_SIZE.HEADING_4,
+                fontWeight: 500,
+              }}
+            >
+              {rupeeAmountFormat(
+                `₹${Math.round(
+                  lvnzyProject?.meta.costingDetails.minimumUnitCost /
+                    lvnzyProject?.meta.costingDetails.minimumUnitSize
+                )}`
+              )}{" "}
+            </Typography.Text>
+          </Typography.Text>
         </Flex>
+        <Paragraph
+          ellipsis={{
+            rows: 1,
+            expandable: true,
+            symbol: `${
+              lvnzyProject!.meta.costingDetails.configurations.length
+            } more`,
+          }}
+          style={{
+            whiteSpace: "pre-line",
+            marginBottom: 0,
+            width: "100%",
+            fontSize: FONT_SIZE.HEADING_3,
+          }}
+        >
+          {lvnzyProject!.meta.costingDetails.configurations
+            .map((c: any) => `${c.config} : ${rupeeAmountFormat(c.cost)}`)
+            .join("\n")}
+        </Paragraph>
       </Flex>
+      <DataSources></DataSources>
 
       <Alert
         message="Click each rating to see more details"

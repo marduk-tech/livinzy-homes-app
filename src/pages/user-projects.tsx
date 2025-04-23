@@ -58,13 +58,12 @@ export function UserProjects() {
     return (
       <Flex
         style={{
-          marginBottom: 16,
+          marginBottom: 8,
           border: "2px solid",
           cursor: "pointer",
           backgroundColor: "white",
-          borderColor: COLORS.borderColorMedium,
-          borderRadius: 8,
-          padding: 8,
+          borderColor: COLORS.borderColor,
+          borderRadius: 12,
           minWidth: isMobile ? "100%" : 320,
           maxWidth: isMobile ? "100%" : 320,
         }}
@@ -72,28 +71,28 @@ export function UserProjects() {
           navigate(`/brick360/${itemInfo._id}`);
         }}
       >
-        <Flex vertical gap={8} style={{ width: "100%" }}>
+        <Flex vertical style={{ width: "100%" }}>
           <div
             style={{
               width: "100%",
-              height: 150,
+              height: 175,
+              borderTopRightRadius: 12,
+              borderTopLeftRadius: 12,
               backgroundImage: `url(${previewImage})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
-              borderRadius: 8,
               backgroundRepeat: "no-repeat",
-              marginTop: 4,
             }}
           ></div>
           {/* <ProjectGallery
             media={itemInfo.originalProjectId.media}
           ></ProjectGallery> */}
 
-          <Flex vertical>
+          <Flex vertical style={{ padding: "8px 8px 0 8px" }}>
             <Typography.Text
               style={{
                 fontSize: FONT_SIZE.HEADING_2,
-                fontWeight: 500,
+                fontWeight: 600,
                 lineHeight: "120%",
                 width: "100%",
                 textWrap: "wrap",
@@ -108,7 +107,12 @@ export function UserProjects() {
               style={{ width: "100%", textWrap: "wrap" }}
             >
               {oneLinerBreakup.length && (
-                <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_4 }}>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.PARA,
+                    color: COLORS.textColorLight,
+                  }}
+                >
                   {oneLinerBreakup.slice(0, 3).join(" · ")}
                 </Typography.Text>
               )}
@@ -130,7 +134,7 @@ export function UserProjects() {
               / {itemInfo.meta.costingDetails.minimumUnitSize} sqft
             </Typography.Text>
           </Flex>
-          <Flex>
+          <Flex style={{ padding: 8 }}>
             <Row
               style={{
                 marginTop: 8,
@@ -146,11 +150,16 @@ export function UserProjects() {
                     style={{
                       borderColor: COLORS.borderColor,
                       borderRadius: 8,
-                      fontSize: FONT_SIZE.SUB_TEXT,
+                      fontSize: FONT_SIZE.PARA,
                     }}
                   >
                     <Flex style={{ width: "100%" }} align="center">
-                      <Typography.Text style={{ fontSize: FONT_SIZE.SUB_TEXT }}>
+                      <Typography.Text
+                        style={{
+                          fontSize: FONT_SIZE.PARA,
+                          color: COLORS.textColorLight,
+                        }}
+                      >
                         {Brick360CategoryInfo[item].title}
                       </Typography.Text>
                       <Flex style={{ marginLeft: "auto" }}>
@@ -180,7 +189,6 @@ export function UserProjects() {
         width: "100%",
         padding: 8,
         paddingBottom: 100,
-        backgroundColor: isMobile ? COLORS.bgColorMedium : "white",
         border: 0,
       }}
       vertical
