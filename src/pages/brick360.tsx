@@ -273,7 +273,23 @@ export function Brick360() {
           media={lvnzyProject?.originalProjectId.media}
         ></ProjectGallery>
         {/* Name */}{" "}
-        <Flex style={{ alignItems: "flex-end", margin: "8px 0" }} gap={8}>
+        <Flex
+          vertical
+          style={{ alignItems: "flex-start", margin: "8px 0" }}
+          gap={8}
+        >
+          <Flex>
+            <Tag
+              style={{
+                fontSize: FONT_SIZE.HEADING_3,
+                padding: "4px 8px",
+                borderRadius: 8,
+                fontWeight: 500,
+              }}
+            >
+              {lvnzyProject?.originalProjectId.info.developerId.name}
+            </Tag>
+          </Flex>
           <Typography.Title
             level={2}
             style={{ margin: "0", lineHeight: "100%" }}
