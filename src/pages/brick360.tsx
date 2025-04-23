@@ -200,6 +200,7 @@ export function Brick360() {
       <Flex
         vertical
         style={{
+          padding: 16,
           width: progressWidth,
           position: "fixed",
           top: "20%",
@@ -214,7 +215,6 @@ export function Brick360() {
           level={2}
           style={{
             margin: 0,
-            marginTop: 16,
             padding: 8,
           }}
         >

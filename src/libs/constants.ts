@@ -272,6 +272,7 @@ export const Brick360DataPoints = {
     amenities: "Amenities",
     density: "Density",
     surroundings: "Surroundings",
+    designAndBuildQuality: "Design/Build Quality",
   },
   areaConnectivity: {
     schoolsOffices: "Schools/Offices",
