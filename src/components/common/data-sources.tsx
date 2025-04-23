@@ -62,51 +62,55 @@ export function DataSources({
         padding: "8px 16px",
         backgroundColor: COLORS.textColorDark,
       }}
-      onClick={() => {
-        if (!disableDetailsDialog) {
-          setDetailsModalOpen(true);
-        }
-      }}
       gap={4}
       align="center"
     >
-      <Typography.Text
-        style={{
-          fontSize: FONT_SIZE.HEADING_3,
-          color: "white",
+      <Flex
+        onClick={() => {
+          if (!disableDetailsDialog) {
+            setDetailsModalOpen(true);
+          }
         }}
+        align="center"
       >
-        Brick
-        <i>360</i> Report
-      </Typography.Text>
-      {!disableDetailsDialog && (
-        <DynamicReactIcon
-          iconName="IoMdInformationCircleOutline"
-          iconSet="io"
-          color="white"
-        ></DynamicReactIcon>
-      )}
+        <Typography.Text
+          style={{
+            fontSize: FONT_SIZE.HEADING_3,
+            color: "white",
+          }}
+        >
+          Brick
+          <i>360</i> Report
+        </Typography.Text>
+        {!disableDetailsDialog && (
+          <DynamicReactIcon
+            iconName="IoMdInformationCircleOutline"
+            iconSet="io"
+            color="white"
+          ></DynamicReactIcon>
+        )}
 
-      <Flex style={{ flexWrap: "wrap", marginLeft: "24px" }}>
-        {(DATA_SRCS as any).map((src: any) => {
-          return (
-            <div
-              style={{
-                fontSize: FONT_SIZE.SUB_TEXT,
-                width: 28,
-                height: 28,
-                borderRadius: "50%",
-                backgroundColor: "white",
-                border: "1px solid",
-                borderColor: COLORS.borderColorMedium,
-                marginLeft: -12,
-                backgroundImage: `url('/images/data-src-logos/${src.image}')`,
-                backgroundSize: "contain",
-                backgroundPosition: "center",
-              }}
-            ></div>
-          );
-        })}
+        <Flex style={{ flexWrap: "wrap", marginLeft: "24px" }}>
+          {(DATA_SRCS as any).map((src: any) => {
+            return (
+              <div
+                style={{
+                  fontSize: FONT_SIZE.SUB_TEXT,
+                  width: 28,
+                  height: 28,
+                  borderRadius: "50%",
+                  backgroundColor: "white",
+                  border: "1px solid",
+                  borderColor: COLORS.borderColorMedium,
+                  marginLeft: -12,
+                  backgroundImage: `url('/images/data-src-logos/${src.image}')`,
+                  backgroundSize: "contain",
+                  backgroundPosition: "center",
+                }}
+              ></div>
+            );
+          })}
+        </Flex>
       </Flex>
       <Modal
         title={null}
