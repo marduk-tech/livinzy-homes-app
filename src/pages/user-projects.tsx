@@ -62,7 +62,7 @@ export function UserProjects() {
           border: "2px solid",
           cursor: "pointer",
           backgroundColor: "white",
-          borderColor: COLORS.borderColor,
+          borderColor: COLORS.borderColorMedium,
           borderRadius: 12,
           minWidth: isMobile ? "100%" : 320,
           maxWidth: isMobile ? "100%" : 320,
@@ -137,7 +137,6 @@ export function UserProjects() {
           <Flex style={{ padding: 8 }}>
             <Flex
               style={{
-                marginTop: 8,
                 paddingTop: 8,
                 borderTop: "1px solid",
                 borderTopColor: COLORS.borderColor,
@@ -186,7 +185,7 @@ export function UserProjects() {
     <Flex
       style={{
         width: "100%",
-        padding: 8,
+        padding: 16,
         paddingBottom: 100,
         border: 0,
       }}

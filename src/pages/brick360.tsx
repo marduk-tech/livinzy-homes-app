@@ -441,10 +441,16 @@ export function Brick360() {
                 marginLeft: "auto",
               }}
             >
-              <Tag color={COLORS.greenIdentifier}>
+              <Tag
+                color={COLORS.greenIdentifier}
+                style={{ fontSize: FONT_SIZE.SUB_TEXT }}
+              >
                 {lvnzyProject?.score.summary.pros.length} pros
               </Tag>
-              <Tag color={COLORS.redIdentifier}>
+              <Tag
+                color={COLORS.redIdentifier}
+                style={{ fontSize: FONT_SIZE.SUB_TEXT }}
+              >
                 {lvnzyProject?.score.summary.cons.length} cons
               </Tag>
             </Flex>
