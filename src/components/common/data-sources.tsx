@@ -1,6 +1,5 @@
 import { Alert, Flex, Modal, Typography } from "antd";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import DynamicReactIcon from "./dynamic-react-icon";
 import { useDevice } from "../../hooks/use-device";
 import { useState } from "react";
 const { Paragraph, Text, Link } = Typography;
@@ -56,11 +55,6 @@ export function DataSources({
     <Flex
       style={{
         marginBottom: 16,
-        marginTop: 8,
-        width: isMobile ? "100%" : "96%",
-        margin: isMobile ? 0 : "0 2%",
-        padding: "8px 16px",
-        backgroundColor: COLORS.textColorDark,
       }}
       gap={4}
       align="center"
@@ -71,38 +65,36 @@ export function DataSources({
             setDetailsModalOpen(true);
           }
         }}
+        style={{
+          borderRadius: 8,
+          padding: 4,
+        }}
         align="center"
       >
-        <Typography.Text
-          style={{
-            fontSize: FONT_SIZE.HEADING_3,
-            color: "white",
-          }}
-        >
-          Brick
-          <i>360</i> Report
-        </Typography.Text>
-        {!disableDetailsDialog && (
+        <Typography.Title level={3} style={{ margin: 0 }}>
+          Brick<i>360</i>
+        </Typography.Title>
+        {/* {!disableDetailsDialog && (
           <DynamicReactIcon
             iconName="IoMdInformationCircleOutline"
             iconSet="io"
-            color="white"
+            color={COLORS.textColorLight}
           ></DynamicReactIcon>
-        )}
+        )} */}
 
-        <Flex style={{ flexWrap: "wrap", marginLeft: "24px" }}>
+        <Flex style={{ flexWrap: "wrap", marginLeft: "16px" }}>
           {(DATA_SRCS as any).map((src: any) => {
             return (
               <div
                 style={{
                   fontSize: FONT_SIZE.SUB_TEXT,
-                  width: 28,
-                  height: 28,
+                  width: 24,
+                  height: 24,
                   borderRadius: "50%",
                   backgroundColor: "white",
                   border: "1px solid",
                   borderColor: COLORS.borderColorMedium,
-                  marginLeft: -12,
+                  marginLeft: -8,
                   backgroundImage: `url('/images/data-src-logos/${src.image}')`,
                   backgroundSize: "contain",
                   backgroundPosition: "center",
@@ -124,10 +116,14 @@ export function DataSources({
           setDetailsModalOpen(false);
         }}
       >
+        <Typography.Title style={{ margin: 0 }} level={3}>
+          Brick<i>360</i>
+        </Typography.Title>
+
         <Flex
           vertical
           style={{
-            marginTop: 32,
+            marginTop: 16,
             height: 500,
             overflowY: "scroll",
             scrollbarWidth: "none",

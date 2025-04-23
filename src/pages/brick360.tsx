@@ -8,6 +8,7 @@ import {
   Modal,
   Progress,
   Space,
+  Tag,
   Typography,
 } from "antd";
 import { useEffect, useRef, useState } from "react";
@@ -59,6 +60,8 @@ export function Brick360() {
   const chatRef = useRef<{ clearChatData: () => void } | null>(null);
 
   const [scoreParams, setScoreParams] = useState<any[]>([]);
+  const [quickSnapshotDialogOpen, setQuickSnapshotDialogOpen] = useState(false);
+
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedDataPointCategory, setSelectedDataPointCategory] =
     useState<any>();
@@ -172,12 +175,14 @@ export function Brick360() {
       for (const key in BRICK360_CATEGORY) {
         const cat = BRICK360_CATEGORY[key as keyof typeof BRICK360_CATEGORY];
         const catInfo = Brick360CategoryInfo[cat];
-        params.push({
-          title: catInfo.title,
-          key: key,
-          icon: getDataCategoryIcon(catInfo.iconName, catInfo.iconSet),
-          dataPoints: Object.entries(lvnzyProject.score[cat]),
-        });
+        if (!catInfo.disabled) {
+          params.push({
+            title: catInfo.title,
+            key: key,
+            icon: getDataCategoryIcon(catInfo.iconName, catInfo.iconSet),
+            dataPoints: Object.entries(lvnzyProject.score[cat]),
+          });
+        }
       }
       setScoreParams(params);
     }
@@ -242,7 +247,7 @@ export function Brick360() {
       }}
     >
       {/* Main project upfront score card including metadata */}
-      <Flex vertical style={{ padding: "16px 16px 0 16px" }}>
+      <Flex vertical style={{ padding: "0 16px 0 16px" }}>
         {/* Project Gallery */}
         <ProjectGallery
           media={lvnzyProject?.originalProjectId.media}
@@ -358,7 +363,7 @@ export function Brick360() {
             whiteSpace: "pre-line",
             marginBottom: 0,
             width: "100%",
-            fontSize: FONT_SIZE.HEADING_3,
+            fontSize: FONT_SIZE.HEADING_4,
           }}
         >
           {lvnzyProject!.meta.costingDetails.configurations
@@ -366,15 +371,75 @@ export function Brick360() {
             .join("\n")}
         </Paragraph>
       </Flex>
-      <DataSources></DataSources>
+      <Flex style={{ padding: "0 16px" }}>
+        <DataSources></DataSources>
+      </Flex>
+      {lvnzyProject?.score.summary && (
+        <Flex
+          style={{
+            margin: "0 16px",
+            padding: "12px 4px",
+            border: "1px solid",
+            borderColor: COLORS.borderColor,
+            backgroundColor: "white",
+            borderRadius: 8,
+          }}
+          onClick={() => {
+            setQuickSnapshotDialogOpen(true);
+          }}
+        >
+          <Flex style={{ width: "100%" }}>
+            <Flex vertical style={{ width: "80%" }}>
+              <Flex align="center" gap={2}>
+                <DynamicReactIcon
+                  iconName="GiTakeMyMoney"
+                  iconSet="gi"
+                  size={18}
+                  color={COLORS.textColorDark}
+                ></DynamicReactIcon>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.HEADING_4,
+                    color: COLORS.textColorDark,
+                  }}
+                >
+                  Quick Investment Snapshot
+                </Typography.Text>
+              </Flex>
+              {/* <Typography.Text
+              style={{
+                fontSize: FONT_SIZE.SUB_TEXT,
+                width: "60%",
+                color: COLORS.textColorLight,
+              }}
+            >
+              Should you invest? Click for more
+            </Typography.Text> */}
+            </Flex>
+            <Flex
+              style={{
+                height: 24,
+                marginLeft: "auto",
+              }}
+            >
+              <Tag color={COLORS.greenIdentifier}>
+                {lvnzyProject?.score.summary.pros.length} pros
+              </Tag>
+              <Tag color={COLORS.redIdentifier}>
+                {lvnzyProject?.score.summary.cons.length} cons
+              </Tag>
+            </Flex>
+          </Flex>
+        </Flex>
+      )}
 
-      <Alert
+      {/* <Alert
         message="Click each rating to see more details"
         type="info"
         showIcon
         closable
         style={{ margin: 16 }}
-      />
+      /> */}
       {/* All the data points */}
       <Flex vertical gap={32} style={{ padding: 16 }}>
         {scoreParams &&
@@ -521,6 +586,77 @@ export function Brick360() {
           />
         </Flex>
       </Modal>
+
+      {/* Pros/Cons Modal */}
+      {lvnzyProject?.score.summary && (
+        <Modal
+          footer={null}
+          height={600}
+          open={quickSnapshotDialogOpen}
+          closable={true}
+          onCancel={() => {
+            setQuickSnapshotDialogOpen(false);
+          }}
+          onClose={() => {
+            setQuickSnapshotDialogOpen(false);
+          }}
+        >
+          <Flex
+            vertical
+            style={{ overflowY: "scroll", height: 600, scrollbarWidth: "none" }}
+          >
+            <Typography.Title level={3} style={{ margin: 0, marginBottom: 16 }}>
+              Quick Investment Snapshot
+            </Typography.Title>
+            <Flex gap={8} vertical>
+              <Flex>
+                <Tag color={COLORS.greenIdentifier}>Pros</Tag>
+              </Flex>
+              {lvnzyProject?.score.summary.pros.map((pro: string) => {
+                return (
+                  <Flex
+                    style={{
+                      maxWidth: 500,
+                      backgroundColor: COLORS.bgColorMedium,
+                      borderRadius: 8,
+                      borderColor: COLORS.borderColorMedium,
+                      padding: 8,
+                    }}
+                  >
+                    <div
+                      dangerouslySetInnerHTML={{ __html: pro }}
+                      className="reasoning"
+                      style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
+                    ></div>
+                  </Flex>
+                );
+              })}
+              <Flex>
+                <Tag color={COLORS.redIdentifier}>Cons</Tag>
+              </Flex>
+              {lvnzyProject?.score.summary.cons.map((pro: string) => {
+                return (
+                  <Flex
+                    style={{
+                      maxWidth: 500,
+                      backgroundColor: COLORS.bgColorMedium,
+                      borderRadius: 8,
+                      borderColor: COLORS.borderColorMedium,
+                      padding: 8,
+                    }}
+                  >
+                    <div
+                      dangerouslySetInnerHTML={{ __html: pro }}
+                      className="reasoning"
+                      style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
+                    ></div>
+                  </Flex>
+                );
+              })}
+            </Flex>
+          </Flex>
+        </Modal>
+      )}
 
       {/* Bottom drawer to show a selected data point */}
       <Drawer

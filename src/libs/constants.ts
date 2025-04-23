@@ -242,7 +242,7 @@ export enum BRICK360_CATEGORY {
 
 export const Brick360CategoryInfo: Record<
   BRICK360_CATEGORY,
-  { title: string; iconName: string; iconSet: string }
+  { title: string; iconName: string; iconSet: string; disabled?: boolean }
 > = {
   property: {
     title: "Property",
@@ -250,6 +250,7 @@ export const Brick360CategoryInfo: Record<
     iconSet: "md",
   },
   investment: {
+    disabled: true,
     title: "Investment",
     iconName: "GiTakeMyMoney",
     iconSet: "gi",
@@ -275,10 +276,10 @@ export const Brick360DataPoints = {
   areaConnectivity: {
     schoolsOffices: "Schools/Offices",
     conveniences: "Conveniences",
-    transport: "Transport",
+    transport: "Connectivity",
   },
   developer: {
-    experience: "Past Experience",
+    experience: "Experience",
     timeCommitment: "Time Committment",
     customerSatisfaction: "Customer Satisfaction",
   },

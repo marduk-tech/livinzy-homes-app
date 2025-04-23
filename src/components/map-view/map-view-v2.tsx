@@ -737,6 +737,7 @@ const MapViewV2 = ({
           backgroundColor: selected ? COLORS.primaryColor : "initial",
           color: selected ? "white" : "initial",
           marginLeft: 4,
+          fontSize: FONT_SIZE.HEADING_3,
         }}
         onClick={() => {
           const selDriverTypes = [...selectedDriverTypes];
