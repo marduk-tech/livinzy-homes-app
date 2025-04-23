@@ -491,18 +491,35 @@ export function Brick360() {
                 ).length ? (
                   <List
                     size="large"
+                    style={{ borderRadius: 16 }}
                     dataSource={Object.keys(
                       (Brick360DataPoints as any)[sc.key]
                     ).map((d) => {
                       return sc.dataPoints.find((dp: any) => dp[0] == d);
                     })}
-                    renderItem={(item) => (
+                    renderItem={(item, index) => (
                       <List.Item
                         style={{
                           padding: "8px",
                           borderBottom: "1px solid",
                           borderBottomColor: COLORS.borderColor,
                           backgroundColor: "white",
+                          borderTopLeftRadius: index == 0 ? 8 : 0,
+                          borderTopRightRadius: index == 0 ? 8 : 0,
+                          borderBottomLeftRadius:
+                            index ==
+                            Object.keys((Brick360DataPoints as any)[sc.key])
+                              .length -
+                              1
+                              ? 8
+                              : 0,
+                          borderBottomRightRadius:
+                            index ==
+                            Object.keys((Brick360DataPoints as any)[sc.key])
+                              .length -
+                              1
+                              ? 8
+                              : 0,
                         }}
                         onClick={() => {
                           setDetailsModalOpen(true);
