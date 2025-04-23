@@ -88,15 +88,16 @@ export function DataSources({
               <div
                 style={{
                   fontSize: FONT_SIZE.SUB_TEXT,
-                  width: 24,
-                  height: 24,
+                  width: 32,
+                  height: 32,
                   borderRadius: "50%",
                   backgroundColor: "white",
                   border: "1px solid",
                   borderColor: COLORS.borderColorMedium,
-                  marginLeft: -8,
+                  marginLeft: -12,
                   backgroundImage: `url('/images/data-src-logos/${src.image}')`,
-                  backgroundSize: "contain",
+                  backgroundSize: "90%",
+                  backgroundRepeat: "no-repeat",
                   backgroundPosition: "center",
                 }}
               ></div>
