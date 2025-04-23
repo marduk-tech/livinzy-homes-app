@@ -1,9 +1,9 @@
 import { Flex, Image, Modal, Typography } from "antd";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useDevice } from "../hooks/use-device";
 import "../theme/gallery.css";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia } from "../types/Project";
+import { COLORS } from "../theme/style-constants";
 
 export const ProjectImagesGalleryModal = ({
   isOpen,
@@ -68,12 +68,11 @@ export const ProjectImagesGalleryModal = ({
         {Object.entries(groupedImages)
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([tag, images]) => (
-            <Flex key={tag} vertical gap={16}>
+            <Flex key={tag} vertical>
               <Typography.Title
-                level={3}
+                level={4}
                 style={{
                   margin: 0,
-                  fontSize: FONT_SIZE.HEADING_3,
                   textTransform: "capitalize",
                 }}
               >
@@ -105,6 +104,8 @@ export const ProjectImagesGalleryModal = ({
                           width: "100%",
                           height: "100%",
                           objectFit: "cover",
+                          border: "1px solid",
+                          borderColor: COLORS.borderColorMedium,
                         }}
                       />
                     </div>
