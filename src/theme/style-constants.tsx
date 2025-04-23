@@ -28,7 +28,7 @@ export const FONT_SIZE = {
   HEADING_1: isMobile ? 30 : 32,
   HEADING_2: isMobile ? 24 : 26,
   HEADING_3: 19,
-  HEADING_4: 15,
+  HEADING_4: 17,
 };
 
 export const MOBILE_MARGIN = 16;

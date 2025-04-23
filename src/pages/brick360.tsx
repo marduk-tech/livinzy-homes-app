@@ -444,7 +444,7 @@ export function Brick360() {
                 </Flex>
                 <Typography.Text
                   style={{
-                    fontSize: FONT_SIZE.HEADING_3,
+                    fontSize: FONT_SIZE.HEADING_4,
                   }}
                 >
                   Investment Snapshot
