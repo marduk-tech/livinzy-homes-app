@@ -3,6 +3,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
+
 import {
   CircleMarker,
   MapContainer,
@@ -521,6 +522,7 @@ const MapViewV2 = ({
           !selectedSurroundingElement || e.type == selectedSurroundingElement
       )
       .map((element: ISurroundingElement, index: number) => {
+        let plygn;
         const positions = element.geometry.map((g: any) => {
           if (Array.isArray(g)) {
             return g.map((subG) => {
@@ -530,36 +532,70 @@ const MapViewV2 = ({
             return [g.lat, g.lon];
           }
         });
-        return (
-          <Polyline
-            key={index}
-            positions={positions}
-            pathOptions={{
-              color: COLORS.textColorDark,
-              weight: 8,
-              opacity: 0.8,
-            }}
-            eventHandlers={{
-              click: () => {
-                const typeLabel = (SurroundingElementLabels as any)[
-                  element.type
-                ]
-                  ? (SurroundingElementLabels as any)[element.type].label
-                  : "";
-                setModalContent({
-                  title: element.description || typeLabel || "",
-                  content: "",
-                  tags: [
-                    {
-                      label: typeLabel || "",
-                      color: COLORS.primaryColor,
-                    },
-                  ],
-                });
-                setInfoModalOpen(true);
+
+        // let isMulti = false;
+        // const plgynCoordinates = element.geometry.map((g: any) => {
+        //   if (Array.isArray(g)) {
+        //     isMulti = true;
+        //     return g.map((subG) => {
+        //       return [subG.lon, subG.lat];
+        //     });
+        //   } else {
+        //     return [g.lon, g.lat];
+        //   }
+        // });
+
+        // let feature, center, cc, icon;
+        // try {
+        //   feature = isMulti
+        //     ? turf.multiLineString(plgynCoordinates)
+        //     : turf.lineString(plgynCoordinates);
+        //   center = turf.pointOnFeature(feature!);
+        //   cc = center!.geometry.coordinates;
+        //   icon = (SurroundingElementLabels as any)[element.type].icon;
+        // } catch (Err) {
+        //   console.log("here");
+        // }
+
+        const handleElementClick = () => {
+          const typeLabel = (SurroundingElementLabels as any)[element.type]
+            ? (SurroundingElementLabels as any)[element.type].label
+            : "";
+          setModalContent({
+            title: element.description || typeLabel || "",
+            content: "",
+            tags: [
+              {
+                label: typeLabel || "",
+                color: COLORS.primaryColor,
               },
-            }}
-          />
+            ],
+          });
+          setInfoModalOpen(true);
+        };
+        return (
+          <>
+            <Polyline
+              key={index}
+              positions={positions}
+              pathOptions={{
+                color: COLORS.textColorDark,
+                weight: 8,
+                opacity: 0.8,
+              }}
+              eventHandlers={{
+                click: handleElementClick,
+              }}
+            />
+            {/* <Marker
+              key={`m-${index}`}
+              position={[cc![1], cc![0]]}
+              icon={icon}
+              eventHandlers={{
+                click: handleElementClick,
+              }}
+            /> */}
+          </>
         );
       });
   };
@@ -999,6 +1035,7 @@ const MapViewV2 = ({
         overflowY: "hidden",
       }}
     >
+      {/* Drivers filters */}
       {drivers && drivers.length && fullSize ? (
         <Flex vertical style={{ paddingBottom: "8px", marginBottom: 16 }}>
           <Flex
@@ -1019,6 +1056,7 @@ const MapViewV2 = ({
         </Flex>
       ) : null}
 
+      {/* Surrounding Elements Filters */}
       {surroundingElements && surroundingElements.length && fullSize ? (
         <Flex vertical style={{ paddingBottom: "8px", marginBottom: 16 }}>
           <Flex
@@ -1038,10 +1076,7 @@ const MapViewV2 = ({
       ) : null}
       <Flex
         style={{
-          height:
-            drivers && drivers.length && fullSize
-              ? "calc(100% - 64px)"
-              : "100%",
+          height: fullSize ? "calc(100% - 70px)" : "100%",
           width: "100%",
         }}
       >
