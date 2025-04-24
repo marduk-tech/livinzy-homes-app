@@ -103,7 +103,7 @@ async function getIcon(
         borderRadius: text ? "24px" : "50%",
         padding: text ? 2 : 0,
         height: text ? "auto" : (style?.iconSize || 20) * 1.6,
-        width: text ? 80 : (style?.iconSize || 20) * 1.6,
+        width: text ? 85 : (style?.iconSize || 20) * 1.6,
         display: "flex",
         alignItems: "center",
         borderColor: isUnderConstruction
@@ -113,6 +113,7 @@ async function getIcon(
         justifyContent: "center",
         animation: toBounce ? "bounceAnimation 1s infinite" : "none",
         boxShadow: "0 0 6px rgba(0,0,0,0.3)",
+        textWrap: "nowrap",
       }}
     >
       <IconComp
@@ -205,12 +206,18 @@ const MapViewV2 = ({
   fullSize,
   defaultSelectedDriverTypes,
   surroundingElements,
+  projectsNearby,
 }: {
   drivers?: any[];
   projectId?: string;
   fullSize: boolean;
   defaultSelectedDriverTypes?: string[];
   surroundingElements?: ISurroundingElement[];
+  projectsNearby?: {
+    projectName: string;
+    sqftCost: number;
+    projectLocation: [number, number];
+  }[];
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
@@ -238,6 +245,8 @@ const MapViewV2 = ({
   const [simpleDriverMarkerIcons, setSimpleDriverMarkerIcons] = useState<any[]>(
     []
   );
+
+  const [projectsNearbyIcons, setProjectsNearbyIcons] = useState<any[]>([]);
   const [projectMarkerIcon, setProjectMarkerIcon] = useState<L.DivIcon | null>(
     null
   );
@@ -302,6 +311,29 @@ const MapViewV2 = ({
     }
     fetchProjectIcon();
   }, []);
+
+  // Settings icons for nearby projects
+  useEffect(() => {
+    async function setIcons() {
+      const icons = [];
+      for (const project of projectsNearby!) {
+        const icon = await getIcon(
+          "MdHomeWork",
+          "md",
+          false,
+          `${project.sqftCost} /sqft`
+        );
+        icons.push({
+          name: project.projectName,
+          icon,
+        });
+      }
+      setProjectsNearbyIcons(icons);
+    }
+    if (projectsNearby && projectsNearby.length) {
+      setIcons();
+    }
+  }, [projectsNearby]);
 
   const processRoadFeatures = (features: GeoJSONFeature[]) => {
     return features.flatMap((feature) => {
@@ -758,8 +790,8 @@ const MapViewV2 = ({
       });
   };
 
-  /**Renders marker for a particular project */
-  const renderProjectMarkers = () => {
+  /**Renders marker for the current project */
+  const renderCurrentProjectMarker = () => {
     if (projectId && projectData?.info?.location && projectMarkerIcon) {
       return (
         <Marker
@@ -784,6 +816,41 @@ const MapViewV2 = ({
     return null;
   };
 
+  /**Renders marker for the nearby projects */
+  const renderProjectsNearby = () => {
+    if (projectsNearby && projectsNearby.length && projectsNearbyIcons.length) {
+      return projectsNearby.map((project) => {
+        const projectIcon = projectsNearbyIcons.find(
+          (p) => p.name == project.projectName
+        );
+        return (
+          <Marker
+            key={project.projectName.toLowerCase()}
+            position={project.projectLocation}
+            icon={projectIcon ? projectIcon.icon! : ""}
+            eventHandlers={{
+              click: () => {
+                setModalContent({
+                  title: project.projectName,
+                  content: "",
+                  tags: [
+                    {
+                      label: `${capitalize(projectData?.info.homeType[0])}`,
+                      color: COLORS.primaryColor,
+                    },
+                  ],
+                });
+                setInfoModalOpen(true);
+              },
+            }}
+          />
+        );
+      });
+    }
+    return null;
+  };
+
+  /** Filter for driver types */
   const renderDriverTypesTag = (k: string, selected: boolean) => {
     if (!(LivIndexDriversConfig as any)[k]) {
       return null;
@@ -887,7 +954,7 @@ const MapViewV2 = ({
         style={{
           height:
             drivers && drivers.length && fullSize
-              ? "calc(100% - 48px)"
+              ? "calc(100% - 64px)"
               : "100%",
           width: "100%",
         }}
@@ -907,9 +974,10 @@ const MapViewV2 = ({
           {renderRoadDrivers()}
           {renderTransitDrivers()}
           {renderSimpleDriverMarkers()}
-          {renderProjectMarkers()}
+          {renderCurrentProjectMarker()}
           {corridorElements}
           {renderSurroundings()}
+          {renderProjectsNearby()}
           <MapPolygons
             driversData={driversData || []}
             selectedDriverTypes={selectedDriverTypes}

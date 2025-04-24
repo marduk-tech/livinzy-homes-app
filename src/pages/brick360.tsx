@@ -11,7 +11,7 @@ import {
   Tag,
   Typography,
 } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import GradientBar from "../components/common/grading-bar";
@@ -37,6 +37,8 @@ import {
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { DataSources } from "../components/common/data-sources";
 import { ISurroundingElement } from "../types/Project";
+import remarkGfm from "remark-gfm";
+import Markdown from "react-markdown";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -62,6 +64,10 @@ export function Brick360() {
 
   const [scoreParams, setScoreParams] = useState<any[]>([]);
   const [quickSnapshotDialogOpen, setQuickSnapshotDialogOpen] = useState(false);
+
+  const [pmtDetailsModalContent, setPmtDetailsModalContent] = useState<
+    ReactNode | undefined
+  >();
 
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedDataPointCategory, setSelectedDataPointCategory] =
@@ -174,7 +180,11 @@ export function Brick360() {
         setMapDrivers(drivers);
         setSurroundingElements([]);
         setMapVisible(true);
-      } else if (surrElements && surrElements.length) {
+      } else if (
+        surrElements &&
+        surrElements.length &&
+        surrElements.filter((e: any) => !!e.geometry).length
+      ) {
         setSurroundingElements(surrElements);
         setMapVisible(true);
         setMapDrivers([]);
@@ -308,7 +318,7 @@ export function Brick360() {
             color: COLORS.textColorLight,
           }}
         >
-          {lvnzyProject?.meta.oneLiner.split(" · ").slice(0, 3).join(" · ")}
+          {lvnzyProject?.meta.oneLiner}
         </Typography.Text>
         {lvnzyProject?.meta.projectTimelines &&
         lvnzyProject?.meta.projectTimelines.length ? (
@@ -354,6 +364,7 @@ export function Brick360() {
         }}
       >
         <Flex vertical style={{ marginBottom: 8 }}>
+          {/* Sqft & Configs */}
           <Typography.Text
             style={{
               borderRadius: 8,
@@ -403,6 +414,100 @@ export function Brick360() {
               .map((c: any) => `₹${rupeeAmountFormat(c.cost)} | ${c.config} `)
               .join("\n")}
           </Paragraph>
+          {/* Payment plan and price point */}
+          <Flex style={{ marginTop: 8, marginBottom: 8 }}>
+            {lvnzyProject?.originalProjectId.info.financialPlan ? (
+              <Flex
+                style={{ marginTop: 8 }}
+                onClick={() => {
+                  setPmtDetailsModalContent(
+                    <Flex vertical style={{ width: "100%" }}>
+                      <Typography.Title level={3}>
+                        Payment Plans
+                      </Typography.Title>
+                      <Markdown
+                        remarkPlugins={[remarkGfm]}
+                        className="liviq-content"
+                      >
+                        {lvnzyProject?.originalProjectId.info.financialPlan}
+                      </Markdown>
+                    </Flex>
+                  );
+                }}
+              >
+                <Tag
+                  color="white"
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  {" "}
+                  <DynamicReactIcon
+                    iconName="MdPayments"
+                    color={COLORS.textColorDark}
+                    iconSet="md"
+                  ></DynamicReactIcon>
+                  <Typography.Text
+                    style={{
+                      marginLeft: 8,
+                      fontWeight: 500,
+                      color: COLORS.textColorDark,
+                    }}
+                  >
+                    Payment Plans
+                  </Typography.Text>
+                </Tag>
+              </Flex>
+            ) : null}
+            {lvnzyProject?.investment &&
+            lvnzyProject?.investment.corridorPricing &&
+            !!lvnzyProject?.investment.corridorPricing.filter(
+              (c: any) => !!c.projectLocation
+            ).length ? (
+              <Flex
+                style={{ marginTop: 8 }}
+                onClick={() => {
+                  setPmtDetailsModalContent(
+                    <Flex vertical style={{ width: "100%" }}>
+                      <Typography.Title level={3}>Price Point</Typography.Title>
+                      <MapViewV2
+                        projectId={lvnzyProject?.originalProjectId._id}
+                        fullSize={true}
+                        projectsNearby={lvnzyProject?.investment.corridorPricing.filter(
+                          (p: any) => !!p.sqftCost
+                        )}
+                      ></MapViewV2>
+                    </Flex>
+                  );
+                }}
+              >
+                <Tag
+                  color="white"
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  {" "}
+                  <DynamicReactIcon
+                    iconName="HiOutlineCurrencyRupee"
+                    color={COLORS.textColorDark}
+                    iconSet="hi"
+                  ></DynamicReactIcon>
+                  <Typography.Text
+                    style={{
+                      marginLeft: 8,
+                      fontWeight: 500,
+                      color: COLORS.textColorDark,
+                    }}
+                  >
+                    Price Point
+                  </Typography.Text>
+                </Tag>
+              </Flex>
+            ) : null}
+          </Flex>
         </Flex>
       </Flex>
 
@@ -414,51 +519,37 @@ export function Brick360() {
         <Flex
           style={{
             margin: "0 16px",
-            padding: "12px 8px 12px 8px",
-            backgroundColor: "white",
             borderRadius: 8,
             cursor: "pointer",
+            padding: "8px 4px",
+            backgroundColor: "white",
           }}
           onClick={() => {
             setQuickSnapshotDialogOpen(true);
           }}
         >
-          <Flex style={{ width: "100%" }}>
-            <Flex vertical style={{ width: "80%" }}>
-              <Flex align="center" gap={4}>
-                <Flex
-                  style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: "50%",
-                    backgroundColor: "white",
-                    border: "1px solid",
-                  }}
-                >
-                  <DynamicReactIcon
-                    iconName="GiReceiveMoney"
-                    iconSet="gi"
-                    size={18}
-                    color={COLORS.textColorDark}
-                  ></DynamicReactIcon>
-                </Flex>
-                <Typography.Text
-                  style={{
-                    fontSize: FONT_SIZE.HEADING_4,
-                  }}
-                >
-                  Investment Snapshot
-                </Typography.Text>
-              </Flex>
-              {/* <Typography.Text
-              style={{
-                fontSize: FONT_SIZE.SUB_TEXT,
-                width: "60%",
-                color: COLORS.textColorLight,
-              }}
-            >
-              Should you invest? Click for more
-            </Typography.Text> */}
+          <Flex
+            style={{
+              width: "100%",
+              marginLeft: 8,
+              marginTop: 8,
+              marginBottom: 8,
+            }}
+          >
+            <Flex align="center" gap={4}>
+              <DynamicReactIcon
+                iconName="GiReceiveMoney"
+                iconSet="gi"
+                size={20}
+                color={COLORS.textColorDark}
+              ></DynamicReactIcon>
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.HEADING_4,
+                }}
+              >
+                Investment Summary
+              </Typography.Text>
             </Flex>
             <Flex
               style={{
@@ -623,7 +714,7 @@ export function Brick360() {
         closeIcon={null}
         footer={null}
         width={isMobile ? "100%" : 900}
-        style={{ padding: 0, top: 40 }}
+        style={{ padding: 0, top: 30 }}
         styles={{
           content: {
             padding: 0,
@@ -748,6 +839,27 @@ export function Brick360() {
           </Flex>
         </Modal>
       )}
+
+      {/* Price point & payment modal */}
+      <Modal
+        footer={null}
+        height={600}
+        open={!!pmtDetailsModalContent}
+        closable={true}
+        style={{ top: 40 }}
+        onCancel={() => {
+          setPmtDetailsModalContent(undefined);
+        }}
+        onClose={() => {
+          setPmtDetailsModalContent(undefined);
+        }}
+      >
+        <Flex
+          style={{ height: 600, overflowY: "scroll", scrollbarWidth: "none" }}
+        >
+          {pmtDetailsModalContent}
+        </Flex>
+      </Modal>
 
       {/* Bottom drawer to show a selected data point */}
       <Drawer
