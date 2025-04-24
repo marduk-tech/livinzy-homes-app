@@ -541,14 +541,17 @@ const MapViewV2 = ({
             }}
             eventHandlers={{
               click: () => {
+                const typeLabel = (SurroundingElementLabels as any)[
+                  element.type
+                ]
+                  ? (SurroundingElementLabels as any)[element.type].label
+                  : "";
                 setModalContent({
-                  title: element.description || "",
+                  title: element.description || typeLabel || "",
                   content: "",
                   tags: [
                     {
-                      label: (SurroundingElementLabels as any)[element.type]
-                        ? (SurroundingElementLabels as any)[element.type].label
-                        : "",
+                      label: typeLabel || "",
                       color: COLORS.primaryColor,
                     },
                   ],

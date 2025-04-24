@@ -15,8 +15,27 @@ import { Brick360 } from "../pages/brick360";
 import { PaymentCallbackPage } from "../pages/payment-callback";
 import { UserProjects } from "../pages/user-projects";
 import { Brick360Full } from "../pages/brick360-full";
+import { useUser } from "../hooks/use-user";
+import { useEffect } from "react";
+import posthog from "posthog-js";
+import { posthogkey } from "../libs/constants";
 
 export const Router = () => {
+  const { user, isLoading: userLoading } = useUser();
+
+  useEffect(() => {
+    if (user && user._id) {
+      console.log(user);
+      posthog.init(posthogkey, {
+        api_host: "https://us.i.posthog.com",
+        person_profiles: "identified_only", // or 'always' to create profiles for anonymous users as well
+      });
+
+      posthog.identify(user._id, {
+        countryCode: user.countryCode,
+      });
+    }
+  }, [user]);
   return (
     <Routes>
       <Route
