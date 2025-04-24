@@ -12,6 +12,7 @@ import {
   TileLayer,
   useMap,
 } from "react-leaflet";
+import { useFetchCorridors } from "../../hooks/use-corridors";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
 import { useFetchProjectById } from "../../hooks/use-project";
 import {
@@ -19,14 +20,13 @@ import {
   PLACE_TIMELINE,
   SurroundingElementLabels,
 } from "../../libs/constants";
+import { capitalize } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace, ISurroundingElement } from "../../types/Project";
 import DynamicReactIcon, {
   dynamicImportMap,
 } from "../common/dynamic-react-icon";
-import { capitalize } from "../../libs/lvnzy-helper";
 import { MapPolygons } from "./map-polygons";
-import { useFetchCorridors } from "../../hooks/use-corridors";
 
 type Coordinate = [number, number];
 type LineString = Coordinate[];
@@ -151,20 +151,48 @@ async function getIcon(
   return leafletIcon!;
 }
 
-const DEFAULT_PROJECT = "66f6442e3696885ef13d55ca";
-
 //  handle map resizing
-const MapCenterHandler = ({ projectData }: { projectData: any }) => {
+const MapCenterHandler = ({
+  projectData,
+  projects,
+  selectedProjectId,
+}: {
+  projectData: any;
+  projects?: any[];
+  selectedProjectId?: string;
+}) => {
   const map = useMap();
 
   useEffect(() => {
-    if (projectData?.info?.location) {
+    if (selectedProjectId && projects) {
+      const selectedProject = projects.find((p) => p._id === selectedProjectId);
+      if (
+        selectedProject?.metadata?.location?.lat &&
+        selectedProject?.metadata?.location?.lng
+      ) {
+        map.setView(
+          [
+            selectedProject.metadata.location.lat,
+            selectedProject.metadata.location.lng,
+          ],
+          13
+        );
+        return;
+      }
+      console.warn("Selected project missing location data:", selectedProject);
+    }
+    if (
+      projectData?.metadata?.location?.lat &&
+      projectData?.metadata?.location?.lng
+    ) {
       map.setView(
-        [projectData.info.location.lat, projectData.info.location.lng],
+        [projectData.metadata.location.lat, projectData.metadata.location.lng],
         13
       );
+    } else {
+      console.warn("Project data missing location:", projectData);
     }
-  }, [projectData, map]);
+  }, [projectData, map, selectedProjectId, projects]);
 
   return null;
 };
@@ -203,14 +231,17 @@ const MapResizeHandler = () => {
 
 const MapViewV2 = ({
   drivers,
-  projectId = DEFAULT_PROJECT,
+  projectId,
+  projects,
   fullSize,
   defaultSelectedDriverTypes,
   surroundingElements,
   projectsNearby,
+  selectedProjectId,
 }: {
   drivers?: any[];
   projectId?: string;
+  projects?: any[];
   fullSize: boolean;
   defaultSelectedDriverTypes?: string[];
   surroundingElements?: ISurroundingElement[];
@@ -219,6 +250,7 @@ const MapViewV2 = ({
     sqftCost: number;
     projectLocation: [number, number];
   }[];
+  selectedProjectId?: string;
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
@@ -237,14 +269,18 @@ const MapViewV2 = ({
     tags?: { label: string; color: string }[];
     content: string;
   }>();
+
   /**
    * Fetching driver data for selected drivers
    */
   const { data: driversData } = useFetchAllLivindexPlaces(
     drivers?.map((d) => d.id)
   );
-  // Always fetch data, use conditionally in render
-  const { data: projectData } = useFetchProjectById(projectId || "");
+
+  // Get primary project from projects array instead of fetching
+  const primaryProject =
+    projects?.find((p) => p._id === projectId) ||
+    (projects && projects.length > 0 ? projects[0] : null);
 
   /**
    * Icons for simple drivermarkers
@@ -261,43 +297,56 @@ const MapViewV2 = ({
   // Setting icons for simple drivermarkers
   useEffect(() => {
     async function fetchDriverIcons() {
-      if (drivers && drivers.length && driversData && driversData.length > 0) {
-        const icons = await Promise.all(
-          driversData.map(async (driver) => {
-            const iconConfig = (LivIndexDriversConfig as any)[driver.driver];
-            const projectSpecificDetails = drivers?.find(
-              (d) => d.id == driver._id
-            );
-
-            const icon = await getIcon(
-              iconConfig ? iconConfig.icon.name : "BiSolidFactory",
-              iconConfig ? iconConfig.icon.set : "bi",
-              false,
-              projectSpecificDetails
-                ? `${projectSpecificDetails.duration} mins`
-                : undefined,
-              driver
-            );
-            return icon ? { icon, driverId: driver._id } : null;
-          })
-        );
-        setSimpleDriverMarkerIcons(icons.filter(Boolean));
+      if (!drivers?.length || !driversData?.length) {
+        console.log("No drivers data to fetch icons for");
+        setSimpleDriverMarkerIcons([]);
+        return;
       }
+
+      console.log("Fetching icons for drivers:", driversData.length);
+      const icons = await Promise.all(
+        driversData.map(async (driver) => {
+          const iconConfig = (LivIndexDriversConfig as any)[driver.driver];
+          const projectSpecificDetails = drivers?.find(
+            (d) => d.id === driver._id
+          );
+
+          if (!iconConfig) {
+            console.warn(
+              `No icon config found for driver type: ${driver.driver}`
+            );
+            return null;
+          }
+
+          const icon = await getIcon(
+            iconConfig.icon.name,
+            iconConfig.icon.set,
+            false,
+            projectSpecificDetails
+              ? `${projectSpecificDetails.duration} mins`
+              : undefined,
+            driver
+          );
+          return icon ? { icon, driverId: driver._id } : null;
+        })
+      );
+
+      const validIcons = icons.filter(Boolean);
+      console.log("Loaded icons count:", validIcons.length);
+      setSimpleDriverMarkerIcons(validIcons);
     }
+
     fetchDriverIcons();
-    if (driversData && driversData.length) {
-      const uniqTypes: string[] = [];
-      driversData.forEach((d: any) => {
-        if (!uniqTypes.includes(d.driver)) {
-          uniqTypes.push(d.driver);
-        }
-      });
+
+    // Update unique driver types
+    if (driversData?.length) {
+      const uniqTypes = Array.from(new Set(driversData.map((d) => d.driver)));
       setUniqueDriverTypes(uniqTypes);
       setSelectedDriverTypes(
         defaultSelectedDriverTypes || uniqTypes.slice(0, 1)
       );
     }
-  }, [driversData]);
+  }, [drivers, driversData, defaultSelectedDriverTypes]); // Added drivers to dependencies
 
   // Setting the unique surrounding elements for filters
   useEffect(() => {
@@ -783,11 +832,24 @@ const MapViewV2 = ({
 
   /** Renders driver markers */
   const renderSimpleDriverMarkers = () => {
-    if (!drivers || !drivers.length) {
-      return;
+    if (!drivers?.length || !driversData?.length) {
+      console.log("No drivers data to render markers for");
+      return null;
     }
+
+    console.log(
+      "Rendering markers for drivers:",
+      driversData.length,
+      "Selected types:",
+      selectedDriverTypes
+    );
+
     return driversData
-      ?.filter((driver) => selectedDriverTypes.includes(driver.driver))
+      ?.filter((driver) => {
+        const included = selectedDriverTypes.includes(driver.driver);
+
+        return included;
+      })
       .map((driver: IDriverPlace) => {
         if (!driver.location?.lat || !driver.location?.lng) {
           return null;
@@ -856,22 +918,32 @@ const MapViewV2 = ({
       });
   };
 
-  /**Renders marker for the current project */
+  /**Renders marker for all projects */
   const renderCurrentProjectMarker = () => {
-    if (projectId && projectData?.info?.location && projectMarkerIcon) {
-      return (
+    const markers: JSX.Element[] = [];
+
+    // Wait for icon to be loaded and verify coordinates
+    if (!projectMarkerIcon) {
+      return markers;
+    }
+
+    if (
+      primaryProject?.metadata?.location?.lat &&
+      primaryProject?.metadata?.location?.lng
+    ) {
+      markers.push(
         <Marker
-          key={projectData._id}
+          key={primaryProject._id}
           position={[
-            projectData.info.location.lat,
-            projectData.info.location.lng,
+            primaryProject.metadata.location.lat,
+            primaryProject.metadata.location.lng,
           ]}
           icon={projectMarkerIcon}
           eventHandlers={{
             click: () => {
               setModalContent({
-                title: projectData.info.name,
-                content: projectData.info.description || "",
+                title: primaryProject.metadata.name,
+                content: primaryProject.metadata.description || "",
               });
               setInfoModalOpen(true);
             },
@@ -879,21 +951,61 @@ const MapViewV2 = ({
         />
       );
     }
-    return null;
+
+    if (projects && projects.length > 0) {
+      projects.forEach((project) => {
+        if (
+          project?.metadata?.location?.lat &&
+          project?.metadata?.location?.lng &&
+          projectMarkerIcon
+        ) {
+          markers.push(
+            <Marker
+              key={project._id}
+              position={[
+                project.metadata.location.lat,
+                project.metadata.location.lng,
+              ]}
+              icon={projectMarkerIcon}
+              eventHandlers={{
+                click: () => {
+                  setModalContent({
+                    title: project.metadata?.name || "Unnamed Project",
+                    content: project.metadata?.description || "",
+                  });
+                  setInfoModalOpen(true);
+                },
+              }}
+            />
+          );
+        }
+      });
+    }
+
+    return markers;
   };
 
   /**Renders marker for the nearby projects */
   const renderProjectsNearby = () => {
-    if (projectsNearby && projectsNearby.length && projectsNearbyIcons.length) {
+    if (projectsNearby?.length && projectsNearbyIcons?.length) {
       return projectsNearby.map((project) => {
+        if (!project.projectLocation?.[0] || !project.projectLocation?.[1]) {
+          return null;
+        }
+
         const projectIcon = projectsNearbyIcons.find(
-          (p) => p.name == project.projectName
+          (p) => p.name === project.projectName && p.icon
         );
+
+        if (!projectIcon?.icon) {
+          return null;
+        }
+
         return (
           <Marker
             key={project.projectName.toLowerCase()}
             position={project.projectLocation}
-            icon={projectIcon ? projectIcon.icon! : ""}
+            icon={projectIcon.icon}
             eventHandlers={{
               click: () => {
                 setModalContent({
@@ -901,7 +1013,9 @@ const MapViewV2 = ({
                   content: "",
                   tags: [
                     {
-                      label: `${capitalize(projectData?.info.homeType[0])}`,
+                      label: `${capitalize(
+                        primaryProject?.metadata?.homeType?.[0] || "Project"
+                      )}`,
                       color: COLORS.primaryColor,
                     },
                   ],
@@ -1087,7 +1201,11 @@ const MapViewV2 = ({
           style={{ height: "100%", width: "100%" }}
         >
           <MapResizeHandler />
-          <MapCenterHandler projectData={projectData} />
+          <MapCenterHandler
+            projectData={primaryProject}
+            projects={projects}
+            selectedProjectId={selectedProjectId}
+          />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
