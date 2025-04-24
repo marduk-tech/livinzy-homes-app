@@ -711,39 +711,26 @@ export function Brick360() {
           setDetailsModalOpen(true);
         }}
         forceRender
-        closeIcon={null}
         footer={null}
         width={isMobile ? "100%" : 900}
-        style={{ padding: 0, top: 30 }}
+        style={{ top: 30 }}
         styles={{
           content: {
-            padding: 0,
             backgroundColor: COLORS.bgColorMedium,
             borderRadius: 8,
+            padding: 16,
             overflowY: "hidden",
           },
         }}
       >
-        <Flex style={{ height: 700 }} vertical gap={8}>
-          <Flex
-            onClick={() => {
-              setIsMapFullScreen(false);
-              setDetailsModalOpen(true);
-            }}
-            style={{
-              marginRight: 8,
-              marginTop: 8,
-              marginLeft: "auto",
-              cursor: "pointer",
-            }}
-          >
-            <DynamicReactIcon
-              iconName="IoMdCloseCircle"
-              iconSet="io"
-              size={32}
-              color={COLORS.textColorLight}
-            ></DynamicReactIcon>
-          </Flex>
+        <Flex style={{ height: 650 }} vertical gap={8}>
+          <Typography.Title level={3}>
+            {selectedDataPointSubCategory == "surroundings"
+              ? capitalize(selectedDataPointSubCategory)
+              : (Brick360CategoryInfo as any)[selectedDataPointCategory]
+              ? (Brick360CategoryInfo as any)[selectedDataPointCategory].title
+              : ""}
+          </Typography.Title>
           <MapViewV2
             fullSize={true}
             surroundingElements={surroundingElements}

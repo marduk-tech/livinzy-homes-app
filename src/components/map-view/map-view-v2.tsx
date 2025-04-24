@@ -225,6 +225,12 @@ const MapViewV2 = ({
     useFetchCorridors();
   const [selectedDriverTypes, setSelectedDriverTypes] = useState<string[]>([]);
 
+  const [uniqueSurroundingElements, setUniqueSurroundingElements] = useState<
+    string[]
+  >([]);
+  const [selectedSurroundingElement, setSelectedSurroundingElement] =
+    useState<string>();
+
   const [modalContent, setModalContent] = useState<{
     title: string;
     tags?: { label: string; color: string }[];
@@ -291,6 +297,19 @@ const MapViewV2 = ({
       );
     }
   }, [driversData]);
+
+  // Setting the unique surrounding elements for filters
+  useEffect(() => {
+    const uniqueElements: string[] = [];
+    if (surroundingElements && surroundingElements.length) {
+      surroundingElements.forEach((e: ISurroundingElement) => {
+        if (!uniqueElements.includes(e.type)) {
+          uniqueElements.push(e.type);
+        }
+      });
+      setUniqueSurroundingElements(uniqueElements);
+    }
+  }, [surroundingElements]);
 
   // Setting icon for project marker
   useEffect(() => {
@@ -496,8 +515,12 @@ const MapViewV2 = ({
     if (!surroundingElements || !surroundingElements.length) {
       return null;
     }
-    return surroundingElements?.map(
-      (element: ISurroundingElement, index: number) => {
+    return surroundingElements
+      ?.filter(
+        (e: ISurroundingElement) =>
+          !selectedSurroundingElement || e.type == selectedSurroundingElement
+      )
+      .map((element: ISurroundingElement, index: number) => {
         const positions = element.geometry.map((g: any) => {
           if (Array.isArray(g)) {
             return g.map((subG) => {
@@ -519,19 +542,23 @@ const MapViewV2 = ({
             eventHandlers={{
               click: () => {
                 setModalContent({
-                  title:
-                    (SurroundingElementLabels as any)[element.type] ||
-                    element.type,
-                  content: element.description || "",
-                  tags: [],
+                  title: element.description || "",
+                  content: "",
+                  tags: [
+                    {
+                      label: (SurroundingElementLabels as any)[element.type]
+                        ? (SurroundingElementLabels as any)[element.type].label
+                        : "",
+                      color: COLORS.primaryColor,
+                    },
+                  ],
                 });
                 setInfoModalOpen(true);
               },
             }}
           />
         );
-      }
-    );
+      });
   };
 
   const renderRoadDrivers = () => {
@@ -900,6 +927,53 @@ const MapViewV2 = ({
     );
   };
 
+  /** Filter for surrounding element types */
+  const renderSurroundingElementTypes = (k: string) => {
+    if (!(SurroundingElementLabels as any)[k]) {
+      return null;
+    }
+    const icon = (SurroundingElementLabels as any)[k].icon;
+    return (
+      <Tag
+        style={{
+          display: "flex",
+          alignItems: "center",
+          borderRadius: 16,
+          padding: "4px 8px",
+          backgroundColor:
+            k == selectedSurroundingElement ? COLORS.primaryColor : "initial",
+          color: k == selectedSurroundingElement ? "white" : "initial",
+          marginLeft: 4,
+          fontSize: FONT_SIZE.HEADING_3,
+          cursor: "pointer",
+        }}
+        onClick={() => {
+          setSelectedSurroundingElement(k);
+        }}
+      >
+        <DynamicReactIcon
+          iconName={icon.name}
+          iconSet={icon.set}
+          size={20}
+          color={
+            k == selectedSurroundingElement ? "white" : COLORS.textColorDark
+          }
+        ></DynamicReactIcon>
+        <Typography.Text
+          style={{
+            color:
+              k == selectedSurroundingElement ? "white" : COLORS.textColorDark,
+            marginLeft: 8,
+          }}
+        >
+          {(SurroundingElementLabels as any)[k]
+            ? capitalize((SurroundingElementLabels as any)[k].label)
+            : ""}
+        </Typography.Text>
+      </Tag>
+    );
+  };
+
   const [corridorElements, setCorridorElements] = useState<React.ReactNode[]>(
     []
   );
@@ -923,7 +997,7 @@ const MapViewV2 = ({
       }}
     >
       {drivers && drivers.length && fullSize ? (
-        <Flex vertical style={{ padding: "8px 8px", marginBottom: 16 }}>
+        <Flex vertical style={{ paddingBottom: "8px", marginBottom: 16 }}>
           <Flex
             style={{
               width: "100%",
@@ -939,15 +1013,24 @@ const MapViewV2 = ({
                 return renderDriverTypesTag(k, selectedDriverTypes.includes(k));
               })}
           </Flex>
-          {/* <Typography.Text
+        </Flex>
+      ) : null}
+
+      {surroundingElements && surroundingElements.length && fullSize ? (
+        <Flex vertical style={{ paddingBottom: "8px", marginBottom: 16 }}>
+          <Flex
             style={{
-              fontSize: FONT_SIZE.PARA,
-              paddingLeft: 8,
-              color: COLORS.textColorLight,
+              width: "100%",
+              overflowX: "scroll",
+              backgroundColor: COLORS.bgColorMedium,
+              scrollbarWidth: "none",
+              height: 32,
             }}
           >
-            {selectedDriverTypes.length} selected.
-          </Typography.Text> */}
+            {uniqueSurroundingElements.map((k: string) => {
+              return renderSurroundingElementTypes(k);
+            })}
+          </Flex>
         </Flex>
       ) : null}
       <Flex
@@ -978,12 +1061,14 @@ const MapViewV2 = ({
           {corridorElements}
           {renderSurroundings()}
           {renderProjectsNearby()}
-          <MapPolygons
-            driversData={driversData || []}
-            selectedDriverTypes={selectedDriverTypes}
-            setModalContent={setModalContent}
-            setInfoModalOpen={setInfoModalOpen}
-          />
+          {drivers && drivers.length ? (
+            <MapPolygons
+              driversData={driversData || []}
+              selectedDriverTypes={selectedDriverTypes}
+              setModalContent={setModalContent}
+              setInfoModalOpen={setInfoModalOpen}
+            />
+          ) : null}
         </MapContainer>
       </Flex>
 

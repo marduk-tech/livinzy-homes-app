@@ -284,9 +284,15 @@ export const Brick360DataPoints = {
 };
 
 export const SurroundingElementLabels = {
-  runway_strip: "Airport/Runwway Strip",
-  lake: "Lake/Waterbody",
-  railway: "Railway Line",
-  power: "High Tension Line",
-  road: "Highway/Expressway",
+  runway_strip: {
+    label: "Airport/Runwway Strip",
+    icon: { name: "MdLocalAirport", set: "md" },
+  },
+  lake: { label: "Lake/Waterbody", icon: { name: "FaWater", set: "fa" } },
+  railway: { label: "Railway Line", icon: { name: "MdTrain", set: "md" } },
+  power: {
+    label: "High Tension Line",
+    icon: { name: "MdElectricBolt", set: "md" },
+  },
+  road: { label: "Highway/Expressway", icon: { name: "GiRoad", set: "gi" } },
 };
