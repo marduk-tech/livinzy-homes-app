@@ -424,9 +424,22 @@ export function Brick360() {
                 onClick={() => {
                   setPmtDetailsModalContent(
                     <Flex vertical style={{ width: "100%" }}>
-                      <Typography.Title level={3}>
+                      <Typography.Title
+                        level={3}
+                        style={{ margin: 0, marginTop: 16 }}
+                      >
                         Payment Plans
                       </Typography.Title>
+                      <Typography.Text
+                        style={{
+                          fontSize: FONT_SIZE.PARA,
+                          color: COLORS.textColorLight,
+                          lineHeight: "120%",
+                        }}
+                      >
+                        Payment structure including construction linked and
+                        other incentives.
+                      </Typography.Text>
                       <Markdown
                         remarkPlugins={[remarkGfm]}
                         className="liviq-content"
@@ -472,10 +485,30 @@ export function Brick360() {
                 onClick={() => {
                   setPmtDetailsModalContent(
                     <Flex vertical style={{ width: "100%" }}>
-                      <Typography.Title level={3}>Price Point</Typography.Title>
+                      <Typography.Title
+                        level={3}
+                        style={{ margin: 0, marginTop: 16 }}
+                      >
+                        Price Point
+                      </Typography.Title>
+                      <Typography.Text
+                        style={{
+                          fontSize: FONT_SIZE.PARA,
+                          color: COLORS.textColorLight,
+                          marginBottom: 16,
+                        }}
+                      >
+                        Per sqft comparison with other nearby projects.
+                      </Typography.Text>
                       <MapViewV2
                         projectId={lvnzyProject?.originalProjectId._id}
                         fullSize={true}
+                        projectSqftPricing={`${rupeeAmountFormat(
+                          `₹${Math.round(
+                            lvnzyProject?.meta.costingDetails.minimumUnitCost /
+                              lvnzyProject?.meta.costingDetails.minimumUnitSize
+                          )}`
+                        )}`}
                         projectsNearby={lvnzyProject?.investment.corridorPricing.filter(
                           (p: any) => !!p.sqftCost
                         )}
@@ -540,9 +573,9 @@ export function Brick360() {
           >
             <Flex align="center" gap={4}>
               <DynamicReactIcon
-                iconName="GiReceiveMoney"
-                iconSet="gi"
-                size={20}
+                iconName="IoMdListBox"
+                iconSet="io"
+                size={22}
                 color={COLORS.textColorDark}
               ></DynamicReactIcon>
               <Typography.Text
@@ -550,7 +583,7 @@ export function Brick360() {
                   fontSize: FONT_SIZE.HEADING_4,
                 }}
               >
-                Investment Summary
+                360 Snapshot
               </Typography.Text>
             </Flex>
             <Flex
@@ -768,16 +801,17 @@ export function Brick360() {
             style={{ overflowY: "scroll", height: 600, scrollbarWidth: "none" }}
           >
             <Typography.Title level={3} style={{ margin: 0, marginBottom: 0 }}>
-              Investment Snapshot
+              360 Snapshot
             </Typography.Title>
             <Typography.Text
               style={{
                 fontSize: FONT_SIZE.PARA,
                 marginBottom: 16,
                 color: COLORS.textColorLight,
+                lineHeight: "120%",
               }}
             >
-              A quick investment summary of this project.
+              Brief summary including highlights for this project.
             </Typography.Text>
             <Flex gap={8} vertical>
               <Flex>

@@ -224,6 +224,7 @@ const MapViewV2 = ({
   defaultSelectedDriverTypes,
   surroundingElements,
   projectsNearby,
+  projectSqftPricing,
 }: {
   drivers?: any[];
   projectId?: string;
@@ -236,6 +237,7 @@ const MapViewV2 = ({
     sqftCost: number;
     projectLocation: [number, number];
   }[];
+  projectSqftPricing?: string;
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
@@ -386,12 +388,14 @@ const MapViewV2 = ({
         "IoLocation",
         "io5",
         true,
-        undefined,
+        projectsNearby && projectsNearby.length
+          ? `${projectSqftPricing} /sqft`
+          : undefined,
         undefined,
         {
           iconBgColor: COLORS.textColorDark,
           iconColor: "white",
-          iconSize: 24,
+          iconSize: projectsNearby && projectsNearby.length ? 18 : 24,
         }
       );
       setCurrentProjectMarkerIcon(currentProjectIcon);

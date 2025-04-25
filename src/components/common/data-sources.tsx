@@ -134,12 +134,12 @@ export function DataSources({
             style={{ marginBottom: 16 }}
             message={
               <Typography.Text>
-                Brickfi uses AI to collect and analyse data from differnet
-                legitimate source. Please{" "}
+                Brickfi uses AI to collect and analyse data from multiple
+                legitimate sources like below. If you have any specific
+                questions, please{" "}
                 <Link href="https://brickfi.in/about-us" target="_blank">
-                  contact
+                  reach out to us.
                 </Link>{" "}
-                us if you have any specific questions.
               </Typography.Text>
             }
           ></Alert>
@@ -176,7 +176,7 @@ export function DataSources({
                 </Flex>
                 <Flex vertical>
                   <Paragraph
-                    ellipsis={{ rows: 2, expandable: true }}
+                    ellipsis={{ rows: 5, expandable: true }}
                     style={{
                       fontSize: FONT_SIZE.PARA,
                       color: COLORS.textColorLight,
