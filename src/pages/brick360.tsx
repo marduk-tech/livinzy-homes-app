@@ -193,6 +193,8 @@ export function Brick360() {
           setMapVisible(true);
           setSelectedDriverTypes([]);
         }
+      } else {
+        setMapVisible(false);
       }
     }
   }, [selectedDataPointCategory, selectedDataPointSubCategory]);
