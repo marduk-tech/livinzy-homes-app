@@ -726,7 +726,7 @@ export function Brick360() {
         }}
       >
         <Flex style={{ height: 650 }} vertical gap={8}>
-          <Typography.Title level={3}>
+          <Typography.Title level={3} style={{ marginBottom: 8 }}>
             {selectedDataPointSubCategory == "surroundings"
               ? capitalize(selectedDataPointSubCategory)
               : (Brick360CategoryInfo as any)[selectedDataPointCategory]
@@ -836,6 +836,11 @@ export function Brick360() {
         open={!!pmtDetailsModalContent}
         closable={true}
         style={{ top: 40 }}
+        styles={{
+          content: {
+            padding: 16,
+          },
+        }}
         onCancel={() => {
           setPmtDetailsModalContent(undefined);
         }}

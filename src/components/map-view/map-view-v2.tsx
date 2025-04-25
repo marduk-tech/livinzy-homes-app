@@ -892,7 +892,7 @@ const MapViewV2 = ({
   };
 
   /** Renders driver markers */
-  const renderSimpleDriverMarkers = () => {
+  const renderSimpleDrivers = () => {
     if (
       !drivers?.length ||
       !driversData?.length ||
@@ -1292,7 +1292,8 @@ const MapViewV2 = ({
       ) : null}
       <Flex
         style={{
-          height: fullSize ? "calc(100% - 90px)" : "100%",
+          height:
+            fullSize && !projectsNearby?.length ? "calc(100% - 90px)" : "100%",
           width: "100%",
         }}
       >
@@ -1310,7 +1311,7 @@ const MapViewV2 = ({
           />
           {renderRoadDrivers()}
           {renderTransitDrivers()}
-          {renderSimpleDriverMarkers()}
+          {renderSimpleDrivers()}
           {renderProjectMarkers()}
           {renderCorridors()}
           {renderSurroundings()}
