@@ -102,7 +102,6 @@ export function Brick360() {
           setDetailsModalOpen(false);
           if (!isMapFullScreen) {
             chatRef.current?.clearChatData();
-            setMapDrivers([]);
           }
         }}
       >
@@ -139,6 +138,17 @@ export function Brick360() {
     }, FAKE_TIMER_SECS);
   });
 
+  useEffect(() => {
+    if (!lvnzyProject) {
+      return;
+    }
+    setMapDrivers([
+      ...(lvnzyProject as any)["neighborhood"].drivers,
+      ...(lvnzyProject as any)["connectivity"].drivers,
+      ...(lvnzyProject as any)["investment"].growthLevers,
+    ]);
+  }, [lvnzyProject]);
+
   // Setting map drivers based on selected data point
   useEffect(() => {
     if (
@@ -146,12 +156,8 @@ export function Brick360() {
       selectedDataPointSubCategory &&
       selectedDataPointCategory
     ) {
-      let drivers, surrElements;
+      let surrElements;
       if (selectedDataPointCategory == "areaConnectivity") {
-        drivers = [
-          ...(lvnzyProject as any)["neighborhood"].drivers,
-          ...(lvnzyProject as any)["connectivity"].drivers,
-        ];
         if (selectedDataPointSubCategory == "schoolsOffices") {
           setSelectedDriverTypes([
             "school",
@@ -163,39 +169,33 @@ export function Brick360() {
         } else if (selectedDataPointSubCategory == "transport") {
           setSelectedDriverTypes(["transit", "highway"]);
         }
+        setMapVisible(true);
+        setSurroundingElements([]);
       } else if (selectedDataPointCategory == "investment") {
-        drivers = (lvnzyProject as any)["investment"].growthLevers;
         setSelectedDriverTypes([
           "school",
           "industrial-hitech",
           "industrial-general",
         ]);
+        setMapVisible(true);
+        setSurroundingElements([]);
       } else if (
         selectedDataPointCategory == "property" &&
         selectedDataPointSubCategory == "surroundings"
       ) {
         surrElements = (lvnzyProject as any)["property"].surroundings;
-      }
-      if (drivers && drivers.length) {
-        setMapDrivers(drivers);
-        setSurroundingElements([]);
-        setMapVisible(true);
-      } else if (
-        surrElements &&
-        surrElements.length &&
-        surrElements.filter((e: any) => !!e.geometry).length
-      ) {
-        setSurroundingElements(surrElements);
-        setMapVisible(true);
-        setMapDrivers([]);
-        setSelectedDriverTypes([]);
-      } else {
-        setMapVisible(false);
-        setMapDrivers([]);
-        setSurroundingElements([]);
+        if (
+          surrElements &&
+          surrElements.length &&
+          surrElements.filter((e: any) => !!e.geometry).length
+        ) {
+          setSurroundingElements(surrElements);
+          setMapVisible(true);
+          setSelectedDriverTypes([]);
+        }
       }
     }
-  }, [lvnzyProject, selectedDataPointCategory, selectedDataPointSubCategory]);
+  }, [selectedDataPointCategory, selectedDataPointSubCategory]);
 
   // Setting main data points category
   useEffect(() => {
@@ -871,7 +871,6 @@ export function Brick360() {
                 setDetailsModalOpen(false);
                 if (!isMapFullScreen) {
                   chatRef.current?.clearChatData();
-                  setMapDrivers([]);
                 }
               }}
             >
@@ -885,7 +884,6 @@ export function Brick360() {
           setDetailsModalOpen(false);
           if (!isMapFullScreen) {
             chatRef.current?.clearChatData();
-            setMapDrivers([]);
           }
         }}
         open={detailsModalOpen}

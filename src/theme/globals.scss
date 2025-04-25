@@ -75,6 +75,12 @@ body {
     border-width: 2px !important;
     padding: 0.5rem;
   }
+
+  h3,
+  h2 {
+    margin-top: 16px;
+    margin-bottom: 0;
+  }
 }
 
 @keyframes bounceAnimation {
