@@ -31,17 +31,16 @@ export function LivIndexFull() {
     "industrial-hitech",
     "airport",
   ]);
-  const [selectedProject, setSelectedProject] = useState<string>();
 
   useEffect(() => {
     if (projects && projects.length) {
       const validProjects = projects.filter((p) => {
         return (
-          p.metadata &&
-          p.metadata.homeType &&
-          p.metadata.location &&
-          typeof p.metadata.location.lat === "number" &&
-          typeof p.metadata.location.lng === "number"
+          p.info &&
+          p.info.homeType &&
+          p.info.location &&
+          typeof p.info.location.lat === "number" &&
+          typeof p.info.location.lng === "number"
         );
       });
       console.log("Total projects:", projects.length);
@@ -50,24 +49,24 @@ export function LivIndexFull() {
       // Log any projects with invalid coordinates for debugging
       const invalidProjects = projects.filter(
         (p) =>
-          p.metadata &&
-          p.metadata.location &&
-          (typeof p.metadata.location.lat !== "number" ||
-            typeof p.metadata.location.lng !== "number")
+          p.info &&
+          p.info.location &&
+          (typeof p.info.location.lat !== "number" ||
+            typeof p.info.location.lng !== "number")
       );
       if (invalidProjects.length > 0) {
         console.warn(
           "Projects with invalid coordinates:",
           invalidProjects.map((p) => ({
             id: p._id,
-            name: p.metadata?.name,
-            location: p.metadata?.location,
+            name: p.info?.name,
+            location: p.info?.location,
           }))
         );
       }
 
       const filtered = validProjects.filter((p) =>
-        p.metadata.homeType.includes(homeTypeFilter)
+        p.info.homeType.includes(homeTypeFilter)
       );
       console.log(
         "Filtered by homeType:",
@@ -79,16 +78,6 @@ export function LivIndexFull() {
       setFilteredProjects(filtered);
     }
   }, [projects, homeTypeFilter]);
-
-  // validate selected project when filtered projects change
-  useEffect(() => {
-    if (selectedProject && filteredProjects.length > 0) {
-      if (!filteredProjects.some((p) => p._id === selectedProject)) {
-        console.log("Selected project no longer in filtered list, resetting");
-        setSelectedProject(undefined);
-      }
-    }
-  }, [filteredProjects, selectedProject]);
 
   // update filtered drivers when places or filters change
   useEffect(() => {
@@ -110,7 +99,6 @@ export function LivIndexFull() {
 
   const handleHomeTypeSelect = (value: string) => {
     setHomeTypeFilter(value);
-    setSelectedProject(undefined);
   };
   const handleDriverSelect = (value: string[]) => {
     setDriverFilters(value);
@@ -210,15 +198,15 @@ export function LivIndexFull() {
                   }}
                   options={filteredProjects.map((p) => ({
                     label:
-                      p.metadata?.name ||
-                      p.metadata?.projectName ||
+                      p.info?.name ||
+                      p.info?.projectName ||
                       "Unnamed Project",
                     value: p._id,
                   }))}
                 /> */}
               </Flex>
               <MapViewV2
-                key={`map-${selectedProject || "all"}`}
+                key={"map-all"}
                 drivers={filteredDrivers.map((p) => ({
                   id: p._id,
                   duration: p.distance ? Math.round(p.distance / 60) : 0,
@@ -226,7 +214,6 @@ export function LivIndexFull() {
                 projects={filteredProjects}
                 fullSize={false}
                 defaultSelectedDriverTypes={selectedDriverTypes}
-                selectedProjectId={selectedProject}
               />
             </>
           )}

@@ -14,7 +14,6 @@ import {
 } from "react-leaflet";
 import { useFetchCorridors } from "../../hooks/use-corridors";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
-import { useFetchProjectById } from "../../hooks/use-project";
 import {
   LivIndexDriversConfig,
   PLACE_TIMELINE,
@@ -27,6 +26,7 @@ import DynamicReactIcon, {
   dynamicImportMap,
 } from "../common/dynamic-react-icon";
 import { MapPolygons } from "./map-polygons";
+import { useFetchProjectById } from "../../hooks/use-project";
 
 type Coordinate = [number, number];
 type LineString = Coordinate[];
@@ -155,44 +155,27 @@ async function getIcon(
 const MapCenterHandler = ({
   projectData,
   projects,
-  selectedProjectId,
 }: {
   projectData: any;
   projects?: any[];
-  selectedProjectId?: string;
 }) => {
   const map = useMap();
 
   useEffect(() => {
-    if (selectedProjectId && projects) {
-      const selectedProject = projects.find((p) => p._id === selectedProjectId);
-      if (
-        selectedProject?.metadata?.location?.lat &&
-        selectedProject?.metadata?.location?.lng
-      ) {
-        map.setView(
-          [
-            selectedProject.metadata.location.lat,
-            selectedProject.metadata.location.lng,
-          ],
-          13
-        );
-        return;
-      }
-      console.warn("Selected project missing location data:", selectedProject);
-    }
     if (
-      projectData?.metadata?.location?.lat &&
-      projectData?.metadata?.location?.lng
+      projectData &&
+      projectData?.info?.location?.lat &&
+      projectData?.info?.location?.lng
     ) {
       map.setView(
-        [projectData.metadata.location.lat, projectData.metadata.location.lng],
+        [projectData.info.location.lat, projectData.info.location.lng],
         13
       );
     } else {
+      map.setView([12.976017, 77.613912], 13);
       console.warn("Project data missing location:", projectData);
     }
-  }, [projectData, map, selectedProjectId, projects]);
+  }, [projectData, map, projects]);
 
   return null;
 };
@@ -278,9 +261,7 @@ const MapViewV2 = ({
   );
 
   // Get primary project from projects array instead of fetching
-  const primaryProject =
-    projects?.find((p) => p._id === projectId) ||
-    (projects && projects.length > 0 ? projects[0] : null);
+  const { data: primaryProject } = useFetchProjectById(projectId || "");
 
   /**
    * Icons for simple drivermarkers
@@ -290,6 +271,8 @@ const MapViewV2 = ({
   );
 
   const [projectsNearbyIcons, setProjectsNearbyIcons] = useState<any[]>([]);
+  const [currentProjectMarkerIcon, setCurrentProjectMarkerIcon] =
+    useState<L.DivIcon | null>(null);
   const [projectMarkerIcon, setProjectMarkerIcon] = useState<L.DivIcon | null>(
     null
   );
@@ -322,7 +305,7 @@ const MapViewV2 = ({
             iconConfig.icon.name,
             iconConfig.icon.set,
             false,
-            projectSpecificDetails
+            projectSpecificDetails && projectSpecificDetails.duration
               ? `${projectSpecificDetails.duration} mins`
               : undefined,
             driver
@@ -364,7 +347,7 @@ const MapViewV2 = ({
   // Setting icon for project marker
   useEffect(() => {
     async function fetchProjectIcon() {
-      const icon = await getIcon(
+      const currentProjectIcon = await getIcon(
         "IoLocation",
         "io5",
         true,
@@ -376,7 +359,20 @@ const MapViewV2 = ({
           iconSize: 24,
         }
       );
-      setProjectMarkerIcon(icon);
+      setCurrentProjectMarkerIcon(currentProjectIcon);
+      const projectIcon = await getIcon(
+        "IoLocation",
+        "io5",
+        false,
+        undefined,
+        undefined,
+        {
+          iconBgColor: COLORS.textColorDark,
+          iconColor: "white",
+          iconSize: 24,
+        }
+      );
+      setProjectMarkerIcon(projectIcon);
     }
     fetchProjectIcon();
   }, []);
@@ -919,31 +915,40 @@ const MapViewV2 = ({
   };
 
   /**Renders marker for all projects */
-  const renderCurrentProjectMarker = () => {
+  const renderProjectMarkers = () => {
     const markers: JSX.Element[] = [];
 
     // Wait for icon to be loaded and verify coordinates
-    if (!projectMarkerIcon) {
+    if (!currentProjectMarkerIcon) {
       return markers;
     }
 
     if (
-      primaryProject?.metadata?.location?.lat &&
-      primaryProject?.metadata?.location?.lng
+      primaryProject &&
+      primaryProject?.info?.location?.lat &&
+      primaryProject?.info?.location?.lng
     ) {
       markers.push(
         <Marker
           key={primaryProject._id}
           position={[
-            primaryProject.metadata.location.lat,
-            primaryProject.metadata.location.lng,
+            primaryProject.info.location.lat,
+            primaryProject.info.location.lng,
           ]}
-          icon={projectMarkerIcon}
+          icon={currentProjectMarkerIcon}
           eventHandlers={{
             click: () => {
               setModalContent({
-                title: primaryProject.metadata.name,
-                content: primaryProject.metadata.description || "",
+                title: primaryProject.info.name,
+                content: primaryProject.info.description || "",
+                tags: [
+                  ...primaryProject.info.homeType.map((h: string) => {
+                    return {
+                      label: capitalize(h),
+                      color: COLORS.textColorDark,
+                    };
+                  }),
+                ],
               });
               setInfoModalOpen(true);
             },
@@ -952,26 +957,23 @@ const MapViewV2 = ({
       );
     }
 
-    if (projects && projects.length > 0) {
+    if (projects && projects.length > 0 && projectMarkerIcon) {
       projects.forEach((project) => {
         if (
-          project?.metadata?.location?.lat &&
-          project?.metadata?.location?.lng &&
-          projectMarkerIcon
+          project?.info?.location?.lat &&
+          project?.info?.location?.lng &&
+          currentProjectMarkerIcon
         ) {
           markers.push(
             <Marker
               key={project._id}
-              position={[
-                project.metadata.location.lat,
-                project.metadata.location.lng,
-              ]}
+              position={[project.info.location.lat, project.info.location.lng]}
               icon={projectMarkerIcon}
               eventHandlers={{
                 click: () => {
                   setModalContent({
-                    title: project.metadata?.name || "Unnamed Project",
-                    content: project.metadata?.description || "",
+                    title: project.info?.name || "Unnamed Project",
+                    content: project.info?.description || "",
                   });
                   setInfoModalOpen(true);
                 },
@@ -1014,7 +1016,9 @@ const MapViewV2 = ({
                   tags: [
                     {
                       label: `${capitalize(
-                        primaryProject?.metadata?.homeType?.[0] || "Project"
+                        primaryProject
+                          ? primaryProject?.info?.homeType?.[0] || ""
+                          : ""
                       )}`,
                       color: COLORS.primaryColor,
                     },
@@ -1201,11 +1205,7 @@ const MapViewV2 = ({
           style={{ height: "100%", width: "100%" }}
         >
           <MapResizeHandler />
-          <MapCenterHandler
-            projectData={primaryProject}
-            projects={projects}
-            selectedProjectId={selectedProjectId}
-          />
+          <MapCenterHandler projectData={primaryProject} projects={projects} />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -1213,7 +1213,7 @@ const MapViewV2 = ({
           {renderRoadDrivers()}
           {renderTransitDrivers()}
           {renderSimpleDriverMarkers()}
-          {renderCurrentProjectMarker()}
+          {renderProjectMarkers()}
           {corridorElements}
           {renderSurroundings()}
           {renderProjectsNearby()}
