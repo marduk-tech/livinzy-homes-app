@@ -738,6 +738,28 @@ const MapViewV2 = ({
             PLACE_TIMELINE.PARTIAL_LAUNCH,
           ].includes(featureStatus as PLACE_TIMELINE);
 
+          // const numPoints = 5;
+          // const units = 'kilometers'; // or 'meters', 'miles', etc.
+          // const totalLength = length({
+          //   "type": "Feature",
+          //   "geometry": {
+          //     "type": "LineString",
+          //     "coordinates": [
+          //       [0, 0],
+          //       [10, 0]
+          //     ]
+          //   }
+          // }, { units });
+          // const interval = totalLength / (numPoints - 1); // -1 if you want start and end included
+
+          // const points = [];
+
+          // for (let i = 0; i < numPoints; i++) {
+          //   const dist = interval * i;
+          //   const point = along(line, dist, { units });
+          //   points.push(point);
+          // }
+
           return (
             <Polyline
               key={`${driver._id}-${lineIndex}`}
