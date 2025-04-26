@@ -1,13 +1,14 @@
 import { Flex, Typography } from "antd";
 import { useState } from "react";
 import { useDevice } from "../hooks/use-device";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia } from "../types/Project";
 import { ProjectImagesGalleryModal } from "./project-images-gallery-modal";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
 
 const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
   const { isMobile } = useDevice();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
 
   return (
     <>
@@ -27,7 +28,10 @@ const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
             <div
               key={index}
               style={{ position: "relative" }}
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                setSelectedImageId(img._id || "");
+                setIsModalOpen(true);
+              }}
             >
               <img
                 src={img.image!.url}
@@ -118,8 +122,12 @@ const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
 
       <ProjectImagesGalleryModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedImageId(null);
+        }}
         media={media}
+        selectedImageId={selectedImageId}
       />
     </>
   );

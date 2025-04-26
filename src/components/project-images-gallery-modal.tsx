@@ -2,17 +2,19 @@ import { Flex, Image, Modal, Typography } from "antd";
 import { useMemo } from "react";
 import { useDevice } from "../hooks/use-device";
 import "../theme/gallery.css";
-import { IMedia } from "../types/Project";
 import { COLORS } from "../theme/style-constants";
+import { IMedia } from "../types/Project";
 
 export const ProjectImagesGalleryModal = ({
   isOpen,
   onClose,
   media,
+  selectedImageId,
 }: {
   isOpen: boolean;
   onClose: () => void;
   media: IMedia[];
+  selectedImageId: string | null;
 }) => {
   const { isMobile } = useDevice();
 
@@ -38,8 +40,21 @@ export const ProjectImagesGalleryModal = ({
       }
     });
 
+    // move selected image to front in its sections
+    if (selectedImageId) {
+      Object.keys(result).forEach((tag) => {
+        const selectedIndex = result[tag].findIndex(
+          (img) => img._id === selectedImageId
+        );
+        if (selectedIndex > -1) {
+          const [selected] = result[tag].splice(selectedIndex, 1);
+          result[tag].unshift(selected);
+        }
+      });
+    }
+
     return result;
-  }, [media]);
+  }, [media, selectedImageId]);
 
   return (
     <Modal
@@ -66,7 +81,19 @@ export const ProjectImagesGalleryModal = ({
     >
       <Flex vertical gap={32}>
         {Object.entries(groupedImages)
-          .sort(([a], [b]) => a.localeCompare(b))
+          .sort(([a], [b]) => {
+            if (selectedImageId) {
+              const aHasSelected = groupedImages[a].some(
+                (img) => img._id === selectedImageId
+              );
+              const bHasSelected = groupedImages[b].some(
+                (img) => img._id === selectedImageId
+              );
+              if (aHasSelected && !bHasSelected) return -1;
+              if (!aHasSelected && bHasSelected) return 1;
+            }
+            return a.localeCompare(b);
+          })
           .map(([tag, images]) => (
             <Flex key={tag} vertical>
               <Typography.Title
