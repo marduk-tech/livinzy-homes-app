@@ -2,16 +2,18 @@ import * as turf from "@turf/turf";
 import { Flex, Modal, Spin, Tag, Typography } from "antd";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 const { Paragraph } = Typography;
 
+import type { LeafletEvent } from "leaflet";
 import {
   MapContainer,
   Marker,
   Polyline,
   TileLayer,
   useMap,
+  type MapContainerProps,
 } from "react-leaflet";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -196,6 +198,12 @@ const BoundsAwareDrivers = ({
   const map = useMap();
   const [bounds, setBounds] = useState(map.getBounds());
 
+  // force map refresh when driver types change
+  useEffect(() => {
+    map.invalidateSize();
+    setBounds(map.getBounds());
+  }, [renderRoadDrivers, renderTransitDrivers, renderSimpleDrivers]);
+
   useEffect(() => {
     const updateBounds = () => {
       setBounds(map.getBounds());
@@ -224,30 +232,42 @@ const MapResizeHandler = () => {
   const map = useMap();
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const containerRef = useRef<HTMLElement | null>(null);
+  const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // handle map refresh
+  const handleMapRefresh = useCallback(() => {
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current);
+    }
+    refreshTimerRef.current = setTimeout(() => {
+      map.invalidateSize();
+      map.setView(map.getCenter(), map.getZoom());
+    }, 100);
+  }, [map]);
 
   useEffect(() => {
-    // map container
+    map.on("layeradd layerremove", handleMapRefresh);
+    return () => {
+      map.off("layeradd layerremove", handleMapRefresh);
+    };
+  }, [map, handleMapRefresh]);
+
+  useEffect(() => {
     containerRef.current = map.getContainer();
-
     if (containerRef.current) {
-      // resize observer
-      resizeObserverRef.current = new ResizeObserver(() => {
-        // need to use a larger delay to ensre modal animation completes
-        setTimeout(() => {
-          map.invalidateSize();
-        }, 300);
-      });
-
-      // Start observing
+      resizeObserverRef.current = new ResizeObserver(handleMapRefresh);
       resizeObserverRef.current.observe(containerRef.current);
     }
 
     return () => {
+      if (refreshTimerRef.current) {
+        clearTimeout(refreshTimerRef.current);
+      }
       if (resizeObserverRef.current && containerRef.current) {
         resizeObserverRef.current.unobserve(containerRef.current);
       }
     };
-  }, [map]);
+  }, [map, handleMapRefresh]);
 
   return null;
 };
@@ -370,13 +390,52 @@ const MapViewV2 = ({
         setSelectedDriverTypes(uniqTypes.slice(0, 1));
       }
     }
-  }, [drivers, driversData]); // Added drivers to dependencies
+  }, [drivers, driversData, selectedDriverTypes]); // Added selectedDriverTypes to ensure marker icons update
 
   useEffect(() => {
     if (defaultSelectedDriverTypes) {
       setSelectedDriverTypes(defaultSelectedDriverTypes);
     }
   }, [defaultSelectedDriverTypes]);
+
+  // reset map when driver types change
+  useEffect(() => {
+    if (selectedDriverTypes.length > 0) {
+      setSimpleDriverMarkerIcons([]);
+      if (driversData && driversData.length) {
+        const updateDrivers = async () => {
+          const icons = await Promise.all(
+            driversData.map(async (driver) => {
+              if (!selectedDriverTypes.includes(driver.driver)) {
+                return null;
+              }
+              const iconConfig = (LivIndexDriversConfig as any)[driver.driver];
+              const projectSpecificDetails = drivers?.find(
+                (d) => d.id === driver._id
+              );
+
+              if (!iconConfig) {
+                return null;
+              }
+
+              const icon = await getIcon(
+                iconConfig.icon.name,
+                iconConfig.icon.set,
+                false,
+                projectSpecificDetails && projectSpecificDetails.duration
+                  ? `${projectSpecificDetails.duration} mins`
+                  : undefined,
+                driver
+              );
+              return icon ? { icon, driverId: driver._id } : null;
+            })
+          );
+          setSimpleDriverMarkerIcons(icons.filter(Boolean));
+        };
+        updateDrivers();
+      }
+    }
+  }, [selectedDriverTypes, driversData, drivers]);
 
   // Setting the unique surrounding elements for filters
   useEffect(() => {
@@ -1384,6 +1443,9 @@ const MapViewV2 = ({
         }}
       >
         <MapContainer
+          key={`map-${selectedDriverTypes.join("-")}-${
+            selectedSurroundingElement || ""
+          }`}
           center={[13.110274, 77.6009443]}
           zoom={13}
           minZoom={12}

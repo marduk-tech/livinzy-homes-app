@@ -11,6 +11,7 @@ import {
   Tag,
   Typography,
 } from "antd";
+import moment from "moment";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
@@ -22,8 +23,10 @@ import MapViewV2 from "../components/map-view/map-view-v2";
 import ProjectGallery from "../components/project-gallery";
 import { useDevice } from "../hooks/use-device";
 import { useFetchLvnzyProjectById } from "../hooks/use-lvnzy-project";
-import moment from "moment";
 
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { DataSources } from "../components/common/data-sources";
 import {
   BRICK360_CATEGORY,
   Brick360CategoryInfo,
@@ -35,10 +38,7 @@ import {
   rupeeAmountFormat,
 } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { DataSources } from "../components/common/data-sources";
 import { ISurroundingElement } from "../types/Project";
-import remarkGfm from "remark-gfm";
-import Markdown from "react-markdown";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -157,47 +157,56 @@ export function Brick360() {
       selectedDataPointCategory
     ) {
       let surrElements;
-      if (selectedDataPointCategory == "areaConnectivity") {
-        if (selectedDataPointSubCategory == "schoolsOffices") {
+
+      const updateMapState = () => {
+        // reset states first
+        setSelectedDriverTypes([]);
+        setSurroundingElements([]);
+        setMapVisible(false);
+
+        if (selectedDataPointCategory === "areaConnectivity") {
+          setMapVisible(true);
+
+          switch (selectedDataPointSubCategory) {
+            case "schoolsOffices":
+              setSelectedDriverTypes([
+                "school",
+                "industrial-hitech",
+                "industrial-general",
+              ]);
+              break;
+            case "conveniences":
+              setSelectedDriverTypes(["food", "hospital"]);
+              break;
+            case "transport":
+              setSelectedDriverTypes(["transit", "highway"]);
+              break;
+          }
+        } else if (selectedDataPointCategory === "investment") {
+          setMapVisible(true);
           setSelectedDriverTypes([
             "school",
             "industrial-hitech",
             "industrial-general",
           ]);
-        } else if (selectedDataPointSubCategory == "conveniences") {
-          setSelectedDriverTypes(["food", "hospital"]);
-        } else if (selectedDataPointSubCategory == "transport") {
-          setSelectedDriverTypes(["transit", "highway"]);
-        }
-        setMapVisible(true);
-        setSurroundingElements([]);
-      } else if (selectedDataPointCategory == "investment") {
-        setSelectedDriverTypes([
-          "school",
-          "industrial-hitech",
-          "industrial-general",
-        ]);
-        setMapVisible(true);
-        setSurroundingElements([]);
-      } else if (
-        selectedDataPointCategory == "property" &&
-        selectedDataPointSubCategory == "surroundings"
-      ) {
-        surrElements = (lvnzyProject as any)["property"].surroundings;
-        if (
-          surrElements &&
-          surrElements.length &&
-          surrElements.filter((e: any) => !!e.geometry).length
+        } else if (
+          selectedDataPointCategory === "property" &&
+          selectedDataPointSubCategory === "surroundings"
         ) {
-          setSurroundingElements(surrElements);
-          setMapVisible(true);
-          setSelectedDriverTypes([]);
+          surrElements = (lvnzyProject as any)["property"].surroundings;
+          if (
+            surrElements?.length &&
+            surrElements.filter((e: any) => !!e.geometry).length
+          ) {
+            setSurroundingElements(surrElements);
+            setMapVisible(true);
+          }
         }
-      } else {
-        setMapVisible(false);
-      }
+      };
+
+      setTimeout(updateMapState, 0);
     }
-  }, [selectedDataPointCategory, selectedDataPointSubCategory]);
+  }, [selectedDataPointCategory, selectedDataPointSubCategory, lvnzyProject]);
 
   // Setting main data points category
   useEffect(() => {
