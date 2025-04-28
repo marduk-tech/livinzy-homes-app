@@ -199,10 +199,10 @@ const BoundsAwareDrivers = ({
   const [bounds, setBounds] = useState(map.getBounds());
 
   // force map refresh when driver types change
-  useEffect(() => {
-    map.invalidateSize();
-    setBounds(map.getBounds());
-  }, [renderRoadDrivers, renderTransitDrivers, renderSimpleDrivers]);
+  // useEffect(() => {
+  //   map.invalidateSize();
+  //   setBounds(map.getBounds());
+  // }, [renderRoadDrivers, renderTransitDrivers, renderSimpleDrivers]);
 
   useEffect(() => {
     const updateBounds = () => {
@@ -1443,9 +1443,6 @@ const MapViewV2 = ({
         }}
       >
         <MapContainer
-          key={`map-${selectedDriverTypes.join("-")}-${
-            selectedSurroundingElement || ""
-          }`}
           center={[13.110274, 77.6009443]}
           zoom={13}
           minZoom={12}
