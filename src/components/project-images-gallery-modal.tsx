@@ -58,6 +58,7 @@ export const ProjectImagesGalleryModal = ({
 
   return (
     <Modal
+      key={selectedImageId}
       open={isOpen}
       onCancel={onClose}
       width={isMobile ? "100%" : 600}
