@@ -6,14 +6,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 const { Paragraph } = Typography;
 
-import type { LeafletEvent } from "leaflet";
 import {
   MapContainer,
   Marker,
   Polyline,
   TileLayer,
   useMap,
-  type MapContainerProps,
 } from "react-leaflet";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -75,6 +73,16 @@ type RoadDriverPlace = IDriverPlace & {
   status: PLACE_TIMELINE;
 };
 
+/**
+ * Gets the icon for map.
+ * @param iconName - React Icons -  icon name
+ * @param iconSet - React Icons - icon set
+ * @param toBounce - Whether icon should bounce.
+ * @param text - Text to display alongside icon (optional)
+ * @param driver - Driver object.
+ * @param style - style of the icon including color, bg color, size
+ * @returns
+ */
 async function getIcon(
   iconName: string,
   iconSet: any,
@@ -167,22 +175,6 @@ const MapCenterHandler = ({
 }) => {
   const map = useMap();
 
-  useEffect(() => {
-    if (
-      projectData &&
-      projectData?.info?.location?.lat &&
-      projectData?.info?.location?.lng
-    ) {
-      map.setView(
-        [projectData.info.location.lat, projectData.info.location.lng],
-        13
-      );
-    } else {
-      map.setView([12.976017, 77.613912], 13);
-      console.warn("Project data missing location:", projectData);
-    }
-  }, [projectData, map, projects]);
-
   return null;
 };
 
@@ -197,12 +189,6 @@ const BoundsAwareDrivers = ({
 }) => {
   const map = useMap();
   const [bounds, setBounds] = useState(map.getBounds());
-
-  // force map refresh when driver types change
-  // useEffect(() => {
-  //   map.invalidateSize();
-  //   setBounds(map.getBounds());
-  // }, [renderRoadDrivers, renderTransitDrivers, renderSimpleDrivers]);
 
   useEffect(() => {
     const updateBounds = () => {
@@ -228,6 +214,7 @@ const BoundsAwareDrivers = ({
   );
 };
 
+// TODO: Why do we need this?
 const MapResizeHandler = () => {
   const map = useMap();
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
@@ -392,50 +379,12 @@ const MapViewV2 = ({
     }
   }, [drivers, driversData, selectedDriverTypes]); // Added selectedDriverTypes to ensure marker icons update
 
+  // Setting selected driver types if passed
   useEffect(() => {
     if (defaultSelectedDriverTypes) {
       setSelectedDriverTypes(defaultSelectedDriverTypes);
     }
   }, [defaultSelectedDriverTypes]);
-
-  // reset map when driver types change
-  useEffect(() => {
-    if (selectedDriverTypes.length > 0) {
-      setSimpleDriverMarkerIcons([]);
-      if (driversData && driversData.length) {
-        const updateDrivers = async () => {
-          const icons = await Promise.all(
-            driversData.map(async (driver) => {
-              if (!selectedDriverTypes.includes(driver.driver)) {
-                return null;
-              }
-              const iconConfig = (LivIndexDriversConfig as any)[driver.driver];
-              const projectSpecificDetails = drivers?.find(
-                (d) => d.id === driver._id
-              );
-
-              if (!iconConfig) {
-                return null;
-              }
-
-              const icon = await getIcon(
-                iconConfig.icon.name,
-                iconConfig.icon.set,
-                false,
-                projectSpecificDetails && projectSpecificDetails.duration
-                  ? `${projectSpecificDetails.duration} mins`
-                  : undefined,
-                driver
-              );
-              return icon ? { icon, driverId: driver._id } : null;
-            })
-          );
-          setSimpleDriverMarkerIcons(icons.filter(Boolean));
-        };
-        updateDrivers();
-      }
-    }
-  }, [selectedDriverTypes, driversData, drivers]);
 
   // Setting the unique surrounding elements for filters
   useEffect(() => {
@@ -1202,49 +1151,46 @@ const MapViewV2 = ({
 
   /**Renders marker for the nearby projects */
   const renderProjectsNearby = () => {
-    if (projectsNearby?.length && projectsNearbyIcons?.length) {
-      return projectsNearby.map((project) => {
-        if (!project.projectLocation?.[0] || !project.projectLocation?.[1]) {
-          return null;
-        }
+    return projectsNearby!.map((project) => {
+      if (!project.projectLocation?.[0] || !project.projectLocation?.[1]) {
+        return null;
+      }
 
-        const projectIcon = projectsNearbyIcons.find(
-          (p) => p.name === project.projectName && p.icon
-        );
+      const projectIcon = projectsNearbyIcons.find(
+        (p) => p.name === project.projectName && p.icon
+      );
 
-        if (!projectIcon?.icon) {
-          return null;
-        }
+      if (!projectIcon?.icon) {
+        return null;
+      }
 
-        return (
-          <Marker
-            key={project.projectName.toLowerCase()}
-            position={project.projectLocation}
-            icon={projectIcon.icon}
-            eventHandlers={{
-              click: () => {
-                setModalContent({
-                  title: project.projectName,
-                  content: "",
-                  tags: [
-                    {
-                      label: `${capitalize(
-                        primaryProject
-                          ? primaryProject?.info?.homeType?.[0] || ""
-                          : ""
-                      )}`,
-                      color: COLORS.primaryColor,
-                    },
-                  ],
-                });
-                setInfoModalOpen(true);
-              },
-            }}
-          />
-        );
-      });
-    }
-    return null;
+      return (
+        <Marker
+          key={project.projectName.toLowerCase()}
+          position={project.projectLocation}
+          icon={projectIcon.icon}
+          eventHandlers={{
+            click: () => {
+              setModalContent({
+                title: project.projectName,
+                content: "",
+                tags: [
+                  {
+                    label: `${capitalize(
+                      primaryProject
+                        ? primaryProject?.info?.homeType?.[0] || ""
+                        : ""
+                    )}`,
+                    color: COLORS.primaryColor,
+                  },
+                ],
+              });
+              setInfoModalOpen(true);
+            },
+          }}
+        />
+      );
+    });
   };
 
   /** Filter for driver types */
@@ -1443,6 +1389,7 @@ const MapViewV2 = ({
         }}
       >
         <MapContainer
+          key={`map-v2`}
           center={[13.110274, 77.6009443]}
           zoom={13}
           minZoom={12}
@@ -1454,22 +1401,27 @@ const MapViewV2 = ({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          <BoundsAwareDrivers
-            renderRoadDrivers={renderRoadDrivers}
-            renderTransitDrivers={renderTransitDrivers}
-            renderSimpleDrivers={renderSimpleDrivers}
-          />
+
           {renderProjectMarkers()}
           {renderCorridors()}
           {renderSurroundings()}
-          {renderProjectsNearby()}
-          {drivers && drivers.length ? (
-            <MapPolygons
-              driversData={driversData || []}
-              selectedDriverTypes={selectedDriverTypes}
-              setModalContent={setModalContent}
-              setInfoModalOpen={setInfoModalOpen}
-            />
+          {projectsNearby?.length && projectsNearbyIcons?.length
+            ? renderProjectsNearby()
+            : null}
+          {drivers && drivers.length && !surroundingElements?.length ? (
+            <>
+              <BoundsAwareDrivers
+                renderRoadDrivers={renderRoadDrivers}
+                renderTransitDrivers={renderTransitDrivers}
+                renderSimpleDrivers={renderSimpleDrivers}
+              />
+              <MapPolygons
+                driversData={driversData || []}
+                selectedDriverTypes={selectedDriverTypes}
+                setModalContent={setModalContent}
+                setInfoModalOpen={setInfoModalOpen}
+              />
+            </>
           ) : null}
         </MapContainer>
       </Flex>
