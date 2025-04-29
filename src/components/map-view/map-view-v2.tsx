@@ -174,6 +174,21 @@ const MapCenterHandler = ({
   projects?: any[];
 }) => {
   const map = useMap();
+  useEffect(() => {
+    if (
+      projectData &&
+      projectData?.info?.location?.lat &&
+      projectData?.info?.location?.lng
+    ) {
+      map.setView(
+        [projectData.info.location.lat, projectData.info.location.lng],
+        13
+      );
+    } else {
+      map.setView([12.976017, 77.613912], 13);
+      console.warn("Project data missing location:", projectData);
+    }
+  }, [projectData, map, projects]);
 
   return null;
 };

@@ -453,7 +453,7 @@ export function Brick360() {
                         remarkPlugins={[remarkGfm]}
                         className="liviq-content"
                       >
-                        {lvnzyProject?.originalProjectId.info.financialPlan}
+                        {lvnzyProject?.investment.paymentPlan}
                       </Markdown>
                     </Flex>
                   );

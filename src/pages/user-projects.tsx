@@ -88,18 +88,19 @@ export function UserProjects() {
             media={itemInfo.originalProjectId.media}
           ></ProjectGallery> */}
 
-          <Flex vertical style={{ padding: "8px 8px 0 8px" }}>
-            <Typography.Text
-              style={{
-                fontSize: FONT_SIZE.HEADING_2,
-                fontWeight: 600,
-                lineHeight: "120%",
-                width: "100%",
-                textWrap: "wrap",
-              }}
-            >
-              {itemInfo.meta.projectName}
-            </Typography.Text>
+          <Typography.Text
+            style={{
+              fontSize: FONT_SIZE.HEADING_2,
+              fontWeight: 600,
+              lineHeight: "120%",
+              width: "100%",
+              padding: "8px",
+              textWrap: "wrap",
+            }}
+          >
+            {itemInfo.meta.projectName}
+          </Typography.Text>
+          <Flex vertical style={{ marginTop: "auto", padding: 8 }}>
             <Flex
               vertical={isMobile}
               gap={4}
@@ -126,18 +127,36 @@ export function UserProjects() {
                 </Tag>
               )}
             </Flex>
-            <Typography.Text
-              style={{ fontSize: FONT_SIZE.PARA, color: COLORS.textColorLight }}
-            >
-              Starts:{" "}
-              {rupeeAmountFormat(itemInfo.meta.costingDetails.minimumUnitCost)}{" "}
-              / {itemInfo.meta.costingDetails.minimumUnitSize} sqft
-            </Typography.Text>
-          </Flex>
-          <Flex style={{ padding: 8 }}>
+            <Flex gap={4}>
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.PARA,
+                  color: COLORS.textColorLight,
+                }}
+              >
+                Starts:{" "}
+                {rupeeAmountFormat(
+                  itemInfo.meta.costingDetails.minimumUnitCost
+                )}{" "}
+                / {itemInfo.meta.costingDetails.minimumUnitSize} sqft
+              </Typography.Text>
+              {itemInfo.investment && itemInfo.investment.paymentPlan ? (
+                <Tag
+                  style={{
+                    fontSize: FONT_SIZE.SUB_TEXT,
+                    marginLeft: "auto",
+                  }}
+                  color={COLORS.primaryColor}
+                >
+                  Payment Plan
+                </Tag>
+              ) : null}
+            </Flex>
+
             <Flex
               style={{
                 paddingTop: 8,
+                marginTop: 8,
                 borderTop: "1px solid",
                 borderTopColor: COLORS.borderColor,
                 justifyContent: "space-between",
@@ -212,19 +231,20 @@ export function UserProjects() {
         />
       ) : null}
 
-      {Object.keys(corridorWiseProjects).map((corridor: string) => {
-        return (
-          <Flex vertical>
-            <Flex vertical style={{ marginTop: 24 }}>
-              <Flex style={{ marginBottom: 8 }}>
-                <Tag
-                  color={COLORS.bgColorDark}
-                  style={{ fontSize: FONT_SIZE.HEADING_4, padding: 4 }}
-                >
-                  {corridor}
-                </Tag>
-              </Flex>
-              {/* {corridor && corridors && corridors.length ? (
+      {selectedCollection.projects.length > 5 ? (
+        Object.keys(corridorWiseProjects).map((corridor: string) => {
+          return (
+            <Flex vertical>
+              <Flex vertical style={{ marginTop: 24 }}>
+                <Flex style={{ marginBottom: 8 }}>
+                  <Tag
+                    color={COLORS.bgColorDark}
+                    style={{ fontSize: FONT_SIZE.HEADING_4, padding: 4 }}
+                  >
+                    {corridor}
+                  </Tag>
+                </Flex>
+                {/* {corridor && corridors && corridors.length ? (
                 <Paragraph
                   ellipsis={{ rows: 2, expandable: true }}
                   style={{ color: COLORS.textColorLight }}
@@ -232,23 +252,40 @@ export function UserProjects() {
                   {corridors.find((c) => c.name == corridor)!.description}
                 </Paragraph>
               ) : null} */}
+              </Flex>
+
+              <Flex
+                style={{
+                  width: "100%",
+                  overflowX: "scroll",
+                  whiteSpace: "nowrap",
+                }}
+                vertical={isMobile}
+                gap={16}
+              >
+                {corridorWiseProjects[corridor].map((p: any) => {
+                  return renderLvnzyProject(p);
+                })}
+              </Flex>
             </Flex>
-            <Flex
-              style={{
-                width: "100%",
-                overflowX: "scroll",
-                whiteSpace: "nowrap",
-              }}
-              vertical={isMobile}
-              gap={16}
-            >
-              {corridorWiseProjects[corridor].map((p: any) => {
-                return renderLvnzyProject(p);
-              })}
-            </Flex>
-          </Flex>
-        );
-      })}
+          );
+        })
+      ) : (
+        <Flex
+          style={{
+            width: "100%",
+            overflowX: "scroll",
+            whiteSpace: "nowrap",
+            marginTop: 16,
+          }}
+          vertical={isMobile}
+          gap={16}
+        >
+          {selectedCollection.projects.map((p: any) => {
+            return renderLvnzyProject(p);
+          })}
+        </Flex>
+      )}
     </Flex>
   );
 }
