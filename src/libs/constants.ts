@@ -294,5 +294,5 @@ export const SurroundingElementLabels = {
     label: "High Tension Line",
     icon: { name: "MdElectricBolt", set: "md" },
   },
-  road: { label: "Highway/Expressway", icon: { name: "GiRoad", set: "gi" } },
+  highway: { label: "Highway/Expressway", icon: { name: "GiRoad", set: "gi" } },
 };
