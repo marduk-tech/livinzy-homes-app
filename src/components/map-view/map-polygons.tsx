@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Polygon, useMap } from "react-leaflet";
+import { COLORS } from "../../theme/style-constants";
 
 export const MapPolygons = ({
   driversData,
@@ -105,10 +106,10 @@ export const MapPolygons = ({
           key={`polygon-${poly.id}`}
           positions={poly.positions}
           pathOptions={{
-            color: "#ff0000",
+            color: COLORS.redIdentifier,
             weight: 3,
             fillOpacity: 0.4,
-            fillColor: "#ff0000",
+            fillColor: COLORS.redIdentifier,
           }}
           eventHandlers={{
             click: () => {
