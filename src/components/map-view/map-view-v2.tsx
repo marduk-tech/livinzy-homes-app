@@ -84,8 +84,8 @@ type RoadDriverPlace = IDriverPlace & {
  * @returns
  */
 async function getIcon(
-  iconName: string,
-  iconSet: any,
+  iconName?: string,
+  iconSet?: any,
   toBounce?: boolean,
   text?: string,
   driver?: IDriverPlace,
@@ -106,8 +106,8 @@ async function getIcon(
   }
 
   try {
-    const iconSetModule = await dynamicImportMap[iconSet]();
-    IconComp = (iconSetModule as any)[iconName] || null;
+    const iconSetModule = iconName ? await dynamicImportMap[iconSet]() : null;
+    IconComp = iconName ? (iconSetModule as any)[iconName] || null : null;
   } catch (error) {
     console.error(`Error loading icon ${iconName} from ${iconSet}`, error);
   }
@@ -193,6 +193,11 @@ const MapCenterHandler = ({
   return null;
 };
 
+/**
+ * Only renders drivers when they are in the view window.
+ * @param param
+ * @returns
+ */
 const BoundsAwareDrivers = ({
   renderRoadDrivers,
   renderTransitDrivers,
@@ -347,6 +352,8 @@ const MapViewV2 = ({
   const [transitStationIcon, setTransitStationIcon] =
     useState<L.DivIcon | null>(null);
 
+  const [roadIcon, setRoadIcon] = useState<L.DivIcon | null>(null);
+
   // Setting icons for simple drivermarkers
   useEffect(() => {
     async function fetchDriverIcons() {
@@ -479,12 +486,26 @@ const MapViewV2 = ({
         undefined,
         undefined,
         {
-          iconBgColor: "white",
-          iconColor: COLORS.textColorDark,
+          iconBgColor: COLORS.textColorDark,
+          iconColor: "white",
           iconSize: 14,
         }
       );
       setTransitStationIcon(transitStationIcon);
+
+      const roadIcon = await getIcon(
+        "FaRoad",
+        "fa",
+        false,
+        undefined,
+        undefined,
+        {
+          iconBgColor: COLORS.textColorDark,
+          iconColor: "white",
+          iconSize: 14,
+        }
+      );
+      setRoadIcon(roadIcon);
     }
     updateProjectIcons();
   }, []);
@@ -678,6 +699,10 @@ const MapViewV2 = ({
     });
   };
 
+  /**
+   * Renders the surrounding elements
+   * @returns
+   */
   const renderSurroundings = () => {
     if (
       !surroundingElements ||
@@ -774,10 +799,21 @@ const MapViewV2 = ({
       });
   };
 
+  /**
+   * Renders the road drivers
+   */
   const renderRoadDrivers = (bounds: L.LatLngBounds) => {
-    if (!drivers || !drivers.length || !!surroundingElements?.length) {
+    if (
+      !drivers ||
+      !drivers.length ||
+      !!surroundingElements?.length ||
+      !roadIcon
+    ) {
       return;
     }
+
+    const map = useMap();
+
     return driversData
       ?.filter(
         (driver): driver is RoadDriverPlace =>
@@ -789,8 +825,31 @@ const MapViewV2 = ({
       .flatMap((driver) => {
         const processedFeatures = processRoadFeatures(driver.features);
 
-        // filter features that have at least one point within bounds
-        return processedFeatures
+        const isDashed = ![
+          PLACE_TIMELINE.LAUNCHED,
+          PLACE_TIMELINE.POST_LAUNCH,
+          PLACE_TIMELINE.PARTIAL_LAUNCH,
+        ].includes(driver.status as PLACE_TIMELINE);
+
+        const handleRoadDriverClick = () => {
+          setModalContent({
+            title: driver.name,
+            content: driver.details?.description || "",
+            tags: [
+              {
+                label: "Road",
+                color: COLORS.primaryColor,
+              },
+              {
+                label: isDashed ? "Under Construction" : "Operational",
+                color: isDashed ? "warning" : "success",
+              },
+            ],
+          });
+          setInfoModalOpen(true);
+        };
+
+        const RoadLine = processedFeatures
           .filter((feature) => {
             return feature.coordinates.some(([lng, lat]) =>
               bounds.contains([lat, lng])
@@ -801,70 +860,50 @@ const MapViewV2 = ({
               ([lng, lat]) => [lat, lng] as [number, number]
             );
 
-            const featureStatus = feature.properties?.status || driver.status;
-            const isDashed = ![
-              PLACE_TIMELINE.LAUNCHED,
-              PLACE_TIMELINE.POST_LAUNCH,
-              PLACE_TIMELINE.PARTIAL_LAUNCH,
-            ].includes(featureStatus as PLACE_TIMELINE);
+            const line = turf.lineString(feature.coordinates);
+            const totalLength = turf.length(line, { units: "kilometers" });
 
-            // const numPoints = 5;
-            // const units = 'kilometers'; // or 'meters', 'miles', etc.
-            // const totalLength = length({
-            //   "type": "Feature",
-            //   "geometry": {
-            //     "type": "LineString",
-            //     "coordinates": [
-            //       [0, 0],
-            //       [10, 0]
-            //     ]
-            //   }
-            // }, { units });
-            // const interval = totalLength / (numPoints - 1); // -1 if you want start and end included
+            const numPoints = 8; // including start and end
 
-            // const points = [];
-
-            // for (let i = 0; i < numPoints; i++) {
-            //   const dist = interval * i;
-            //   const point = along(line, dist, { units });
-            //   points.push(point);
-            // }
-
+            const points = [];
+            for (let i = 0; i <= numPoints - 1; i++) {
+              const distance = (i * totalLength) / (numPoints - 1);
+              const point = turf.along(line, distance, { units: "kilometers" });
+              points.push(point.geometry.coordinates);
+            }
             return (
-              <Polyline
-                key={`${driver._id}-${lineIndex}`}
-                positions={positions}
-                pathOptions={{
-                  color:
-                    feature.properties?.strokeColor || COLORS.textColorDark,
-                  weight: 5,
-                  opacity: 0.5,
-                  dashArray: isDashed ? "10, 10" : undefined,
-                }}
-                eventHandlers={{
-                  click: () => {
-                    setModalContent({
-                      title: driver.name,
-                      content: driver.details?.description || "",
-                      tags: [
-                        {
-                          label: "Road",
-                          color: COLORS.primaryColor,
-                        },
-                        {
-                          label: isDashed
-                            ? "Under Construction"
-                            : "Operational",
-                          color: isDashed ? "warning" : "success",
-                        },
-                      ],
-                    });
-                    setInfoModalOpen(true);
-                  },
-                }}
-              />
+              <>
+                {map.getZoom() > 12.5
+                  ? points.map((p) => (
+                      <Marker
+                        key={`road-${Math.round(Math.random() * 1000)}`}
+                        position={[p![1], p![0]]}
+                        icon={roadIcon}
+                        eventHandlers={{
+                          click: handleRoadDriverClick,
+                        }}
+                      />
+                    ))
+                  : null}
+                <Polyline
+                  key={`${driver._id}-${lineIndex}`}
+                  positions={positions}
+                  pathOptions={{
+                    color:
+                      feature.properties?.strokeColor || COLORS.textColorDark,
+                    weight: 5,
+                    opacity: 0.5,
+                    dashArray: isDashed ? "10, 10" : undefined,
+                  }}
+                  eventHandlers={{
+                    click: handleRoadDriverClick,
+                  }}
+                />
+              </>
             );
           });
+
+        return <>{RoadLine}</>;
       });
   };
 
@@ -877,6 +916,8 @@ const MapViewV2 = ({
     ) {
       return;
     }
+    const map = useMap();
+
     return driversData
       ?.filter(
         (driver): driver is RoadDriverPlace =>
@@ -904,38 +945,36 @@ const MapViewV2 = ({
           PLACE_TIMELINE.PARTIAL_LAUNCH,
         ].includes(driver.status as PLACE_TIMELINE);
 
-        return [
-          // Render transit lines
-          ...lineFeatures.map((feature, lineIndex) => {
-            const positions = feature.coordinates.map(
-              ([lng, lat]) => [lat, lng] as [number, number]
-            );
+        const transitLines = lineFeatures.map((feature, lineIndex) => {
+          const positions = feature.coordinates.map(
+            ([lng, lat]) => [lat, lng] as [number, number]
+          );
 
-            // if at least one point of the line is within bounds
-            const hasPointInBounds = positions.some(([lat, lng]) =>
-              bounds.contains([lat, lng])
-            );
+          // if at least one point of the line is within bounds
+          const hasPointInBounds = positions.some(([lat, lng]) =>
+            bounds.contains([lat, lng])
+          );
 
-            if (!hasPointInBounds) {
-              return null;
-            }
+          if (!hasPointInBounds) {
+            return null;
+          }
 
-            return (
-              <Polyline
-                key={`${driver._id}-line-${lineIndex}`}
-                positions={positions}
-                pathOptions={{
-                  color:
-                    feature.properties?.strokeColor || COLORS.textColorDark,
-                  weight: 6,
-                  opacity: 0.8,
-                  dashArray: isDashed ? "10, 10" : undefined,
-                }}
-              />
-            );
-          }),
-          // Render point stations
-          ...pointFeatures
+          return (
+            <Polyline
+              key={`${driver._id}-line-${lineIndex}`}
+              positions={positions}
+              pathOptions={{
+                color: feature.properties?.strokeColor || COLORS.textColorDark,
+                weight: 6,
+                opacity: 0.8,
+                dashArray: isDashed ? "10, 10" : undefined,
+              }}
+            />
+          );
+        });
+        let stations = null;
+        if (map.getZoom() > 12.5) {
+          stations = pointFeatures
             .filter((feature) => {
               // render stations within bounds
               const [lng, lat] = feature.geometry.coordinates;
@@ -974,8 +1013,14 @@ const MapViewV2 = ({
                   },
                 }}
               />
-            )),
-        ];
+            ));
+        }
+        return (
+          <>
+            {transitLines}
+            {stations}
+          </>
+        );
       });
   };
 
