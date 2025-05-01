@@ -76,9 +76,7 @@ export function LoginForm() {
 
     if (values.mobileNumber) {
       phoneNumber =
-        values.mobileNumber.countryCode +
-        values.mobileNumber.areaCode +
-        values.mobileNumber.phoneNumber;
+        values.mobileNumber.areaCode + values.mobileNumber.phoneNumber;
       countryCode = values.mobileNumber.countryCode;
     }
 
