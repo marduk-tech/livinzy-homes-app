@@ -38,66 +38,55 @@ export const DashboardLayout: React.FC = () => {
 
   const navLinks: NavLink[] = [
     {
+      key: "profile",
       title: "Profile",
       link: "/profile",
       icon: { name: "FaRegUserCircle", set: "fa" },
     },
     {
+      key: "about",
+      title: "About Brickfi",
+      link: "https://brickfi.in/",
+      icon: { name: "FiInfo", set: "fi" },
+    },
+    {
+      key: "chat-history",
       title: "Chat History",
       link: "/user-sessions",
       icon: { name: "RiHistoryLine", set: "ri" },
-    },
-    {
-      title: "Learn",
-      link: "https://learn.livinzy.com/",
-      icon: { src: "./images/livology-icon.png" },
-    },
-    {
-      title: "Buying a Farmland",
-      link: "https://livology.hashnode.dev/faqs-buying-agricultural-land-karnataka",
-      icon: { name: "TbPhotoQuestion", set: "tb" },
-    },
-    {
-      title: "About Us",
-      link: "https://livinzy.com/about",
-      icon: { name: "RiProfileLine", set: "ri" },
-      alignBottom: true,
     },
   ];
 
   const NavLinks = ({ navLinks }: { navLinks: NavLink[] }) => {
     return (
       <>
-        {navLinks
-          .filter((l) => l.title === "Profile")
+        {navLinks.map((link) => (
+          <Link
+            key={link.title}
+            to={link.link || "#"}
+            onClick={() => {
+              setSidebarOpen(false);
+            }}
+            style={{ marginTop: link.alignBottom ? "auto" : "initial" }}
+          >
+            <Flex align="center" gap={8}>
+              {link.icon.name ? (
+                <DynamicReactIcon
+                  iconName={link.icon.name}
+                  iconSet={link.icon.set as any}
+                  size={20}
+                  color={COLORS.textColorDark}
+                />
+              ) : (
+                <Image width={16} src={link.icon.src}></Image>
+              )}
 
-          .map((link) => (
-            <Link
-              key={link.title}
-              to={link.link || "#"}
-              onClick={() => {
-                setSidebarOpen(false);
-              }}
-              style={{ marginTop: link.alignBottom ? "auto" : "initial" }}
-            >
-              <Flex align="center" gap={8}>
-                {link.icon.name ? (
-                  <DynamicReactIcon
-                    iconName={link.icon.name}
-                    iconSet={link.icon.set as any}
-                    size={16}
-                    color={COLORS.textColorDark}
-                  />
-                ) : (
-                  <Image width={16} src={link.icon.src}></Image>
-                )}
-
-                <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
-                  {link.title}
-                </Typography.Text>
-              </Flex>
-            </Link>
-          ))}
+              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
+                {link.title}
+              </Typography.Text>
+            </Flex>
+          </Link>
+        ))}
       </>
     );
   };
@@ -180,16 +169,22 @@ export const DashboardLayout: React.FC = () => {
               align="flex-start"
               style={{ position: "relative", height: "100%" }}
             >
-              <NavLinks navLinks={navLinks} />
-              <Typography.Text
-                style={{
-                  fontSize: FONT_SIZE.SUB_TEXT,
-                  color: COLORS.textColorLight,
-                  marginTop: "auto",
-                }}
-              >
-                Copyright @Marduk Technologies Private Ltd
-              </Typography.Text>
+              <NavLinks
+                navLinks={navLinks.filter((l) => l.key === "profile")}
+              />
+              <Flex gap={24} vertical style={{ marginTop: "auto" }}>
+                <NavLinks
+                  navLinks={navLinks.filter((l) => l.key === "about")}
+                />
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.SUB_TEXT,
+                    color: COLORS.textColorLight,
+                  }}
+                >
+                  Copyright @Marduk Technologies Private Ltd
+                </Typography.Text>
+              </Flex>
             </Flex>
           </Drawer>
           <Content

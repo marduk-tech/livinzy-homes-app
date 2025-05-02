@@ -295,4 +295,5 @@ export const SurroundingElementLabels = {
     icon: { name: "MdElectricBolt", set: "md" },
   },
   highway: { label: "Highway/Expressway", icon: { name: "GiRoad", set: "gi" } },
+  forest: { label: "Forest Area", icon: { name: "GiPalmTree", set: "gi" } },
 };
