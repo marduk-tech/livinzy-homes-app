@@ -51,9 +51,13 @@ export function UserProjects() {
       ? itemInfo.meta.oneLiner.split(" · ")
       : [];
 
-    const previewImage =
+    const imgs =
       itemInfo && itemInfo.originalProjectId && itemInfo.originalProjectId.media
-        ? itemInfo.originalProjectId.media[0].image.url!
+        ? itemInfo.originalProjectId.media.filter((m: any) => m.type == "image")
+        : [];
+    const previewImage =
+      imgs && imgs.length
+        ? (imgs.find((i: any) => i.isPreview) || imgs[0]).image.url!
         : "";
     return (
       <Flex
