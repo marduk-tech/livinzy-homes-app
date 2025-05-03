@@ -1468,6 +1468,8 @@ const MapViewV2 = ({
           </Flex>
         </Flex>
       ) : null}
+
+      {/* Map container */}
       <Flex
         style={{
           height:
@@ -1487,6 +1489,13 @@ const MapViewV2 = ({
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          {/* Render primary project bounds */}
+          <MapPolygons
+            driversData={primaryProjectBounds}
+            selectedDriverTypes={[]}
+            setModalContent={setModalContent}
+            setInfoModalOpen={setInfoModalOpen}
           />
 
           {renderProjectMarkers()}
@@ -1512,18 +1521,12 @@ const MapViewV2 = ({
                 setModalContent={setModalContent}
                 setInfoModalOpen={setInfoModalOpen}
               />
-              {/* Render primary project bounds */}
-              <MapPolygons
-                driversData={primaryProjectBounds}
-                selectedDriverTypes={[]}
-                setModalContent={setModalContent}
-                setInfoModalOpen={setInfoModalOpen}
-              />
             </>
           ) : null}
         </MapContainer>
       </Flex>
 
+      {/* Dynamic modal to show map click content */}
       <Modal
         title={null}
         closable={true}
