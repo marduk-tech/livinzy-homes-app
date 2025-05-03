@@ -2,7 +2,7 @@ import * as turf from "@turf/turf";
 import { Flex, Modal, Spin, Tag, Typography } from "antd";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 const { Paragraph } = Typography;
 
@@ -802,17 +802,17 @@ const MapViewV2 = ({
   /**
    * Renders the road drivers
    */
-  const renderRoadDrivers = (bounds: L.LatLngBounds) => {
+  const RoadDriversComponent = ({ bounds }: { bounds: L.LatLngBounds }) => {
+    const map = useMap();
+
     if (
       !drivers ||
       !drivers.length ||
       !!surroundingElements?.length ||
       !roadIcon
     ) {
-      return;
+      return null;
     }
-
-    const map = useMap();
 
     return driversData
       ?.filter(
@@ -903,20 +903,25 @@ const MapViewV2 = ({
             );
           });
 
-        return <>{RoadLine}</>;
+        return (
+          <React.Fragment key={`road-group-${Math.random()}`}>
+            {RoadLine}
+          </React.Fragment>
+        );
       });
   };
 
-  const renderTransitDrivers = (bounds: L.LatLngBounds) => {
+  const TransitDriversComponent = ({ bounds }: { bounds: L.LatLngBounds }) => {
+    const map = useMap();
+
     if (
       !drivers ||
       !drivers.length ||
       !!surroundingElements?.length ||
       !transitStationIcon
     ) {
-      return;
+      return null;
     }
-    const map = useMap();
 
     return driversData
       ?.filter(
@@ -1350,6 +1355,28 @@ const MapViewV2 = ({
     );
   };
 
+  // Process primary project polygon if available
+  const primaryProjectBounds = primaryProject?.info?.location?.osm?.geojson
+    ? [
+        {
+          _id: primaryProject._id,
+          driver: "project-bounds",
+          name: primaryProject.info.name,
+          details: {
+            description: primaryProject.info.description || "",
+            osm: {
+              geojson: {
+                type: "Polygon",
+                coordinates: [
+                  primaryProject.info.location.osm.geojson.coordinates[0],
+                ],
+              },
+            },
+          },
+        },
+      ]
+    : [];
+
   return (
     <div
       style={{
@@ -1471,13 +1498,24 @@ const MapViewV2 = ({
           {drivers && drivers.length && !surroundingElements?.length ? (
             <>
               <BoundsAwareDrivers
-                renderRoadDrivers={renderRoadDrivers}
-                renderTransitDrivers={renderTransitDrivers}
+                renderRoadDrivers={(bounds) => (
+                  <RoadDriversComponent bounds={bounds} />
+                )}
+                renderTransitDrivers={(bounds) => (
+                  <TransitDriversComponent bounds={bounds} />
+                )}
                 renderSimpleDrivers={renderSimpleDrivers}
               />
               <MapPolygons
                 driversData={driversData || []}
                 selectedDriverTypes={selectedDriverTypes}
+                setModalContent={setModalContent}
+                setInfoModalOpen={setInfoModalOpen}
+              />
+              {/* Render primary project bounds */}
+              <MapPolygons
+                driversData={primaryProjectBounds}
+                selectedDriverTypes={[]}
                 setModalContent={setModalContent}
                 setInfoModalOpen={setInfoModalOpen}
               />

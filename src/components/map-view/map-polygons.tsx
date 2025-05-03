@@ -27,7 +27,7 @@ export const MapPolygons = ({
     const zoom = map.getZoom();
     const bounds = map.getBounds();
 
-    if (zoom >= 14) {
+    if (zoom >= 14 || driversData.some((d) => d.driver === "project-bounds")) {
       const polygons = driversData
         ?.filter(
           (driver) =>
@@ -106,10 +106,16 @@ export const MapPolygons = ({
           key={`polygon-${poly.id}`}
           positions={poly.positions}
           pathOptions={{
-            color: COLORS.redIdentifier,
+            color:
+              poly.id === "primary-project"
+                ? COLORS.textColorDark
+                : COLORS.redIdentifier,
             weight: 3,
             fillOpacity: 0.4,
-            fillColor: COLORS.redIdentifier,
+            fillColor:
+              poly.id === "primary-project"
+                ? COLORS.textColorDark
+                : COLORS.redIdentifier,
           }}
           eventHandlers={{
             click: () => {
