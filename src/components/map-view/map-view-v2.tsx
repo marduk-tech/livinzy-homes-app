@@ -1359,7 +1359,7 @@ const MapViewV2 = ({
   const primaryProjectBounds = primaryProject?.info?.location?.osm?.geojson
     ? [
         {
-          _id: primaryProject._id,
+          _id: "primary-project",
           driver: "project-bounds",
           name: primaryProject.info.name,
           details: {
