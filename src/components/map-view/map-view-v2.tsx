@@ -31,9 +31,6 @@ import DynamicReactIcon, {
 } from "../common/dynamic-react-icon";
 import { MapPolygons } from "./map-polygons";
 
-type Coordinate = [number, number];
-type LineString = Coordinate[];
-
 type GeoJSONCoordinate = [number, number];
 type GeoJSONLineString = GeoJSONCoordinate[];
 type GeoJSONMultiLineString = GeoJSONLineString[];
@@ -52,13 +49,6 @@ interface GeoJSONFeature {
     status?: string;
   };
   geometry: GeoJSONGeometry;
-}
-
-interface GeoJSONLineFeature extends GeoJSONFeature {
-  geometry: {
-    type: "LineString" | "MultiLineString";
-    coordinates: GeoJSONLineString | GeoJSONMultiLineString;
-  };
 }
 
 interface GeoJSONPointFeature extends GeoJSONFeature {
@@ -277,6 +267,50 @@ const MapResizeHandler = () => {
   }, [map, handleMapRefresh]);
 
   return null;
+};
+
+/**
+ * Process driver data into polygon format
+ */
+const processDriversToPolygons = (
+  data: any[],
+  filterByDriverTypes = true,
+  selectedDriverTypes: string[] = []
+) => {
+  return data
+    .filter((driver) => {
+      const hasGeojson = driver.details?.osm?.geojson;
+      const matchesType =
+        !filterByDriverTypes ||
+        selectedDriverTypes.length === 0 ||
+        selectedDriverTypes.includes(driver.driver);
+      return hasGeojson && matchesType;
+    })
+    .map((driver) => {
+      try {
+        const geojson =
+          typeof driver.details.osm.geojson === "string"
+            ? JSON.parse(driver.details.osm.geojson)
+            : driver.details.osm.geojson;
+
+        if (!geojson || geojson.type !== "Polygon") {
+          return null;
+        }
+
+        return {
+          id: driver._id,
+          positions: geojson.coordinates[0].map(
+            ([lng, lat]: [number, number]) => [lat, lng] as [number, number]
+          ),
+          name: driver.name,
+          description: driver.details?.description || "",
+        };
+      } catch (error) {
+        console.error("Error processing polygon data:", error);
+        return null;
+      }
+    })
+    .filter((p): p is NonNullable<typeof p> => p !== null);
 };
 
 const MapViewV2 = ({
@@ -1490,39 +1524,49 @@ const MapViewV2 = ({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          {/* Render primary project bounds */}
-          <MapPolygons
-            driversData={primaryProjectBounds}
-            selectedDriverTypes={[]}
-            setModalContent={setModalContent}
-            setInfoModalOpen={setInfoModalOpen}
-          />
+          {/* Process and render polygon data */}
+          {(() => {
+            // Process primary project bounds
+            const projectPolygons = processDriversToPolygons(
+              primaryProjectBounds,
+              false,
+              selectedDriverTypes
+            );
 
-          {renderProjectMarkers()}
-          {renderCorridors()}
-          {renderSurroundings()}
-          {projectsNearby?.length && projectsNearbyIcons?.length
-            ? renderProjectsNearby()
-            : null}
-          {drivers && drivers.length && !surroundingElements?.length ? (
-            <>
-              <BoundsAwareDrivers
-                renderRoadDrivers={(bounds) => (
-                  <RoadDriversComponent bounds={bounds} />
-                )}
-                renderTransitDrivers={(bounds) => (
-                  <TransitDriversComponent bounds={bounds} />
-                )}
-                renderSimpleDrivers={renderSimpleDrivers}
-              />
-              <MapPolygons
-                driversData={driversData || []}
-                selectedDriverTypes={selectedDriverTypes}
-                setModalContent={setModalContent}
-                setInfoModalOpen={setInfoModalOpen}
-              />
-            </>
-          ) : null}
+            // Render all components
+            return (
+              <>
+                <MapPolygons polygons={projectPolygons} />
+
+                {renderProjectMarkers()}
+                {renderCorridors()}
+                {renderSurroundings()}
+                {projectsNearby?.length && projectsNearbyIcons?.length
+                  ? renderProjectsNearby()
+                  : null}
+                {drivers && drivers.length && !surroundingElements?.length ? (
+                  <>
+                    <BoundsAwareDrivers
+                      renderRoadDrivers={(bounds) => (
+                        <RoadDriversComponent bounds={bounds} />
+                      )}
+                      renderTransitDrivers={(bounds) => (
+                        <TransitDriversComponent bounds={bounds} />
+                      )}
+                      renderSimpleDrivers={renderSimpleDrivers}
+                    />
+                    <MapPolygons
+                      polygons={processDriversToPolygons(
+                        driversData || [],
+                        true,
+                        selectedDriverTypes
+                      )}
+                    />
+                  </>
+                ) : null}
+              </>
+            );
+          })()}
         </MapContainer>
       </Flex>
 
