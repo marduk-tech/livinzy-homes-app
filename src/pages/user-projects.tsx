@@ -235,61 +235,36 @@ export function UserProjects() {
         />
       ) : null}
 
-      {selectedCollection.projects.length > 5 ? (
-        Object.keys(corridorWiseProjects).map((corridor: string) => {
-          return (
-            <Flex vertical>
-              <Flex vertical style={{ marginTop: 24 }}>
-                <Flex style={{ marginBottom: 8 }}>
-                  <Tag
-                    color={COLORS.bgColorDark}
-                    style={{ fontSize: FONT_SIZE.HEADING_4, padding: 4 }}
-                  >
-                    {corridor}
-                  </Tag>
-                </Flex>
-                {/* {corridor && corridors && corridors.length ? (
-                <Paragraph
-                  ellipsis={{ rows: 2, expandable: true }}
-                  style={{ color: COLORS.textColorLight }}
+      {Object.keys(corridorWiseProjects).map((corridor: string) => {
+        return (
+          <Flex vertical>
+            <Flex vertical style={{ marginTop: 24 }}>
+              <Flex style={{ marginBottom: 8 }}>
+                <Tag
+                  color={COLORS.bgColorDark}
+                  style={{ fontSize: FONT_SIZE.HEADING_4, padding: 4 }}
                 >
-                  {corridors.find((c) => c.name == corridor)!.description}
-                </Paragraph>
-              ) : null} */}
-              </Flex>
-
-              <Flex
-                style={{
-                  width: "100%",
-                  overflowX: "scroll",
-                  whiteSpace: "nowrap",
-                }}
-                vertical={isMobile}
-                gap={16}
-              >
-                {corridorWiseProjects[corridor].map((p: any) => {
-                  return renderLvnzyProject(p);
-                })}
+                  {corridor}
+                </Tag>
               </Flex>
             </Flex>
-          );
-        })
-      ) : (
-        <Flex
-          style={{
-            width: "100%",
-            overflowX: "scroll",
-            whiteSpace: "nowrap",
-            marginTop: 16,
-          }}
-          vertical={isMobile}
-          gap={16}
-        >
-          {selectedCollection.projects.map((p: any) => {
-            return renderLvnzyProject(p);
-          })}
-        </Flex>
-      )}
+
+            <Flex
+              style={{
+                width: "100%",
+                overflowX: "scroll",
+                whiteSpace: "nowrap",
+              }}
+              vertical={isMobile}
+              gap={16}
+            >
+              {corridorWiseProjects[corridor].map((p: any) => {
+                return renderLvnzyProject(p);
+              })}
+            </Flex>
+          </Flex>
+        );
+      })}
     </Flex>
   );
 }
