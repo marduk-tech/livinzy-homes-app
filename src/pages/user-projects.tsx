@@ -1,14 +1,14 @@
 import { Flex, Select, Tag, Typography } from "antd";
-import { Loader } from "../components/common/loader";
-import { useUser } from "../hooks/use-user";
-import { useNavigate } from "react-router-dom";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { getCategoryScore, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { useEffect, useState } from "react";
-import { useDevice } from "../hooks/use-device";
-import { useFetchCorridors } from "../hooks/use-corridors";
-import { BRICK360_CATEGORY, Brick360CategoryInfo } from "../libs/constants";
+import { useNavigate } from "react-router-dom";
 import GradientBar from "../components/common/grading-bar";
+import { Loader } from "../components/common/loader";
+import { useFetchCorridors } from "../hooks/use-corridors";
+import { useDevice } from "../hooks/use-device";
+import { useUser } from "../hooks/use-user";
+import { BRICK360_CATEGORY, Brick360CategoryInfo } from "../libs/constants";
+import { getCategoryScore, rupeeAmountFormat } from "../libs/lvnzy-helper";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 const { Paragraph } = Typography;
 
 export function UserProjects() {
@@ -16,9 +16,10 @@ export function UserProjects() {
   const navigate = useNavigate();
   const { data: corridors, isLoading: isCorridorsDataLoading } =
     useFetchCorridors();
-  const [corridorWiseProjects, setCorridorWiseProjects] = useState<any>();
+  const [projects, setProjects] = useState<any[]>([]);
   const [collectionNames, setCollectionNames] = useState<string[]>();
   const [selectedCollection, setSelectedCollection] = useState<any>();
+  const [selectedCorridor, setSelectedCorridor] = useState<string>("All");
   const { isMobile } = useDevice();
 
   useEffect(() => {
@@ -37,14 +38,17 @@ export function UserProjects() {
     if (!selectedCollection) {
       return;
     }
-    const corrProjects: any = {};
-    selectedCollection.projects.forEach((p: any) => {
-      corrProjects[p.meta.projectCorridor] =
-        corrProjects[p.meta.projectCorridor] || [];
-      corrProjects[p.meta.projectCorridor].push(p);
-    });
-    setCorridorWiseProjects(corrProjects);
+    setProjects(selectedCollection.projects || []);
   }, [selectedCollection]);
+
+  const filteredProjects = projects.filter(
+    (p: any) =>
+      selectedCorridor === "All" || p.meta.projectCorridor === selectedCorridor
+  );
+
+  const uniqueCorridors = [
+    ...new Set(projects.map((p: any) => p.meta.projectCorridor)),
+  ];
 
   const renderLvnzyProject = (itemInfo: any) => {
     const oneLinerBreakup = itemInfo.meta.oneLiner
@@ -200,7 +204,23 @@ export function UserProjects() {
     );
   };
 
-  if (!user || !corridorWiseProjects) {
+  if (!user) {
+    return <Loader></Loader>;
+  }
+
+  if (!user.savedLvnzyProjects || user.savedLvnzyProjects.length === 0) {
+    return (
+      <Flex
+        style={{ width: "100%", padding: 16 }}
+        justify="center"
+        align="center"
+      >
+        <Typography.Text>No saved projects found</Typography.Text>
+      </Flex>
+    );
+  }
+
+  if (!projects.length) {
     return <Loader></Loader>;
   }
 
@@ -214,57 +234,44 @@ export function UserProjects() {
       }}
       vertical
     >
-      {collectionNames && collectionNames.length > 1 ? (
-        <Select
-          placeholder="Select project list"
-          defaultValue={
-            collectionNames ? collectionNames[collectionNames.length - 1] : ""
-          }
-          optionFilterProp="label"
-          onChange={(value: string) => {
-            setSelectedCollection(
-              user.savedLvnzyProjects.find((c) => c.collectionName == value)
-            );
-          }}
-          options={collectionNames?.map((c) => {
-            return {
+      <Flex gap={8} style={{ marginBottom: 16 }}>
+        {collectionNames && collectionNames.length > 1 && (
+          <Select
+            style={{ minWidth: 200 }}
+            placeholder="Select project list"
+            defaultValue={
+              collectionNames ? collectionNames[collectionNames.length - 1] : ""
+            }
+            optionFilterProp="label"
+            onChange={(value: string) => {
+              setSelectedCollection(
+                user.savedLvnzyProjects.find((c) => c.collectionName == value)
+              );
+            }}
+            options={collectionNames?.map((c) => ({
               value: c,
               label: c,
-            };
-          })}
+            }))}
+          />
+        )}
+        <Select
+          style={{ minWidth: 150 }}
+          placeholder="Select corridor"
+          value={selectedCorridor}
+          onChange={(value: string) => setSelectedCorridor(value)}
+          options={[
+            { value: "All", label: "All Corridors" },
+            ...uniqueCorridors.map((c) => ({
+              value: c,
+              label: c,
+            })),
+          ]}
         />
-      ) : null}
+      </Flex>
 
-      {Object.keys(corridorWiseProjects).map((corridor: string) => {
-        return (
-          <Flex vertical>
-            <Flex vertical style={{ marginTop: 24 }}>
-              <Flex style={{ marginBottom: 8 }}>
-                <Tag
-                  color={COLORS.bgColorDark}
-                  style={{ fontSize: FONT_SIZE.HEADING_4, padding: 4 }}
-                >
-                  {corridor}
-                </Tag>
-              </Flex>
-            </Flex>
-
-            <Flex
-              style={{
-                width: "100%",
-                overflowX: "scroll",
-                whiteSpace: "nowrap",
-              }}
-              vertical={isMobile}
-              gap={16}
-            >
-              {corridorWiseProjects[corridor].map((p: any) => {
-                return renderLvnzyProject(p);
-              })}
-            </Flex>
-          </Flex>
-        );
-      })}
+      <Flex wrap="wrap" gap={16}>
+        {filteredProjects.map((p: any) => renderLvnzyProject(p))}
+      </Flex>
     </Flex>
   );
 }
