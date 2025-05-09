@@ -13,12 +13,13 @@ import UserSessions from "../pages/user-sessions";
 import LivProjectPro from "../components/liv-project-pro";
 import { Brick360 } from "../pages/brick360";
 import { PaymentCallbackPage } from "../pages/payment-callback";
-import { UserProjects } from "../pages/user-projects";
 import { Brick360Full } from "../pages/brick360-full";
 import { useUser } from "../hooks/use-user";
 import { useEffect } from "react";
 import posthog from "posthog-js";
 import { posthogkey } from "../libs/constants";
+import { MainLanding } from "../pages/landing/main-landing";
+import { UserProjects } from "../pages/user-projects";
 
 export const Router = () => {
   const { user, isLoading: userLoading } = useUser();
@@ -42,6 +43,7 @@ export const Router = () => {
         path="/sides/unit-connvertor"
         element={<LandMeasurementConvertor />}
       />
+      <Route path="/landing/" element={<MainLanding />} />
       <Route element={<DashboardLayout />}>
         <Route path="/map" element={<LivindexPlaces />} />
         {/* <Route path="/:sessionId?" element={<LivV3 />} /> */}
