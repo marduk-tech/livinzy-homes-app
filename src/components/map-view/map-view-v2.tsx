@@ -1,6 +1,6 @@
 import * as turf from "@turf/turf";
 import { Flex, Modal, Spin, Tag, Typography } from "antd";
-import L from "leaflet";
+import L, { LatLngTuple } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
@@ -174,8 +174,17 @@ const MapCenterHandler = ({
         [projectData.info.location.lat, projectData.info.location.lng],
         13
       );
-    } else {
-      map.setView([12.976017, 77.613912], 13);
+    } else if (projects && projects.length && projects.length < 10) {
+      var projectsLoc = turf.points(
+        projects
+          .filter((p) => !!p.info.location && !!p.info.location.lat)
+          .map((p) => {
+            return [p.info.location.lng, p.info.location.lat];
+          })
+      );
+
+      var center = turf.center(projectsLoc);
+      map.setView(center.geometry.coordinates.reverse() as LatLngTuple, 12);
       console.warn("Project data missing location:", projectData);
     }
   }, [projectData, map, projects]);
@@ -1507,7 +1516,9 @@ const MapViewV2 = ({
       <Flex
         style={{
           height:
-            fullSize && !projectsNearby?.length ? "calc(100% - 90px)" : "100%",
+            fullSize && !projectsNearby?.length && !!drivers?.length
+              ? "calc(100% - 90px)"
+              : "100%",
           width: "100%",
         }}
       >

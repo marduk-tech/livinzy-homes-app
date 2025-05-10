@@ -18,7 +18,6 @@ import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import GradientBar from "../components/common/grading-bar";
 import { Loader } from "../components/common/loader";
 import RatingBar from "../components/common/rating-bar";
-import Brick360Chat from "../components/liv/brick360-chat";
 import MapViewV2 from "../components/map-view/map-view-v2";
 import ProjectGallery from "../components/project-gallery";
 import { useDevice } from "../hooks/use-device";
@@ -288,7 +287,7 @@ export function Brick360() {
       }}
     >
       {/* Main project upfront score card including metadata */}
-      <Flex vertical style={{ padding: "0 16px 0 16px" }}>
+      <Flex vertical style={{ padding: 0 }}>
         {/* Project Gallery */}
         <ProjectGallery
           media={lvnzyProject?.originalProjectId.media}
@@ -296,7 +295,11 @@ export function Brick360() {
         {/* Name */}{" "}
         <Flex
           vertical
-          style={{ alignItems: "flex-start", margin: "8px 0" }}
+          style={{
+            alignItems: "flex-start",
+            margin: "8px 0",
+            padding: "0 8px",
+          }}
           gap={8}
         >
           <Flex>
@@ -321,7 +324,7 @@ export function Brick360() {
       </Flex>
 
       {/* One liner & timeline */}
-      <Flex vertical style={{ padding: "0 16px" }}>
+      <Flex vertical style={{ padding: "0 8px" }}>
         <Typography.Text
           style={{
             fontSize: FONT_SIZE.PARA,
@@ -370,7 +373,7 @@ export function Brick360() {
       <Flex
         vertical
         style={{
-          margin: 16,
+          margin: "16px 8px",
           marginBottom: 8,
         }}
       >
@@ -531,6 +534,7 @@ export function Brick360() {
                   style={{
                     display: "flex",
                     justifyContent: "center",
+                    padding: 0,
                   }}
                 >
                   {" "}
@@ -541,7 +545,7 @@ export function Brick360() {
                   ></DynamicReactIcon>
                   <Typography.Text
                     style={{
-                      marginLeft: 8,
+                      marginLeft: 4,
                       fontWeight: 500,
                       color: COLORS.textColorDark,
                     }}
@@ -555,17 +559,17 @@ export function Brick360() {
         </Flex>
       </Flex>
 
-      <Divider style={{ margin: "0 16px 16px 16px" }}></Divider>
-      <Flex style={{ padding: "0 16px" }}>
+      <Divider style={{ margin: "0 8px 16px 8px" }}></Divider>
+      <Flex style={{ padding: "0 4px" }}>
         <DataSources></DataSources>
       </Flex>
       {lvnzyProject?.score.summary && (
         <Flex
           style={{
-            margin: "0 16px",
+            margin: "0 8px",
             borderRadius: 8,
             cursor: "pointer",
-            padding: "8px 4px",
+            padding: "8px 0",
             backgroundColor: "white",
           }}
           onClick={() => {
@@ -575,7 +579,7 @@ export function Brick360() {
           <Flex
             style={{
               width: "100%",
-              marginLeft: 8,
+              marginLeft: 0,
               marginTop: 8,
               marginBottom: 8,
             }}
@@ -633,7 +637,7 @@ export function Brick360() {
         style={{ margin: 16 }}
       /> */}
       {/* All the data points */}
-      <Flex vertical gap={32} style={{ padding: 16 }}>
+      <Flex vertical gap={32} style={{ padding: "16px 8px" }}>
         {scoreParams &&
           scoreParams.map((sc) => {
             return (
@@ -1049,12 +1053,11 @@ export function Brick360() {
             <Divider></Divider>
 
             <Flex style={{ width: "100%" }}>
-              <Brick360Chat
+              " "
+              {/* <Brick360Chat
                 ref={chatRef}
                 lvnzyProjectId={lvnzyProjectId!}
-                dataPointCategory={selectedDataPointCategory}
-                dataPoint={selectedDataPointTitle}
-              ></Brick360Chat>
+              ></Brick360Chat> */}
             </Flex>
           </Flex>
         </Flex>

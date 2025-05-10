@@ -1,5 +1,5 @@
 import { Flex, Select, Tag, Typography } from "antd";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GradientBar from "../components/common/grading-bar";
 import { Loader } from "../components/common/loader";
@@ -9,45 +9,31 @@ import { useUser } from "../hooks/use-user";
 import { BRICK360_CATEGORY, Brick360CategoryInfo } from "../libs/constants";
 import { getCategoryScore, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { useRef } from "react";
+import { LvnzyProject } from "../types/LvnzyProject";
 const { Paragraph } = Typography;
 
-export function UserProjects() {
+export function UserProjects({
+  lvnzyProjects,
+}: {
+  lvnzyProjects: LvnzyProject[];
+}) {
   const { user } = useUser();
+  const chatRef = useRef<{ clearChatData: () => void } | null>(null);
+
   const navigate = useNavigate();
   const { data: corridors, isLoading: isCorridorsDataLoading } =
     useFetchCorridors();
-  const [projects, setProjects] = useState<any[]>([]);
-  const [collectionNames, setCollectionNames] = useState<string[]>();
-  const [selectedCollection, setSelectedCollection] = useState<any>();
   const [selectedCorridor, setSelectedCorridor] = useState<string>("All");
   const { isMobile } = useDevice();
 
-  useEffect(() => {
-    if (user?.savedLvnzyProjects && user.savedLvnzyProjects.length) {
-      const collections = user.savedLvnzyProjects.map((c) => c.collectionName);
-      setCollectionNames(collections);
-      setSelectedCollection(
-        user.savedLvnzyProjects.find(
-          (c) => c.collectionName == collections[collections.length - 1]
-        )
-      );
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (!selectedCollection) {
-      return;
-    }
-    setProjects(selectedCollection.projects || []);
-  }, [selectedCollection]);
-
-  const filteredProjects = projects.filter(
+  const filteredProjects = lvnzyProjects.filter(
     (p: any) =>
       selectedCorridor === "All" || p.meta.projectCorridor === selectedCorridor
   );
 
   const uniqueCorridors = [
-    ...new Set(projects.map((p: any) => p.meta.projectCorridor)),
+    ...new Set(lvnzyProjects.map((p: any) => p.meta.projectCorridor)),
   ];
 
   const renderLvnzyProject = (itemInfo: any) => {
@@ -72,18 +58,17 @@ export function UserProjects() {
           backgroundColor: "white",
           borderColor: COLORS.borderColorMedium,
           borderRadius: 12,
-          minWidth: isMobile ? "100%" : 320,
-          maxWidth: isMobile ? "100%" : 320,
+          width: isMobile ? "100%" : 250,
         }}
         onClick={() => {
-          navigate(`/brick360/${itemInfo._id}`);
+          navigate(`/app/brick360/${itemInfo._id}`);
         }}
       >
         <Flex vertical style={{ width: "100%" }}>
           <div
             style={{
               width: "100%",
-              height: 175,
+              height: isMobile ? 200 : 125,
               borderTopRightRadius: 12,
               borderTopLeftRadius: 12,
               backgroundImage: `url(${previewImage})`,
@@ -98,12 +83,13 @@ export function UserProjects() {
 
           <Typography.Text
             style={{
-              fontSize: FONT_SIZE.HEADING_2,
+              fontSize: FONT_SIZE.HEADING_3,
               fontWeight: 600,
-              lineHeight: "120%",
               width: "100%",
+              lineHeight: "120%",
               padding: "8px",
               textWrap: "wrap",
+              paddingBottom: 0,
             }}
           >
             {itemInfo.meta.projectName}
@@ -118,7 +104,7 @@ export function UserProjects() {
               {oneLinerBreakup.length && (
                 <Typography.Text
                   style={{
-                    fontSize: FONT_SIZE.PARA,
+                    fontSize: FONT_SIZE.SUB_TEXT,
                     color: COLORS.textColorLight,
                   }}
                 >
@@ -126,7 +112,7 @@ export function UserProjects() {
                 </Typography.Text>
               )}
               {oneLinerBreakup.length > 3 && (
-                <Tag style={{ fontSize: FONT_SIZE.PARA }} color="blue">
+                <Tag style={{ fontSize: FONT_SIZE.SUB_TEXT }} color="blue">
                   {oneLinerBreakup
                     .slice(3, 4)
                     .join("")
@@ -138,7 +124,7 @@ export function UserProjects() {
             <Flex gap={4}>
               <Typography.Text
                 style={{
-                  fontSize: FONT_SIZE.PARA,
+                  fontSize: FONT_SIZE.SUB_TEXT,
                   color: COLORS.textColorLight,
                 }}
               >
@@ -176,13 +162,13 @@ export function UserProjects() {
                   style={{
                     borderColor: COLORS.borderColor,
                     borderRadius: 8,
-                    fontSize: FONT_SIZE.PARA,
+                    fontSize: FONT_SIZE.SUB_TEXT,
                   }}
                 >
                   <Flex vertical style={{ width: "100%" }}>
                     <Typography.Text
                       style={{
-                        fontSize: FONT_SIZE.PARA,
+                        fontSize: FONT_SIZE.SUB_TEXT,
                         color: COLORS.textColorLight,
                       }}
                     >
@@ -208,7 +194,7 @@ export function UserProjects() {
     return <Loader></Loader>;
   }
 
-  if (!user.savedLvnzyProjects || user.savedLvnzyProjects.length === 0) {
+  if (!lvnzyProjects || !lvnzyProjects.length) {
     return (
       <Flex
         style={{ width: "100%", padding: 16 }}
@@ -218,10 +204,6 @@ export function UserProjects() {
         <Typography.Text>No saved projects found</Typography.Text>
       </Flex>
     );
-  }
-
-  if (!projects.length) {
-    return <Loader></Loader>;
   }
 
   return (
@@ -235,27 +217,8 @@ export function UserProjects() {
       vertical
     >
       <Flex gap={8} style={{ marginBottom: 16 }}>
-        {collectionNames && collectionNames.length > 1 && (
-          <Select
-            style={{ minWidth: 200 }}
-            placeholder="Select project list"
-            defaultValue={
-              collectionNames ? collectionNames[collectionNames.length - 1] : ""
-            }
-            optionFilterProp="label"
-            onChange={(value: string) => {
-              setSelectedCollection(
-                user.savedLvnzyProjects.find((c) => c.collectionName == value)
-              );
-            }}
-            options={collectionNames?.map((c) => ({
-              value: c,
-              label: c,
-            }))}
-          />
-        )}
         <Select
-          style={{ minWidth: 150 }}
+          style={{ width: 225, height: 42 }}
           placeholder="Select corridor"
           value={selectedCorridor}
           onChange={(value: string) => setSelectedCorridor(value)}
@@ -269,9 +232,26 @@ export function UserProjects() {
         />
       </Flex>
 
-      <Flex wrap="wrap" gap={16}>
+      <Flex vertical>
+        <Typography.Title level={4} style={{ margin: 0 }}>
+          {lvnzyProjects.length} projects
+        </Typography.Title>
+      </Flex>
+      <Flex
+        style={{
+          width: "100%",
+          flexWrap: "wrap",
+          marginTop: 16,
+        }}
+        gap={16}
+        vertical={isMobile}
+      >
         {filteredProjects.map((p: any) => renderLvnzyProject(p))}
       </Flex>
+      {/* <BrickfiAssist
+        ref={chatRef}
+        lvnzyProjectsCollection={selectedCollection.name}
+      ></BrickfiAssist> */}
     </Flex>
   );
 }

@@ -40,7 +40,7 @@ export const DashboardLayout: React.FC = () => {
     {
       key: "profile",
       title: "Profile",
-      link: "/profile",
+      link: "/app/profile",
       icon: { name: "FaRegUserCircle", set: "fa" },
     },
     {
@@ -172,6 +172,25 @@ export const DashboardLayout: React.FC = () => {
               <NavLinks
                 navLinks={navLinks.filter((l) => l.key === "profile")}
               />
+              {/* {collectionNames && collectionNames.length > 1 && (
+        <Select
+          style={{ minWidth: 200 }}
+          placeholder="Select project list"
+          defaultValue={
+            collectionNames ? collectionNames[collectionNames.length - 1] : ""
+          }
+          optionFilterProp="label"
+          onChange={(value: string) => {
+            setSelectedCollection(
+              user!.savedLvnzyProjects.find((c) => c.collectionName == value)
+            );
+          }}
+          options={collectionNames?.map((c) => ({
+            value: c,
+            label: c,
+          }))}
+        />
+      )} */}
               <Flex gap={24} vertical style={{ marginTop: "auto" }}>
                 <NavLinks
                   navLinks={navLinks.filter((l) => l.key === "about")}
@@ -193,9 +212,7 @@ export const DashboardLayout: React.FC = () => {
               backgroundColor: COLORS.bgColorMedium,
               maxWidth: MAX_WIDTH,
               width: "100%",
-              height: "calc(100vh - 100px)",
-              overflowY: "scroll",
-              scrollbarWidth: "none",
+              overflowY: "hidden",
             }}
           >
             <CustomErrorBoundary>
