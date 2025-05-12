@@ -2,6 +2,7 @@ import { Flex, Typography } from "antd";
 import { useDevice } from "../../hooks/use-device";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import Link from "antd/es/typography/Link";
+import { LandingConstants } from "../../libs/constants";
 
 export function LandingFooter() {
   const { isMobile } = useDevice();
@@ -32,28 +33,19 @@ export function LandingFooter() {
         guidance to help you make confident decisions.
       </Typography.Text>
       <Flex style={{ marginTop: 40 }} gap={isMobile ? 16 : 32}>
-        <Link
-          href="https://app.brickfi.in"
-          style={{ color: COLORS.textColorLight }}
-        >
+        <Link href="/app" style={{ color: COLORS.textColorLight }}>
           Brickfi App
         </Link>
         <Link
-          href="https://app.brickfi.in"
+          href={LandingConstants.consultUsLink}
           style={{ color: COLORS.textColorLight }}
         >
           Consult With Us
         </Link>
-        <Link
-          href="https://app.brickfi.in"
-          style={{ color: COLORS.textColorLight }}
-        >
+        <Link href="/aboutus" style={{ color: COLORS.textColorLight }}>
           About Us
         </Link>
-        <Link
-          href="https://app.brickfi.in"
-          style={{ color: COLORS.textColorLight }}
-        >
+        <Link href="/aboutus" style={{ color: COLORS.textColorLight }}>
           Help
         </Link>
       </Flex>

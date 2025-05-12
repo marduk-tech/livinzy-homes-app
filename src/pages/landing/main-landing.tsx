@@ -4,6 +4,7 @@ import { COLORS } from "../../theme/style-constants";
 import { SectionCenter, SectionLeft, SectionRight } from "./section";
 import { LandingHeader } from "./header";
 import { LandingFooter } from "./footer";
+import { LandingConstants } from "../../libs/constants";
 
 export function MainLanding() {
   const { isMobile } = useDevice();
@@ -63,6 +64,10 @@ export function MainLanding() {
         sectionData={{
           heading: "The BrickFi Difference",
           fullHeight: true,
+          btn: {
+            link: LandingConstants.consultUsLink,
+            txt: "Schedule Call",
+          },
           subHeading:
             "A combination of technology driven, data backed and personalized experience. ",
           mainImgUrl: "/images/landing/slide-4.png",
@@ -133,6 +138,10 @@ export function MainLanding() {
         sectionData={{
           verticalPadding: 100,
           heading: "Choose Real Estate To Diversify & Leverage",
+          btn: {
+            link: LandingConstants.consultUsLink,
+            txt: "Schedule Call",
+          },
           subHeading:
             "Diversify your portfolio with real estate — a stable, physical asset that grows in value over time. Take advantage of leverage to secure high-value investments with lower upfront costs.",
           mainImgUrl: "/images/landing/slide-11.png",

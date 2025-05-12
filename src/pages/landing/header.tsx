@@ -2,6 +2,7 @@ import { Flex } from "antd";
 import { COLORS } from "../../theme/style-constants";
 import Link from "antd/es/typography/Link";
 import { useDevice } from "../../hooks/use-device";
+import { LandingConstants } from "../../libs/constants";
 
 export function LandingHeader() {
   const { isMobile } = useDevice();
@@ -19,14 +20,11 @@ export function LandingHeader() {
     >
       <img src="/images/brickfi-logo.png" height="20"></img>
       <Flex style={{ marginLeft: "auto", marginRight: 48 }} gap={16}>
-        <Link
-          href="https://app.brickfi.in"
-          style={{ color: COLORS.textColorDark }}
-        >
+        <Link href="/app" style={{ color: COLORS.textColorDark }}>
           Brickfi App
         </Link>
         <Link
-          href="https://app.brickfi.in"
+          href={LandingConstants.consultUsLink}
           style={{ color: COLORS.textColorDark }}
         >
           Consult Us

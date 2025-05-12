@@ -297,3 +297,7 @@ export const SurroundingElementLabels = {
   highway: { label: "Highway/Expressway", icon: { name: "GiRoad", set: "gi" } },
   forest: { label: "Forest Area", icon: { name: "GiPalmTree", set: "gi" } },
 };
+
+export const LandingConstants = {
+  consultUsLink: "https://xcaklnxh.formester.com/f/NSwf98IzN",
+};

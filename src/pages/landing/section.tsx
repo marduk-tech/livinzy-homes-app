@@ -1,6 +1,7 @@
-import { Flex } from "antd";
+import { Button, Flex } from "antd";
 import { useDevice } from "../../hooks/use-device";
-import { COLORS } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { useNavigate } from "react-router-dom";
 
 interface SectionProps {
   heading?: string;
@@ -13,6 +14,10 @@ interface SectionProps {
   fullHeight?: boolean;
   primaryImageSize?: string;
   mediaUrl?: string;
+  btn?: {
+    link: string;
+    txt: string;
+  };
 }
 const styles = {
   h1: {
@@ -35,6 +40,8 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
   sectionData,
 }) => {
   const { isMobile } = useDevice();
+
+  const navigate = useNavigate();
 
   return (
     <Flex
@@ -83,6 +90,22 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
           >
             {sectionData.subHeading as any}
           </h2>
+        )}
+        {sectionData.btn && (
+          <Button
+            type="primary"
+            onClick={() => {
+              window.location.href = sectionData.btn!.link!;
+            }}
+            style={{
+              alignSelf: "flex-start",
+              marginTop: 16,
+              fontWeight: 800,
+              fontSize: FONT_SIZE.HEADING_3,
+            }}
+          >
+            {sectionData.btn.txt}
+          </Button>
         )}
       </Flex>
       <Flex
@@ -183,6 +206,22 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
             {sectionData.subHeading as any}
           </h2>
         )}
+        {sectionData.btn && (
+          <Button
+            type="primary"
+            onClick={() => {
+              window.location.href = sectionData.btn!.link!;
+            }}
+            style={{
+              alignSelf: "flex-start",
+              marginTop: 16,
+              fontWeight: 800,
+              fontSize: FONT_SIZE.HEADING_3,
+            }}
+          >
+            {sectionData.btn.txt}
+          </Button>
+        )}
       </Flex>
     </Flex>
   );
@@ -234,6 +273,22 @@ const SectionCenter: React.FC<{ sectionData: SectionProps }> = ({
           >
             {sectionData.subHeading as any}
           </h2>
+        )}
+        {sectionData.btn && (
+          <Button
+            type="primary"
+            onClick={() => {
+              window.location.href = sectionData.btn!.link!;
+            }}
+            style={{
+              alignSelf: "flex-start",
+              marginTop: 16,
+              fontWeight: 800,
+              fontSize: FONT_SIZE.HEADING_3,
+            }}
+          >
+            {sectionData.btn.txt}
+          </Button>
         )}
       </Flex>
       <Flex
