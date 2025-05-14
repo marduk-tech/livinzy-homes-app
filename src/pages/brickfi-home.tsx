@@ -49,11 +49,7 @@ const BrickfiHome: React.FC = () => {
   return (
     <Flex vertical style={{ paddingBottom: 100 }}>
       {lvnzyProjectId ? (
-        <Brick360
-          setFixedContent={(node: ReactNode) => {
-            setDrawerFixedContent(node);
-          }}
-        ></Brick360>
+        <Brick360></Brick360>
       ) : (
         <UserProjects
           lvnzyProjects={selectedCollection.projects}
