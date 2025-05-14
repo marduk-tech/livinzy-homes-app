@@ -1,10 +1,9 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import { Drawer, Flex } from "antd";
+import { Flex } from "antd";
 import { UserProjects } from "./user-projects";
 import { useUser } from "../hooks/use-user";
 import { useParams } from "react-router-dom";
 import { Brick360 } from "./brick360";
-import BrickfiAssist from "../components/liv/brickfi-assist";
 import { Loader } from "../components/common/loader";
 
 const BrickfiHome: React.FC = () => {
@@ -55,7 +54,7 @@ const BrickfiHome: React.FC = () => {
           lvnzyProjects={selectedCollection.projects}
         ></UserProjects>
       )}
-      <Drawer
+      {/* <Drawer
         open={true}
         mask={false}
         title={null}
@@ -96,7 +95,7 @@ const BrickfiHome: React.FC = () => {
             lvnzyProjectId={lvnzyProjectId}
           ></BrickfiAssist>
         </Flex>
-      </Drawer>
+      </Drawer> */}
       {/* <Tabs
         onChange={(key: string) => {
           setSelectedTabKey(key);
