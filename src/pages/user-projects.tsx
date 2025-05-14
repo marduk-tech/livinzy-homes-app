@@ -3,13 +3,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GradientBar from "../components/common/grading-bar";
 import { Loader } from "../components/common/loader";
-import { useFetchCorridors } from "../hooks/use-corridors";
 import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
 import { BRICK360_CATEGORY, Brick360CategoryInfo } from "../libs/constants";
 import { getCategoryScore, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { useRef } from "react";
 import { LvnzyProject } from "../types/LvnzyProject";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 const { Paragraph } = Typography;
@@ -20,11 +18,8 @@ export function UserProjects({
   lvnzyProjects: LvnzyProject[];
 }) {
   const { user } = useUser();
-  const chatRef = useRef<{ clearChatData: () => void } | null>(null);
 
   const navigate = useNavigate();
-  const { data: corridors, isLoading: isCorridorsDataLoading } =
-    useFetchCorridors();
   const [selectedCorridor, setSelectedCorridor] = useState<string>("All");
   const { isMobile } = useDevice();
 

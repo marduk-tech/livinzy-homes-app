@@ -1,4 +1,4 @@
-import { Drawer, Flex, Image, Layout, Modal, Typography } from "antd";
+import { Drawer, Flex, Image, Layout, Modal, Select, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
@@ -19,6 +19,8 @@ export const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const navigate = useNavigate();
+
+  const [selectedCollection, setSelectedCollection] = useState<any>();
 
   useEffect(() => {
     const userItem = localStorage.getItem(LocalStorageKeys.user);
@@ -172,25 +174,27 @@ export const DashboardLayout: React.FC = () => {
               <NavLinks
                 navLinks={navLinks.filter((l) => l.key === "profile")}
               />
-              {/* {collectionNames && collectionNames.length > 1 && (
-        <Select
-          style={{ minWidth: 200 }}
-          placeholder="Select project list"
-          defaultValue={
-            collectionNames ? collectionNames[collectionNames.length - 1] : ""
-          }
-          optionFilterProp="label"
-          onChange={(value: string) => {
-            setSelectedCollection(
-              user!.savedLvnzyProjects.find((c) => c.collectionName == value)
-            );
-          }}
-          options={collectionNames?.map((c) => ({
-            value: c,
-            label: c,
-          }))}
-        />
-      )} */}
+              {user?.savedLvnzyProjects &&
+                user.savedLvnzyProjects.length > 1 && (
+                  <Select
+                    style={{ minWidth: 200 }}
+                    placeholder="Select project list"
+                    defaultValue={
+                      user.savedLvnzyProjects[
+                        user.savedLvnzyProjects.length - 1
+                      ]._id
+                    }
+                    optionFilterProp="label"
+                    onChange={(value: string) => {
+                      setSidebarOpen(false);
+                      navigate(`/app/${value}`);
+                    }}
+                    options={user.savedLvnzyProjects?.map((c) => ({
+                      value: c._id,
+                      label: c.collectionName,
+                    }))}
+                  />
+                )}
               <Flex gap={24} vertical style={{ marginTop: "auto" }}>
                 <NavLinks
                   navLinks={navLinks.filter((l) => l.key === "about")}

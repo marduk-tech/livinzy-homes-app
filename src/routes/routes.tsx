@@ -47,7 +47,7 @@ export const Router = () => {
       <Route path="/aboutus" element={<AboutUs />} />
       <Route element={<DashboardLayout />}>
         <Route path="/app/map-view-345" element={<LivIndexFull />} />
-        <Route path="/app" element={<BrickfiHome />} />
+        <Route path="/app/:collectionId?" element={<BrickfiHome />} />
         <Route path="/app/profile" element={<ProfilePage />} />
         <Route path="/pro/:projectId?" element={<LivProjectPro />} />
         <Route
