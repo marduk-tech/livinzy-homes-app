@@ -11,6 +11,7 @@ import { getCategoryScore, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { useRef } from "react";
 import { LvnzyProject } from "../types/LvnzyProject";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
 const { Paragraph } = Typography;
 
 export function UserProjects({
@@ -121,7 +122,7 @@ export function UserProjects({
                 </Tag>
               )}
             </Flex>
-            <Flex gap={4}>
+            <Flex gap={4} align="center">
               <Typography.Text
                 style={{
                   fontSize: FONT_SIZE.SUB_TEXT,
@@ -135,15 +136,12 @@ export function UserProjects({
                 / {itemInfo.meta.costingDetails.minimumUnitSize} sqft
               </Typography.Text>
               {itemInfo.investment && itemInfo.investment.paymentPlan ? (
-                <Tag
-                  style={{
-                    fontSize: FONT_SIZE.SUB_TEXT,
-                    marginLeft: "auto",
-                  }}
+                <DynamicReactIcon
+                  iconName="BiSolidOffer"
+                  iconSet="bi"
+                  size={18}
                   color={COLORS.primaryColor}
-                >
-                  Payment Plan
-                </Tag>
+                ></DynamicReactIcon>
               ) : null}
             </Flex>
 
