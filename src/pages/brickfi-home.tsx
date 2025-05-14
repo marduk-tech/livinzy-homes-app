@@ -1,26 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { Flex } from "antd";
 import { UserProjects } from "./user-projects";
 import { useUser } from "../hooks/use-user";
 import { useParams } from "react-router-dom";
 import { Brick360 } from "./brick360";
+import { Loader } from "../components/common/loader";
 
 const BrickfiHome: React.FC = () => {
   const { user } = useUser();
-  const [selectedCollection, setSelectedCollection] = useState<any>();
   const [projects, setProjects] = useState<any[]>([]);
-  const { lvnzyProjectId } = useParams();
+  const { lvnzyProjectId, collectionId } = useParams();
 
-  useEffect(() => {
-    if (user?.savedLvnzyProjects && user.savedLvnzyProjects.length) {
-      const collections = user.savedLvnzyProjects.map((c) => c.collectionName);
-      setSelectedCollection(collections[0]);
-      setProjects(
-        user.savedLvnzyProjects.find((c) => c.collectionName == collections[0])
-          .projects
-      );
-    }
-  }, [user]);
+  const [drawerFixedContent, setDrawerFixedContent] = useState<ReactNode>(null);
+  const [drawerVisibility, setDrawerVisibility] = useState<boolean>(false);
+  const [selectedCollection, setSelectedCollection] = useState<any>();
 
   const tabs = [
     {
@@ -36,76 +29,77 @@ const BrickfiHome: React.FC = () => {
     tabs[0].key
   );
 
+  useEffect(() => {
+    if (user && user.savedLvnzyProjects) {
+      if (collectionId) {
+        setSelectedCollection(
+          user!.savedLvnzyProjects.find((c) => c._id == collectionId)
+        );
+      } else {
+        setSelectedCollection(user!.savedLvnzyProjects[0]);
+      }
+    }
+  }, [collectionId, user]);
+
+  if (!user || !selectedCollection) {
+    return <Loader></Loader>;
+  }
+
   return (
-    <Flex vertical>
+    <Flex vertical style={{ paddingBottom: 100 }}>
       {lvnzyProjectId ? (
-        <Brick360></Brick360>
+        <Brick360
+          setFixedContent={(node: ReactNode) => {
+            setDrawerFixedContent(node);
+          }}
+        ></Brick360>
       ) : (
-        <UserProjects lvnzyProjects={projects}></UserProjects>
+        <UserProjects
+          lvnzyProjects={selectedCollection.projects}
+        ></UserProjects>
       )}
       {/* <Drawer
         open={true}
         mask={false}
         title={null}
         placement="bottom"
-        height={175}
+        height={drawerFixedContent || drawerVisibility ? 700 : 175}
         closeIcon={null}
         style={{
-          borderTopRightRadius: 24,
-          borderTopLeftRadius: 24,
+          borderTopRightRadius: 16,
+          borderTopLeftRadius: 16,
           boxShadow: "0 0 8px #888",
+          overflowY:
+            drawerFixedContent || drawerVisibility ? "scroll" : "hidden",
+          position: "relative",
         }}
         styles={{
           body: {
-            padding: "8px 16px",
-            position: "relative",
+            padding: 0,
+            overflowY:
+              drawerFixedContent || drawerVisibility ? "scroll" : "hidden",
           },
         }}
         rootClassName="brickfi-drawer"
       >
+        {drawerFixedContent && (
+          <Flex style={{ paddingBottom: 100 }}>{drawerFixedContent}</Flex>
+        )}
         <Flex
           vertical
           gap={8}
           style={{
-            position: "absolute",
-            bottom: 8,
             width: "calc(100% - 24px)",
+            backgroundColor: "white",
+            padding: 12,
           }}
         >
-          <Flex
-            style={{
-              width: "100%",
-              overflowX: "scroll",
-              whiteSpace: "nowrap",
-              scrollbarWidth: "none",
-            }}
-            gap={8}
-          >
-            {[
-              "Expected Investment Return",
-              "More about the area ?",
-              "Compare across density",
-            ].map((p) => {
-              return (
-                <div
-                  style={{
-                    border: "1px solid",
-                    borderRadius: 8,
-                    minWidth: 140,
-                    padding: 8,
-                    textWrap: "wrap",
-                    borderColor: COLORS.borderColor,
-                    fontSize: FONT_SIZE.HEADING_4,
-                  }}
-                >
-                  {p}
-                </div>
-              );
-            })}
-          </Flex>
-
           <BrickfiAssist
-            lvnzyProjectsCollection={selectedCollection}
+            lvnzyProjectsCollection={selectedCollection.name}
+            lvnzyProjectId={lvnzyProjectId}
+            showDrawer={() => {
+              setDrawerVisibility(true);
+            }}
           ></BrickfiAssist>
         </Flex>
       </Drawer> */}
