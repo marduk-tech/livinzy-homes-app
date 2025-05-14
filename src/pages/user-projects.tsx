@@ -244,7 +244,6 @@ export function UserProjects({
           marginTop: 16,
         }}
         gap={16}
-        vertical={isMobile}
       >
         {filteredProjects.map((p: any) => renderLvnzyProject(p))}
       </Flex>

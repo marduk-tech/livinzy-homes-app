@@ -212,7 +212,9 @@ export const DashboardLayout: React.FC = () => {
               backgroundColor: COLORS.bgColorMedium,
               maxWidth: MAX_WIDTH,
               width: "100%",
-              overflowY: "hidden",
+              height: "calc(100vh - 100px)",
+              overflowY: "scroll",
+              scrollbarWidth: "none",
             }}
           >
             <CustomErrorBoundary>

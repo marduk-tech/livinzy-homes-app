@@ -38,6 +38,7 @@ import {
 } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { ISurroundingElement } from "../types/Project";
+import Brick360Chat from "../components/liv/brick360-chat";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -1053,11 +1054,12 @@ export function Brick360() {
             <Divider></Divider>
 
             <Flex style={{ width: "100%" }}>
-              " "
-              {/* <Brick360Chat
+              <Brick360Chat
                 ref={chatRef}
+                dataPointCategory={selectedDataPointCategory}
+                dataPoint={selectedDataPointTitle}
                 lvnzyProjectId={lvnzyProjectId!}
-              ></Brick360Chat> */}
+              ></Brick360Chat>
             </Flex>
           </Flex>
         </Flex>

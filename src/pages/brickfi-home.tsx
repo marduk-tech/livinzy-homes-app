@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Tabs, Typography } from "antd";
+import { Flex } from "antd";
 import { UserProjects } from "./user-projects";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
-import { COLORS } from "../theme/style-constants";
 import { useUser } from "../hooks/use-user";
-import MapViewV2 from "../components/map-view/map-view-v2";
-import BrickfiAssist from "../components/liv/brickfi-assist";
 import { useParams } from "react-router-dom";
 import { Brick360 } from "./brick360";
 
@@ -20,9 +16,8 @@ const BrickfiHome: React.FC = () => {
       const collections = user.savedLvnzyProjects.map((c) => c.collectionName);
       setSelectedCollection(collections[0]);
       setProjects(
-        user.savedLvnzyProjects.find(
-          (c) => c.collectionName == collections[collections.length - 1]
-        ).projects
+        user.savedLvnzyProjects.find((c) => c.collectionName == collections[0])
+          .projects
       );
     }
   }, [user]);
@@ -43,7 +38,78 @@ const BrickfiHome: React.FC = () => {
 
   return (
     <Flex vertical>
-      <Tabs
+      {lvnzyProjectId ? (
+        <Brick360></Brick360>
+      ) : (
+        <UserProjects lvnzyProjects={projects}></UserProjects>
+      )}
+      {/* <Drawer
+        open={true}
+        mask={false}
+        title={null}
+        placement="bottom"
+        height={175}
+        closeIcon={null}
+        style={{
+          borderTopRightRadius: 24,
+          borderTopLeftRadius: 24,
+          boxShadow: "0 0 8px #888",
+        }}
+        styles={{
+          body: {
+            padding: "8px 16px",
+            position: "relative",
+          },
+        }}
+        rootClassName="brickfi-drawer"
+      >
+        <Flex
+          vertical
+          gap={8}
+          style={{
+            position: "absolute",
+            bottom: 8,
+            width: "calc(100% - 24px)",
+          }}
+        >
+          <Flex
+            style={{
+              width: "100%",
+              overflowX: "scroll",
+              whiteSpace: "nowrap",
+              scrollbarWidth: "none",
+            }}
+            gap={8}
+          >
+            {[
+              "Expected Investment Return",
+              "More about the area ?",
+              "Compare across density",
+            ].map((p) => {
+              return (
+                <div
+                  style={{
+                    border: "1px solid",
+                    borderRadius: 8,
+                    minWidth: 140,
+                    padding: 8,
+                    textWrap: "wrap",
+                    borderColor: COLORS.borderColor,
+                    fontSize: FONT_SIZE.HEADING_4,
+                  }}
+                >
+                  {p}
+                </div>
+              );
+            })}
+          </Flex>
+
+          <BrickfiAssist
+            lvnzyProjectsCollection={selectedCollection}
+          ></BrickfiAssist>
+        </Flex>
+      </Drawer> */}
+      {/* <Tabs
         onChange={(key: string) => {
           setSelectedTabKey(key);
         }}
@@ -111,7 +177,7 @@ const BrickfiHome: React.FC = () => {
             ),
           };
         })}
-      />
+      /> */}
     </Flex>
   );
 };

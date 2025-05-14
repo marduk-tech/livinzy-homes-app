@@ -135,6 +135,12 @@ body {
   display: none !important;
 }
 
+.brickfi-drawer {
+  .ant-drawer-content-wrapper {
+    box-shadow: none !important;
+  }
+}
+
 .full-width-modal {
   display: flex;
   justify-content: center;

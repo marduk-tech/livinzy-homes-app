@@ -286,9 +286,6 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
           <Flex
             vertical
             style={{
-              position: "absolute",
-              bottom: 0,
-              maxWidth: 850,
               width: "100%",
               backgroundColor: "white",
             }}
@@ -358,8 +355,7 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
                     border: "1px solid",
                     borderColor: COLORS.borderColorMedium,
                     borderRadius: 16,
-                    width: "95%",
-                    marginLeft: "2.5%",
+                    width: "100%",
                     fontSize: FONT_SIZE.HEADING_3,
                   }}
                   name="query"
