@@ -296,6 +296,14 @@ export const SurroundingElementLabels = {
   },
   highway: { label: "Highway/Expressway", icon: { name: "GiRoad", set: "gi" } },
   forest: { label: "Forest Area", icon: { name: "GiPalmTree", set: "gi" } },
+  cemetery: {
+    label: "Cemetery/Graveyard",
+    icon: { name: "TbGrave", set: "tb" },
+  },
+  sewageDrainage: {
+    label: "Sewage/Drainage",
+    icon: { name: "FaHouseFloodWater", set: "fa6" },
+  },
 };
 
 export const LandingConstants = {

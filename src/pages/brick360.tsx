@@ -127,6 +127,24 @@ export function Brick360() {
       ></DynamicReactIcon>
     );
   };
+
+  const getStatusLabel = (projectTimelines: any[]) => {
+    const completionDate =
+      projectTimelines[projectTimelines.length - 1]["completionDate"];
+    const [day, month, year] = completionDate.split("-");
+    const date = new Date(`${year}-${month}-${day}`);
+    const diff = Math.ceil(
+      (new Date().getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    if (diff > 365 * 1) {
+      return "Ready To Move";
+    } else if (diff < 365 && diff > 0) {
+      return "Recently Completed";
+    } else if (diff < 0) {
+      return "Under Construction";
+    }
+    return "";
+  };
   // Fake timeout and progress
   useEffect(() => {
     const interval = setInterval(() => {
@@ -309,13 +327,23 @@ export function Brick360() {
           <Flex>
             <Tag
               style={{
-                fontSize: FONT_SIZE.HEADING_3,
+                fontSize: FONT_SIZE.HEADING_4,
                 padding: "4px 8px",
                 borderRadius: 8,
                 fontWeight: 500,
               }}
             >
               {lvnzyProject?.originalProjectId.info.developerId.name}
+            </Tag>
+            <Tag
+              style={{
+                fontSize: FONT_SIZE.HEADING_4,
+                padding: "4px 8px",
+                borderRadius: 8,
+                fontWeight: 500,
+              }}
+            >
+              {getStatusLabel(lvnzyProject?.meta.projectTimelines)}
             </Tag>
           </Flex>
           <Typography.Title
@@ -412,7 +440,7 @@ export function Brick360() {
                 )}`
               )}{" "}
             </Typography.Text>
-
+            {/* 
             <Typography.Text
               style={{
                 color: COLORS.textColorLight,
@@ -422,9 +450,9 @@ export function Brick360() {
             >
               | {lvnzyProject!.meta.costingDetails.configurations.length} Unit
               Types
-            </Typography.Text>
+            </Typography.Text> */}
           </Typography.Text>
-          <Flex>
+          <Flex vertical={isMobile}>
             <Typography.Text
               onClick={() => {
                 setIsConfigurationsModalOpen(true);
@@ -1148,13 +1176,25 @@ export function Brick360() {
             overflowY: "scroll",
             scrollbarWidth: "none",
           }}
-          gap={8}
+          gap={16}
         >
           {lvnzyProject!.meta.costingDetails.configurations.map((c: any) => {
             return (
-              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
-                {c.config} | ₹{rupeeAmountFormat(c.cost)}
-              </Typography.Text>
+              <Flex
+                vertical
+                style={{
+                  borderLeft: "1px solid",
+                  paddingLeft: 8,
+                  borderLeftColor: COLORS.borderColorMedium,
+                }}
+              >
+                <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_4 }}>
+                  ₹{rupeeAmountFormat(c.cost)}
+                </Typography.Text>
+                <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
+                  {c.config}
+                </Typography.Text>
+              </Flex>
             );
           })}
         </Flex>

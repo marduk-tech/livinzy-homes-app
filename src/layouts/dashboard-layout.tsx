@@ -1,10 +1,9 @@
 import { Drawer, Flex, Image, Layout, Modal, Select, Typography } from "antd";
 import React, { useEffect, useState } from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { LoginForm } from "../components/login-forms";
-import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
 import { LocalStorageKeys } from "../libs/constants";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
@@ -13,14 +12,11 @@ import { NavLink } from "../types/Common";
 const { Header, Content } = Layout;
 
 export const DashboardLayout: React.FC = () => {
-  const { isMobile } = useDevice();
-
   const { user } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const navigate = useNavigate();
-
-  const [selectedCollection, setSelectedCollection] = useState<any>();
+  const { lvnzyProjectId, collectionId } = useParams();
 
   useEffect(() => {
     const userItem = localStorage.getItem(LocalStorageKeys.user);
@@ -133,7 +129,11 @@ export const DashboardLayout: React.FC = () => {
             >
               <Flex
                 onClick={() => {
-                  window.location.replace("/");
+                  if (lvnzyProjectId || collectionId) {
+                    window.location.replace("/app");
+                  } else {
+                    window.location.replace("/");
+                  }
                 }}
                 style={{ height: 60, display: "flex", alignItems: "center" }}
               >
@@ -179,11 +179,7 @@ export const DashboardLayout: React.FC = () => {
                   <Select
                     style={{ minWidth: 200 }}
                     placeholder="Select project list"
-                    defaultValue={
-                      user.savedLvnzyProjects[
-                        user.savedLvnzyProjects.length - 1
-                      ]._id
-                    }
+                    defaultValue={user.savedLvnzyProjects[0]._id}
                     optionFilterProp="label"
                     onChange={(value: string) => {
                       setSidebarOpen(false);
