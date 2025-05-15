@@ -86,6 +86,9 @@ export function Brick360() {
   const [fakeTimeoutProgress, setFakeTimeoutProgress] = useState<any>(10);
   const [selectedDataPointTitle, setSelectedDataPointTitle] = useState("");
 
+  const [isConfigurationsModalOpen, setIsConfigurationsModalOpen] =
+    useState(false);
+
   const [isMapFullScreen, setIsMapFullScreen] = useState(false);
 
   // Renders the drawer close button
@@ -409,26 +412,42 @@ export function Brick360() {
                 )}`
               )}{" "}
             </Typography.Text>
+
+            <Typography.Text
+              style={{
+                color: COLORS.textColorLight,
+                fontSize: FONT_SIZE.HEADING_4,
+                fontWeight: 500,
+              }}
+            >
+              | {lvnzyProject!.meta.costingDetails.configurations.length} Unit
+              Types
+            </Typography.Text>
           </Typography.Text>
-          <Paragraph
-            ellipsis={{
-              rows: 1,
-              expandable: true,
-              symbol: `${
-                lvnzyProject!.meta.costingDetails.configurations.length
-              } more`,
-            }}
-            style={{
-              whiteSpace: "pre-line",
-              marginBottom: 0,
-              width: "100%",
-              fontSize: FONT_SIZE.HEADING_3,
-            }}
-          >
-            {lvnzyProject!.meta.costingDetails.configurations
-              .map((c: any) => `₹${rupeeAmountFormat(c.cost)} | ${c.config} `)
-              .join("\n")}
-          </Paragraph>
+          <Flex>
+            <Typography.Text
+              onClick={() => {
+                setIsConfigurationsModalOpen(true);
+              }}
+            >
+              {lvnzyProject!.meta.costingDetails.configurations
+                .slice(0, 1)
+                .map((c: any) => `${c.config} | ₹${rupeeAmountFormat(c.cost)}`)
+                .join("\n")}
+            </Typography.Text>
+            <Typography.Text
+              onClick={() => {
+                setIsConfigurationsModalOpen(true);
+              }}
+              style={{
+                color: COLORS.primaryColor,
+                marginLeft: 8,
+                cursor: "pointer",
+              }}
+            >
+              ...See all
+            </Typography.Text>
+          </Flex>
           {/* Payment plan and price point */}
           <Flex style={{ marginTop: 8, marginBottom: 8 }}>
             {lvnzyProject?.originalProjectId.info.financialPlan ? (
@@ -480,6 +499,7 @@ export function Brick360() {
                     style={{
                       marginLeft: 8,
                       fontWeight: 500,
+                      padding: "0 4px",
                       color: COLORS.textColorDark,
                     }}
                   >
@@ -549,6 +569,7 @@ export function Brick360() {
                       marginLeft: 4,
                       fontWeight: 500,
                       color: COLORS.textColorDark,
+                      padding: "0 4px",
                     }}
                   >
                     Price Point
@@ -788,7 +809,9 @@ export function Brick360() {
             drivers={mapDrivers.map((d) => {
               return {
                 id: d.driverId._id,
-                duration: Math.round(d.mapsDurationSeconds / 60),
+                duration: d.durationMins
+                  ? d.durationMins
+                  : Math.round(d.mapsDurationSeconds / 60),
               };
             })}
           />
@@ -1005,7 +1028,9 @@ export function Brick360() {
                   drivers={mapDrivers.map((d) => {
                     return {
                       id: d.driverId._id,
-                      duration: Math.round(d.mapsDurationSeconds / 60),
+                      duration: d.durationMins
+                        ? d.durationMins
+                        : Math.round(d.mapsDurationSeconds / 60),
                     };
                   })}
                   fullSize={false}
@@ -1064,6 +1089,76 @@ export function Brick360() {
           </Flex>
         </Flex>
       </Drawer>
+
+      {/* Configurations List */}
+      <Modal
+        title={null}
+        closable={true}
+        footer={null}
+        open={isConfigurationsModalOpen}
+        onOk={() => {
+          setIsConfigurationsModalOpen(false);
+        }}
+        onCancel={() => {
+          setIsConfigurationsModalOpen(false);
+        }}
+      >
+        <Typography.Title style={{ margin: 0, marginBottom: 16 }} level={3}>
+          Configurations/Pricing
+        </Typography.Title>
+        {lvnzyProject?.meta.projectConfigurations && (
+          <Flex>
+            {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
+              <>
+                <Tag>
+                  {lvnzyProject?.meta.projectConfigurations.towers.length}{" "}
+                  Towers
+                </Tag>
+                <Tag>
+                  {`${Math.min(
+                    ...lvnzyProject?.meta.projectConfigurations.towers.map(
+                      (t: any) => t.totalFloors
+                    )
+                  )} -
+                ${Math.max(
+                  ...lvnzyProject?.meta.projectConfigurations.towers.map(
+                    (t: any) => t.totalFloors
+                  )
+                )}`}{" "}
+                  Floors
+                </Tag>
+              </>
+            )}
+            {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
+              <Tag>
+                {lvnzyProject?.meta.projectConfigurations.unitsBreakup.reduce(
+                  (sum: number, item: any) => sum + item.totalUnits,
+                  0
+                )}{" "}
+                Units
+              </Tag>
+            )}
+          </Flex>
+        )}
+        <Flex
+          vertical
+          style={{
+            marginTop: 16,
+            maxHeight: 400,
+            overflowY: "scroll",
+            scrollbarWidth: "none",
+          }}
+          gap={8}
+        >
+          {lvnzyProject!.meta.costingDetails.configurations.map((c: any) => {
+            return (
+              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
+                {c.config} | ₹{rupeeAmountFormat(c.cost)}
+              </Typography.Text>
+            );
+          })}
+        </Flex>
+      </Modal>
     </Flex>
   );
 }
