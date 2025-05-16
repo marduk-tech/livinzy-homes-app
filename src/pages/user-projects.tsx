@@ -13,8 +13,10 @@ import DynamicReactIcon from "../components/common/dynamic-react-icon";
 const { Paragraph } = Typography;
 
 export function UserProjects({
+  collectionId,
   lvnzyProjects,
 }: {
+  collectionId: string;
   lvnzyProjects: LvnzyProject[];
 }) {
   const { user } = useUser();
@@ -54,10 +56,10 @@ export function UserProjects({
           backgroundColor: "white",
           borderColor: COLORS.borderColorMedium,
           borderRadius: 12,
-          width: isMobile ? "100%" : 250,
+          width: isMobile ? "100%" : 230,
         }}
         onClick={() => {
-          navigate(`/app/brick360/${itemInfo._id}`);
+          navigate(`/app/brick360/${collectionId}/${itemInfo._id}`);
         }}
       >
         <Flex vertical style={{ width: "100%" }}>

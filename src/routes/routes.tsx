@@ -51,7 +51,7 @@ export const Router = () => {
         <Route path="/app/profile" element={<ProfilePage />} />
         <Route path="/pro/:projectId?" element={<LivProjectPro />} />
         <Route
-          path="/app/brick360/:lvnzyProjectId?"
+          path="/app/brick360/:collectionId/:lvnzyProjectId?"
           element={<BrickfiHome />}
         />
         <Route

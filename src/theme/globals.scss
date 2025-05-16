@@ -106,6 +106,10 @@ body {
   }
 }
 
+.leaflet-container {
+  border-radius: 8px;
+}
+
 .reasoning {
   line-height: 145%;
   b {
@@ -119,6 +123,14 @@ body {
     color: #0084d1;
     background-color: rgba(43, 203, 242, 0.1);
     padding: 0 4px;
+  }
+
+  &.clip {
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Set the number of lines you want to show */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

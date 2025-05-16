@@ -2,12 +2,10 @@ import {
   Alert,
   Button,
   Divider,
-  Drawer,
   Flex,
   List,
   Modal,
   Progress,
-  Space,
   Tag,
   Typography,
 } from "antd";
@@ -38,11 +36,10 @@ import {
 } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { ISurroundingElement } from "../types/Project";
-import Brick360Chat from "../components/liv/brick360-chat";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
-export function Brick360() {
+export function Brick360({ setFixedContent }: { setFixedContent: any }) {
   const { lvnzyProjectId } = useParams();
 
   const { isMobile } = useDevice();
@@ -76,8 +73,6 @@ export function Brick360() {
     useState<any>();
 
   const [selectedDriverTypes, setSelectedDriverTypes] = useState<any>();
-
-  const [mapVisible, setMapVisible] = useState<boolean>(false);
 
   const [mapDrivers, setMapDrivers] = useState<any[]>([]);
   const [surroundingElements, setSurroundingElements] =
@@ -183,10 +178,11 @@ export function Brick360() {
         // reset states first
         setSelectedDriverTypes([]);
         setSurroundingElements([]);
-        setMapVisible(false);
+
+        let isMapVisible = false;
 
         if (selectedDataPointCategory === "areaConnectivity") {
-          setMapVisible(true);
+          isMapVisible = true;
 
           switch (selectedDataPointSubCategory) {
             case "schoolsOffices":
@@ -204,7 +200,7 @@ export function Brick360() {
               break;
           }
         } else if (selectedDataPointCategory === "investment") {
-          setMapVisible(true);
+          isMapVisible = true;
           setSelectedDriverTypes([
             "school",
             "industrial-hitech",
@@ -220,9 +216,10 @@ export function Brick360() {
             surrElements.filter((e: any) => !!e.geometry).length
           ) {
             setSurroundingElements(surrElements);
-            setMapVisible(true);
+            isMapVisible = true;
           }
         }
+        setFixedContent(drawerContent(isMapVisible));
       };
 
       setTimeout(updateMapState, 0);
@@ -249,6 +246,135 @@ export function Brick360() {
       setScoreParams(params);
     }
   }, [lvnzyProject]);
+
+  const drawerContent = (mapVisible: boolean) => {
+    return (
+      <Flex
+        vertical
+        style={{
+          position: "relative",
+          overflowY: "scroll",
+          paddingBottom: 16,
+        }}
+      >
+        {/* Close button when map view is absent */}
+        {!mapDrivers || !mapDrivers.length ? renderDrawerCloseBtn() : null}
+
+        {/* Rest of the content including title, markdown content and chatbox */}
+        <Flex
+          vertical
+          style={{ padding: 16, backgroundColor: COLORS.bgColorMedium }}
+        >
+          <Typography.Title level={4} style={{ margin: 0 }}>
+            {selectedDataPointTitle}
+          </Typography.Title>
+          <Typography.Text style={{ margin: 0, marginBottom: 16 }}>
+            Preset score details.
+          </Typography.Text>
+          {/* Map view including expand button and drawer close icon button */}
+          {mapVisible ? (
+            <Flex vertical style={{ position: "relative" }}>
+              <Flex
+                style={{
+                  position: "absolute",
+                  bottom: 16,
+                  right: 16,
+                  zIndex: 9999,
+                }}
+              >
+                <Button
+                  size="small"
+                  icon={
+                    <DynamicReactIcon
+                      iconName="FaExpand"
+                      color="white"
+                      iconSet="fa"
+                      size={16}
+                    />
+                  }
+                  style={{
+                    marginLeft: "auto",
+                    marginBottom: 8,
+                    borderRadius: 8,
+                    cursor: "pointer",
+                    backgroundColor: COLORS.textColorDark,
+                    color: "white",
+                    fontSize: FONT_SIZE.SUB_TEXT,
+                    height: 28,
+                  }}
+                  onClick={() => {
+                    setDetailsModalOpen(false);
+                    setIsMapFullScreen(true);
+                  }}
+                >
+                  Expand
+                </Button>
+              </Flex>
+              <Flex
+                style={{
+                  height: isMobile ? 200 : 300,
+                  width: "100%",
+                  borderRadius: 16,
+                  marginBottom: 8,
+                }}
+              >
+                <MapViewV2
+                  projectId={lvnzyProject?.originalProjectId._id}
+                  defaultSelectedDriverTypes={selectedDriverTypes}
+                  surroundingElements={surroundingElements}
+                  drivers={mapDrivers.map((d) => {
+                    return {
+                      id: d.driverId._id,
+                      duration: Math.round(d.mapsDurationSeconds / 60),
+                    };
+                  })}
+                  fullSize={false}
+                />
+              </Flex>
+            </Flex>
+          ) : null}
+          {selectedDataPointCategory == "developer" && (
+            <Typography.Title level={5} style={{ margin: "8px 0" }}>
+              {lvnzyProject?.originalProjectId.info.developerId.name}
+            </Typography.Title>
+          )}
+          <Flex vertical gap={16}>
+            {selectedDataPoint
+              ? selectedDataPoint.reasoning.map((r: string) => {
+                  return (
+                    <Flex
+                      style={{
+                        maxWidth: 500,
+                        backgroundColor: "white",
+                        borderRadius: 8,
+                        padding: 8,
+                      }}
+                    >
+                      <div
+                        dangerouslySetInnerHTML={{ __html: r }}
+                        className="reasoning"
+                        style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
+                      ></div>
+                    </Flex>
+                  );
+                })
+              : ""}
+          </Flex>
+          {/* 
+      <Divider></Divider>
+
+      <Flex style={{ width: "100%" }}>
+        <Brick360Chat
+          ref={chatRef}
+          dataPointCategory={selectedDataPointCategory}
+          dataPoint={selectedDataPointTitle}
+          lvnzyProjectId={lvnzyProjectId!}
+        ></Brick360Chat>
+      </Flex> */}
+        </Flex>
+      </Flex>
+    );
+  };
 
   const progressWidth = isMobile ? window.innerWidth : 800;
 
@@ -304,7 +430,6 @@ export function Brick360() {
         width: "100%",
         paddingBottom: 75,
         margin: "auto",
-        maxWidth: 900,
         overflowX: "hidden",
       }}
     >
@@ -619,7 +744,7 @@ export function Brick360() {
             margin: "0 8px",
             borderRadius: 8,
             cursor: "pointer",
-            padding: "8px 0",
+            padding: "8px",
             backgroundColor: "white",
           }}
           onClick={() => {
@@ -953,170 +1078,6 @@ export function Brick360() {
           {pmtDetailsModalContent}
         </Flex>
       </Modal>
-
-      {/* Bottom drawer to show a selected data point */}
-      <Drawer
-        title={null}
-        placement="bottom"
-        styles={{
-          body: {
-            padding: 0,
-          },
-          header: {
-            padding: 16,
-          },
-        }}
-        rootStyle={{
-          maxWidth: 900,
-          marginLeft: isMobile ? 0 : "calc(50% - 450px)",
-        }}
-        extra={
-          <Space>
-            <Button
-              onClick={() => {
-                setDetailsModalOpen(false);
-                if (!isMapFullScreen) {
-                  chatRef.current?.clearChatData();
-                }
-              }}
-            >
-              Close
-            </Button>
-          </Space>
-        }
-        closable={false}
-        height={Math.min(700, window.innerHeight * 0.8)}
-        onClose={() => {
-          setDetailsModalOpen(false);
-          if (!isMapFullScreen) {
-            chatRef.current?.clearChatData();
-          }
-        }}
-        open={detailsModalOpen}
-      >
-        <Flex
-          vertical
-          style={{
-            position: "relative",
-            overflowY: "scroll",
-            paddingBottom: 64,
-          }}
-        >
-          {/* Map view including expand button and drawer close icon button */}
-          {mapVisible ? (
-            <Flex vertical style={{ position: "relative" }}>
-              {renderDrawerCloseBtn()}
-              <Flex
-                style={{
-                  position: "absolute",
-                  bottom: 16,
-                  right: 16,
-                  zIndex: 9999,
-                }}
-              >
-                <Button
-                  size="small"
-                  icon={
-                    <DynamicReactIcon
-                      iconName="FaExpand"
-                      color="white"
-                      iconSet="fa"
-                      size={16}
-                    />
-                  }
-                  style={{
-                    marginLeft: "auto",
-                    marginBottom: 8,
-                    borderRadius: 8,
-                    cursor: "pointer",
-                    backgroundColor: COLORS.textColorDark,
-                    color: "white",
-                    fontSize: FONT_SIZE.SUB_TEXT,
-                    height: 28,
-                  }}
-                  onClick={() => {
-                    setDetailsModalOpen(false);
-                    setIsMapFullScreen(true);
-                  }}
-                >
-                  Expand
-                </Button>
-              </Flex>
-              <Flex
-                style={{
-                  height: isMobile ? 200 : 300,
-                  width: "100%",
-                  borderRadius: 16,
-                }}
-              >
-                <MapViewV2
-                  projectId={lvnzyProject?.originalProjectId._id}
-                  defaultSelectedDriverTypes={selectedDriverTypes}
-                  surroundingElements={surroundingElements}
-                  drivers={mapDrivers.map((d) => {
-                    return {
-                      id: d.driverId._id,
-                      duration: d.durationMins
-                        ? d.durationMins
-                        : Math.round(d.mapsDurationSeconds / 60),
-                    };
-                  })}
-                  fullSize={false}
-                />
-              </Flex>
-            </Flex>
-          ) : null}
-
-          {/* Close button when map view is absent */}
-          {!mapDrivers || !mapDrivers.length ? renderDrawerCloseBtn() : null}
-
-          {/* Rest of the content including title, markdown content and chatbox */}
-          <Flex vertical style={{ padding: 16 }}>
-            <Typography.Title level={4} style={{ margin: "8px 0" }}>
-              {selectedDataPointTitle}
-            </Typography.Title>
-            {selectedDataPointCategory == "developer" && (
-              <Typography.Title level={5} style={{ margin: "8px 0" }}>
-                {lvnzyProject?.originalProjectId.info.developerId.name}
-              </Typography.Title>
-            )}
-            <Flex vertical gap={16}>
-              {selectedDataPoint
-                ? selectedDataPoint.reasoning.map((r: string) => {
-                    return (
-                      <Flex
-                        style={{
-                          maxWidth: 500,
-                          backgroundColor: COLORS.bgColorMedium,
-                          borderRadius: 8,
-                          borderColor: COLORS.borderColorMedium,
-                          padding: 8,
-                        }}
-                      >
-                        <div
-                          dangerouslySetInnerHTML={{ __html: r }}
-                          className="reasoning"
-                          style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
-                        ></div>
-                      </Flex>
-                    );
-                  })
-                : ""}
-            </Flex>
-
-            <Divider></Divider>
-
-            <Flex style={{ width: "100%" }}>
-              <Brick360Chat
-                ref={chatRef}
-                dataPointCategory={selectedDataPointCategory}
-                dataPoint={selectedDataPointTitle}
-                lvnzyProjectId={lvnzyProjectId!}
-              ></Brick360Chat>
-            </Flex>
-          </Flex>
-        </Flex>
-      </Drawer>
 
       {/* Configurations List */}
       <Modal

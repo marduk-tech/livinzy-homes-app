@@ -1,9 +1,10 @@
 import { Flex } from "antd";
 import React, { ReactNode, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Brick360 } from "./brick360";
+import BrickfiAssist from "../components/liv/brickfi-assist";
 import { Loader } from "../components/common/loader";
 import { useUser } from "../hooks/use-user";
-import { Brick360 } from "./brick360";
 import { UserProjects } from "./user-projects";
 
 const BrickfiHome: React.FC = () => {
@@ -11,8 +12,7 @@ const BrickfiHome: React.FC = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const { lvnzyProjectId, collectionId } = useParams();
 
-  const [drawerFixedContent, setDrawerFixedContent] = useState<ReactNode>(null);
-  const [drawerVisibility, setDrawerVisibility] = useState<boolean>(false);
+  const [reportContent, setReportContent] = useState<ReactNode>(null);
   const [selectedCollection, setSelectedCollection] = useState<any>();
 
   const tabs = [
@@ -51,138 +51,39 @@ const BrickfiHome: React.FC = () => {
         });
       } else if (collectionId) {
         setSelectedCollection(
-          user!.savedLvnzyProjects.find((c) => c._id == collectionId)
+          user.savedLvnzyProjects.find((c) => c._id == collectionId)
         );
-      } else {
-        setSelectedCollection(user!.savedLvnzyProjects[0]);
+      } else if (!lvnzyProjectId) {
+        setSelectedCollection(user.savedLvnzyProjects[0]);
       }
     }
   }, [collectionId, user]);
 
-  if (!user || !selectedCollection) {
+  if (!user) {
     return <Loader></Loader>;
   }
 
   return (
     <Flex vertical style={{ paddingBottom: 100 }}>
       {lvnzyProjectId ? (
-        <Brick360></Brick360>
+        <Brick360
+          setFixedContent={(node: ReactNode) => {
+            setReportContent(node);
+          }}
+        ></Brick360>
       ) : (
         <UserProjects
-          lvnzyProjects={selectedCollection.projects}
+          collectionId={selectedCollection ? selectedCollection._id : ""}
+          lvnzyProjects={selectedCollection ? selectedCollection.projects : []}
         ></UserProjects>
       )}
-      {/* <Drawer
-        open={true}
-        mask={false}
-        title={null}
-        placement="bottom"
-        height={drawerFixedContent || drawerVisibility ? 700 : 175}
-        closeIcon={null}
-        style={{
-          borderTopRightRadius: 16,
-          borderTopLeftRadius: 16,
-          boxShadow: "0 0 8px #888",
-          overflowY:
-            drawerFixedContent || drawerVisibility ? "scroll" : "hidden",
-          position: "relative",
-        }}
-        styles={{
-          body: {
-            padding: 0,
-            overflowY:
-              drawerFixedContent || drawerVisibility ? "scroll" : "hidden",
-          },
-        }}
-        rootClassName="brickfi-drawer"
-      >
-        {drawerFixedContent && (
-          <Flex style={{ paddingBottom: 100 }}>{drawerFixedContent}</Flex>
-        )}
-        <Flex
-          vertical
-          gap={8}
-          style={{
-            width: "calc(100% - 24px)",
-            backgroundColor: "white",
-            padding: 12,
-          }}
-        >
-          <BrickfiAssist
-            lvnzyProjectsCollection={selectedCollection.name}
-            lvnzyProjectId={lvnzyProjectId}
-          ></BrickfiAssist>
-        </Flex>
-      </Drawer> */}
-      {/* <Tabs
-        onChange={(key: string) => {
-          setSelectedTabKey(key);
-        }}
-        tabPosition="top"
-        tabBarStyle={{
-          marginLeft: 16,
-          marginBottom: 0,
-        }}
-        items={tabs.map((tab, i) => {
-          return {
-            label: (
-              <Flex gap={4} style={{ height: 32 }} align="center">
-                <Typography.Text
-                  style={{
-                    color:
-                      tab.key == selectedTabKey
-                        ? COLORS.primaryColor
-                        : COLORS.textColorLight,
-                    fontWeight: tab.key == selectedTabKey ? 600 : "normal",
-                  }}
-                >
-                  {tab.label}
-                </Typography.Text>
-                <DynamicReactIcon
-                  iconName={tab.iconName}
-                  color={
-                    tab.key == selectedTabKey
-                      ? COLORS.primaryColor
-                      : COLORS.textColorLight
-                  }
-                  iconSet={tab.iconSet as any}
-                  size={18}
-                ></DynamicReactIcon>
-              </Flex>
-            ),
-            key: tab.key,
-            children: (
-              <Flex
-                style={{
-                  height: "calc(100vh - 125px)",
-                  overflowY: "scroll",
-                  scrollbarWidth: "none",
-                  backgroundColor: "white",
-                  borderRadius: 8,
-                  margin: "0 16px",
-                }}
-              >
-                {tab.key == "list" ? (
-                  lvnzyProjectId ? (
-                    <Brick360></Brick360>
-                  ) : (
-                    <UserProjects lvnzyProjects={projects}></UserProjects>
-                  )
-                ) : tab.key == "map" ? (
-                  <MapViewV2
-                    fullSize
-                    projects={projects.map((p) => p.originalProjectId)}
-                  ></MapViewV2>
-                ) : (
-                  <BrickfiAssist
-                    lvnzyProjectsCollection={selectedCollection}
-                  ></BrickfiAssist>
-                )}
-              </Flex>
-            ),
-          };
-        })}
-      /> */}
+      <BrickfiAssist
+        lvnzyProjectsCollection={
+          selectedCollection ? selectedCollection.collectionName : ""
+        }
+        lvnzyProjectId={lvnzyProjectId || ""}
+        reportContent={reportContent}
+      ></BrickfiAssist>
     </Flex>
   );
 };

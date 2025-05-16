@@ -1,7 +1,8 @@
-import { Button, Flex, Form, Input, message, Typography } from "antd";
+import { Button, Drawer, Flex, Form, Input, message, Typography } from "antd";
 import { makeStreamingJsonRequest } from "http-streaming-request";
 import {
   forwardRef,
+  ReactNode,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -12,10 +13,12 @@ import { useUser } from "../../hooks/use-user";
 import { axiosApiInstance } from "../../libs/axios-api-Instance";
 import { baseApiUrl } from "../../libs/constants";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE, MAX_WIDTH } from "../../theme/style-constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { Loader } from "../common/loader";
 import { sha256 } from "js-sha256";
+import LLMText from "../common/llm-answer";
+import { useDevice } from "../../hooks/use-device";
 
 const { Paragraph } = Typography;
 
@@ -28,6 +31,7 @@ export interface AICuratedProject {
 export interface Brick360Props {
   lvnzyProjectId?: string;
   lvnzyProjectsCollection?: string;
+  reportContent?: ReactNode;
 }
 interface BrickfiAssistRef {
   clearChatData: () => void;
@@ -37,8 +41,14 @@ export interface Brick360Answer {
   answer: string;
 }
 
+export interface Brick360Prompts {
+  prompts: string[];
+}
+
 export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
-  ({ lvnzyProjectId, lvnzyProjectsCollection }, ref) => {
+  ({ lvnzyProjectId, lvnzyProjectsCollection, reportContent }, ref) => {
+    const assistDrawerRef = useRef(null);
+
     const [currentQuestion, setCurrentQuestion] = useState<string>();
     const [currentAnswer, setCurrentAnswer] = useState<
       Brick360Answer | undefined
@@ -48,7 +58,13 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
       uuidv4()
     );
     const [queryStreaming, setQueryStreaming] = useState<boolean>(false);
+    const streamingRef = useRef(false); // <-- ref instead of state
+
+    const [drawerFixedContent, setDrawerFixedContent] =
+      useState<ReactNode>(reportContent);
+
     const [loadingLivThread, setLoadingLivThread] = useState(false);
+    const [drawerVisibility, setDrawerVisibility] = useState<boolean>(false);
 
     const { user } = useUser();
 
@@ -60,11 +76,24 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
     const [messageApi, contextHolder] = message.useMessage();
+    const [followupPrompts, setFollowupPrompts] = useState<Brick360Prompts>({
+      prompts: [],
+    });
+    const { isMobile } = useDevice();
 
     const [
       selectedProjectPredefinedQuestion,
       setSelectedProjectPredefinedQuestion,
     ] = useState<string>();
+
+    const resetScroll = () => {
+      const el = assistDrawerRef.current;
+      if (el) {
+        setTimeout(() => {
+          (el as any).scrollTop = (el as any).scrollHeight;
+        }, 100);
+      }
+    };
 
     // Expose functions to the parent
     useImperativeHandle(ref, () => ({
@@ -76,13 +105,29 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
     }));
 
     useEffect(() => {
-      if (user && (lvnzyProjectId || lvnzyProjectsCollection)) {
+      if (user && lvnzyProjectsCollection) {
         const sessionId = sha256(`${user._id}:${lvnzyProjectsCollection}`);
         setCurrentSessionId(sessionId);
         fetchHistory(sessionId);
       }
     }, [user, lvnzyProjectId, lvnzyProjectsCollection]);
 
+    useEffect(() => {
+      if (drawerVisibility) {
+        resetScroll();
+      } else {
+        setDrawerFixedContent(undefined);
+      }
+    }, [drawerVisibility]);
+
+    useEffect(() => {
+      if (reportContent) {
+        setDrawerFixedContent(reportContent);
+        setDrawerVisibility(true);
+      }
+    }, [reportContent]);
+
+    // Fetching history for current session
     const fetchHistory = async (historySessionId: string) => {
       try {
         setLoadingLivThread(true);
@@ -90,7 +135,7 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
           sessionId: historySessionId,
         });
 
-        if (response.data?.data) {
+        if (response.data?.data && response.data.data.length) {
           const history = response.data.data;
           const threads: Array<{ question: string; answer: Brick360Answer }> =
             [];
@@ -113,9 +158,17 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
               }
             }
           }
-
           // update livThread with historical messages
           setLivThread(threads);
+        } else {
+          if (!followupPrompts.prompts || !followupPrompts.prompts.length) {
+            handleLLMRequest(
+              lvnzyProjectId
+                ? "suggest followup prompts for this single project"
+                : "suggest followup prompts for these list of projects",
+              true
+            );
+          }
         }
         setLoadingLivThread(false);
       } catch (error) {
@@ -123,13 +176,17 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
       }
     };
 
-    const [isFirstQuestion, setIsFirstQuestion] = useState<boolean>(true);
+    // Handle LLM stream request
+    const handleLLMRequest = async (
+      question: string,
+      suggestFollowup?: boolean
+    ) => {
+      if (!question || question.length < 3 || streamingRef.current) {
+        return;
+      }
 
-    const handleRequest = async (question: string) => {
       try {
-        if (!question || question.length < 3) {
-          return;
-        }
+        streamingRef.current = true;
 
         captureAnalyticsEvent("question-asked", { question });
         setQueryStreaming(true);
@@ -140,22 +197,14 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
             { question: currentQuestion!, answer: currentAnswer || {} },
           ]);
         }
-        setCurrentQuestion(question);
-        setCurrentAnswer({ answer: "..." });
-
-        // // if this is first question store session info
-        // if (isFirstQuestion && user?._id) {
-        //   try {
-        //     await axiosApiInstance.put(`/user/${user._id}/chat-session`, {
-        //       userId: user._id,
-        //       sessionId: currentSessionId,
-        //       startingQuestion: question,
-        //     });
-        //     setIsFirstQuestion(false);
-        //   } catch (error) {
-        //     console.log("Error saving chat session:", error);
-        //   }
-        // }
+        if (!suggestFollowup) {
+          setFollowupPrompts({ prompts: [] });
+          setDrawerVisibility(true);
+          setCurrentQuestion(question);
+          setCurrentAnswer({ answer: "..." });
+        } else {
+          resetScroll();
+        }
 
         const stream = makeStreamingJsonRequest({
           url: `${baseApiUrl}ai/ask-stream-v2`,
@@ -166,13 +215,22 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
             userId: user?._id,
             lvnzyProjectsCollection,
             lvnzyProjectId,
+            suggestPrompts: !!suggestFollowup,
           },
         });
 
-        for await (const data of stream) {
-          console.log("received stream response: ", JSON.stringify(data));
-          setCurrentAnswer(data);
+        if (suggestFollowup) {
+          for await (const data of stream) {
+            console.log("received stream response: ", JSON.stringify(data));
+            setFollowupPrompts(data);
+          }
+        } else {
+          for await (const data of stream) {
+            console.log("received stream response: ", JSON.stringify(data));
+            setCurrentAnswer(data);
+          }
         }
+
         console.log("Streaming completed");
         setQueryStreaming(false);
       } catch (error) {
@@ -183,11 +241,18 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
         });
       } finally {
         setQueryStreaming(false);
+        streamingRef.current = false;
         setSelectedProjectPredefinedQuestion(undefined);
       }
     };
 
-    const renderQABlock = (q: string, a: string, currentQuestion: boolean) => {
+    // Render single QA block
+    const renderQABlock = (
+      q: string,
+      a: string,
+      currentQuestion: boolean,
+      disableClip: boolean
+    ) => {
       return (
         <Flex vertical>
           <Flex>
@@ -219,17 +284,21 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
           </Markdown> */}
           <Flex
             style={{
-              maxWidth: 500,
               borderRadius: 8,
               borderColor: COLORS.borderColorMedium,
               padding: 8,
             }}
           >
-            <div
+            {/* <div
               dangerouslySetInnerHTML={{ __html: a }}
               className="reasoning"
               style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
-            ></div>
+            ></div> */}
+            <LLMText
+              html={a}
+              maxLines={5}
+              disableClip={currentQuestion || disableClip}
+            ></LLMText>
           </Flex>
         </Flex>
       );
@@ -238,28 +307,25 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
     const renderQuestionAnswerSection = () => {
       return (
         <Flex
-          ref={chatContainerRef}
           vertical
           gap={24}
           style={{
-            overflowY: "auto",
-            scrollbarWidth: "none",
-            scrollBehavior: "smooth",
             padding: 8,
             paddingTop: 16,
-            paddingBottom: 80,
           }}
         >
-          {(livThread && livThread.length) || currentQuestion ? (
+          {livThread && livThread.length ? (
             <>
               {" "}
               {/* Past Interactions */}
               {livThread.map((thread, index) =>
-                renderQABlock(thread.question, thread.answer.answer, false)
+                renderQABlock(
+                  thread.question,
+                  thread.answer.answer,
+                  false,
+                  index == livThread.length - 1
+                )
               )}
-              {/* Current Question & Answer (Only show while processing) */}
-              {currentQuestion &&
-                renderQABlock(currentQuestion, currentAnswer?.answer!, true)}
             </>
           ) : null}
         </Flex>
@@ -271,76 +337,143 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
     }
 
     return (
-      <Flex
-        vertical
+      <Drawer
+        open={true}
+        mask={false}
+        title={null}
+        placement="bottom"
+        closeIcon={null}
+        height={drawerVisibility ? 700 : 140}
         style={{
-          width: "100%",
+          borderTopRightRadius: 16,
+          borderTopLeftRadius: 16,
+          boxShadow: "0 0 8px #888",
           position: "relative",
+          overflowY: "hidden",
+          maxWidth: MAX_WIDTH,
+          marginLeft: isMobile ? 0 : window.innerWidth / 2 - MAX_WIDTH / 2,
         }}
+        styles={{ body: { padding: 0, overflowY: "hidden" } }}
+        rootClassName="brickfi-drawer"
       >
-        <Flex vertical style={{ height: "100%" }}>
+        {drawerVisibility && (
+          <Flex
+            justify="flex-end"
+            style={{ margin: 8 }}
+            onClick={() => {
+              setDrawerVisibility(false);
+            }}
+          >
+            <DynamicReactIcon
+              iconName="IoIosCloseCircleOutline"
+              iconSet="io"
+            ></DynamicReactIcon>
+          </Flex>
+        )}
+        <Flex
+          vertical
+          ref={assistDrawerRef}
+          style={{
+            height: drawerVisibility ? 600 : 140,
+            overflowY: "auto",
+            scrollbarWidth: "none",
+            scrollBehavior: "smooth",
+          }}
+        >
           {/* Single session of question / answer */}
-          {renderQuestionAnswerSection()}
+          {drawerVisibility ? renderQuestionAnswerSection() : null}
+
+          {drawerFixedContent && <Flex>{drawerFixedContent}</Flex>}
+
+          {/* Current Question & Answer (Only show while processing) */}
+          <Flex
+            vertical
+            gap={24}
+            style={{
+              padding: 8,
+              paddingTop: 16,
+            }}
+          >
+            {currentQuestion &&
+              renderQABlock(
+                currentQuestion,
+                currentAnswer?.answer!,
+                true,
+                false
+              )}
+          </Flex>
 
           {/* Prompts & Input */}
           <Flex
             vertical
             style={{
-              width: "100%",
+              width: "calc(100% - 24px)",
+              position: "absolute",
+              bottom: 0,
+              left: 0,
               backgroundColor: "white",
+              padding: 12,
             }}
           >
-            {/* {!queryStreaming && currentAnswer && currentAnswer.projectId ? (
             <Flex
               style={{
+                width: "100%",
                 overflowX: "scroll",
                 whiteSpace: "nowrap",
-                marginBottom: 16,
                 scrollbarWidth: "none",
-                padding: isMobile ? "0 16px" : 0,
               }}
               gap={8}
-              align={isMobile ? "flex-start" : "center"}
             >
-              {[
-                "Project amenities",
-                "Explain cost structure",
-                "How is the location ?",
-              ].map((q) => {
-                return (
-                  <Typography.Text
-                    onClick={() => {
-                      if (selectedProjectPredefinedQuestion == q) {
-                        return;
-                      }
-                      setSelectedProjectPredefinedQuestion(q);
-                      handleRequest(q);
-                    }}
-                    style={{
-                      cursor: "pointer",
-                      backgroundColor: "white",
-                      padding: "4px 12px",
-                      color: COLORS.textColorDark,
-                      borderRadius: 16,
-                      border: "1px solid",
-                      borderColor: COLORS.textColorDark,
-                      display: "flex",
-                      fontSize: FONT_SIZE.PARA,
-                    }}
-                  >
-                    {q}
+              {followupPrompts &&
+              followupPrompts.prompts &&
+              followupPrompts.prompts.length ? (
+                followupPrompts.prompts.map((p) => {
+                  return (
+                    <div
+                      style={{
+                        borderRadius: 8,
+                        minWidth: 125,
+                        padding: "4px 8px",
+                        textWrap: "wrap",
+                        backgroundColor: COLORS.bgColorMedium,
+                        fontSize: FONT_SIZE.PARA,
+                        fontWeight: 500,
+                        height: "50px",
+                      }}
+                      onClick={() => {
+                        handleLLMRequest(
+                          `${p}${lvnzyProjectId ? "" : " across projects"}`,
+                          false
+                        );
+                      }}
+                    >
+                      {p}
+                    </div>
+                  );
+                })
+              ) : drawerVisibility ? null : (
+                <Flex
+                  vertical
+                  onClick={() => {
+                    setDrawerVisibility(true);
+                  }}
+                >
+                  <Typography.Text style={{ color: COLORS.textColorLight }}>
+                    See your previous questions
                   </Typography.Text>
-                );
-              })}
+                  <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
+                    Continue your search. Ask Anything!
+                  </Typography.Text>
+                </Flex>
+              )}
             </Flex>
-          ) : null} */}
 
             <Form
               form={form}
               onFinish={async (value) => {
                 form.resetFields();
                 const { question } = value;
-                handleRequest(question);
+                handleLLMRequest(question);
               }}
             >
               <Form.Item label="" name="question" style={{ marginBottom: 0 }}>
@@ -348,7 +481,6 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
                   disabled={queryStreaming}
                   style={{
                     height: 50,
-                    marginBottom: 16,
                     marginTop: 8,
                     paddingRight: 0,
                     backgroundColor: "white",
@@ -359,7 +491,7 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
                     fontSize: FONT_SIZE.HEADING_3,
                   }}
                   name="query"
-                  placeholder="Ask anything!"
+                  placeholder="Compare, discover or analyse!"
                   prefix={
                     <Flex style={{ marginRight: 8 }}>
                       <DynamicReactIcon
@@ -391,7 +523,7 @@ export const BrickfiAssist = forwardRef<BrickfiAssistRef, Brick360Props>(
             </Form>
           </Flex>
         </Flex>
-      </Flex>
+      </Drawer>
     );
   }
 );
