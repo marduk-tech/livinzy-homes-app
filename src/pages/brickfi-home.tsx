@@ -1,10 +1,10 @@
-import React, { ReactNode, useEffect, useState } from "react";
 import { Flex } from "antd";
-import { UserProjects } from "./user-projects";
-import { useUser } from "../hooks/use-user";
+import React, { ReactNode, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Brick360 } from "./brick360";
 import { Loader } from "../components/common/loader";
+import { useUser } from "../hooks/use-user";
+import { Brick360 } from "./brick360";
+import { UserProjects } from "./user-projects";
 
 const BrickfiHome: React.FC = () => {
   const { user } = useUser();
@@ -31,7 +31,25 @@ const BrickfiHome: React.FC = () => {
 
   useEffect(() => {
     if (user && user.savedLvnzyProjects) {
-      if (collectionId) {
+      if (collectionId === "all") {
+        // Combine projects from all collections
+        const allProjects = user.savedLvnzyProjects.reduce(
+          (acc: any[], curr: any) => {
+            // Only add unique projects based on _id
+            const uniqueProjects = curr.projects.filter(
+              (project: any) => !acc.some((p: any) => p._id === project._id)
+            );
+            return [...acc, ...uniqueProjects];
+          },
+          []
+        );
+
+        setSelectedCollection({
+          _id: "all",
+          name: "All Collections",
+          projects: allProjects,
+        });
+      } else if (collectionId) {
         setSelectedCollection(
           user!.savedLvnzyProjects.find((c) => c._id == collectionId)
         );

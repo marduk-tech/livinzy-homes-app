@@ -179,16 +179,19 @@ export const DashboardLayout: React.FC = () => {
                   <Select
                     style={{ minWidth: 200 }}
                     placeholder="Select project list"
-                    defaultValue={user.savedLvnzyProjects[0]._id}
+                    value={collectionId || user.savedLvnzyProjects[0]._id}
                     optionFilterProp="label"
                     onChange={(value: string) => {
                       setSidebarOpen(false);
                       navigate(`/app/${value}`);
                     }}
-                    options={user.savedLvnzyProjects?.map((c) => ({
-                      value: c._id,
-                      label: c.collectionName,
-                    }))}
+                    options={[
+                      { value: "all", label: "All Collections" },
+                      ...(user.savedLvnzyProjects || []).map((c) => ({
+                        value: c._id,
+                        label: c.collectionName,
+                      })),
+                    ]}
                   />
                 )}
               <Flex gap={24} vertical style={{ marginTop: "auto" }}>
