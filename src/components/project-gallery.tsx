@@ -1,6 +1,7 @@
 import { Flex, Typography } from "antd";
 import { useState } from "react";
 import { useDevice } from "../hooks/use-device";
+import { getVideoEmbedUrl } from "../libs/video-utils";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia } from "../types/Project";
 import { ProjectImagesGalleryModal } from "./project-images-gallery-modal";
@@ -90,14 +91,15 @@ const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
               }}
             >
               <iframe
-                src={`https://iframe.mediadelivery.net/embed/330257/${media.video?.bunnyVideoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true`}
+                src={getVideoEmbedUrl(media.video || {})}
                 loading="lazy"
+                title={media.video?.caption || "Video"}
                 style={{
                   height: "100%",
                   width: "100%",
                   border: "none",
                 }}
-                allow="accelerometer;gyroscope;encrypted-media;picture-in-picture;"
+                allow="accelerometer;gyroscope;encrypted-media;picture-in-picture;autoplay;"
               ></iframe>
               {media.video!.caption ||
               (media.video?.tags && media.video.tags.length) ? (

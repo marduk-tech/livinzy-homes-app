@@ -21,6 +21,8 @@ export interface IMedia {
     hlsUrl?: string;
     thumbnailUrl?: string;
     previewUrl?: string;
+    isYoutube?: boolean;
+    youtubeUrl?: string;
   };
 }
 
@@ -211,6 +213,7 @@ export interface IPlace {
   distance: number;
   timeline: string;
 }
+
 export interface IMegaDriverScore {
   score: number;
   megaDriver: string;
@@ -230,6 +233,7 @@ export interface IProjectDriver {
     timelineCoeffecient: number;
   };
 }
+
 export interface IScoreBreakup {
   megaDriver: string;
   drivers: [IProjectDriver];
