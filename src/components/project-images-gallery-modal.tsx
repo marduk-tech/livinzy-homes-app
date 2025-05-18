@@ -161,7 +161,7 @@ export const ProjectImagesGalleryModal = ({
                               top: 0,
                               left: 0,
                               width: "100%",
-                              height: "100%",
+                              height: "88%",
                               border: "1px solid",
                               borderColor: COLORS.borderColorMedium,
                             }}
@@ -169,7 +169,7 @@ export const ProjectImagesGalleryModal = ({
                             title={item.video?.caption || "Video"}
                           />
                           {item.video!.caption || item.video?.tags?.length ? (
-                            <div className="gallery-caption">
+                            <div className="gallery-caption-video">
                               {item.video!.caption ||
                                 item.video!.tags.join(", ")}
                             </div>
