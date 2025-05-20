@@ -1,3 +1,4 @@
+import { PlayCircleFilled } from "@ant-design/icons";
 import { Flex, Typography } from "antd";
 import { useState } from "react";
 import { useDevice } from "../hooks/use-device";
@@ -82,25 +83,67 @@ const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
               key={index}
               style={{
                 height: "100%",
-                width: isMobile ? "100%" : "49%",
+                width: "200px",
                 borderRadius: 8,
                 overflow: "hidden",
                 flexShrink: 0,
                 marginRight: 8,
                 position: "relative",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSelectedImageId(media._id || "");
+                setIsModalOpen(true);
               }}
             >
-              <iframe
-                src={getVideoEmbedUrl(media.video || {})}
-                loading="lazy"
-                title={media.video?.caption || "Video"}
+              <div
                 style={{
-                  height: "100%",
                   width: "100%",
-                  border: "none",
+                  height: "100%",
+                  position: "relative",
                 }}
-                allow="accelerometer;gyroscope;encrypted-media;picture-in-picture;autoplay;"
-              ></iframe>
+              >
+                {media.video?.thumbnailUrl ? (
+                  <img
+                    src={media.video.thumbnailUrl}
+                    alt={media.video?.caption || "Video thumbnail"}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontSize: 32,
+                      background: "#000",
+                    }}
+                  >
+                    <PlayCircleFilled />
+                  </div>
+                )}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    color: "white",
+                    fontSize: 32,
+                    textShadow: "0 0 10px rgba(0,0,0,0.5)",
+                    opacity: 0.8,
+                  }}
+                >
+                  <PlayCircleFilled />
+                </div>
+              </div>
               {media.video!.caption ||
               (media.video?.tags && media.video.tags.length) ? (
                 <Typography.Text
