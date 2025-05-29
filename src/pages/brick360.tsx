@@ -163,11 +163,12 @@ export function Brick360() {
     if (!lvnzyProject) {
       return;
     }
-    setMapDrivers([
-      ...(lvnzyProject as any)["neighborhood"].drivers,
-      ...(lvnzyProject as any)["connectivity"].drivers,
-      ...(lvnzyProject as any)["investment"].growthLevers,
-    ]);
+    setMapDrivers(
+      [
+        ...(lvnzyProject as any)["neighborhood"].drivers,
+        ...(lvnzyProject as any)["connectivity"].drivers,
+      ].filter((d) => !!d.driverId && !!d.driverId._id)
+    );
   }, [lvnzyProject]);
 
   // Setting map drivers based on selected data point
