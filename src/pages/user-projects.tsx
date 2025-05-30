@@ -1,5 +1,5 @@
 import { Flex, Select, Tag, Typography } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GradientBar from "../components/common/grading-bar";
 import { Loader } from "../components/common/loader";
@@ -22,17 +22,32 @@ export function UserProjects({
   const { user } = useUser();
 
   const navigate = useNavigate();
-  const [selectedCorridor, setSelectedCorridor] = useState<string>("All");
+  const [selectedCorridor, setSelectedCorridor] = useState<
+    string | undefined
+  >();
+  const [uniqueCorridors, setUniqueCorridors] = useState<string[]>();
   const { isMobile } = useDevice();
 
   const filteredProjects = lvnzyProjects.filter(
     (p: any) =>
-      selectedCorridor === "All" || p.meta.projectCorridor === selectedCorridor
+      !selectedCorridor ||
+      p.meta.projectCorridors.split(",").includes(selectedCorridor)
   );
 
-  const uniqueCorridors = [
-    ...new Set(lvnzyProjects.map((p: any) => p.meta.projectCorridor)),
-  ];
+  useEffect(() => {
+    const uniqC: string[] = [];
+    if (lvnzyProjects && lvnzyProjects.length) {
+      setSelectedCorridor(undefined);
+      lvnzyProjects.forEach((p) => {
+        p.meta.projectCorridors.split(",").forEach((c: string) => {
+          if (!uniqC.includes(c)) {
+            uniqC.push(c);
+          }
+        });
+      });
+    }
+    setUniqueCorridors(uniqC);
+  }, [lvnzyProjects]);
 
   const renderLvnzyProject = (itemInfo: any) => {
     const oneLinerBreakup = itemInfo.meta.oneLiner
@@ -211,27 +226,31 @@ export function UserProjects({
       }}
       vertical
     >
-      <Flex gap={8} style={{ marginBottom: 16 }}>
-        <Select
-          style={{ width: 225, height: 42 }}
-          placeholder="Select corridor"
-          value={selectedCorridor}
-          onChange={(value: string) => setSelectedCorridor(value)}
-          options={[
-            { value: "All", label: "All Corridors" },
-            ...uniqueCorridors.map((c) => ({
-              value: c,
-              label: c,
-            })),
-          ]}
-        />
-      </Flex>
+      {uniqueCorridors && uniqueCorridors.length && lvnzyProjects.length > 5 ? (
+        <>
+          <Flex gap={8} style={{ marginBottom: 16 }}>
+            <Select
+              style={{ width: 225, height: 42 }}
+              placeholder="Select corridor"
+              value={selectedCorridor}
+              onChange={(value: string) => setSelectedCorridor(value)}
+              options={[
+                { value: "All", label: "All Corridors" },
+                ...uniqueCorridors.map((c) => ({
+                  value: c,
+                  label: c,
+                })),
+              ]}
+            />
+          </Flex>
+          <Flex vertical>
+            <Typography.Title level={4} style={{ margin: 0 }}>
+              {lvnzyProjects.length} projects
+            </Typography.Title>
+          </Flex>
+        </>
+      ) : null}
 
-      <Flex vertical>
-        <Typography.Title level={4} style={{ margin: 0 }}>
-          {lvnzyProjects.length} projects
-        </Typography.Title>
-      </Flex>
       <Flex
         style={{
           width: "100%",
