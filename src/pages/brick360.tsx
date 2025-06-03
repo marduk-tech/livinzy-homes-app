@@ -262,7 +262,9 @@ export function Brick360() {
             title: catInfo.title,
             key: key,
             icon: getDataCategoryIcon(catInfo.iconName, catInfo.iconSet),
-            dataPoints: Object.entries(lvnzyProject.score[cat]),
+            dataPoints: lvnzyProject.score[cat]
+              ? Object.entries(lvnzyProject.score[cat])
+              : [],
           });
         }
       }
@@ -720,10 +722,12 @@ export function Brick360() {
                   >
                     {sc.title}
                   </Typography.Title>
-                  <GradientBar
-                    value={getCategoryScore(lvnzyProject!.score[sc.key])}
-                    showBadgeOnly={true}
-                  ></GradientBar>
+                  {lvnzyProject!.score[sc.key] ? (
+                    <GradientBar
+                      value={getCategoryScore(lvnzyProject!.score[sc.key])}
+                      showBadgeOnly={true}
+                    ></GradientBar>
+                  ) : null}
                 </Flex>
 
                 {sc.dataPoints &&
