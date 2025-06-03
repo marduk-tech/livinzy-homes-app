@@ -123,6 +123,25 @@ export function Brick360({ setFixedContent }: { setFixedContent: any }) {
     );
   };
 
+  const getTotalFloors = (lvnzyProject: any) => {
+    const minFloors = Math.min(
+      ...lvnzyProject?.meta.projectConfigurations.towers.map(
+        (t: any) => t.totalFloors
+      )
+    );
+    const maxFloors = Math.max(
+      ...lvnzyProject?.meta.projectConfigurations.towers.map(
+        (t: any) => t.totalFloors
+      )
+    );
+    if (minFloors == maxFloors) {
+      return `${minFloors}`;
+    } else {
+      return `${minFloors} -
+                ${maxFloors}`;
+    }
+  };
+
   const getStatusLabel = (projectTimelines: any[]) => {
     const completionDate =
       projectTimelines[projectTimelines.length - 1]["completionDate"];
@@ -1104,19 +1123,7 @@ export function Brick360({ setFixedContent }: { setFixedContent: any }) {
                   {lvnzyProject?.meta.projectConfigurations.towers.length}{" "}
                   Towers
                 </Tag>
-                <Tag>
-                  {`${Math.min(
-                    ...lvnzyProject?.meta.projectConfigurations.towers.map(
-                      (t: any) => t.totalFloors
-                    )
-                  )} -
-                ${Math.max(
-                  ...lvnzyProject?.meta.projectConfigurations.towers.map(
-                    (t: any) => t.totalFloors
-                  )
-                )}`}{" "}
-                  Floors
-                </Tag>
+                <Tag> {getTotalFloors(lvnzyProject)} Floors</Tag>
               </>
             )}
             {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
