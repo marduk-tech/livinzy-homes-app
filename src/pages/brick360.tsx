@@ -1178,6 +1178,14 @@ export function Brick360() {
                 Units
               </Tag>
             )}
+            {lvnzyProject?.property.layout.totalLandArea && (
+              <Tag>
+                {Math.round(
+                  lvnzyProject?.property.layout.totalLandArea / 4046.8564
+                )}{" "}
+                Acre
+              </Tag>
+            )}
           </Flex>
         )}
         <Flex
