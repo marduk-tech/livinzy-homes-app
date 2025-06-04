@@ -677,25 +677,29 @@ export function Brick360() {
                 marginLeft: "auto",
               }}
             >
-              <Tag
-                color={COLORS.greenIdentifier}
-                style={{
-                  fontSize: FONT_SIZE.SUB_TEXT,
-                  marginRight: 0,
-                }}
-              >
-                {lvnzyProject?.score.summary.pros.length} pros
-              </Tag>
-              <Tag
-                color={COLORS.redIdentifier}
-                style={{
-                  fontSize: FONT_SIZE.SUB_TEXT,
-                  marginLeft: 4,
-                  marginRight: 0,
-                }}
-              >
-                {lvnzyProject?.score.summary.cons.length} cons
-              </Tag>
+              {lvnzyProject?.score.summary.pros.length ? (
+                <Tag
+                  color={COLORS.greenIdentifier}
+                  style={{
+                    fontSize: FONT_SIZE.SUB_TEXT,
+                    marginRight: 0,
+                  }}
+                >
+                  {lvnzyProject?.score.summary.pros.length} pros
+                </Tag>
+              ) : null}
+              {lvnzyProject?.score.summary.cons.length ? (
+                <Tag
+                  color={COLORS.redIdentifier}
+                  style={{
+                    fontSize: FONT_SIZE.SUB_TEXT,
+                    marginLeft: 4,
+                    marginRight: 0,
+                  }}
+                >
+                  {lvnzyProject?.score.summary.cons.length} cons
+                </Tag>
+              ) : null}
             </Flex>
           </Flex>
         </Flex>
