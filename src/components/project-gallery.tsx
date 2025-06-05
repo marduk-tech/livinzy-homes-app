@@ -1,7 +1,7 @@
 import { Flex, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useDevice } from "../hooks/use-device";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { COLORS } from "../theme/style-constants";
 import { IMedia } from "../types/Project";
 import { ProjectImagesGalleryModal } from "./project-images-gallery-modal";
 
@@ -71,7 +71,7 @@ const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
               }}
               alt={img.image!.caption || `Project image ${index + 1}`}
             />
-            {img.image!.caption ||
+            {/* {img.image!.caption ||
             (img.image?.tags && img.image.tags.length) ? (
               <Typography.Text
                 style={{
@@ -89,7 +89,7 @@ const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
               >
                 {img.image!.caption || img.image!.tags}
               </Typography.Text>
-            ) : null}
+            ) : null} */}
           </div>
         ))}
 

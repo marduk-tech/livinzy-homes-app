@@ -121,7 +121,7 @@ export const ProjectImagesGalleryModal = ({
                         src={item.image!.url}
                         alt={item.image!.caption || `${tag} image ${index + 1}`}
                         preview={{
-                          mask: (
+                          mask: true ? null : (
                             <div className="gallery-caption">
                               {item.image!.caption ||
                                 item.image!.tags.join(", ")}
