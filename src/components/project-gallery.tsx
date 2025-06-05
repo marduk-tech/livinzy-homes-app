@@ -14,15 +14,37 @@ const ProjectGallery: React.FC<{ media: IMedia[] }> = ({ media }) => {
   const [filteredVideos, setFilteredVideos] = useState<IMedia[]>([]);
 
   useEffect(() => {
+    const customOrder = [
+      "exterior",
+      "amenities",
+      "layout",
+      "house",
+      "floorplan",
+      "construction",
+    ];
+
+    function sortByCustomtag(media: IMedia[]) {
+      return media.sort((a: any, b: any) => {
+        const aIndex = customOrder.indexOf(a.image.tags[0]);
+        const bIndex = customOrder.indexOf(b.image.tags[0]);
+
+        const aRank = aIndex === -1 ? customOrder.length : aIndex;
+        const bRank = bIndex === -1 ? customOrder.length : bIndex;
+
+        return aRank - bRank;
+      });
+    }
     if (media && media.length) {
       setFilteredImgs(
-        media.filter(
-          (item: IMedia) =>
-            item.type === "image" &&
-            item.image &&
-            item.image.tags &&
-            item.image.tags.length &&
-            !item.image.tags.includes("na")
+        sortByCustomtag(
+          media.filter(
+            (item: IMedia) =>
+              item.type === "image" &&
+              item.image &&
+              item.image.tags &&
+              item.image.tags.length &&
+              !item.image.tags.includes("na")
+          )
         )
       );
       setFilteredVideos(
