@@ -259,7 +259,9 @@ export function Brick360({ setFixedContent }: { setFixedContent: any }) {
             title: catInfo.title,
             key: key,
             icon: getDataCategoryIcon(catInfo.iconName, catInfo.iconSet),
-            dataPoints: Object.entries(lvnzyProject.score[cat]),
+            dataPoints: lvnzyProject.score[cat]
+              ? Object.entries(lvnzyProject.score[cat])
+              : [],
           });
         }
       }
@@ -800,25 +802,29 @@ export function Brick360({ setFixedContent }: { setFixedContent: any }) {
                 marginLeft: "auto",
               }}
             >
-              <Tag
-                color={COLORS.greenIdentifier}
-                style={{
-                  fontSize: FONT_SIZE.SUB_TEXT,
-                  marginRight: 0,
-                }}
-              >
-                {lvnzyProject?.score.summary.pros.length} pros
-              </Tag>
-              <Tag
-                color={COLORS.redIdentifier}
-                style={{
-                  fontSize: FONT_SIZE.SUB_TEXT,
-                  marginLeft: 4,
-                  marginRight: 0,
-                }}
-              >
-                {lvnzyProject?.score.summary.cons.length} cons
-              </Tag>
+              {lvnzyProject?.score.summary.pros.length ? (
+                <Tag
+                  color={COLORS.greenIdentifier}
+                  style={{
+                    fontSize: FONT_SIZE.SUB_TEXT,
+                    marginRight: 0,
+                  }}
+                >
+                  {lvnzyProject?.score.summary.pros.length} pros
+                </Tag>
+              ) : null}
+              {lvnzyProject?.score.summary.cons.length ? (
+                <Tag
+                  color={COLORS.redIdentifier}
+                  style={{
+                    fontSize: FONT_SIZE.SUB_TEXT,
+                    marginLeft: 4,
+                    marginRight: 0,
+                  }}
+                >
+                  {lvnzyProject?.score.summary.cons.length} cons
+                </Tag>
+              ) : null}
             </Flex>
           </Flex>
         </Flex>
@@ -845,10 +851,12 @@ export function Brick360({ setFixedContent }: { setFixedContent: any }) {
                   >
                     {sc.title}
                   </Typography.Title>
-                  <GradientBar
-                    value={getCategoryScore(lvnzyProject!.score[sc.key])}
-                    showBadgeOnly={true}
-                  ></GradientBar>
+                  {lvnzyProject!.score[sc.key] ? (
+                    <GradientBar
+                      value={getCategoryScore(lvnzyProject!.score[sc.key])}
+                      showBadgeOnly={true}
+                    ></GradientBar>
+                  ) : null}
                 </Flex>
 
                 {sc.dataPoints &&
@@ -1117,7 +1125,7 @@ export function Brick360({ setFixedContent }: { setFixedContent: any }) {
         </Typography.Title>
         {lvnzyProject?.meta.projectConfigurations && (
           <Flex>
-            {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
+            {/* {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
               <>
                 <Tag>
                   {lvnzyProject?.meta.projectConfigurations.towers.length}{" "}
@@ -1125,14 +1133,16 @@ export function Brick360({ setFixedContent }: { setFixedContent: any }) {
                 </Tag>
                 <Tag> {getTotalFloors(lvnzyProject)} Floors</Tag>
               </>
-            )}
+            )} */}
             {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
+              <Tag>{lvnzyProject?.property.layout.totalUnits} Units</Tag>
+            )}
+            {lvnzyProject?.property.layout.totalLandArea && (
               <Tag>
-                {lvnzyProject?.meta.projectConfigurations.unitsBreakup.reduce(
-                  (sum: number, item: any) => sum + item.totalUnits,
-                  0
+                {Math.round(
+                  lvnzyProject?.property.layout.totalLandArea / 4046.8564
                 )}{" "}
-                Units
+                Acre
               </Tag>
             )}
           </Flex>
