@@ -20,22 +20,20 @@ export function UserProjects({
   const { user } = useUser();
 
   const navigate = useNavigate();
-  const [selectedCorridor, setSelectedCorridor] = useState<
-    string | undefined
-  >();
+  const [selectedCorridor, setSelectedCorridor] = useState<string>("all");
   const [uniqueCorridors, setUniqueCorridors] = useState<string[]>();
   const { isMobile } = useDevice();
 
   const filteredProjects = lvnzyProjects.filter(
     (p: any) =>
       !selectedCorridor ||
+      selectedCorridor == "all" ||
       p.meta.projectCorridors.split(",").includes(selectedCorridor)
   );
 
   useEffect(() => {
     const uniqC: string[] = [];
     if (lvnzyProjects && lvnzyProjects.length) {
-      setSelectedCorridor(undefined);
       lvnzyProjects.forEach((p) => {
         p.meta.projectCorridors.split(",").forEach((c: string) => {
           if (!uniqC.includes(c)) {
@@ -233,7 +231,7 @@ export function UserProjects({
               value={selectedCorridor}
               onChange={(value: string) => setSelectedCorridor(value)}
               options={[
-                { value: "All", label: "All Corridors" },
+                { value: "all", label: "All Corridors" },
                 ...uniqueCorridors.map((c) => ({
                   value: c,
                   label: c,
@@ -243,7 +241,7 @@ export function UserProjects({
           </Flex>
           <Flex vertical>
             <Typography.Title level={4} style={{ margin: 0 }}>
-              {lvnzyProjects.length} projects
+              {filteredProjects.length} projects
             </Typography.Title>
           </Flex>
         </>
