@@ -53,7 +53,7 @@ const BrickfiHome: React.FC = () => {
         setSelectedCollection(
           user.savedLvnzyProjects.find((c) => c._id == collectionId)
         );
-      } else if (!lvnzyProjectId) {
+      } else {
         setSelectedCollection(user.savedLvnzyProjects[0]);
       }
     }

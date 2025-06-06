@@ -517,6 +517,7 @@ export function Brick360() {
                           fontSize: FONT_SIZE.PARA,
                           color: COLORS.textColorLight,
                           lineHeight: "120%",
+                          marginBottom: 24,
                         }}
                       >
                         Payment structure including construction linked and
@@ -526,7 +527,7 @@ export function Brick360() {
                         remarkPlugins={[remarkGfm]}
                         className="liviq-content"
                       >
-                        {lvnzyProject?.investment.paymentPlan}
+                        {lvnzyProject?.originalProjectId.info.financialPlan}
                       </Markdown>
                     </Flex>
                   );
