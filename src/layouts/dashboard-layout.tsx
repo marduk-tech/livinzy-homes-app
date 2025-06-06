@@ -185,10 +185,13 @@ export const DashboardLayout: React.FC = () => {
                       setSidebarOpen(false);
                       navigate(`/app/${value}`);
                     }}
-                    options={user.savedLvnzyProjects?.map((c) => ({
-                      value: c._id,
-                      label: c.collectionName,
-                    }))}
+                    options={[
+                      { value: "all", label: "All Collections" },
+                      ...user.savedLvnzyProjects?.map((c) => ({
+                        value: c._id,
+                        label: c.collectionName,
+                      })),
+                    ]}
                   />
                 )}
               <Flex gap={24} vertical style={{ marginTop: "auto" }}>
