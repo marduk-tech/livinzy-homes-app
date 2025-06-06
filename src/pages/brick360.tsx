@@ -1164,7 +1164,7 @@ export function Brick360() {
         </Typography.Title>
         {lvnzyProject?.meta.projectConfigurations && (
           <Flex>
-            {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
+            {/* {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
               <>
                 <Tag>
                   {lvnzyProject?.meta.projectConfigurations.towers.length}{" "}
@@ -1172,15 +1172,9 @@ export function Brick360() {
                 </Tag>
                 <Tag> {getTotalFloors(lvnzyProject)} Floors</Tag>
               </>
-            )}
+            )} */}
             {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
-              <Tag>
-                {lvnzyProject?.meta.projectConfigurations.unitsBreakup.reduce(
-                  (sum: number, item: any) => sum + item.totalUnits,
-                  0
-                )}{" "}
-                Units
-              </Tag>
+              <Tag>{lvnzyProject?.property.layout.totalUnits} Units</Tag>
             )}
             {lvnzyProject?.property.layout.totalLandArea && (
               <Tag>
