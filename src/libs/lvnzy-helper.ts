@@ -49,6 +49,9 @@ export const captureAnalyticsEvent = (event: string, props: any) => {
 };
 
 export const getCategoryScore = (dataPt: any) => {
+  if (!dataPt) {
+    return 0;
+  }
   let totRating = 0,
     ct = 0;
   Object.keys(dataPt).forEach((subPt) => {
