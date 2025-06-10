@@ -8,6 +8,7 @@ export const queryKeys = {
   getLvnzyProjectById: "getLvnzyProjectById",
   getAllPlaces: "getAllPlaces",
   getAllCorridors: "getAllCorridors",
+  getAllLocalities: "getAllLocalities",
   user: "user",
   paymentById: "paymentById",
 };

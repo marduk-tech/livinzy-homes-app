@@ -214,6 +214,7 @@ export function LivIndexFull() {
                 projects={filteredProjects}
                 fullSize={false}
                 defaultSelectedDriverTypes={selectedDriverTypes}
+                showLocalities={true}
               />
             </>
           )}

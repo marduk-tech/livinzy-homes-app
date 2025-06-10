@@ -32,7 +32,7 @@ export const DashboardLayout: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (user && (!user.profile.email || !user.profile.email)) {
+    if (user && (!user.profile.email || !user.profile.name)) {
       setShowUserDetailsForm(true);
     }
   }, [user]);

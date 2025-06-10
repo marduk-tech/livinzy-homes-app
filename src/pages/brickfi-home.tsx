@@ -5,7 +5,6 @@ import { Loader } from "../components/common/loader";
 import { ProjectSearch } from "../components/project-search";
 import { RequestedProjectsList } from "../components/requested-projects-list";
 import { useUser } from "../hooks/use-user";
-import { User } from "../types/User";
 import { Brick360 } from "./brick360";
 import { UserProjects } from "./user-projects";
 
@@ -107,7 +106,7 @@ const BrickfiHome: React.FC = () => {
       <Flex style={{ padding: "16px 16px 8px 16px" }}>
         <ProjectSearch
           onSelect={handleProjectSelect}
-          placeholder="Search for projects..."
+          placeholder="Search for a project"
         />
       </Flex>
       {lvnzyProjectId ? (

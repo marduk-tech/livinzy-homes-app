@@ -850,14 +850,7 @@ export function Brick360() {
           },
         }}
       >
-        <Flex style={{ height: 650 }} vertical gap={8}>
-          <Typography.Title level={3} style={{ marginBottom: 8 }}>
-            {selectedDataPointSubCategory == "surroundings"
-              ? capitalize(selectedDataPointSubCategory)
-              : (Brick360CategoryInfo as any)[selectedDataPointCategory]
-              ? (Brick360CategoryInfo as any)[selectedDataPointCategory].title
-              : ""}
-          </Typography.Title>
+        <Flex style={{ height: 650, paddingTop: 40 }} vertical gap={8}>
           <MapViewV2
             fullSize={true}
             surroundingElements={surroundingElements}

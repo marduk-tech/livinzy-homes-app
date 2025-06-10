@@ -1,12 +1,4 @@
-import {
-  Alert,
-  AutoComplete,
-  Button,
-  message,
-  Modal,
-  notification,
-  Spin,
-} from "antd";
+import { Alert, AutoComplete, Button, Input, message, Modal, Spin } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -15,9 +7,7 @@ import {
 } from "../hooks/use-project-search";
 import { useUser } from "../hooks/use-user";
 import { useUpdateUserMutation } from "../hooks/user-hooks";
-import { queryKeys } from "../libs/constants";
-import { queryClient } from "../libs/query-client";
-import { COLORS } from "../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 
 // Utility function to remove duplicates and prepend new ID
 const removeDuplicatesAndPrepend = (arr: string[], newId: string): string[] => {
@@ -259,7 +249,6 @@ export const ProjectSearch: React.FC<ProjectSearchProps> = ({
         style={{ width: "100%", ...style }}
         options={options}
         onSelect={handleSelect}
-        placeholder={placeholder}
         filterOption={(inputValue, option) =>
           option!.value.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1
         }
@@ -296,7 +285,12 @@ export const ProjectSearch: React.FC<ProjectSearchProps> = ({
             </Button>
           </div>
         }
-      />
+      >
+        <Input
+          style={{ fontSize: FONT_SIZE.HEADING_2 }}
+          placeholder={placeholder}
+        ></Input>
+      </AutoComplete>
       <Modal
         title={
           <div style={{ fontSize: "22px", fontWeight: 600 }}>
