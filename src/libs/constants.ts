@@ -8,6 +8,7 @@ export const queryKeys = {
   getLvnzyProjectById: "getLvnzyProjectById",
   getAllPlaces: "getAllPlaces",
   getAllCorridors: "getAllCorridors",
+  getAllLocalities: "getAllLocalities",
   user: "user",
   paymentById: "paymentById",
 };
@@ -237,6 +238,7 @@ export enum BRICK360_CATEGORY {
   property = "property",
   areaConnectivity = "areaConnectivity",
   developer = "developer",
+  financials = "financials",
 }
 
 export const Brick360CategoryInfo: Record<
@@ -258,6 +260,11 @@ export const Brick360CategoryInfo: Record<
     iconName: "FaPeopleGroup",
     iconSet: "fa6",
   },
+  financials: {
+    title: "Financials",
+    iconName: "TbPigMoney",
+    iconSet: "tb",
+  },
 };
 
 export const Brick360DataPoints = {
@@ -277,9 +284,10 @@ export const Brick360DataPoints = {
     timeCommitment: "Time Committment",
     customerSatisfaction: "Customer Satisfaction",
   },
-  investment: {
-    growthDrivers: "Growth Drivers",
+  financials: {
+    growthPotential: "Growth Potential",
     pricePoint: "Price Point",
+    rentalIncome: "Rental Income",
   },
 };
 

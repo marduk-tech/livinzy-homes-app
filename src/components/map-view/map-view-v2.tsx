@@ -30,6 +30,9 @@ import DynamicReactIcon, {
   dynamicImportMap,
 } from "../common/dynamic-react-icon";
 import { MapPolygons } from "./map-polygons";
+import { useFetchLocalities } from "../../hooks/use-localities";
+import { CorridorMarkerIcon } from "./corridor-marker-icon";
+import { LocalityMarkerIcon } from "./locality-marker-icon";
 
 type GeoJSONCoordinate = [number, number];
 type GeoJSONLineString = GeoJSONCoordinate[];
@@ -331,6 +334,7 @@ const MapViewV2 = ({
   surroundingElements,
   projectsNearby,
   projectSqftPricing,
+  showLocalities,
 }: {
   drivers?: any[];
   projectId?: string;
@@ -344,11 +348,14 @@ const MapViewV2 = ({
     projectLocation: [number, number];
   }[];
   projectSqftPricing?: string;
+  showLocalities?: boolean;
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
   const { data: corridors, isLoading: isCorridorsDataLoading } =
     useFetchCorridors();
+  const { data: localities, isLoading: isLocalitiesDataLoading } =
+    useFetchLocalities();
   const [selectedDriverTypes, setSelectedDriverTypes] = useState<string[]>([]);
 
   const [uniqueSurroundingElements, setUniqueSurroundingElements] = useState<
@@ -599,121 +606,51 @@ const MapViewV2 = ({
     });
   };
 
+  const renderLocalities = () => {
+    if (!localities) {
+      return null;
+    }
+
+    const LocalityIcon = L.divIcon({
+      className: "", // prevent default icon styles
+      html: renderToString(<LocalityMarkerIcon />),
+      iconSize: [100, 100],
+      iconAnchor: [50, 50],
+    });
+    return localities!
+      .filter((l) => !!l.location && !!l.location.lat)
+      .map((c) => {
+        return (
+          <>
+            <Marker
+              key={`rpple-${c._id}`}
+              icon={LocalityIcon}
+              position={[c.location.lat, c.location.lng]}
+              eventHandlers={{
+                click: () => {
+                  setModalContent({
+                    title: c.name,
+                    content: "",
+                    tags: [
+                      { label: "Growth corridor", color: COLORS.textColorDark },
+                    ],
+                  });
+                  setInfoModalOpen(true);
+                },
+              }}
+            />
+          </>
+        );
+      });
+  };
+
   const renderCorridors = () => {
     if (!corridors) {
       return null;
     }
-    const RippleSVG = () => (
-      <div style={{ width: "100px", height: "150px" }}>
-        <svg width="150" height="150" viewBox="0 0 200 200">
-          {/* Solid filled center circle */}
-          <circle cx="100" cy="100" r="6" fill={COLORS.textColorDark} />
-
-          {/* Animated rings */}
-          <circle
-            cx="100"
-            cy="100"
-            r="10"
-            fill="none"
-            stroke={COLORS.textColorDark}
-            strokeWidth="2"
-          >
-            <animate
-              attributeName="r"
-              from="10"
-              to="90"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="opacity"
-              from="1"
-              to="0"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </circle>
-          <circle
-            cx="100"
-            cy="100"
-            r="10"
-            fill="none"
-            stroke={COLORS.textColorDark}
-            strokeWidth="2"
-          >
-            <animate
-              attributeName="r"
-              from="10"
-              to="90"
-              begin="0.5s"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="opacity"
-              from="1"
-              to="0"
-              begin="0.5s"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </circle>
-          <circle
-            cx="100"
-            cy="100"
-            r="10"
-            fill="none"
-            stroke={COLORS.textColorDark}
-            strokeWidth="2"
-          >
-            <animate
-              attributeName="r"
-              from="10"
-              to="90"
-              begin="1s"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="opacity"
-              from="1"
-              to="0"
-              begin="1s"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </circle>
-          <circle
-            cx="100"
-            cy="100"
-            r="10"
-            fill="none"
-            stroke={COLORS.textColorDark}
-            strokeWidth="2"
-          >
-            <animate
-              attributeName="r"
-              from="10"
-              to="90"
-              begin="1.5s"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="opacity"
-              from="1"
-              to="0"
-              begin="1.5s"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </circle>
-        </svg>
-      </div>
-    );
-    const RippleIcon = L.divIcon({
+    const CorridorIcon = L.divIcon({
       className: "", // prevent default icon styles
-      html: renderToString(<RippleSVG />),
+      html: renderToString(<CorridorMarkerIcon />),
       iconSize: [100, 100],
       iconAnchor: [50, 50],
     });
@@ -722,7 +659,7 @@ const MapViewV2 = ({
         <>
           <Marker
             key={`rpple-${c._id}`}
-            icon={RippleIcon}
+            icon={CorridorIcon}
             position={[c.location.lat, c.location.lng]}
             eventHandlers={{
               click: () => {
@@ -1551,6 +1488,7 @@ const MapViewV2 = ({
 
                 {renderProjectMarkers()}
                 {renderCorridors()}
+                {showLocalities && localities ? renderLocalities() : null}
                 {renderSurroundings()}
                 {projectsNearby?.length && projectsNearbyIcons?.length
                   ? renderProjectsNearby()

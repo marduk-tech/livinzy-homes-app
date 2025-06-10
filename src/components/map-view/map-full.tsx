@@ -211,6 +211,7 @@ export function MapFull() {
                 projects={filteredProjects}
                 fullSize={false}
                 defaultSelectedDriverTypes={selectedDriverTypes}
+                showLocalities={true}
               />
             </>
           )}
