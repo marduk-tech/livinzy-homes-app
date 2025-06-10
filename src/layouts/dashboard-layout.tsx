@@ -186,7 +186,6 @@ export const DashboardLayout: React.FC = () => {
                       navigate(`/app/${value}`);
                     }}
                     options={[
-                      { value: "all", label: "All Collections" },
                       ...(user.savedLvnzyProjects || []).map((c) => ({
                         value: c._id,
                         label: c.collectionName,

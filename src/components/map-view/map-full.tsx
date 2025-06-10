@@ -1,19 +1,16 @@
 import { Flex, Select, Typography } from "antd";
 import { useEffect, useState } from "react";
-import { useFetchAllLivindexPlaces } from "../../../../hooks/use-livindex-places";
-import { useFetchProjects } from "../../../../hooks/use-project";
-import {
-  LivIndexDriversConfig,
-  ProjectHomeType,
-} from "../../../../libs/constants";
-import { capitalize } from "../../../../libs/lvnzy-helper";
-import { COLORS } from "../../../../theme/style-constants";
-import { IDriverPlace } from "../../../../types/Project";
-import { Loader } from "../../../common/loader";
-import { getProjectTypeIcon } from "../../map-old/project-type-icon";
-import MapViewV2 from "../../map-view-v2";
+import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
+import { useFetchProjects } from "../../hooks/use-project";
+import { LivIndexDriversConfig, ProjectHomeType } from "../../libs/constants";
+import { capitalize } from "../../libs/lvnzy-helper";
+import { COLORS } from "../../theme/style-constants";
+import { IDriverPlace } from "../../types/Project";
+import { Loader } from "../common/loader";
+import { getProjectTypeIcon } from "./map-old/project-type-icon";
+import MapViewV2 from "./map-view-v2";
 
-export function LivIndexFull() {
+export function MapFull() {
   const { data: livindexPlaces, isLoading: livindexPlacesLoading } =
     useFetchAllLivindexPlaces();
 

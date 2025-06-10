@@ -19,7 +19,7 @@ import { posthogkey } from "../libs/constants";
 import { MainLanding } from "../pages/landing/main-landing";
 import BrickfiHome from "../pages/brickfi-home";
 import { AboutUs } from "../pages/landing/about-us";
-import { LivIndexFull } from "../components/map-view/map-old/liv-index-all/livindex-full";
+import { MapFull } from "../components/map-view/map-full";
 
 export const Router = () => {
   const { user, isLoading: userLoading } = useUser();
@@ -46,7 +46,7 @@ export const Router = () => {
       <Route path="/" element={<MainLanding />} />
       <Route path="/aboutus" element={<AboutUs />} />
       <Route element={<DashboardLayout />}>
-        <Route path="/app/map-view-345" element={<LivIndexFull />} />
+        <Route path="/app/map-view-345" element={<MapFull />} />
         <Route path="/app/:collectionId?" element={<BrickfiHome />} />
         <Route path="/app/profile" element={<ProfilePage />} />
         <Route path="/pro/:projectId?" element={<LivProjectPro />} />

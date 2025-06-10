@@ -128,7 +128,7 @@ export const ProjectImagesGalleryModal = ({
                             item.image!.caption || `${tag} image ${index + 1}`
                           }
                           preview={{
-                            mask: (
+                            mask: true ? null : (
                               <div className="gallery-caption">
                                 {item.image!.caption ||
                                   item.image!.tags.join(", ")}
@@ -168,12 +168,12 @@ export const ProjectImagesGalleryModal = ({
                             allow="accelerometer;gyroscope;encrypted-media;picture-in-picture;autoplay;"
                             title={item.video?.caption || "Video"}
                           />
-                          {item.video!.caption || item.video?.tags?.length ? (
+                          {/* {item.video!.caption || item.video?.tags?.length ? (
                             <div className="gallery-caption-video">
                               {item.video!.caption ||
                                 item.video!.tags.join(", ")}
                             </div>
-                          ) : null}
+                          ) : null} */}
                         </div>
                       )}
                     </div>

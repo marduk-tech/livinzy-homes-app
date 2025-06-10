@@ -31,29 +31,11 @@ const BrickfiHome: React.FC = () => {
 
   useEffect(() => {
     if (user && user.savedLvnzyProjects) {
-      if (collectionId === "all") {
-        // Combine projects from all collections
-        const allProjects = user.savedLvnzyProjects.reduce(
-          (acc: any[], curr: any) => {
-            // Only add unique projects based on _id
-            const uniqueProjects = curr.projects.filter(
-              (project: any) => !acc.some((p: any) => p._id === project._id)
-            );
-            return [...acc, ...uniqueProjects];
-          },
-          []
-        );
-
-        setSelectedCollection({
-          _id: "all",
-          name: "All Collections",
-          projects: allProjects,
-        });
-      } else if (collectionId) {
+      if (collectionId) {
         setSelectedCollection(
           user.savedLvnzyProjects.find((c) => c._id == collectionId)
         );
-      } else if (!lvnzyProjectId) {
+      } else {
         setSelectedCollection(user.savedLvnzyProjects[0]);
       }
     }

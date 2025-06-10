@@ -60,9 +60,13 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
     } else if (value < 65 && value >= 40) {
       iconName = "PiSmileyMehBold";
       iconSet = "pi";
-    } else if (value < 40) {
+    } else if (value < 40 && value > 0) {
       iconName = "PiSmileySadBold";
       iconSet = "pi";
+    } else {
+      iconName = "PiSmileyMehDuotone";
+      iconSet = "pi";
+      color = "grey";
     }
     return (
       <DynamicReactIcon
@@ -73,9 +77,6 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
       ></DynamicReactIcon>
     );
   };
-  if (!value) {
-    return null;
-  }
 
   if (showBadgeOnly) {
     return (
@@ -90,7 +91,7 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
         gap={2}
         align="center"
       >
-        <Flex>{Math.round(value * 5) / 100}</Flex>
+        <Flex>{value ? Math.round(value * 5) / 100 : ""}</Flex>
         {getSmileyIcon(value)}
       </Flex>
     );
