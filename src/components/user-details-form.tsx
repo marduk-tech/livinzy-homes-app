@@ -1,7 +1,8 @@
-import { Button, Form, Input, Select } from "antd";
+import { Button, Form, Input, Select, Typography } from "antd";
 import { useUser } from "../hooks/use-user";
 import { useUpdateUserMutation } from "../hooks/user-hooks";
 import { FONT_SIZE } from "../theme/style-constants";
+import { LocalStorageKeys } from "../libs/constants";
 
 const sourceOptions = [
   { label: "Direct email", value: "Direct email" },
@@ -32,14 +33,19 @@ export function UserDetailsForm({
   const handleUserUpdate = async () => {
     const values = await form.validateFields();
 
-    updateUserMutation.mutate({
-      userData: {
-        profile: {
-          ...user?.profile,
-          ...values,
+    updateUserMutation
+      .mutateAsync({
+        userData: {
+          profile: {
+            ...user?.profile,
+            ...values,
+          },
         },
-      },
-    });
+      })
+      .then((user: any) => {
+        localStorage.setItem(LocalStorageKeys.user, JSON.stringify(user));
+        window.location.replace("/app");
+      });
   };
 
   if (user) {
@@ -51,6 +57,9 @@ export function UserDetailsForm({
         onFinish={handleUserUpdate}
         initialValues={user.profile}
       >
+        <Typography.Title level={3} style={{ marginBottom: 24, marginTop: 16 }}>
+          Enter basic details
+        </Typography.Title>
         <Form.Item
           label="Name"
           name="name"
@@ -78,6 +87,9 @@ export function UserDetailsForm({
             {
               type: "email",
               message: "Please enter a valid email!",
+            },
+            {
+              required: true,
             },
           ]}
           validateTrigger="onSubmit"

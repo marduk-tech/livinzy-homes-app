@@ -285,9 +285,9 @@ export const Brick360DataPoints = {
     customerSatisfaction: "Customer Satisfaction",
   },
   financials: {
-    growthPotential: "Growth Potential",
     pricePoint: "Price Point",
     rentalIncome: "Rental Income",
+    growthPotential: "Growth Potential",
   },
 };
 

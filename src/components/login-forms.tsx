@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useUser } from "../hooks/use-user";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { UserDetailsForm } from "./user-details-form";
 
 export function LoginForm() {
   // auth
@@ -33,7 +32,7 @@ export function LoginForm() {
   const { user, isLoading: userLoading } = useUser();
 
   useEffect(() => {
-    if (user && !user.profile?.name) {
+    if (user && !user.profile?.email) {
       setShowUserDetailsForm(true);
     }
   }, [userLoading, user]);
@@ -93,9 +92,7 @@ export function LoginForm() {
           mobile: values.mobileNumber,
         })
         .then((user: any) => {
-          if (!user.profile?.name) {
-            setShowUserDetailsForm(true);
-          }
+          window.location.replace("/app");
         });
     } catch (error) {
       message.error("Invalid OTP. Please try again.");
@@ -141,64 +138,59 @@ Login with your mobile number to continue.
         {/* <Divider style={{ marginTop: 8, marginBottom: 32 }} /> */}
 
         <Flex>
-          {showUserDetailsForm ? (
-            <>
-              <UserDetailsForm />
-            </>
-          ) : (
-            <Form
-              style={{ width: "100%" }}
-              form={form}
-              layout="vertical"
-              onFinish={
-                loginStatus === "OTP_SENT" ? handleLogin : handleGenerateOtp
-              }
-            >
-              <Form.Item noStyle shouldUpdate>
-                {({ getFieldValue, resetFields }) => {
-                  return (
-                    <>
-                      <Form.Item
-                        label=""
-                        name="mobileNumber"
-                        validateTrigger="onSubmit"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please input your mobile number!",
+          <Form
+            style={{ width: "100%" }}
+            form={form}
+            layout="vertical"
+            onFinish={
+              loginStatus === "OTP_SENT" ? handleLogin : handleGenerateOtp
+            }
+          >
+            <Form.Item noStyle shouldUpdate>
+              {({ getFieldValue, resetFields }) => {
+                return (
+                  <>
+                    <Form.Item
+                      label=""
+                      name="mobileNumber"
+                      validateTrigger="onSubmit"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input your mobile number!",
+                        },
+
+                        {
+                          validator: (_, value) => {
+                            const mobile = value.areaCode + value.phoneNumber;
+
+                            console.log(mobile);
+
+                            return value && mobile.length >= 10
+                              ? Promise.resolve()
+                              : Promise.reject(
+                                  new Error(
+                                    "Mobile number must be at least 10 digits long!"
+                                  )
+                                );
                           },
-
-                          {
-                            validator: (_, value) => {
-                              const mobile = value.areaCode + value.phoneNumber;
-
-                              console.log(mobile);
-
-                              return value && mobile.length >= 10
-                                ? Promise.resolve()
-                                : Promise.reject(
-                                    new Error(
-                                      "Mobile number must be at least 10 digits long!"
-                                    )
-                                  );
-                            },
-                          },
-                        ]}
-                        style={{ marginBottom: 0 }}
-                        initialValue={{
-                          countryCode: 91,
-                          isoCode: "in",
-                        }}
-                      >
-                        <PhoneInput
-                          disabled={loginStatus === "OTP_SENT"}
-                          placeholder="Login with your mobile number"
-                          enableArrow
-                          enableSearch
-                          disableParentheses
-                        />
-                      </Form.Item>
-                      {/* <Typography.Text
+                        },
+                      ]}
+                      style={{ marginBottom: 0 }}
+                      initialValue={{
+                        countryCode: 91,
+                        isoCode: "in",
+                      }}
+                    >
+                      <PhoneInput
+                        disabled={loginStatus === "OTP_SENT"}
+                        placeholder="Login with your mobile number"
+                        enableArrow
+                        enableSearch
+                        disableParentheses
+                      />
+                    </Form.Item>
+                    {/* <Typography.Text
 style={{
 fontSize: FONT_SIZE.default,
 color: COLORS.textColorLight,
@@ -208,94 +200,93 @@ width: "100%",
 By signing up, you agree to the terms & conditions.
 </Typography.Text> */}
 
-                      {loginStatus === "OTP_SENT" && (
-                        <Button
-                          type="link"
-                          size="small"
-                          style={{ padding: 0 }}
-                          onClick={() => {
-                            setLoginStatus("EDIT_MOBILE");
-                            form.resetFields(["otp"]);
-                          }}
+                    {loginStatus === "OTP_SENT" && (
+                      <Button
+                        type="link"
+                        size="small"
+                        style={{ padding: 0 }}
+                        onClick={() => {
+                          setLoginStatus("EDIT_MOBILE");
+                          form.resetFields(["otp"]);
+                        }}
+                      >
+                        Edit number
+                      </Button>
+                    )}
+
+                    {loginStatus === "OTP_SENT" && (
+                      <>
+                        <Form.Item
+                          label="OTP"
+                          name="otp"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please input the OTP!",
+                            },
+                          ]}
+                          validateTrigger="onSubmit"
+                          style={{ marginBottom: 0, marginTop: 20 }}
                         >
-                          Edit number
-                        </Button>
-                      )}
-
-                      {loginStatus === "OTP_SENT" && (
-                        <>
-                          <Form.Item
-                            label="OTP"
-                            name="otp"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Please input the OTP!",
-                              },
-                            ]}
-                            validateTrigger="onSubmit"
-                            style={{ marginBottom: 0, marginTop: 20 }}
-                          >
-                            <Input
-                              style={{
-                                width: "100%",
-                                fontSize: FONT_SIZE.HEADING_3,
-                              }}
-                              placeholder="Enter the OTP"
-                              maxLength={6}
-                            />
-                          </Form.Item>
-
-                          <Button
-                            disabled={resendTimer > 0}
+                          <Input
                             style={{
-                              padding: 0,
-                              color:
-                                resendTimer > 0
-                                  ? COLORS.textColorLight
-                                  : COLORS.textColorDark,
+                              width: "100%",
+                              fontSize: FONT_SIZE.HEADING_3,
                             }}
-                            type="link"
-                            onClick={() => {
-                              const mobile = getFieldValue("mobileNumber");
+                            placeholder="Enter the OTP"
+                            maxLength={6}
+                          />
+                        </Form.Item>
 
-                              const phoneNumber =
-                                mobile.countryCode +
-                                mobile.areaCode +
-                                mobile.phoneNumber;
+                        <Button
+                          disabled={resendTimer > 0}
+                          style={{
+                            padding: 0,
+                            color:
+                              resendTimer > 0
+                                ? COLORS.textColorLight
+                                : COLORS.textColorDark,
+                          }}
+                          type="link"
+                          onClick={() => {
+                            const mobile = getFieldValue("mobileNumber");
 
-                              generateOtp({
-                                mobile: phoneNumber,
-                                countryCode: `${mobile.countryCode}`,
-                              });
-                            }}
-                            size="small"
-                          >
-                            {resendTimer > 0 ? (
-                              <>Resend OTP in {resendTimer} sec</>
-                            ) : (
-                              <>Resend OTP</>
-                            )}
-                          </Button>
-                        </>
-                      )}
-                    </>
-                  );
-                }}
-              </Form.Item>
-              <Form.Item style={{ marginTop: 20 }}>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={
-                    generateOtpMutation.isPending || loginMutation.isPending
-                  }
-                >
-                  {loginStatus === "OTP_SENT" ? "Verify OTP" : "Send OTP"}
-                </Button>
-              </Form.Item>
-            </Form>
-          )}
+                            const phoneNumber =
+                              mobile.countryCode +
+                              mobile.areaCode +
+                              mobile.phoneNumber;
+
+                            generateOtp({
+                              mobile: phoneNumber,
+                              countryCode: `${mobile.countryCode}`,
+                            });
+                          }}
+                          size="small"
+                        >
+                          {resendTimer > 0 ? (
+                            <>Resend OTP in {resendTimer} sec</>
+                          ) : (
+                            <>Resend OTP</>
+                          )}
+                        </Button>
+                      </>
+                    )}
+                  </>
+                );
+              }}
+            </Form.Item>
+            <Form.Item style={{ marginTop: 20 }}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={
+                  generateOtpMutation.isPending || loginMutation.isPending
+                }
+              >
+                {loginStatus === "OTP_SENT" ? "Verify OTP" : "Send OTP"}
+              </Button>
+            </Form.Item>
+          </Form>
         </Flex>
       </div>
     </>

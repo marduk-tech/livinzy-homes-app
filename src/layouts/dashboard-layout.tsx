@@ -5,32 +5,35 @@ import { CustomErrorBoundary } from "../components/common/custom-error-boundary"
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { LoginForm } from "../components/login-forms";
 import { useUser } from "../hooks/use-user";
-import { LocalStorageKeys } from "../libs/constants";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { NavLink } from "../types/Common";
+import { UserDetailsForm } from "../components/user-details-form";
+import { LocalStorageKeys } from "../libs/constants";
 
 const { Header, Content } = Layout;
 
 export const DashboardLayout: React.FC = () => {
-  const { user } = useUser();
+  const { user, isLoading: userLoading } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [showUserDetailsForm, setShowUserDetailsForm] = useState(false);
+
   const navigate = useNavigate();
   const { lvnzyProjectId, collectionId } = useParams();
 
   useEffect(() => {
     const userItem = localStorage.getItem(LocalStorageKeys.user);
-    const user = userItem ? JSON.parse(userItem) : null;
-    if (user) {
-      return;
-    } else {
+    const userLocal = userItem ? JSON.parse(userItem) : null;
+    if (!userLocal) {
       setLoginModalOpen(true);
+    } else {
+      setLoginModalOpen(false);
     }
   });
 
   useEffect(() => {
-    if (user) {
-      setLoginModalOpen(false);
+    if (user && (!user.profile.email || !user.profile.email)) {
+      setShowUserDetailsForm(true);
     }
   }, [user]);
 
@@ -92,7 +95,7 @@ export const DashboardLayout: React.FC = () => {
   return (
     <CustomErrorBoundary>
       <Modal
-        open={loginModalOpen}
+        open={loginModalOpen || showUserDetailsForm}
         closable={false}
         footer={null}
         style={{ padding: 0 }}
@@ -103,7 +106,11 @@ export const DashboardLayout: React.FC = () => {
           },
         }}
       >
-        <LoginForm></LoginForm>
+        {showUserDetailsForm ? (
+          <UserDetailsForm ignoreCity={true} />
+        ) : (
+          <LoginForm></LoginForm>
+        )}
       </Modal>
       <Layout
         style={{

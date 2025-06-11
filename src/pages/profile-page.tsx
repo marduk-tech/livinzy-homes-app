@@ -1,8 +1,4 @@
-import {
-  EditOutlined,
-  ExclamationCircleFilled,
-  LogoutOutlined,
-} from "@ant-design/icons";
+import { EditOutlined, LogoutOutlined } from "@ant-design/icons";
 import { Button, Flex, Modal, Typography } from "antd";
 import { useState } from "react";
 import { Loader } from "../components/common/loader";
@@ -23,7 +19,7 @@ export function ProfilePage() {
 
   const handleLogout = () => {
     logout.mutate();
-    window.location.href = "/";
+    window.location.href = "/app";
     setIsLogoutModalVisible(false);
   };
 
@@ -53,7 +49,7 @@ export function ProfilePage() {
           <p>Are you sure you want to logout?</p>
         </Modal>
 
-        <Flex vertical gap={40}>
+        <Flex vertical gap={40} style={{ padding: 16 }}>
           <Flex vertical>
             <Typography.Title level={4}>Your Profile</Typography.Title>
             <Flex

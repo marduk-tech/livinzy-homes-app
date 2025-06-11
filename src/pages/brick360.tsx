@@ -219,12 +219,12 @@ export function Brick360({ setFixedContent }: { setFixedContent: any }) {
               setSelectedDriverTypes(["transit", "highway"]);
               break;
           }
-        } else if (selectedDataPointCategory === "investment") {
+        } else if (selectedDataPointCategory === "financials") {
           isMapVisible = true;
           setSelectedDriverTypes([
-            "school",
             "industrial-hitech",
             "industrial-general",
+            "highway",
           ]);
         } else if (
           selectedDataPointCategory === "property" &&
