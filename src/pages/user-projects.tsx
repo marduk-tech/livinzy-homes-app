@@ -1,4 +1,4 @@
-import { Button, Flex, Select, Tag, Typography } from "antd";
+import { Flex, Select, Tag, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GradientBar from "../components/common/grading-bar";
@@ -222,15 +222,6 @@ export function UserProjects({
       }}
       vertical
     >
-      <Button
-        style={{
-          fontSize: FONT_SIZE.HEADING_3,
-          border: "1px dashed",
-          height: 75,
-        }}
-      >
-        Generate New Brick360 Report
-      </Button>
       {uniqueCorridors &&
       uniqueCorridors.length &&
       lvnzyProjects.length > 5 &&
