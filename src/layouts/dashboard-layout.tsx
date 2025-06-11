@@ -8,6 +8,7 @@ import { useUser } from "../hooks/use-user";
 import { LocalStorageKeys } from "../libs/constants";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { NavLink } from "../types/Common";
+import { UserDetailsForm } from "../components/user-details-form";
 
 const { Header, Content } = Layout;
 
@@ -15,6 +16,8 @@ export const DashboardLayout: React.FC = () => {
   const { user } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [showUserDetailsForm, setShowUserDetailsForm] = useState(false);
+
   const navigate = useNavigate();
   const { lvnzyProjectId, collectionId } = useParams();
 
@@ -22,6 +25,9 @@ export const DashboardLayout: React.FC = () => {
     const userItem = localStorage.getItem(LocalStorageKeys.user);
     const user = userItem ? JSON.parse(userItem) : null;
     if (user) {
+      if (user.profile && (!user.profile.email || !user.profile.name)) {
+        setShowUserDetailsForm(true);
+      }
       return;
     } else {
       setLoginModalOpen(true);
@@ -92,7 +98,7 @@ export const DashboardLayout: React.FC = () => {
   return (
     <CustomErrorBoundary>
       <Modal
-        open={loginModalOpen}
+        open={loginModalOpen || showUserDetailsForm}
         closable={false}
         footer={null}
         style={{ padding: 0 }}
@@ -103,7 +109,11 @@ export const DashboardLayout: React.FC = () => {
           },
         }}
       >
-        <LoginForm></LoginForm>
+        {showUserDetailsForm ? (
+          <UserDetailsForm ignoreCity={true} />
+        ) : (
+          <LoginForm></LoginForm>
+        )}
       </Modal>
       <Layout
         style={{
