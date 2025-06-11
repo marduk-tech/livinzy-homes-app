@@ -58,7 +58,7 @@ export function UserDetailsForm({
         initialValues={user.profile}
       >
         <Typography.Title level={3} style={{ marginBottom: 24, marginTop: 16 }}>
-          Provide basic details
+          Enter basic details
         </Typography.Title>
         <Form.Item
           label="Name"

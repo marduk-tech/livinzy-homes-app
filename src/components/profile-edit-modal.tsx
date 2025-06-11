@@ -9,7 +9,7 @@ export function ProfileEditModal({
   onCancel: () => void;
 }) {
   return (
-    <Modal title="Edit Profile" open={open} onCancel={onCancel} footer={[]}>
+    <Modal title="" open={open} onCancel={onCancel} footer={[]}>
       <UserDetailsForm ignoreCity={true} ignoreSource={true} />
     </Modal>
   );
