@@ -237,6 +237,7 @@ export enum BRICK360_CATEGORY {
   property = "property",
   areaConnectivity = "areaConnectivity",
   developer = "developer",
+  financials = "financials",
 }
 
 export const Brick360CategoryInfo: Record<
@@ -258,6 +259,11 @@ export const Brick360CategoryInfo: Record<
     iconName: "FaPeopleGroup",
     iconSet: "fa6",
   },
+  financials: {
+    title: "Financials",
+    iconName: "TbPigMoney",
+    iconSet: "tb",
+  },
 };
 
 export const Brick360DataPoints = {
@@ -277,9 +283,10 @@ export const Brick360DataPoints = {
     timeCommitment: "Time Committment",
     customerSatisfaction: "Customer Satisfaction",
   },
-  investment: {
-    growthDrivers: "Growth Drivers",
+  financials: {
     pricePoint: "Price Point",
+    rentalIncome: "Rental Income",
+    growthPotential: "Growth Potential",
   },
 };
 
