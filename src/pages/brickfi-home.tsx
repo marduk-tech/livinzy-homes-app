@@ -1,19 +1,29 @@
-import React, { ReactNode, useEffect, useState } from "react";
 import { Flex } from "antd";
-import { UserProjects } from "./user-projects";
-import { useUser } from "../hooks/use-user";
+import React, { ReactNode, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Brick360 } from "./brick360";
 import { Loader } from "../components/common/loader";
+import { ProjectSearch } from "../components/project-search";
+import { RequestedProjectsList } from "../components/requested-projects-list";
+import { useUser } from "../hooks/use-user";
+import { User } from "../types/User";
+import { Brick360 } from "./brick360";
+import { UserProjects } from "./user-projects";
+
+interface SavedLvnzyProject {
+  _id: string;
+  collectionName: string;
+  projects: any[];
+}
 
 const BrickfiHome: React.FC = () => {
-  const { user } = useUser();
-  const [projects, setProjects] = useState<any[]>([]);
+  const { user, isLoading: userLoading } = useUser();
   const { lvnzyProjectId, collectionId } = useParams();
 
   const [drawerFixedContent, setDrawerFixedContent] = useState<ReactNode>(null);
   const [drawerVisibility, setDrawerVisibility] = useState<boolean>(false);
-  const [selectedCollection, setSelectedCollection] = useState<any>();
+  const [selectedCollection, setSelectedCollection] =
+    useState<SavedLvnzyProject | null>(null);
+  const [isLoadingCollection, setIsLoadingCollection] = useState(true);
 
   const tabs = [
     {
@@ -30,49 +40,98 @@ const BrickfiHome: React.FC = () => {
   );
 
   useEffect(() => {
-    if (user && user.savedLvnzyProjects) {
-      if (collectionId === "all") {
-        // Combine projects from all collections
-        const allProjects = user.savedLvnzyProjects.reduce(
-          (acc: any[], curr: any) => {
-            // Only add unique projects based on _id
-            const uniqueProjects = curr.projects.filter(
-              (project: any) => !acc.some((p: any) => p._id === project._id)
-            );
-            return [...acc, ...uniqueProjects];
-          },
-          []
-        );
+    setIsLoadingCollection(true);
 
-        setSelectedCollection({
-          _id: "all",
-          name: "All Collections",
-          projects: allProjects,
-        });
-      } else if (collectionId) {
-        setSelectedCollection(
-          user.savedLvnzyProjects.find((c) => c._id == collectionId)
-        );
-      } else {
-        setSelectedCollection(user.savedLvnzyProjects[0]);
-      }
+    if (!user) {
+      setIsLoadingCollection(false);
+      return;
     }
+
+    if (!user.savedLvnzyProjects || user.savedLvnzyProjects.length === 0) {
+      setSelectedCollection(null);
+      setIsLoadingCollection(false);
+      return;
+    }
+
+    if (collectionId === "all") {
+      // Combine projects from all collections
+      const allProjects = user.savedLvnzyProjects.reduce(
+        (acc: any[], curr: SavedLvnzyProject) => {
+          // Only add unique projects based on _id
+          const uniqueProjects = curr.projects.filter(
+            (project: any) => !acc.some((p: any) => p._id === project._id)
+          );
+          return [...acc, ...uniqueProjects];
+        },
+        []
+      );
+
+      setSelectedCollection({
+        _id: "all",
+        collectionName: "All Collections",
+        projects: allProjects,
+      });
+    } else if (collectionId) {
+      setSelectedCollection(
+        user.savedLvnzyProjects.find(
+          (c: SavedLvnzyProject) => c._id === collectionId
+        ) || null
+      );
+    } else {
+      setSelectedCollection(user.savedLvnzyProjects[0]);
+    }
+
+    setIsLoadingCollection(false);
   }, [collectionId, user]);
 
-  if (!user || !selectedCollection) {
+  if (userLoading || isLoadingCollection) {
     return <Loader></Loader>;
   }
 
+  const handleProjectSelect = (
+    projectId: string,
+    projectName: string,
+    lvnzyProjectId: string | null
+  ) => {
+    // Handle project selection
+    console.log("Selected project:", {
+      projectId,
+      projectName,
+      lvnzyProjectId,
+    });
+    // You can add navigation or other logic here
+  };
+
   return (
     <Flex vertical style={{ paddingBottom: 100 }}>
+      <Flex style={{ padding: "16px 16px 8px 16px" }}>
+        <ProjectSearch
+          onSelect={handleProjectSelect}
+          placeholder="Search for projects..."
+        />
+      </Flex>
       {lvnzyProjectId ? (
-        <Brick360></Brick360>
+        <Brick360 />
       ) : (
-        <UserProjects
-          lvnzyProjects={selectedCollection.projects}
-        ></UserProjects>
+        <>
+          {user && <RequestedProjectsList user={user} />}
+          {selectedCollection?.projects ? (
+            <UserProjects lvnzyProjects={selectedCollection.projects} />
+          ) : (
+            <Flex justify="center" align="center" style={{ height: "50vh" }}>
+              No projects found. Add some projects to get started.
+            </Flex>
+          )}
+        </>
       )}
-      {/* <Drawer
+    </Flex>
+  );
+};
+
+export default BrickfiHome;
+
+{
+  /* <Drawer
         open={true}
         mask={false}
         title={null}
@@ -113,8 +172,10 @@ const BrickfiHome: React.FC = () => {
             lvnzyProjectId={lvnzyProjectId}
           ></BrickfiAssist>
         </Flex>
-      </Drawer> */}
-      {/* <Tabs
+      </Drawer> */
+}
+{
+  /* <Tabs
         onChange={(key: string) => {
           setSelectedTabKey(key);
         }}
@@ -182,9 +243,5 @@ const BrickfiHome: React.FC = () => {
             ),
           };
         })}
-      /> */}
-    </Flex>
-  );
-};
-
-export default BrickfiHome;
+      /> */
+}
