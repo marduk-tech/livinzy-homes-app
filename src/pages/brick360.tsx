@@ -124,21 +124,19 @@ export function Brick360({ setFixedContent }: { setFixedContent: any }) {
   };
 
   const getTotalFloors = (lvnzyProject: any) => {
-    const minFloors = Math.min(
-      ...lvnzyProject?.meta.projectConfigurations.towers.map(
-        (t: any) => t.totalFloors
-      )
-    );
-    const maxFloors = Math.max(
-      ...lvnzyProject?.meta.projectConfigurations.towers.map(
-        (t: any) => t.totalFloors
-      )
-    );
-    if (minFloors == maxFloors) {
+    const towers = lvnzyProject?.meta?.projectConfigurations?.towers;
+    if (!towers || !towers.length) {
+      return "0";
+    }
+
+    const floorCounts = towers.map((t: any) => t.totalFloors);
+    const minFloors = Math.min(...floorCounts);
+    const maxFloors = Math.max(...floorCounts);
+
+    if (minFloors === maxFloors) {
       return `${minFloors}`;
     } else {
-      return `${minFloors} -
-                ${maxFloors}`;
+      return `${minFloors} - ${maxFloors}`;
     }
   };
 
@@ -164,14 +162,17 @@ export function Brick360({ setFixedContent }: { setFixedContent: any }) {
     const interval = setInterval(() => {
       setFakeTimeoutProgress((prevFakeTimeoutProgress: any) => {
         if (prevFakeTimeoutProgress >= 130) {
-          // Stop at 10
+          // Stop at 130
           clearInterval(interval);
           return prevFakeTimeoutProgress;
         }
         return prevFakeTimeoutProgress + 10;
       });
     }, FAKE_TIMER_SECS);
-  });
+
+    // Cleanup on unmount
+    return () => clearInterval(interval);
+  }, []); // Empty dependency array since we only want to run this once
 
   useEffect(() => {
     if (!lvnzyProject) {

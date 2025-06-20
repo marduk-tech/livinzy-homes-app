@@ -1,6 +1,7 @@
 import { Flex, Select, Tag, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import GradientBar from "../components/common/grading-bar";
 import { Loader } from "../components/common/loader";
 import { useDevice } from "../hooks/use-device";
@@ -9,7 +10,6 @@ import { BRICK360_CATEGORY, Brick360CategoryInfo } from "../libs/constants";
 import { getCategoryScore, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { LvnzyProject } from "../types/LvnzyProject";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
 const { Paragraph } = Typography;
 
 export function UserProjects({
@@ -112,7 +112,7 @@ export function UserProjects({
               align={isMobile ? "flex-start" : "center"}
               style={{ width: "100%", textWrap: "wrap" }}
             >
-              {oneLinerBreakup.length && (
+              {oneLinerBreakup.length > 0 && (
                 <Typography.Text
                   style={{
                     fontSize: FONT_SIZE.SUB_TEXT,
@@ -225,9 +225,8 @@ export function UserProjects({
       vertical
     >
       {uniqueCorridors &&
-      uniqueCorridors.length &&
-      lvnzyProjects.length > 5 &&
-      false ? (
+      uniqueCorridors.length > 0 &&
+      lvnzyProjects.length > 5 ? (
         <>
           <Flex gap={8} style={{ marginBottom: 16 }}>
             <Select
@@ -237,10 +236,10 @@ export function UserProjects({
               onChange={(value: string) => setSelectedCorridor(value)}
               options={[
                 { value: "all", label: "All Corridors" },
-                ...uniqueCorridors.map((c) => ({
+                ...(uniqueCorridors?.map((c) => ({
                   value: c,
                   label: c,
-                })),
+                })) ?? []),
               ]}
             />
           </Flex>
