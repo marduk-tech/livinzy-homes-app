@@ -17,6 +17,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useFetchCorridors } from "../../hooks/use-corridors";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
+import { useFetchLocalities } from "../../hooks/use-localities";
 import { useFetchProjectById } from "../../hooks/use-project";
 import {
   LivIndexDriversConfig,
@@ -29,10 +30,9 @@ import { IDriverPlace, ISurroundingElement } from "../../types/Project";
 import DynamicReactIcon, {
   dynamicImportMap,
 } from "../common/dynamic-react-icon";
-import { MapPolygons } from "./map-polygons";
-import { useFetchLocalities } from "../../hooks/use-localities";
 import { CorridorMarkerIcon } from "./corridor-marker-icon";
 import { LocalityMarkerIcon } from "./locality-marker-icon";
+import { MapPolygons } from "./map-polygons";
 
 type GeoJSONCoordinate = [number, number];
 type GeoJSONLineString = GeoJSONCoordinate[];
@@ -178,7 +178,7 @@ const MapCenterHandler = ({
         13
       );
     } else if (projects && projects.length && projects.length < 10) {
-      var projectsLoc = turf.points(
+      const projectsLoc = turf.points(
         projects
           .filter((p) => !!p.info.location && !!p.info.location.lat)
           .map((p) => {
@@ -186,7 +186,7 @@ const MapCenterHandler = ({
           })
       );
 
-      var center = turf.center(projectsLoc);
+      const center = turf.center(projectsLoc);
       map.setView(center.geometry.coordinates.reverse() as LatLngTuple, 12);
       console.warn("Project data missing location:", projectData);
     }
@@ -422,16 +422,21 @@ const MapViewV2 = ({
             return null;
           }
 
-          const icon = await getIcon(
+          const baseIcon = await getIcon(
             iconConfig.icon.name,
             iconConfig.icon.set,
             false,
-            projectSpecificDetails && projectSpecificDetails.duration
-              ? `${projectSpecificDetails.duration} mins`
-              : undefined,
+            undefined,
             driver
           );
-          return icon ? { icon, driverId: driver._id } : null;
+
+          return baseIcon
+            ? {
+                icon: baseIcon,
+                driverId: driver._id,
+                duration: projectSpecificDetails?.duration,
+              }
+            : null;
         })
       );
 
@@ -621,7 +626,7 @@ const MapViewV2 = ({
       .filter((l) => !!l.location && !!l.location.lat)
       .map((c) => {
         return (
-          <>
+          <React.Fragment key={`locality-${c._id}`}>
             <Marker
               key={`rpple-${c._id}`}
               icon={LocalityIcon}
@@ -639,7 +644,7 @@ const MapViewV2 = ({
                 },
               }}
             />
-          </>
+          </React.Fragment>
         );
       });
   };
@@ -656,7 +661,7 @@ const MapViewV2 = ({
     });
     return corridors!.map((c) => {
       return (
-        <>
+        <React.Fragment key={`corridor-${c._id}`}>
           <Marker
             key={`rpple-${c._id}`}
             icon={CorridorIcon}
@@ -674,7 +679,7 @@ const MapViewV2 = ({
               },
             }}
           />
-        </>
+        </React.Fragment>
       );
     });
   };
@@ -1001,16 +1006,75 @@ const MapViewV2 = ({
             ));
         }
         return (
-          <>
+          <React.Fragment key={`transit-${driver._id}`}>
             {transitLines}
             {stations}
-          </>
+          </React.Fragment>
         );
       });
   };
 
-  /** Renders driver markers */
-  const renderSimpleDrivers = (bounds: L.LatLngBounds) => {
+  /**
+   * Component to render simple drivers with zoom-dependent duration display
+   */
+  const SimpleDriversRenderer = ({
+    bounds,
+  }: {
+    bounds: L.LatLngBounds;
+  }): JSX.Element | null => {
+    const map = useMap();
+    const showDuration = map.getZoom() > 14;
+    const [markerIcons, setMarkerIcons] = useState<{
+      [key: string]: L.DivIcon;
+    }>({});
+
+    useEffect(() => {
+      if (
+        !drivers?.length ||
+        !driversData?.length ||
+        !!surroundingElements?.length
+      ) {
+        return;
+      }
+
+      const updateIcons = async () => {
+        const newIcons: { [key: string]: L.DivIcon } = {};
+
+        for (const driver of driversData) {
+          if (!driver.location?.lat || !driver.location?.lng) continue;
+
+          const driverIcon = simpleDriverMarkerIcons.find(
+            (icon) => icon.driverId === driver._id
+          );
+
+          if (driverIcon?.icon) {
+            if (showDuration && driverIcon.duration) {
+              const iconConfig = (LivIndexDriversConfig as any)[driver.driver]
+                ?.icon;
+              if (iconConfig) {
+                const icon = await getIcon(
+                  iconConfig.name,
+                  iconConfig.set,
+                  false,
+                  `${driverIcon.duration} mins`,
+                  driver
+                );
+                if (icon) {
+                  newIcons[driver._id] = icon;
+                }
+              }
+            } else {
+              newIcons[driver._id] = driverIcon.icon;
+            }
+          }
+        }
+
+        setMarkerIcons(newIcons);
+      };
+
+      updateIcons();
+    }, [driversData, showDuration, simpleDriverMarkerIcons, drivers]);
+
     if (
       !drivers?.length ||
       !driversData?.length ||
@@ -1019,106 +1083,82 @@ const MapViewV2 = ({
       return null;
     }
 
-    // console.log(
-    //   "Rendering simple markers for drivers:",
-    //   driversData.length,
-    //   "Selected types:",
-    //   selectedDriverTypes
-    // );
+    const filteredDrivers = driversData.filter((driver) => {
+      if (!driver.location?.lat || !driver.location?.lng) return false;
+      return (
+        selectedDriverTypes.includes(driver.driver) &&
+        bounds.contains([driver.location.lat, driver.location.lng])
+      );
+    });
 
-    return driversData
-      ?.filter((driver) => {
-        const included = selectedDriverTypes.includes(driver.driver);
+    return (
+      <>
+        {filteredDrivers.map((driver) => {
+          if (!driver.location?.lat || !driver.location?.lng) return null;
+          const markerIcon = markerIcons[driver._id];
+          if (!markerIcon) return null;
 
-        // check if driver is within the current map bounds
-        if (!driver.location?.lat || !driver.location?.lng) {
-          return false;
-        }
+          const statusText =
+            driver.status === PLACE_TIMELINE.CONSTRUCTION
+              ? "Under Construction"
+              : [
+                  PLACE_TIMELINE.LAUNCHED,
+                  PLACE_TIMELINE.POST_LAUNCH,
+                  PLACE_TIMELINE.PARTIAL_LAUNCH,
+                ].includes(driver.status as PLACE_TIMELINE)
+              ? "Operational"
+              : "Planning Stage";
 
-        const isInBounds = bounds.contains([
-          driver.location.lat,
-          driver.location.lng,
-        ]);
-        // console.log("Driver bounds check:", {
-        //   id: driver._id,
-        //   location: [driver.location.lat, driver.location.lng],
-        //   isInBounds,
-        //   bounds: {
-        //     north: bounds.getNorth(),
-        //     south: bounds.getSouth(),
-        //     east: bounds.getEast(),
-        //     west: bounds.getWest(),
-        //   },
-        // });
-        return included && isInBounds;
-      })
-      .map((driver: IDriverPlace) => {
-        if (!driver.location?.lat || !driver.location?.lng) {
-          return null;
-        }
+          const isDashed = ![
+            PLACE_TIMELINE.LAUNCHED,
+            PLACE_TIMELINE.POST_LAUNCH,
+            PLACE_TIMELINE.PARTIAL_LAUNCH,
+          ].includes(driver.status as PLACE_TIMELINE);
 
-        const icon = simpleDriverMarkerIcons.find(
-          (icon: any) => icon.driverId === driver._id
-        )?.icon;
+          const projectSpecificDetails = drivers?.find(
+            (d) => d.id === driver._id
+          );
 
-        if (!icon) {
-          return null;
-        }
-
-        const statusText =
-          driver.status == PLACE_TIMELINE.CONSTRUCTION
-            ? "Under Construction"
-            : [
-                PLACE_TIMELINE.LAUNCHED,
-                PLACE_TIMELINE.POST_LAUNCH,
-                PLACE_TIMELINE.PARTIAL_LAUNCH,
-              ].includes(driver.status as PLACE_TIMELINE)
-            ? "Operational"
-            : "Planning Stage";
-
-        const isDashed = ![
-          PLACE_TIMELINE.LAUNCHED,
-          PLACE_TIMELINE.POST_LAUNCH,
-          PLACE_TIMELINE.PARTIAL_LAUNCH,
-        ].includes(driver.status as PLACE_TIMELINE);
-
-        return (
-          <Marker
-            key={driver._id}
-            position={[driver.location.lat, driver.location.lng]}
-            icon={icon}
-            eventHandlers={{
-              click: () => {
-                const projectSpecificDetails = drivers?.find(
-                  (d) => d.id == driver._id
-                );
-                setModalContent({
-                  title: driver.name,
-                  content: driver.details?.description || "",
-                  tags: [
-                    {
-                      label: (LivIndexDriversConfig as any)[driver.driver]
-                        .label,
-                      color: COLORS.primaryColor,
-                    },
-                    {
-                      label: statusText,
-                      color: isDashed
-                        ? COLORS.yellowIdentifier
-                        : COLORS.greenIdentifier,
-                    },
-                    {
-                      label: `${projectSpecificDetails.duration} mins`,
-                      color: COLORS.textColorDark,
-                    },
-                  ],
-                });
-                setInfoModalOpen(true);
-              },
-            }}
-          />
-        );
-      });
+          return (
+            <Marker
+              key={driver._id}
+              position={[driver.location.lat, driver.location.lng]}
+              icon={markerIcon}
+              eventHandlers={{
+                click: () => {
+                  setModalContent({
+                    title: driver.name,
+                    content: driver.details?.description || "",
+                    tags: [
+                      {
+                        label: (LivIndexDriversConfig as any)[driver.driver]
+                          .label,
+                        color: COLORS.primaryColor,
+                      },
+                      {
+                        label: statusText,
+                        color: isDashed
+                          ? COLORS.yellowIdentifier
+                          : COLORS.greenIdentifier,
+                      },
+                      ...(projectSpecificDetails?.duration
+                        ? [
+                            {
+                              label: `${projectSpecificDetails.duration} mins`,
+                              color: COLORS.textColorDark,
+                            },
+                          ]
+                        : []),
+                    ],
+                  });
+                  setInfoModalOpen(true);
+                },
+              }}
+            />
+          );
+        })}
+      </>
+    );
   };
 
   /**Renders marker for all projects */
@@ -1502,7 +1542,9 @@ const MapViewV2 = ({
                       renderTransitDrivers={(bounds) => (
                         <TransitDriversComponent bounds={bounds} />
                       )}
-                      renderSimpleDrivers={renderSimpleDrivers}
+                      renderSimpleDrivers={(bounds) => (
+                        <SimpleDriversRenderer bounds={bounds} />
+                      )}
                     />
                     <MapPolygons
                       polygons={processDriversToPolygons(
@@ -1570,5 +1612,4 @@ const MapViewV2 = ({
     </div>
   );
 };
-``;
 export default MapViewV2;
