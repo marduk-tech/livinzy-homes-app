@@ -4,11 +4,11 @@ import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { LoginForm } from "../components/login-forms";
+import { UserDetailsForm } from "../components/user-details-form";
 import { useUser } from "../hooks/use-user";
+import { LocalStorageKeys } from "../libs/constants";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { NavLink } from "../types/Common";
-import { UserDetailsForm } from "../components/user-details-form";
-import { LocalStorageKeys } from "../libs/constants";
 
 const { Header, Content } = Layout;
 
@@ -29,7 +29,7 @@ export const DashboardLayout: React.FC = () => {
     } else {
       setLoginModalOpen(false);
     }
-  });
+  }, []);
 
   useEffect(() => {
     if (user && (!user.profile.email || !user.profile.email)) {
@@ -193,7 +193,7 @@ export const DashboardLayout: React.FC = () => {
                       navigate(`/app/${value}`);
                     }}
                     options={[
-                      ...(user.savedLvnzyProjects || []).map((c) => ({
+                      ...(user.savedLvnzyProjects || []).map((c: any) => ({
                         value: c._id,
                         label: c.collectionName,
                       })),

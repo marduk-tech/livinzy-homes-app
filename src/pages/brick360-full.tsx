@@ -52,6 +52,9 @@ const RatingBlock = ({
 }) => (
   <div style={subsectionStyle}>
     {title && <h4>{title}</h4>}
+    {typeof rating === "number" && (
+      <p style={ratingStyle}>Rating: {rating}/100</p>
+    )}
     {reasoning && (
       <ul className="reasoning">
         {reasoning.map((html, idx) => (
@@ -62,9 +65,6 @@ const RatingBlock = ({
           />
         ))}
       </ul>
-    )}
-    {typeof rating === "number" && (
-      <p style={ratingStyle}>Rating: {rating}/100</p>
     )}
   </div>
 );
