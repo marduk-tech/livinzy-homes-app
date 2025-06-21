@@ -67,7 +67,7 @@ export function DataSources({
         }}
         style={{
           borderRadius: 8,
-          padding: 4,
+          padding: "4px 0",
         }}
         align="center"
       >

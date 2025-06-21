@@ -126,14 +126,6 @@ body {
   padding: 16px;
 }
 /* Remove bottom border from active tab */
-.ant-tabs-tab-active {
-  border-bottom: none !important;
-}
-
-/* Optional: Also remove the default ink bar if needed */
-.ant-tabs-ink-bar {
-  display: none !important;
-}
 
 .brickfi-drawer {
   .ant-drawer-content-wrapper {

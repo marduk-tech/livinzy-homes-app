@@ -1,5 +1,5 @@
 import { ThemeConfig } from "antd";
-import { COLORS, FONTS } from "./style-constants";
+import { COLORS, FONT_SIZE, FONTS } from "./style-constants";
 
 export const antTheme: ThemeConfig = {
   token: {
@@ -14,6 +14,12 @@ export const antTheme: ThemeConfig = {
     Button: {
       defaultBorderColor: COLORS.primaryColor,
       defaultColor: COLORS.primaryColor,
+    },
+    Tabs: {
+      inkBarColor: COLORS.textColorDark,
+      itemColor: COLORS.textColorMedium,
+      itemSelectedColor: COLORS.textColorDark,
+      titleFontSize: FONT_SIZE.HEADING_3,
     },
   },
 };

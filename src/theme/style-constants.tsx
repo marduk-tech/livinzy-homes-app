@@ -7,10 +7,11 @@ export const COLORS = {
   bgColor: "#fafbfb",
   bgColorMedium: "#f2f4f5",
   bgColorDark: "#2D3F4E",
-  borderColor: "#eee",
+  borderColor: "#ddd",
   borderColorMedium: "#ddd",
   borderColorDark: "#666",
   textColorDark: "#2D3F4E",
+  textColorMedium: "#4e6d86",
   textColorLight: "#999",
   textColorVeryLight: "#e1e1e1",
 };

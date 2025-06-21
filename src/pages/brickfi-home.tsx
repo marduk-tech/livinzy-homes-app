@@ -5,8 +5,8 @@ import { Loader } from "../components/common/loader";
 import { ProjectSearch } from "../components/project-search";
 import { RequestedProjectsList } from "../components/requested-projects-list";
 import { useUser } from "../hooks/use-user";
-import { Brick360 } from "./brick360";
 import { UserProjects } from "./user-projects";
+import { Brick360v2 } from "./brick360-v2";
 
 interface SavedLvnzyProject {
   _id: string;
@@ -103,16 +103,16 @@ const BrickfiHome: React.FC = () => {
 
   return (
     <Flex vertical style={{ paddingBottom: 100 }}>
-      <Flex style={{ padding: "16px 16px 8px 16px" }}>
-        <ProjectSearch
-          onSelect={handleProjectSelect}
-          placeholder="Search for a project"
-        />
-      </Flex>
       {lvnzyProjectId ? (
-        <Brick360 />
+        <Brick360v2 />
       ) : (
         <>
+          <Flex style={{ padding: "16px 16px 8px 16px" }}>
+            <ProjectSearch
+              onSelect={handleProjectSelect}
+              placeholder="Search for a project"
+            />
+          </Flex>
           {user && <RequestedProjectsList user={user} />}
           {selectedCollection?.projects ? (
             <UserProjects lvnzyProjects={selectedCollection.projects} />
