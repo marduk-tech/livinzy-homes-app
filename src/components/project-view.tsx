@@ -171,7 +171,6 @@ const CostSnapshot: React.FC<{ project: Project }> = ({ project }) => {
   const { user } = useUser();
   const updateUser = useUpdateUserMutation({
     userId: user?._id as string,
-    enableToasts: false,
   });
 
   const handleSave = () => {
