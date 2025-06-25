@@ -16,7 +16,8 @@ export const ProjectImagesGalleryV2 = ({
 
   const groupedImages = useMemo(() => {
     const imageMedia = media.filter(
-      (item) => item.type === "image" && item.image
+      (item) =>
+        item.type === "image" && item.image && !item.image.tags.includes("na")
     );
     const result: Record<string, IMedia[]> = {};
 
