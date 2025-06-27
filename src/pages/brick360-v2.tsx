@@ -24,6 +24,8 @@ import { useDevice } from "../hooks/use-device";
 import { useFetchLvnzyProjectById } from "../hooks/use-lvnzy-project";
 
 import { DataSources } from "../components/common/data-sources";
+import Brick360Chat from "../components/liv/brick360-chat";
+import { ProjectImagesGalleryV2 } from "../components/project-images-gallery-v2";
 import {
   BRICK360_CATEGORY,
   Brick360CategoryInfo,
@@ -36,8 +38,6 @@ import {
 } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { ISurroundingElement } from "../types/Project";
-import Brick360Chat from "../components/liv/brick360-chat";
-import { ProjectImagesGalleryV2 } from "../components/project-images-gallery-v2";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -128,16 +128,21 @@ export function Brick360v2() {
   };
 
   const getTotalFloors = (lvnzyProject: any) => {
-    const minFloors = Math.min(
-      ...lvnzyProject?.meta.projectConfigurations.towers.map(
-        (t: any) => t.totalFloors
-      )
-    );
-    const maxFloors = Math.max(
-      ...lvnzyProject?.meta.projectConfigurations.towers.map(
-        (t: any) => t.totalFloors
-      )
-    );
+    const towers = lvnzyProject?.meta?.projectConfigurations?.towers;
+    if (!towers || !Array.isArray(towers) || towers.length === 0) {
+      return "";
+    }
+
+    const floorCounts = towers
+      .map((t: any) => t.totalFloors)
+      .filter((floors: any) => typeof floors === "number");
+    if (floorCounts.length === 0) {
+      return "";
+    }
+
+    const minFloors = Math.min(...floorCounts);
+    const maxFloors = Math.max(...floorCounts);
+
     if (minFloors == maxFloors) {
       return `${minFloors}`;
     } else {
