@@ -4,6 +4,7 @@ import {
   Divider,
   Drawer,
   Flex,
+  Image,
   List,
   Modal,
   Progress,
@@ -652,7 +653,7 @@ export function Brick360v2() {
                   size={20}
                 ></DynamicReactIcon>
                 <Typography.Text color={COLORS.textColorDark}>
-                  Units
+                  Unitssss
                 </Typography.Text>
               </Flex>
             ),
@@ -706,14 +707,18 @@ export function Brick360v2() {
                       gap={16}
                     >
                       {lvnzyProject!.meta.costingDetails.configurations.map(
-                        (c: any) => {
+                        (c: any, index: number) => {
+                          console.log(c.floorplans);
+
                           return (
                             <Flex
+                              key={`config-${index}`}
                               vertical
                               style={{
                                 borderLeft: "1px solid",
                                 paddingLeft: 8,
                                 borderLeftColor: COLORS.borderColorMedium,
+                                marginTop: 20,
                               }}
                             >
                               <Typography.Text
@@ -726,6 +731,29 @@ export function Brick360v2() {
                               >
                                 {c.config}
                               </Typography.Text>
+                              {c.floorplans && c.floorplans.length > 0 && (
+                                <Flex
+                                  style={{
+                                    overflowX: "auto",
+                                    marginTop: 8,
+                                  }}
+                                  gap={8}
+                                >
+                                  {c.floorplans.map((fp: any, i: number) => {
+                                    console.log(fp);
+
+                                    return (
+                                      <Image
+                                        key={`fp-${i}`}
+                                        src={fp}
+                                        style={{
+                                          height: 100,
+                                        }}
+                                      />
+                                    );
+                                  })}
+                                </Flex>
+                              )}
                             </Flex>
                           );
                         }
@@ -1156,25 +1184,49 @@ export function Brick360v2() {
           }}
           gap={16}
         >
-          {lvnzyProject!.meta.costingDetails.configurations.map((c: any) => {
-            return (
-              <Flex
-                vertical
-                style={{
-                  borderLeft: "1px solid",
-                  paddingLeft: 8,
-                  borderLeftColor: COLORS.borderColorMedium,
-                }}
-              >
-                <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_4 }}>
-                  ₹{rupeeAmountFormat(c.cost)}
-                </Typography.Text>
-                <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
-                  {c.config}
-                </Typography.Text>
-              </Flex>
-            );
-          })}
+          {lvnzyProject!.meta.costingDetails.configurations.map(
+            (c: any, index: number) => {
+              return (
+                <Flex
+                  key={`config-modal-${index}`}
+                  vertical
+                  style={{
+                    borderLeft: "1px solid",
+                    paddingLeft: 8,
+                    borderLeftColor: COLORS.borderColorMedium,
+                  }}
+                >
+                  <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_4 }}>
+                    ₹{rupeeAmountFormat(c.cost)}
+                  </Typography.Text>
+                  <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
+                    {c.config}
+                  </Typography.Text>
+                  {c.floorPlans && c.floorPlans.length > 0 && (
+                    <Flex
+                      style={{
+                        overflowX: "auto",
+                        marginTop: 8,
+                      }}
+                      gap={8}
+                    >
+                      {c.floorPlans.map((fp: any, i: number) => (
+                        <Image
+                          key={`fp-modal-${i}`}
+                          src={fp.url}
+                          style={{
+                            height: 100,
+                            borderRadius: 8,
+                          }}
+                          width={100}
+                        />
+                      ))}
+                    </Flex>
+                  )}
+                </Flex>
+              );
+            }
+          )}
         </Flex>
       </Modal>
     </Flex>
