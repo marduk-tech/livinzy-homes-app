@@ -1,5 +1,5 @@
-import { Flex, Image, Typography } from "antd";
-import { useMemo } from "react";
+import { Flex, Image, Tag, Typography } from "antd";
+import { useMemo, useState } from "react";
 import { useDevice } from "../hooks/use-device";
 import "../theme/gallery.css";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
@@ -13,6 +13,21 @@ export const ProjectImagesGalleryV2 = ({
   selectedImageId: string | null;
 }) => {
   const { isMobile } = useDevice();
+  const [selectedTag, setSelectedTag] = useState<string>("all");
+
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    media.forEach((item) => {
+      if (item.type === "image" && item.image?.tags) {
+        item.image.tags.forEach((tag) => {
+          if (tag !== "na") {
+            tags.add(tag);
+          }
+        });
+      }
+    });
+    return ["all", ...Array.from(tags)];
+  }, [media]);
 
   const groupedImages = useMemo(() => {
     const imageMedia = media.filter(
@@ -53,68 +68,111 @@ export const ProjectImagesGalleryV2 = ({
     return result;
   }, [media, selectedImageId]);
 
-  return (
-    <Flex vertical gap={32}>
-      {Object.entries(groupedImages)
-        .sort(([a], [b]) => {
-          if (selectedImageId) {
-            const aHasSelected = groupedImages[a].some(
-              (img) => img._id === selectedImageId
-            );
-            const bHasSelected = groupedImages[b].some(
-              (img) => img._id === selectedImageId
-            );
-            if (aHasSelected && !bHasSelected) return -1;
-            if (!aHasSelected && bHasSelected) return 1;
-          }
-          return a.localeCompare(b);
-        })
-        .map(([tag, images]) => (
-          <Flex key={tag} vertical>
-            <Typography.Text
-              style={{
-                margin: 0,
-                fontSize: FONT_SIZE.HEADING_3,
-                textTransform: "capitalize",
-              }}
-            >
-              {tag}
-            </Typography.Text>
+  const filteredImages = useMemo((): [string, IMedia[]][] => {
+    if (selectedTag === "all") {
+      return Object.entries(groupedImages);
+    }
+    if (groupedImages[selectedTag]) {
+      return [[selectedTag, groupedImages[selectedTag]]];
+    }
+    return [];
+  }, [selectedTag, groupedImages]);
 
-            <div className="gallery-grid">
-              {images.map((item, index) => {
-                const isFirstInSection = index === 0;
-                return (
-                  <div
-                    key={`${tag}-${item._id}`}
-                    className={`gallery-item ${
-                      isFirstInSection ? "gallery-item-large" : ""
-                    }`}
-                  >
-                    <Image
-                      src={item.image!.url}
-                      alt={item.image!.caption || `${tag} image ${index + 1}`}
-                      preview={{
-                        mask: true ? null : (
-                          <div className="gallery-caption">
-                            {item.image!.caption || item.image!.tags.join(", ")}
-                          </div>
-                        ),
-                      }}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        border: "1px solid",
-                        borderColor: COLORS.borderColorMedium,
-                      }}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </Flex>
+  return (
+    <Flex vertical gap={16}>
+      <Flex wrap="wrap" gap={8}>
+        {allTags.map((tag) => (
+          <Tag.CheckableTag
+            key={tag}
+            checked={selectedTag === tag}
+            onChange={(checked) => {
+              if (checked) {
+                setSelectedTag(tag);
+              }
+            }}
+            style={{
+              textTransform: "capitalize",
+              border: `1px solid ${
+                selectedTag === tag ? COLORS.primaryColor : COLORS.borderColor
+              }`,
+              padding: "4px 12px",
+              borderRadius: 16,
+              backgroundColor:
+                selectedTag === tag ? COLORS.primaryColor : "white",
+              color: selectedTag === tag ? "white" : COLORS.textColorMedium,
+            }}
+          >
+            {tag}
+          </Tag.CheckableTag>
         ))}
+      </Flex>
+
+      {filteredImages.length > 0 ? (
+        <Flex vertical gap={32}>
+          {filteredImages
+            .sort(([aTag, aImages], [bTag, bImages]) => {
+              if (selectedImageId) {
+                const aHasSelected = aImages.some(
+                  (img) => img._id === selectedImageId
+                );
+                const bHasSelected = bImages.some(
+                  (img) => img._id === selectedImageId
+                );
+                if (aHasSelected && !bHasSelected) return -1;
+                if (!aHasSelected && bHasSelected) return 1;
+              }
+              return aTag.localeCompare(bTag);
+            })
+            .map(([tag, images]) => (
+              <Flex key={tag} vertical>
+                <Typography.Text
+                  style={{
+                    margin: 0,
+                    fontSize: FONT_SIZE.HEADING_3,
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {tag}
+                </Typography.Text>
+
+                <div className="gallery-grid">
+                  {images.map((item, index) => {
+                    const isFirstInSection = index === 0;
+                    return (
+                      <div
+                        key={`${tag}-${item._id}`}
+                        className={`gallery-item ${
+                          isFirstInSection ? "gallery-item-large" : ""
+                        }`}
+                      >
+                        <Image
+                          src={item.image!.url}
+                          alt={
+                            item.image!.caption || `${tag} image ${index + 1}`
+                          }
+                          preview={{
+                            mask: null,
+                          }}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            border: "1px solid",
+                            borderColor: COLORS.borderColorMedium,
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </Flex>
+            ))}
+        </Flex>
+      ) : (
+        <Typography.Text>
+          No images available for the selected tag.
+        </Typography.Text>
+      )}
     </Flex>
   );
 };

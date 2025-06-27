@@ -708,8 +708,6 @@ export function Brick360v2() {
                     >
                       {lvnzyProject!.meta.costingDetails.configurations.map(
                         (c: any, index: number) => {
-                          console.log(c.floorplans);
-
                           return (
                             <Flex
                               key={`config-${index}`}
