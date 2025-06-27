@@ -5,7 +5,7 @@ import { Loader } from "../components/common/loader";
 import { ProjectSearch } from "../components/project-search";
 import { RequestedProjectsList } from "../components/requested-projects-list";
 import { useUser } from "../hooks/use-user";
-import { Brick360v2 } from "./brick360-v2";
+import { Brick360v2 } from "./brick-360/brick360-v2";
 import { UserProjects } from "./user-projects";
 
 interface SavedLvnzyProject {

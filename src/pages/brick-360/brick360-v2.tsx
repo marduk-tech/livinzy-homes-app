@@ -13,33 +13,33 @@ import {
   Tag,
   Typography,
 } from "antd";
-import moment from "moment";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
-import GradientBar from "../components/common/grading-bar";
-import { Loader } from "../components/common/loader";
-import RatingBar from "../components/common/rating-bar";
-import MapViewV2 from "../components/map-view/map-view-v2";
-import { useDevice } from "../hooks/use-device";
-import { useFetchLvnzyProjectById } from "../hooks/use-lvnzy-project";
+import DynamicReactIcon from "../../components/common/dynamic-react-icon";
+import GradientBar from "../../components/common/grading-bar";
+import { Loader } from "../../components/common/loader";
+import RatingBar from "../../components/common/rating-bar";
+import MapViewV2 from "../../components/map-view/map-view-v2";
+import { useDevice } from "../../hooks/use-device";
+import { useFetchLvnzyProjectById } from "../../hooks/use-lvnzy-project";
 
-import { DataSources } from "../components/common/data-sources";
-import Brick360Chat from "../components/liv/brick360-chat";
-import { ProjectImagesGalleryV2 } from "../components/project-images-gallery-v2";
-import { ScrollableContainer } from "../components/scrollable-container";
+import { DataSources } from "../../components/common/data-sources";
+import Brick360Chat from "../../components/liv/brick360-chat";
+import { ProjectImagesGalleryV2 } from "../../components/project-images-gallery-v2";
+import { ScrollableContainer } from "../../components/scrollable-container";
 import {
   BRICK360_CATEGORY,
   Brick360CategoryInfo,
   Brick360DataPoints,
-} from "../libs/constants";
+} from "../../libs/constants";
 import {
   capitalize,
   getCategoryScore,
   rupeeAmountFormat,
-} from "../libs/lvnzy-helper";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { ISurroundingElement } from "../types/Project";
+} from "../../libs/lvnzy-helper";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { ISurroundingElement } from "../../types/Project";
+import MetaInfo from "./meta-info";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -325,49 +325,6 @@ export function Brick360v2() {
     );
   }
 
-  const renderMetaInfo = () => {
-    const renderText = (text: string) => {
-      return (
-        <Typography.Text
-          style={{
-            fontSize: FONT_SIZE.HEADING_4,
-            margin: 0,
-            color: COLORS.textColorLight,
-          }}
-        >
-          {text}
-        </Typography.Text>
-      );
-    };
-    return (
-      <Flex vertical>
-        {renderText(lvnzyProject?.meta.oneLiner)}
-        {renderText(`Starts: 
-            ${rupeeAmountFormat(
-              lvnzyProject?.meta.costingDetails.configurations[0].cost
-            )} / ${
-          lvnzyProject?.meta.costingDetails.configurations[0].config
-        }`)}
-        {lvnzyProject?.meta.projectTimelines &&
-        lvnzyProject?.meta.projectTimelines.length ? (
-          <Flex>
-            {renderText(
-              `Launched: 
-              ${moment(
-                lvnzyProject?.meta.projectTimelines[0].startDate,
-                "DD-MM-YYYY"
-              ).format("MMM YYYY")},  Completion:
-              ${moment(
-                lvnzyProject?.meta.projectTimelines[0].completionDate,
-                "DD-MM-YYYY"
-              ).format("MMM YYYY")}`
-            )}
-          </Flex>
-        ) : null}
-      </Flex>
-    );
-  };
-
   return (
     <Flex
       vertical
@@ -406,7 +363,7 @@ export function Brick360v2() {
 
       {/* One liner & timeline */}
       <Flex vertical style={{ padding: "0 8px", marginBottom: 16 }}>
-        {renderMetaInfo()}
+        <MetaInfo lvnzyProject={lvnzyProject!}></MetaInfo>
       </Flex>
 
       <Tabs
@@ -656,7 +613,7 @@ export function Brick360v2() {
                   size={20}
                 ></DynamicReactIcon>
                 <Typography.Text color={COLORS.textColorDark}>
-                  Unitssss
+                  Units
                 </Typography.Text>
               </Flex>
             ),
