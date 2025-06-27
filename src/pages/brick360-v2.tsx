@@ -27,6 +27,7 @@ import { useFetchLvnzyProjectById } from "../hooks/use-lvnzy-project";
 import { DataSources } from "../components/common/data-sources";
 import Brick360Chat from "../components/liv/brick360-chat";
 import { ProjectImagesGalleryV2 } from "../components/project-images-gallery-v2";
+import { ScrollableContainer } from "../components/scrollable-container";
 import {
   BRICK360_CATEGORY,
   Brick360CategoryInfo,
@@ -372,7 +373,7 @@ export function Brick360v2() {
       vertical
       style={{
         width: "100%",
-        paddingBottom: 75,
+
         margin: "auto",
         maxWidth: 900,
         overflowX: "hidden",
@@ -433,213 +434,215 @@ export function Brick360v2() {
               </Flex>
             ),
             children: (
-              <Flex vertical>
-                {" "}
-                {/* <Flex>
+              <ScrollableContainer>
+                <Flex vertical>
+                  {" "}
+                  {/* <Flex>
                   <DataSources></DataSources>
                 </Flex> */}
-                {lvnzyProject?.score.summary && (
-                  <Flex
-                    style={{
-                      borderRadius: 8,
-                      cursor: "pointer",
-                      padding: "8px 0",
-                      backgroundColor: "white",
-                    }}
-                    onClick={() => {
-                      setQuickSnapshotDialogOpen(true);
-                    }}
-                  >
+                  {lvnzyProject?.score.summary && (
                     <Flex
                       style={{
-                        width: "100%",
-                        marginLeft: 0,
-                        marginTop: 8,
-                        marginBottom: 8,
+                        borderRadius: 8,
+                        cursor: "pointer",
+                        padding: "8px 0",
+                        backgroundColor: "white",
+                      }}
+                      onClick={() => {
+                        setQuickSnapshotDialogOpen(true);
                       }}
                     >
-                      <Flex align="center" gap={4}>
-                        <DynamicReactIcon
-                          iconName="IoMdListBox"
-                          iconSet="io"
-                          size={22}
-                          color={COLORS.textColorDark}
-                        ></DynamicReactIcon>
-                        <Typography.Text
-                          style={{
-                            fontSize: FONT_SIZE.HEADING_4,
-                          }}
-                        >
-                          360 Snapshot
-                        </Typography.Text>
-                      </Flex>
                       <Flex
                         style={{
-                          height: 24,
-                          marginLeft: "auto",
+                          width: "100%",
+                          marginLeft: 0,
+                          marginTop: 8,
+                          marginBottom: 8,
                         }}
                       >
-                        {lvnzyProject?.score.summary.pros.length ? (
-                          <Tag
-                            color={COLORS.greenIdentifier}
+                        <Flex align="center" gap={4}>
+                          <DynamicReactIcon
+                            iconName="IoMdListBox"
+                            iconSet="io"
+                            size={22}
+                            color={COLORS.textColorDark}
+                          ></DynamicReactIcon>
+                          <Typography.Text
                             style={{
-                              fontSize: FONT_SIZE.SUB_TEXT,
-                              marginRight: 0,
+                              fontSize: FONT_SIZE.HEADING_4,
                             }}
                           >
-                            {lvnzyProject?.score.summary.pros.length} pros
-                          </Tag>
-                        ) : null}
-                        {lvnzyProject?.score.summary.cons.length ? (
-                          <Tag
-                            color={COLORS.redIdentifier}
-                            style={{
-                              fontSize: FONT_SIZE.SUB_TEXT,
-                              marginLeft: 4,
-                              marginRight: 0,
-                            }}
-                          >
-                            {lvnzyProject?.score.summary.cons.length} cons
-                          </Tag>
-                        ) : null}
+                            360 Snapshot
+                          </Typography.Text>
+                        </Flex>
+                        <Flex
+                          style={{
+                            height: 24,
+                            marginLeft: "auto",
+                          }}
+                        >
+                          {lvnzyProject?.score.summary.pros.length ? (
+                            <Tag
+                              color={COLORS.greenIdentifier}
+                              style={{
+                                fontSize: FONT_SIZE.SUB_TEXT,
+                                marginRight: 0,
+                              }}
+                            >
+                              {lvnzyProject?.score.summary.pros.length} pros
+                            </Tag>
+                          ) : null}
+                          {lvnzyProject?.score.summary.cons.length ? (
+                            <Tag
+                              color={COLORS.redIdentifier}
+                              style={{
+                                fontSize: FONT_SIZE.SUB_TEXT,
+                                marginLeft: 4,
+                                marginRight: 0,
+                              }}
+                            >
+                              {lvnzyProject?.score.summary.cons.length} cons
+                            </Tag>
+                          ) : null}
+                        </Flex>
                       </Flex>
                     </Flex>
-                  </Flex>
-                )}
-                {/* All the data points */}
-                <Flex vertical gap={32} style={{ padding: "16px 0" }}>
-                  {scoreParams &&
-                    scoreParams.map((sc) => {
-                      return (
-                        <Flex vertical>
-                          <Flex
-                            gap={8}
-                            align="center"
-                            style={{ marginBottom: 8 }}
-                          >
-                            {sc.icon ? sc.icon : null}
-                            <Typography.Title
-                              level={4}
-                              style={{ margin: 0, marginBottom: 0 }}
+                  )}
+                  {/* All the data points */}
+                  <Flex vertical gap={32} style={{ padding: "16px 0" }}>
+                    {scoreParams &&
+                      scoreParams.map((sc) => {
+                        return (
+                          <Flex vertical>
+                            <Flex
+                              gap={8}
+                              align="center"
+                              style={{ marginBottom: 8 }}
                             >
-                              {sc.title}
-                            </Typography.Title>
-                            {lvnzyProject!.score[sc.key] ? (
-                              <GradientBar
-                                value={getCategoryScore(
-                                  lvnzyProject!.score[sc.key]
-                                )}
-                                showBadgeOnly={true}
-                              ></GradientBar>
-                            ) : null}
-                          </Flex>
+                              {sc.icon ? sc.icon : null}
+                              <Typography.Title
+                                level={4}
+                                style={{ margin: 0, marginBottom: 0 }}
+                              >
+                                {sc.title}
+                              </Typography.Title>
+                              {lvnzyProject!.score[sc.key] ? (
+                                <GradientBar
+                                  value={getCategoryScore(
+                                    lvnzyProject!.score[sc.key]
+                                  )}
+                                  showBadgeOnly={true}
+                                ></GradientBar>
+                              ) : null}
+                            </Flex>
 
-                          {sc.dataPoints &&
-                          sc.dataPoints.filter(
-                            (dp: any[]) =>
-                              !["_id", "openAreaRating"].includes(dp[0])
-                          ).length ? (
-                            <List
-                              size="large"
-                              style={{ borderRadius: 16, cursor: "pointer" }}
-                              dataSource={Object.keys(
-                                (Brick360DataPoints as any)[sc.key]
-                              )
-                                .map((d) => {
-                                  return sc.dataPoints.find(
-                                    (dp: any) => dp[0] == d
-                                  );
-                                })
-                                .filter((d) => !!d)}
-                              renderItem={(item, index) => (
-                                <List.Item
-                                  key={`p-${index}`}
-                                  style={{
-                                    padding: "8px",
-                                    borderBottom: "1px solid",
-                                    borderBottomColor: COLORS.borderColor,
-                                    backgroundColor: "white",
-                                    borderTopLeftRadius: index == 0 ? 8 : 0,
-                                    borderTopRightRadius: index == 0 ? 8 : 0,
-                                    borderBottomLeftRadius:
-                                      index ==
-                                      Object.keys(
-                                        (Brick360DataPoints as any)[sc.key]
-                                      ).length -
-                                        1
-                                        ? 8
-                                        : 0,
-                                    borderBottomRightRadius:
-                                      index ==
-                                      Object.keys(
-                                        (Brick360DataPoints as any)[sc.key]
-                                      ).length -
-                                        1
-                                        ? 8
-                                        : 0,
-                                  }}
-                                  onClick={() => {
-                                    setDetailsModalOpen(true);
-                                    setSelectedDataPointCategory(sc.key);
-                                    setSelectedDataPointSubCategory(
-                                      (item as any)[0]
+                            {sc.dataPoints &&
+                            sc.dataPoints.filter(
+                              (dp: any[]) =>
+                                !["_id", "openAreaRating"].includes(dp[0])
+                            ).length ? (
+                              <List
+                                size="large"
+                                style={{ borderRadius: 16, cursor: "pointer" }}
+                                dataSource={Object.keys(
+                                  (Brick360DataPoints as any)[sc.key]
+                                )
+                                  .map((d) => {
+                                    return sc.dataPoints.find(
+                                      (dp: any) => dp[0] == d
                                     );
-                                    setSelectedDataPoint((item as any)[1]);
-                                    setSelectedDataPointTitle(
-                                      `${sc.title} > ${
-                                        (Brick360DataPoints as any)[sc.key][
-                                          (item as any)[0]
-                                        ]
-                                      }`
-                                    );
-                                  }}
-                                >
-                                  <Flex
-                                    align="center"
-                                    style={{ width: "100%" }}
+                                  })
+                                  .filter((d) => !!d)}
+                                renderItem={(item, index) => (
+                                  <List.Item
+                                    key={`p-${index}`}
+                                    style={{
+                                      padding: "8px",
+                                      borderBottom: "1px solid",
+                                      borderBottomColor: COLORS.borderColor,
+                                      backgroundColor: "white",
+                                      borderTopLeftRadius: index == 0 ? 8 : 0,
+                                      borderTopRightRadius: index == 0 ? 8 : 0,
+                                      borderBottomLeftRadius:
+                                        index ==
+                                        Object.keys(
+                                          (Brick360DataPoints as any)[sc.key]
+                                        ).length -
+                                          1
+                                          ? 8
+                                          : 0,
+                                      borderBottomRightRadius:
+                                        index ==
+                                        Object.keys(
+                                          (Brick360DataPoints as any)[sc.key]
+                                        ).length -
+                                          1
+                                          ? 8
+                                          : 0,
+                                    }}
+                                    onClick={() => {
+                                      setDetailsModalOpen(true);
+                                      setSelectedDataPointCategory(sc.key);
+                                      setSelectedDataPointSubCategory(
+                                        (item as any)[0]
+                                      );
+                                      setSelectedDataPoint((item as any)[1]);
+                                      setSelectedDataPointTitle(
+                                        `${sc.title} > ${
+                                          (Brick360DataPoints as any)[sc.key][
+                                            (item as any)[0]
+                                          ]
+                                        }`
+                                      );
+                                    }}
                                   >
-                                    <Typography.Text
-                                      style={{
-                                        fontSize: FONT_SIZE.HEADING_4,
-                                        width: "60%",
-                                        color:
-                                          (item as any)[1].rating > 0
-                                            ? COLORS.textColorDark
-                                            : COLORS.textColorLight,
-                                      }}
-                                    >
-                                      {capitalize(
-                                        (Brick360DataPoints as any)[sc.key][
-                                          (item as any)[0]
-                                        ]
-                                      )}
-                                    </Typography.Text>
                                     <Flex
-                                      style={{
-                                        width: "40%",
-                                        height: 24,
-                                        justifyContent: "flex-end",
-                                      }}
+                                      align="center"
+                                      style={{ width: "100%" }}
                                     >
-                                      <RatingBar
-                                        value={(item as any)[1].rating}
-                                      ></RatingBar>
+                                      <Typography.Text
+                                        style={{
+                                          fontSize: FONT_SIZE.HEADING_4,
+                                          width: "60%",
+                                          color:
+                                            (item as any)[1].rating > 0
+                                              ? COLORS.textColorDark
+                                              : COLORS.textColorLight,
+                                        }}
+                                      >
+                                        {capitalize(
+                                          (Brick360DataPoints as any)[sc.key][
+                                            (item as any)[0]
+                                          ]
+                                        )}
+                                      </Typography.Text>
+                                      <Flex
+                                        style={{
+                                          width: "40%",
+                                          height: 24,
+                                          justifyContent: "flex-end",
+                                        }}
+                                      >
+                                        <RatingBar
+                                          value={(item as any)[1].rating}
+                                        ></RatingBar>
+                                      </Flex>
                                     </Flex>
-                                  </Flex>
-                                </List.Item>
-                              )}
-                            />
-                          ) : (
-                            <Alert
-                              message="There are no other projects by the developer in the state of Karnataka yet. Please make sure to check track record in other states.   "
-                              type="warning"
-                            />
-                          )}
-                        </Flex>
-                      );
-                    })}
+                                  </List.Item>
+                                )}
+                              />
+                            ) : (
+                              <Alert
+                                message="There are no other projects by the developer in the state of Karnataka yet. Please make sure to check track record in other states.   "
+                                type="warning"
+                              />
+                            )}
+                          </Flex>
+                        );
+                      })}
+                  </Flex>
                 </Flex>
-              </Flex>
+              </ScrollableContainer>
             ),
           },
           {
@@ -658,108 +661,110 @@ export function Brick360v2() {
               </Flex>
             ),
             children: (
-              <Flex
-                vertical
-                style={{
-                  margin: "16px 8px",
-                  marginBottom: 8,
-                }}
-              >
-                <Flex vertical style={{ marginBottom: 8 }}>
-                  {/* Sqft & Configs */}
-                  <Typography.Text
-                    style={{
-                      borderRadius: 8,
-                      color: "white",
-                    }}
-                  >
-                    {lvnzyProject?.meta.projectConfigurations && (
-                      <Flex>
-                        {lvnzyProject?.meta.projectConfigurations
-                          .unitsBreakup && (
-                          <Tag> {getTotalFloors(lvnzyProject)} Floors</Tag>
-                        )}
-                        {lvnzyProject?.meta.projectConfigurations
-                          .unitsBreakup && (
-                          <Tag>
-                            {lvnzyProject?.property.layout.totalUnits} Units
-                          </Tag>
-                        )}
-                        {lvnzyProject?.property.layout.totalLandArea && (
-                          <Tag>
-                            {Math.round(
-                              lvnzyProject?.property.layout.totalLandArea /
-                                4046.8564
-                            )}{" "}
-                            Acre
-                          </Tag>
+              <ScrollableContainer>
+                <Flex
+                  vertical
+                  style={{
+                    margin: "16px 8px",
+                    marginBottom: 8,
+                  }}
+                >
+                  <Flex vertical style={{ marginBottom: 8 }}>
+                    {/* Sqft & Configs */}
+                    <Typography.Text
+                      style={{
+                        borderRadius: 8,
+                        color: "white",
+                      }}
+                    >
+                      {lvnzyProject?.meta.projectConfigurations && (
+                        <Flex>
+                          {lvnzyProject?.meta.projectConfigurations
+                            .unitsBreakup && (
+                            <Tag> {getTotalFloors(lvnzyProject)} Floors</Tag>
+                          )}
+                          {lvnzyProject?.meta.projectConfigurations
+                            .unitsBreakup && (
+                            <Tag>
+                              {lvnzyProject?.property.layout.totalUnits} Units
+                            </Tag>
+                          )}
+                          {lvnzyProject?.property.layout.totalLandArea && (
+                            <Tag>
+                              {Math.round(
+                                lvnzyProject?.property.layout.totalLandArea /
+                                  4046.8564
+                              )}{" "}
+                              Acre
+                            </Tag>
+                          )}
+                        </Flex>
+                      )}
+                      <Flex
+                        vertical
+                        style={{
+                          marginTop: 16,
+                          maxHeight: 400,
+                          overflowY: "scroll",
+                          scrollbarWidth: "none",
+                        }}
+                        gap={16}
+                      >
+                        {lvnzyProject!.meta.costingDetails.configurations.map(
+                          (c: any, index: number) => {
+                            return (
+                              <Flex
+                                key={`config-${index}`}
+                                vertical
+                                style={{
+                                  borderLeft: "1px solid",
+                                  paddingLeft: 8,
+                                  borderLeftColor: COLORS.borderColorMedium,
+                                  marginTop: 20,
+                                }}
+                              >
+                                <Typography.Text
+                                  style={{ fontSize: FONT_SIZE.HEADING_4 }}
+                                >
+                                  ₹{rupeeAmountFormat(c.cost)}
+                                </Typography.Text>
+                                <Typography.Text
+                                  style={{ fontSize: FONT_SIZE.HEADING_3 }}
+                                >
+                                  {c.config}
+                                </Typography.Text>
+                                {c.floorplans && c.floorplans.length > 0 && (
+                                  <Flex
+                                    style={{
+                                      overflowX: "auto",
+                                      marginTop: 8,
+                                    }}
+                                    gap={8}
+                                  >
+                                    {c.floorplans.map((fp: any, i: number) => {
+                                      console.log(fp);
+
+                                      return (
+                                        <Image
+                                          key={`fp-${i}`}
+                                          src={fp}
+                                          style={{
+                                            height: 100,
+                                          }}
+                                        />
+                                      );
+                                    })}
+                                  </Flex>
+                                )}
+                              </Flex>
+                            );
+                          }
                         )}
                       </Flex>
-                    )}
-                    <Flex
-                      vertical
-                      style={{
-                        marginTop: 16,
-                        maxHeight: 400,
-                        overflowY: "scroll",
-                        scrollbarWidth: "none",
-                      }}
-                      gap={16}
-                    >
-                      {lvnzyProject!.meta.costingDetails.configurations.map(
-                        (c: any, index: number) => {
-                          return (
-                            <Flex
-                              key={`config-${index}`}
-                              vertical
-                              style={{
-                                borderLeft: "1px solid",
-                                paddingLeft: 8,
-                                borderLeftColor: COLORS.borderColorMedium,
-                                marginTop: 20,
-                              }}
-                            >
-                              <Typography.Text
-                                style={{ fontSize: FONT_SIZE.HEADING_4 }}
-                              >
-                                ₹{rupeeAmountFormat(c.cost)}
-                              </Typography.Text>
-                              <Typography.Text
-                                style={{ fontSize: FONT_SIZE.HEADING_3 }}
-                              >
-                                {c.config}
-                              </Typography.Text>
-                              {c.floorplans && c.floorplans.length > 0 && (
-                                <Flex
-                                  style={{
-                                    overflowX: "auto",
-                                    marginTop: 8,
-                                  }}
-                                  gap={8}
-                                >
-                                  {c.floorplans.map((fp: any, i: number) => {
-                                    console.log(fp);
-
-                                    return (
-                                      <Image
-                                        key={`fp-${i}`}
-                                        src={fp}
-                                        style={{
-                                          height: 100,
-                                        }}
-                                      />
-                                    );
-                                  })}
-                                </Flex>
-                              )}
-                            </Flex>
-                          );
-                        }
-                      )}
-                    </Flex>
-                  </Typography.Text>
+                    </Typography.Text>
+                  </Flex>
                 </Flex>
-              </Flex>
+              </ScrollableContainer>
             ),
           },
           {
@@ -778,22 +783,24 @@ export function Brick360v2() {
               </Flex>
             ),
             children: (
-              <Flex style={{ height: 650 }} vertical gap={8}>
-                <MapViewV2
-                  fullSize={true}
-                  surroundingElements={surroundingElements}
-                  defaultSelectedDriverTypes={selectedDriverTypes}
-                  projectId={lvnzyProject?.originalProjectId._id}
-                  drivers={mapDrivers.map((d) => {
-                    return {
-                      id: d.driverId._id,
-                      duration: d.durationMins
-                        ? d.durationMins
-                        : Math.round(d.mapsDurationSeconds / 60),
-                    };
-                  })}
-                />
-              </Flex>
+              <ScrollableContainer>
+                <Flex style={{ height: 650 }} vertical gap={8}>
+                  <MapViewV2
+                    fullSize={true}
+                    surroundingElements={surroundingElements}
+                    defaultSelectedDriverTypes={selectedDriverTypes}
+                    projectId={lvnzyProject?.originalProjectId._id}
+                    drivers={mapDrivers.map((d) => {
+                      return {
+                        id: d.driverId._id,
+                        duration: d.durationMins
+                          ? d.durationMins
+                          : Math.round(d.mapsDurationSeconds / 60),
+                      };
+                    })}
+                  />
+                </Flex>
+              </ScrollableContainer>
             ),
           },
           {
@@ -812,10 +819,12 @@ export function Brick360v2() {
               </Flex>
             ),
             children: (
-              <ProjectImagesGalleryV2
-                media={lvnzyProject?.originalProjectId.media}
-                selectedImageId={null}
-              />
+              <ScrollableContainer>
+                <ProjectImagesGalleryV2
+                  media={lvnzyProject?.originalProjectId.media}
+                  selectedImageId={null}
+                />
+              </ScrollableContainer>
             ),
           },
         ]}

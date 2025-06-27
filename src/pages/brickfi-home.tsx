@@ -5,8 +5,8 @@ import { Loader } from "../components/common/loader";
 import { ProjectSearch } from "../components/project-search";
 import { RequestedProjectsList } from "../components/requested-projects-list";
 import { useUser } from "../hooks/use-user";
-import { UserProjects } from "./user-projects";
 import { Brick360v2 } from "./brick360-v2";
+import { UserProjects } from "./user-projects";
 
 interface SavedLvnzyProject {
   _id: string;
@@ -102,7 +102,7 @@ const BrickfiHome: React.FC = () => {
   };
 
   return (
-    <Flex vertical style={{ paddingBottom: 100 }}>
+    <Flex vertical>
       {lvnzyProjectId ? (
         <Brick360v2 />
       ) : (
