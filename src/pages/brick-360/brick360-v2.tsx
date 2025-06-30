@@ -1,47 +1,31 @@
-import {
-  Alert,
-  Button,
-  Divider,
-  Drawer,
-  Flex,
-  Image,
-  List,
-  Modal,
-  Progress,
-  Space,
-  Tabs,
-  Tag,
-  Typography,
-} from "antd";
+import { Button, Flex, Tabs, Typography } from "antd";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import DynamicReactIcon from "../../components/common/dynamic-react-icon";
-import GradientBar from "../../components/common/grading-bar";
 import { Loader } from "../../components/common/loader";
-import RatingBar from "../../components/common/rating-bar";
-import MapViewV2 from "../../components/map-view/map-view-v2";
 import { useDevice } from "../../hooks/use-device";
 import { useFetchLvnzyProjectById } from "../../hooks/use-lvnzy-project";
 
-import { DataSources } from "../../components/common/data-sources";
-import Brick360Chat from "../../components/liv/brick360-chat";
-import { ProjectImagesGalleryV2 } from "../../components/project-images-gallery-v2";
-import { ScrollableContainer } from "../../components/scrollable-container";
+import { Brick360Tab } from "../../components/brick-360/brick-360-tab";
+import { ConfigurationsModal } from "../../components/brick-360/configurations-modal";
+import { DetailsDrawer } from "../../components/brick-360/details-drawer";
+import { FakeProgress } from "../../components/brick-360/fake-progress";
+import { FullMapModal } from "../../components/brick-360/full-map-modal";
+import { MapTab } from "../../components/brick-360/map-tab";
+import { MediaTab } from "../../components/brick-360/media-tab";
+import { PricePointModal } from "../../components/brick-360/price-point-modal";
+import { ProjectHeader } from "../../components/brick-360/project-header";
+import { SnapshotModal } from "../../components/brick-360/snapshot-modal";
+import { UnitsTab } from "../../components/brick-360/units-tab";
 import {
   BRICK360_CATEGORY,
   Brick360CategoryInfo,
   Brick360DataPoints,
 } from "../../libs/constants";
-import {
-  capitalize,
-  getCategoryScore,
-  rupeeAmountFormat,
-} from "../../libs/lvnzy-helper";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { COLORS } from "../../theme/style-constants";
 import { ISurroundingElement } from "../../types/Project";
-import MetaInfo from "./meta-info";
+
 const FAKE_TIMER_SECS = 1000;
-const { Paragraph, Text } = Typography;
 
 export function Brick360v2() {
   const { lvnzyProjectId } = useParams();
@@ -50,16 +34,6 @@ export function Brick360v2() {
 
   const { data: lvnzyProject, isLoading: lvnzyProjectIsLoading } =
     useFetchLvnzyProjectById(lvnzyProjectId!);
-
-  const dataSets = [
-    "RERA",
-    "Open Street",
-    "BBMP",
-    "BIAPPA",
-    "Google Maps",
-    "Open City",
-    "Online Listings",
-  ];
 
   const chatRef = useRef<{ clearChatData: () => void } | null>(null);
 
@@ -129,47 +103,6 @@ export function Brick360v2() {
     );
   };
 
-  const getTotalFloors = (lvnzyProject: any) => {
-    const towers = lvnzyProject?.meta?.projectConfigurations?.towers;
-    if (!towers || !Array.isArray(towers) || towers.length === 0) {
-      return "";
-    }
-
-    const floorCounts = towers
-      .map((t: any) => t.totalFloors)
-      .filter((floors: any) => typeof floors === "number");
-    if (floorCounts.length === 0) {
-      return "";
-    }
-
-    const minFloors = Math.min(...floorCounts);
-    const maxFloors = Math.max(...floorCounts);
-
-    if (minFloors == maxFloors) {
-      return `${minFloors}`;
-    } else {
-      return `${minFloors} -
-                ${maxFloors}`;
-    }
-  };
-
-  const getStatusLabel = (projectTimelines: any[]) => {
-    const completionDate =
-      projectTimelines[projectTimelines.length - 1]["completionDate"];
-    const [day, month, year] = completionDate.split("-");
-    const date = new Date(`${year}-${month}-${day}`);
-    const diff = Math.ceil(
-      (new Date().getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    if (diff > 365 * 1) {
-      return "Ready To Move";
-    } else if (diff < 365 && diff > 0) {
-      return "Recently Completed";
-    } else if (diff < 0) {
-      return "Under Construction";
-    }
-    return "";
-  };
   // Fake timeout and progress
   useEffect(() => {
     const interval = setInterval(() => {
@@ -278,8 +211,6 @@ export function Brick360v2() {
     }
   }, [lvnzyProject]);
 
-  const progressWidth = isMobile ? window.innerWidth : 800;
-
   if (lvnzyProjectIsLoading) {
     return <Loader></Loader>;
   }
@@ -287,41 +218,10 @@ export function Brick360v2() {
   // Fake progress bar
   if (fakeTimeoutProgress < 130) {
     return (
-      <Flex
-        vertical
-        style={{
-          padding: 16,
-          width: progressWidth,
-          position: "fixed",
-          top: "20%",
-          left: `calc(50% - ${progressWidth / 2}px)`,
-        }}
-      >
-        <Flex vertical>
-          <DataSources disableDetailsDialog={true}></DataSources>
-        </Flex>
-        {/* <ProjectGallery ></ProjectGallery> */}
-        <Typography.Title
-          level={2}
-          style={{
-            margin: 0,
-            padding: 8,
-          }}
-        >
-          {lvnzyProject?.meta.projectName}
-        </Typography.Title>
-        <Flex vertical style={{ marginTop: 16 }}>
-          {" "}
-          <Typography.Text style={{ padding: "0 8px" }}>
-            {fakeTimeoutProgress < 20
-              ? "Starting up"
-              : fakeTimeoutProgress < 80
-              ? "Collecting Data"
-              : "Finishing up"}
-          </Typography.Text>
-          <Progress percent={fakeTimeoutProgress} style={{ padding: 8 }} />
-        </Flex>
-      </Flex>
+      <FakeProgress
+        progress={fakeTimeoutProgress}
+        projectName={lvnzyProject?.meta.projectName}
+      />
     );
   }
 
@@ -330,41 +230,12 @@ export function Brick360v2() {
       vertical
       style={{
         width: "100%",
-
         margin: "auto",
         maxWidth: 900,
         overflowX: "hidden",
       }}
     >
-      {/* Main project upfront score card including metadata */}
-      <Flex vertical style={{ padding: 0 }}>
-        {/* Project Gallery */}
-        {/* Name */}{" "}
-        <Flex
-          vertical
-          style={{
-            alignItems: "flex-start",
-            margin: "8px 0",
-            padding: "0 8px",
-          }}
-          gap={8}
-        >
-          <Typography.Text
-            style={{
-              margin: "0",
-              lineHeight: "100%",
-              fontSize: FONT_SIZE.HEADING_1,
-            }}
-          >
-            {lvnzyProject?.meta.projectName}
-          </Typography.Text>
-        </Flex>
-      </Flex>
-
-      {/* One liner & timeline */}
-      <Flex vertical style={{ padding: "0 8px", marginBottom: 16 }}>
-        <MetaInfo lvnzyProject={lvnzyProject!}></MetaInfo>
-      </Flex>
+      <ProjectHeader lvnzyProject={lvnzyProject} />
 
       <Tabs
         tabBarGutter={24}
@@ -391,215 +262,22 @@ export function Brick360v2() {
               </Flex>
             ),
             children: (
-              <ScrollableContainer>
-                <Flex vertical>
-                  {" "}
-                  {/* <Flex>
-                  <DataSources></DataSources>
-                </Flex> */}
-                  {lvnzyProject?.score.summary && (
-                    <Flex
-                      style={{
-                        borderRadius: 8,
-                        cursor: "pointer",
-                        padding: "8px 0",
-                        backgroundColor: "white",
-                      }}
-                      onClick={() => {
-                        setQuickSnapshotDialogOpen(true);
-                      }}
-                    >
-                      <Flex
-                        style={{
-                          width: "100%",
-                          marginLeft: 0,
-                          marginTop: 8,
-                          marginBottom: 8,
-                        }}
-                      >
-                        <Flex align="center" gap={4}>
-                          <DynamicReactIcon
-                            iconName="IoMdListBox"
-                            iconSet="io"
-                            size={22}
-                            color={COLORS.textColorDark}
-                          ></DynamicReactIcon>
-                          <Typography.Text
-                            style={{
-                              fontSize: FONT_SIZE.HEADING_4,
-                            }}
-                          >
-                            360 Snapshot
-                          </Typography.Text>
-                        </Flex>
-                        <Flex
-                          style={{
-                            height: 24,
-                            marginLeft: "auto",
-                          }}
-                        >
-                          {lvnzyProject?.score.summary.pros.length ? (
-                            <Tag
-                              color={COLORS.greenIdentifier}
-                              style={{
-                                fontSize: FONT_SIZE.SUB_TEXT,
-                                marginRight: 0,
-                              }}
-                            >
-                              {lvnzyProject?.score.summary.pros.length} pros
-                            </Tag>
-                          ) : null}
-                          {lvnzyProject?.score.summary.cons.length ? (
-                            <Tag
-                              color={COLORS.redIdentifier}
-                              style={{
-                                fontSize: FONT_SIZE.SUB_TEXT,
-                                marginLeft: 4,
-                                marginRight: 0,
-                              }}
-                            >
-                              {lvnzyProject?.score.summary.cons.length} cons
-                            </Tag>
-                          ) : null}
-                        </Flex>
-                      </Flex>
-                    </Flex>
-                  )}
-                  {/* All the data points */}
-                  <Flex vertical gap={32} style={{ padding: "16px 0" }}>
-                    {scoreParams &&
-                      scoreParams.map((sc) => {
-                        return (
-                          <Flex vertical>
-                            <Flex
-                              gap={8}
-                              align="center"
-                              style={{ marginBottom: 8 }}
-                            >
-                              {sc.icon ? sc.icon : null}
-                              <Typography.Title
-                                level={4}
-                                style={{ margin: 0, marginBottom: 0 }}
-                              >
-                                {sc.title}
-                              </Typography.Title>
-                              {lvnzyProject!.score[sc.key] ? (
-                                <GradientBar
-                                  value={getCategoryScore(
-                                    lvnzyProject!.score[sc.key]
-                                  )}
-                                  showBadgeOnly={true}
-                                ></GradientBar>
-                              ) : null}
-                            </Flex>
-
-                            {sc.dataPoints &&
-                            sc.dataPoints.filter(
-                              (dp: any[]) =>
-                                !["_id", "openAreaRating"].includes(dp[0])
-                            ).length ? (
-                              <List
-                                size="large"
-                                style={{ borderRadius: 16, cursor: "pointer" }}
-                                dataSource={Object.keys(
-                                  (Brick360DataPoints as any)[sc.key]
-                                )
-                                  .map((d) => {
-                                    return sc.dataPoints.find(
-                                      (dp: any) => dp[0] == d
-                                    );
-                                  })
-                                  .filter((d) => !!d)}
-                                renderItem={(item, index) => (
-                                  <List.Item
-                                    key={`p-${index}`}
-                                    style={{
-                                      padding: "8px",
-                                      borderBottom: "1px solid",
-                                      borderBottomColor: COLORS.borderColor,
-                                      backgroundColor: "white",
-                                      borderTopLeftRadius: index == 0 ? 8 : 0,
-                                      borderTopRightRadius: index == 0 ? 8 : 0,
-                                      borderBottomLeftRadius:
-                                        index ==
-                                        Object.keys(
-                                          (Brick360DataPoints as any)[sc.key]
-                                        ).length -
-                                          1
-                                          ? 8
-                                          : 0,
-                                      borderBottomRightRadius:
-                                        index ==
-                                        Object.keys(
-                                          (Brick360DataPoints as any)[sc.key]
-                                        ).length -
-                                          1
-                                          ? 8
-                                          : 0,
-                                    }}
-                                    onClick={() => {
-                                      setDetailsModalOpen(true);
-                                      setSelectedDataPointCategory(sc.key);
-                                      setSelectedDataPointSubCategory(
-                                        (item as any)[0]
-                                      );
-                                      setSelectedDataPoint((item as any)[1]);
-                                      setSelectedDataPointTitle(
-                                        `${sc.title} > ${
-                                          (Brick360DataPoints as any)[sc.key][
-                                            (item as any)[0]
-                                          ]
-                                        }`
-                                      );
-                                    }}
-                                  >
-                                    <Flex
-                                      align="center"
-                                      style={{ width: "100%" }}
-                                    >
-                                      <Typography.Text
-                                        style={{
-                                          fontSize: FONT_SIZE.HEADING_4,
-                                          width: "60%",
-                                          color:
-                                            (item as any)[1].rating > 0
-                                              ? COLORS.textColorDark
-                                              : COLORS.textColorLight,
-                                        }}
-                                      >
-                                        {capitalize(
-                                          (Brick360DataPoints as any)[sc.key][
-                                            (item as any)[0]
-                                          ]
-                                        )}
-                                      </Typography.Text>
-                                      <Flex
-                                        style={{
-                                          width: "40%",
-                                          height: 24,
-                                          justifyContent: "flex-end",
-                                        }}
-                                      >
-                                        <RatingBar
-                                          value={(item as any)[1].rating}
-                                        ></RatingBar>
-                                      </Flex>
-                                    </Flex>
-                                  </List.Item>
-                                )}
-                              />
-                            ) : (
-                              <Alert
-                                message="There are no other projects by the developer in the state of Karnataka yet. Please make sure to check track record in other states.   "
-                                type="warning"
-                              />
-                            )}
-                          </Flex>
-                        );
-                      })}
-                  </Flex>
-                </Flex>
-              </ScrollableContainer>
+              <Brick360Tab
+                lvnzyProject={lvnzyProject}
+                scoreParams={scoreParams}
+                onSnapshotClick={() => setQuickSnapshotDialogOpen(true)}
+                onDataPointClick={(sc, item) => {
+                  setDetailsModalOpen(true);
+                  setSelectedDataPointCategory(sc.key);
+                  setSelectedDataPointSubCategory((item as any)[0]);
+                  setSelectedDataPoint((item as any)[1]);
+                  setSelectedDataPointTitle(
+                    `${sc.title} > ${
+                      (Brick360DataPoints as any)[sc.key][(item as any)[0]]
+                    }`
+                  );
+                }}
+              />
             ),
           },
           {
@@ -617,112 +295,7 @@ export function Brick360v2() {
                 </Typography.Text>
               </Flex>
             ),
-            children: (
-              <ScrollableContainer>
-                <Flex
-                  vertical
-                  style={{
-                    margin: "16px 8px",
-                    marginBottom: 8,
-                  }}
-                >
-                  <Flex vertical style={{ marginBottom: 8 }}>
-                    {/* Sqft & Configs */}
-                    <Typography.Text
-                      style={{
-                        borderRadius: 8,
-                        color: "white",
-                      }}
-                    >
-                      {lvnzyProject?.meta.projectConfigurations && (
-                        <Flex>
-                          {lvnzyProject?.meta.projectConfigurations
-                            .unitsBreakup && (
-                            <Tag> {getTotalFloors(lvnzyProject)} Floors</Tag>
-                          )}
-                          {lvnzyProject?.meta.projectConfigurations
-                            .unitsBreakup && (
-                            <Tag>
-                              {lvnzyProject?.property.layout.totalUnits} Units
-                            </Tag>
-                          )}
-                          {lvnzyProject?.property.layout.totalLandArea && (
-                            <Tag>
-                              {Math.round(
-                                lvnzyProject?.property.layout.totalLandArea /
-                                  4046.8564
-                              )}{" "}
-                              Acre
-                            </Tag>
-                          )}
-                        </Flex>
-                      )}
-                      <Flex
-                        vertical
-                        style={{
-                          marginTop: 16,
-                          maxHeight: 400,
-                          overflowY: "scroll",
-                          scrollbarWidth: "none",
-                        }}
-                        gap={16}
-                      >
-                        {lvnzyProject!.meta.costingDetails.configurations.map(
-                          (c: any, index: number) => {
-                            return (
-                              <Flex
-                                key={`config-${index}`}
-                                vertical
-                                style={{
-                                  borderLeft: "1px solid",
-                                  paddingLeft: 8,
-                                  borderLeftColor: COLORS.borderColorMedium,
-                                  marginTop: 20,
-                                }}
-                              >
-                                <Typography.Text
-                                  style={{ fontSize: FONT_SIZE.HEADING_4 }}
-                                >
-                                  ₹{rupeeAmountFormat(c.cost)}
-                                </Typography.Text>
-                                <Typography.Text
-                                  style={{ fontSize: FONT_SIZE.HEADING_3 }}
-                                >
-                                  {c.config}
-                                </Typography.Text>
-                                {c.floorplans && c.floorplans.length > 0 && (
-                                  <Flex
-                                    style={{
-                                      overflowX: "auto",
-                                      marginTop: 8,
-                                    }}
-                                    gap={8}
-                                  >
-                                    {c.floorplans.map((fp: any, i: number) => {
-                                      console.log(fp);
-
-                                      return (
-                                        <Image
-                                          key={`fp-${i}`}
-                                          src={fp}
-                                          style={{
-                                            height: 100,
-                                          }}
-                                        />
-                                      );
-                                    })}
-                                  </Flex>
-                                )}
-                              </Flex>
-                            );
-                          }
-                        )}
-                      </Flex>
-                    </Typography.Text>
-                  </Flex>
-                </Flex>
-              </ScrollableContainer>
-            ),
+            children: <UnitsTab lvnzyProject={lvnzyProject} />,
           },
           {
             key: "map",
@@ -740,24 +313,12 @@ export function Brick360v2() {
               </Flex>
             ),
             children: (
-              <ScrollableContainer>
-                <Flex style={{ height: 650 }} vertical gap={8}>
-                  <MapViewV2
-                    fullSize={true}
-                    surroundingElements={surroundingElements}
-                    defaultSelectedDriverTypes={selectedDriverTypes}
-                    projectId={lvnzyProject?.originalProjectId._id}
-                    drivers={mapDrivers.map((d) => {
-                      return {
-                        id: d.driverId._id,
-                        duration: d.durationMins
-                          ? d.durationMins
-                          : Math.round(d.mapsDurationSeconds / 60),
-                      };
-                    })}
-                  />
-                </Flex>
-              </ScrollableContainer>
+              <MapTab
+                lvnzyProject={lvnzyProject}
+                mapDrivers={mapDrivers}
+                surroundingElements={surroundingElements}
+                selectedDriverTypes={selectedDriverTypes}
+              />
             ),
           },
           {
@@ -775,424 +336,66 @@ export function Brick360v2() {
                 </Typography.Text>
               </Flex>
             ),
-            children: (
-              <ScrollableContainer>
-                <ProjectImagesGalleryV2
-                  media={lvnzyProject?.originalProjectId.media}
-                  selectedImageId={null}
-                />
-              </ScrollableContainer>
-            ),
+            children: <MediaTab lvnzyProject={lvnzyProject} />,
           },
         ]}
       ></Tabs>
 
-      {/* Full map view modal */}
-      <Modal
-        title={null}
-        open={isMapFullScreen}
-        onCancel={() => {
+      <FullMapModal
+        isOpen={isMapFullScreen}
+        onClose={() => {
           setIsMapFullScreen(false);
           setDetailsModalOpen(true);
         }}
-        forceRender
-        footer={null}
-        width={isMobile ? "100%" : 900}
-        style={{ top: 30 }}
-        styles={{
-          content: {
-            backgroundColor: COLORS.bgColorMedium,
-            borderRadius: 8,
-            padding: 16,
-            overflowY: "hidden",
-          },
-        }}
-      >
-        <Flex style={{ height: 650, paddingTop: 40 }} vertical gap={8}>
-          <MapViewV2
-            fullSize={true}
-            surroundingElements={surroundingElements}
-            defaultSelectedDriverTypes={selectedDriverTypes}
-            projectId={lvnzyProject?.originalProjectId._id}
-            drivers={mapDrivers.map((d) => {
-              return {
-                id: d.driverId._id,
-                duration: d.durationMins
-                  ? d.durationMins
-                  : Math.round(d.mapsDurationSeconds / 60),
-              };
-            })}
-          />
-        </Flex>
-      </Modal>
+        isMobile={isMobile}
+        lvnzyProject={lvnzyProject}
+        surroundingElements={surroundingElements!}
+        selectedDriverTypes={selectedDriverTypes}
+        mapDrivers={mapDrivers}
+      />
 
-      {/* Pros/Cons Modal */}
-      {lvnzyProject?.score.summary && (
-        <Modal
-          footer={null}
-          height={600}
-          open={quickSnapshotDialogOpen}
-          closable={true}
-          style={{ top: 40 }}
-          onCancel={() => {
-            setQuickSnapshotDialogOpen(false);
-          }}
-          onClose={() => {
-            setQuickSnapshotDialogOpen(false);
-          }}
-        >
-          <Flex
-            vertical
-            style={{ overflowY: "scroll", height: 600, scrollbarWidth: "none" }}
-          >
-            <Typography.Title level={3} style={{ margin: 0, marginBottom: 0 }}>
-              360 Snapshot
-            </Typography.Title>
-            <Typography.Text
-              style={{
-                fontSize: FONT_SIZE.PARA,
-                marginBottom: 16,
-                color: COLORS.textColorLight,
-                lineHeight: "120%",
-              }}
-            >
-              Brief summary including highlights for this project.
-            </Typography.Text>
-            <Flex gap={8} vertical>
-              <Flex>
-                <Tag color={COLORS.greenIdentifier}>PROS</Tag>
-              </Flex>
-              {lvnzyProject?.score.summary.pros.map((pro: string) => {
-                return (
-                  <Flex
-                    style={{
-                      maxWidth: 500,
-                      backgroundColor: COLORS.bgColorMedium,
-                      borderRadius: 8,
-                      borderColor: COLORS.borderColorMedium,
-                      padding: 8,
-                    }}
-                  >
-                    <div
-                      dangerouslySetInnerHTML={{ __html: pro }}
-                      className="reasoning"
-                      style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
-                    ></div>
-                  </Flex>
-                );
-              })}
-              <Flex style={{ marginTop: 24 }}>
-                <Tag color={COLORS.redIdentifier}>CONS</Tag>
-              </Flex>
-              {lvnzyProject?.score.summary.cons.map((pro: string) => {
-                return (
-                  <Flex
-                    style={{
-                      maxWidth: 500,
-                      backgroundColor: COLORS.bgColorMedium,
-                      borderRadius: 8,
-                      borderColor: COLORS.borderColorMedium,
-                      padding: 8,
-                    }}
-                  >
-                    <div
-                      dangerouslySetInnerHTML={{ __html: pro }}
-                      className="reasoning"
-                      style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
-                    ></div>
-                  </Flex>
-                );
-              })}
-            </Flex>
-          </Flex>
-        </Modal>
-      )}
+      <SnapshotModal
+        isOpen={quickSnapshotDialogOpen}
+        onClose={() => setQuickSnapshotDialogOpen(false)}
+        lvnzyProject={lvnzyProject}
+      />
 
-      {/* Price point & payment modal */}
-      <Modal
-        footer={null}
-        height={600}
-        open={!!pmtDetailsModalContent}
-        closable={true}
-        style={{ top: 40 }}
-        styles={{
-          content: {
-            padding: 16,
-          },
-        }}
-        onCancel={() => {
-          setPmtDetailsModalContent(undefined);
-        }}
-        onClose={() => {
-          setPmtDetailsModalContent(undefined);
-        }}
-      >
-        <Flex
-          style={{ height: 600, overflowY: "scroll", scrollbarWidth: "none" }}
-        >
-          {pmtDetailsModalContent}
-        </Flex>
-      </Modal>
+      <PricePointModal
+        content={pmtDetailsModalContent}
+        onClose={() => setPmtDetailsModalContent(undefined)}
+      />
 
-      {/* Bottom drawer to show a selected data point */}
-      <Drawer
-        title={null}
-        placement="bottom"
-        styles={{
-          body: {
-            padding: 0,
-          },
-          header: {
-            padding: 16,
-          },
-        }}
-        rootStyle={{
-          maxWidth: 900,
-          marginLeft: isMobile ? 0 : "calc(50% - 450px)",
-        }}
-        extra={
-          <Space>
-            <Button
-              onClick={() => {
-                setDetailsModalOpen(false);
-                if (!isMapFullScreen) {
-                  chatRef.current?.clearChatData();
-                }
-              }}
-            >
-              Close
-            </Button>
-          </Space>
-        }
-        closable={false}
-        height={Math.min(700, window.innerHeight * 0.8)}
+      <DetailsDrawer
+        isOpen={detailsModalOpen}
         onClose={() => {
           setDetailsModalOpen(false);
           if (!isMapFullScreen) {
             chatRef.current?.clearChatData();
           }
         }}
-        open={detailsModalOpen}
-      >
-        <Flex
-          vertical
-          style={{
-            position: "relative",
-            overflowY: "scroll",
-            paddingBottom: 64,
-          }}
-        >
-          {/* Map view including expand button and drawer close icon button */}
-          {mapVisible ? (
-            <Flex vertical style={{ position: "relative" }}>
-              {renderDrawerCloseBtn()}
-              <Flex
-                style={{
-                  position: "absolute",
-                  bottom: 16,
-                  right: 16,
-                  zIndex: 9999,
-                }}
-              >
-                <Button
-                  size="small"
-                  icon={
-                    <DynamicReactIcon
-                      iconName="FaExpand"
-                      color="white"
-                      iconSet="fa"
-                      size={16}
-                    />
-                  }
-                  style={{
-                    marginLeft: "auto",
-                    marginBottom: 8,
-                    borderRadius: 8,
-                    cursor: "pointer",
-                    backgroundColor: COLORS.textColorDark,
-                    color: "white",
-                    fontSize: FONT_SIZE.SUB_TEXT,
-                    height: 28,
-                  }}
-                  onClick={() => {
-                    setDetailsModalOpen(false);
-                    setIsMapFullScreen(true);
-                  }}
-                >
-                  Expand
-                </Button>
-              </Flex>
-              <Flex
-                style={{
-                  height: isMobile ? 200 : 300,
-                  width: "100%",
-                  borderRadius: 16,
-                }}
-              >
-                <MapViewV2
-                  projectId={lvnzyProject?.originalProjectId._id}
-                  defaultSelectedDriverTypes={selectedDriverTypes}
-                  surroundingElements={surroundingElements}
-                  drivers={mapDrivers.map((d) => {
-                    return {
-                      id: d.driverId._id,
-                      duration: d.durationMins
-                        ? d.durationMins
-                        : Math.round(d.mapsDurationSeconds / 60),
-                    };
-                  })}
-                  fullSize={false}
-                />
-              </Flex>
-            </Flex>
-          ) : null}
-
-          {/* Close button when map view is absent */}
-          {!mapDrivers || !mapDrivers.length ? renderDrawerCloseBtn() : null}
-
-          {/* Rest of the content including title, markdown content and chatbox */}
-          <Flex vertical style={{ padding: 16 }}>
-            <Typography.Title level={4} style={{ margin: "8px 0" }}>
-              {selectedDataPointTitle}
-            </Typography.Title>
-            {selectedDataPointCategory == "developer" && (
-              <Typography.Title level={5} style={{ margin: "8px 0" }}>
-                {lvnzyProject?.originalProjectId.info.developerId.name}
-              </Typography.Title>
-            )}
-            <Flex vertical gap={16}>
-              {selectedDataPoint
-                ? selectedDataPoint.reasoning.map((r: string) => {
-                    return (
-                      <Flex
-                        style={{
-                          maxWidth: 500,
-                          backgroundColor: COLORS.bgColorMedium,
-                          borderRadius: 8,
-                          borderColor: COLORS.borderColorMedium,
-                          padding: 8,
-                        }}
-                      >
-                        <div
-                          dangerouslySetInnerHTML={{ __html: r }}
-                          className="reasoning"
-                          style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
-                        ></div>
-                      </Flex>
-                    );
-                  })
-                : ""}
-            </Flex>
-
-            <Divider></Divider>
-
-            <Flex style={{ width: "100%" }}>
-              <Brick360Chat
-                ref={chatRef}
-                dataPointCategory={selectedDataPointCategory}
-                dataPoint={selectedDataPointTitle}
-                lvnzyProjectId={lvnzyProjectId!}
-              ></Brick360Chat>
-            </Flex>
-          </Flex>
-        </Flex>
-      </Drawer>
-
-      {/* Configurations List */}
-      <Modal
-        title={null}
-        closable={true}
-        footer={null}
-        open={isConfigurationsModalOpen}
-        onOk={() => {
-          setIsConfigurationsModalOpen(false);
+        onExpandMap={() => {
+          setDetailsModalOpen(false);
+          setIsMapFullScreen(true);
         }}
-        onCancel={() => {
-          setIsConfigurationsModalOpen(false);
-        }}
-      >
-        <Typography.Title style={{ margin: 0, marginBottom: 16 }} level={3}>
-          Configurations/Pricing
-        </Typography.Title>
-        {lvnzyProject?.meta.projectConfigurations && (
-          <Flex>
-            {/* {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
-              <>
-                <Tag>
-                  {lvnzyProject?.meta.projectConfigurations.towers.length}{" "}
-                  Towers
-                </Tag>
-                <Tag> {getTotalFloors(lvnzyProject)} Floors</Tag>
-              </>
-            )} */}
-            {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
-              <Tag>{lvnzyProject?.property.layout.totalUnits} Units</Tag>
-            )}
-            {lvnzyProject?.property.layout.totalLandArea && (
-              <Tag>
-                {Math.round(
-                  lvnzyProject?.property.layout.totalLandArea / 4046.8564
-                )}{" "}
-                Acre
-              </Tag>
-            )}
-          </Flex>
-        )}
-        <Flex
-          vertical
-          style={{
-            marginTop: 16,
-            maxHeight: 400,
-            overflowY: "scroll",
-            scrollbarWidth: "none",
-          }}
-          gap={16}
-        >
-          {lvnzyProject!.meta.costingDetails.configurations.map(
-            (c: any, index: number) => {
-              return (
-                <Flex
-                  key={`config-modal-${index}`}
-                  vertical
-                  style={{
-                    borderLeft: "1px solid",
-                    paddingLeft: 8,
-                    borderLeftColor: COLORS.borderColorMedium,
-                  }}
-                >
-                  <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_4 }}>
-                    ₹{rupeeAmountFormat(c.cost)}
-                  </Typography.Text>
-                  <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
-                    {c.config}
-                  </Typography.Text>
-                  {c.floorPlans && c.floorPlans.length > 0 && (
-                    <Flex
-                      style={{
-                        overflowX: "auto",
-                        marginTop: 8,
-                      }}
-                      gap={8}
-                    >
-                      {c.floorPlans.map((fp: any, i: number) => (
-                        <Image
-                          key={`fp-modal-${i}`}
-                          src={fp.url}
-                          style={{
-                            height: 100,
-                            borderRadius: 8,
-                          }}
-                          width={100}
-                        />
-                      ))}
-                    </Flex>
-                  )}
-                </Flex>
-              );
-            }
-          )}
-        </Flex>
-      </Modal>
+        mapVisible={mapVisible}
+        isMobile={isMobile}
+        lvnzyProject={lvnzyProject}
+        selectedDriverTypes={selectedDriverTypes}
+        surroundingElements={surroundingElements!}
+        mapDrivers={mapDrivers}
+        selectedDataPointTitle={selectedDataPointTitle}
+        selectedDataPointCategory={selectedDataPointCategory}
+        selectedDataPoint={selectedDataPoint}
+        lvnzyProjectId={lvnzyProjectId!}
+        chatRef={chatRef}
+        renderDrawerCloseBtn={renderDrawerCloseBtn}
+      />
+
+      <ConfigurationsModal
+        isOpen={isConfigurationsModalOpen}
+        onClose={() => setIsConfigurationsModalOpen(false)}
+        lvnzyProject={lvnzyProject}
+      />
     </Flex>
   );
 }
