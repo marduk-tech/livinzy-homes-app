@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 //Layouts
 import { DashboardLayout } from "../layouts/dashboard-layout";
@@ -9,20 +9,24 @@ import { ProfilePage } from "../pages/profile-page";
 import { SignUpForm } from "../pages/signup";
 import UserSessions from "../pages/user-sessions";
 
-import LivProjectPro from "../components/liv-project-pro";
-import { PaymentCallbackPage } from "../pages/payment-callback";
-import { Brick360Full } from "../pages/brick360-full";
-import { useUser } from "../hooks/use-user";
-import { useEffect } from "react";
+import { Capacitor } from "@capacitor/core";
 import posthog from "posthog-js";
+import { useEffect } from "react";
+import LivProjectPro from "../components/liv-project-pro";
+import { LivIndexFull } from "../components/map-view/map-old/liv-index-all/livindex-full";
+import { useUser } from "../hooks/use-user";
 import { posthogkey } from "../libs/constants";
-import { MainLanding } from "../pages/landing/main-landing";
+import { Brick360Full } from "../pages/brick360-full";
 import BrickfiHome from "../pages/brickfi-home";
 import { AboutUs } from "../pages/landing/about-us";
-import { LivIndexFull } from "../components/map-view/map-old/liv-index-all/livindex-full";
+import { MainLanding } from "../pages/landing/main-landing";
+import { PaymentCallbackPage } from "../pages/payment-callback";
 
 export const Router = () => {
   const { user, isLoading: userLoading } = useUser();
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (user && user._id) {
@@ -37,6 +41,14 @@ export const Router = () => {
       });
     }
   }, [user]);
+
+  useEffect(() => {
+    const isNative = Capacitor.isNativePlatform();
+    if (isNative && location.pathname === "/") {
+      navigate("/app", { replace: true });
+    }
+  }, [location.pathname]);
+
   return (
     <Routes>
       <Route
