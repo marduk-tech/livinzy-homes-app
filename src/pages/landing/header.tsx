@@ -18,7 +18,19 @@ export function LandingHeader() {
       }}
       align="center"
     >
-      <img src="/images/brickfi-logo.png" height="20"></img>
+      <Flex
+        onClick={() => {
+          window.location.replace("/");
+        }}
+        style={{
+          height: 60,
+          display: "flex",
+          alignItems: "center",
+          cursor: "pointer",
+        }}
+      >
+        <img src="/images/brickfi-logo.png" height="20"></img>
+      </Flex>
       <Flex style={{ marginLeft: "auto", marginRight: 48 }} gap={16}>
         <Link href="/app" style={{ color: COLORS.textColorDark }}>
           Brickfi App

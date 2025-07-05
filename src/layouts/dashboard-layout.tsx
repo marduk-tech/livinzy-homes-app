@@ -47,7 +47,7 @@ export const DashboardLayout: React.FC = () => {
     {
       key: "about",
       title: "About Brickfi",
-      link: "https://brickfi.in/",
+      link: "/aboutus",
       icon: { name: "FiInfo", set: "fi" },
     },
     {

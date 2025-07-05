@@ -66,7 +66,7 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
             : sectionData.fullHeight
             ? window.innerHeight
             : "auto",
-          marginLeft: isMobile ? 32 : 64,
+          marginLeft: isMobile ? 24 : 64,
         }}
         align={isMobile ? "center" : "flex-end"}
         justify="center"
@@ -75,7 +75,6 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
           style={{
             ...styles.h1,
             fontSize: isMobile ? 50 : 60,
-            fontWeight: 1000,
           }}
         >
           {sectionData.heading}
@@ -201,6 +200,8 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
               ...styles.h2,
               fontSize: isMobile ? 20 : 24,
               color: sectionData.textColor || COLORS.textColorDark,
+              maxWidth: 600,
+              alignSelf: "flex-start",
             }}
           >
             {sectionData.subHeading as any}
@@ -249,7 +250,7 @@ const SectionCenter: React.FC<{ sectionData: SectionProps }> = ({
         style={{
           width: isMobile ? "calc(100% - 32px)" : "100%",
           textAlign: isMobile ? "left" : "center",
-          marginLeft: isMobile ? 32 : 0,
+          marginLeft: isMobile ? 24 : 0,
         }}
         align="center"
         justify="center"

@@ -21,6 +21,7 @@ import BrickfiHome from "../pages/brickfi-home";
 import { AboutUs } from "../pages/landing/about-us";
 import { MainLanding } from "../pages/landing/main-landing";
 import { PaymentCallbackPage } from "../pages/payment-callback";
+import { FourOFour } from "../pages/landing/404";
 
 export const Router = () => {
   const { user, isLoading: userLoading } = useUser();
@@ -75,7 +76,7 @@ export const Router = () => {
 
       <Route path="/app/payments/callback" element={<PaymentCallbackPage />} />
 
-      <Route path="/*" element={<div>404</div>} />
+      <Route path="/*" element={<FourOFour></FourOFour>} />
       <Route path="/app/sign-up" element={<SignUpForm />} />
     </Routes>
   );
