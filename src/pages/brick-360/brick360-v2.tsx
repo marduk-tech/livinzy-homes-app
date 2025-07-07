@@ -1,4 +1,4 @@
-import { Button, Flex, Tabs, Typography } from "antd";
+import { Flex, Tabs, Typography } from "antd";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import DynamicReactIcon from "../../components/common/dynamic-react-icon";
@@ -98,7 +98,8 @@ export function Brick360v2() {
       <DynamicReactIcon
         iconName={iconName}
         iconSet={iconSet}
-        color={COLORS.textColorDark}
+        color="white"
+        size={16}
       ></DynamicReactIcon>
     );
   };
@@ -383,9 +384,11 @@ export function Brick360v2() {
         selectedDriverTypes={selectedDriverTypes}
         surroundingElements={surroundingElements!}
         mapDrivers={mapDrivers}
-        selectedDataPointTitle={selectedDataPointTitle}
-        selectedDataPointCategory={selectedDataPointCategory}
-        selectedDataPoint={selectedDataPoint}
+        dataPoint={{
+          selectedDataPointTitle,
+          selectedDataPointCategory,
+          selectedDataPoint,
+        }}
         lvnzyProjectId={lvnzyProjectId!}
         chatRef={chatRef}
         renderDrawerCloseBtn={renderDrawerCloseBtn}

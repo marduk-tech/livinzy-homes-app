@@ -30,7 +30,7 @@ export const Router = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (user && user._id) {
+    if (user && user._id && !window.location.href.includes("localhost")) {
       console.log(user);
       posthog.init(posthogkey, {
         api_host: "https://us.i.posthog.com",

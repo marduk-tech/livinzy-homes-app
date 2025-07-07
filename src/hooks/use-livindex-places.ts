@@ -21,5 +21,6 @@ export function useFetchAllLivindexPlaces(
   return useQuery<IDriverPlace[]>({
     queryKey: [queryKeys.getAllPlaces, mapTitle],
     queryFn: () => getAllLivIndexPlaces(driverIds),
+    refetchOnWindowFocus: false,
   });
 }

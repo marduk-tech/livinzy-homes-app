@@ -119,7 +119,7 @@ export const DashboardLayout: React.FC = () => {
       >
         <Layout
           style={{
-            backgroundColor: "transparent",
+            backgroundColor: "#fefbfb",
           }}
         >
           <Header
@@ -219,7 +219,7 @@ export const DashboardLayout: React.FC = () => {
           <Content
             style={{
               margin: "auto",
-              backgroundColor: COLORS.bgColorMedium,
+              backgroundColor: "#fefbfb",
               maxWidth: MAX_WIDTH,
               width: "100%",
               height: "calc(100vh - 100px)",

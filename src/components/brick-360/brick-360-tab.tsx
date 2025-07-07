@@ -1,9 +1,5 @@
 import { Alert, Flex, List, Tag, Typography } from "antd";
-import {
-  BRICK360_CATEGORY,
-  Brick360CategoryInfo,
-  Brick360DataPoints,
-} from "../../libs/constants";
+import { Brick360DataPoints } from "../../libs/constants";
 import { capitalize, getCategoryScore } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
@@ -94,19 +90,43 @@ export const Brick360Tab = ({
           </Flex>
         )}
         {/*  data points */}
-        <Flex vertical gap={32} style={{ padding: "16px 0" }}>
+        <Flex vertical gap={32} style={{ paddingBottom: 40, paddingTop: 16 }}>
           {scoreParams &&
             scoreParams.map((sc) => {
               return (
                 <Flex vertical>
-                  <Flex gap={8} align="center" style={{ marginBottom: 8 }}>
-                    {sc.icon ? sc.icon : null}
-                    <Typography.Title
-                      level={4}
-                      style={{ margin: 0, marginBottom: 0 }}
+                  <Flex
+                    gap={4}
+                    align="center"
+                    style={{
+                      marginBottom: 8,
+                      borderBottom: "1px solid",
+                      paddingBottom: 8,
+                      borderBottomColor: COLORS.borderColor,
+                    }}
+                  >
+                    <Flex
+                      style={{
+                        width: 24,
+                        height: 24,
+                        backgroundColor: COLORS.textColorDark,
+                        borderRadius: "50%",
+                      }}
+                      align="center"
+                      justify="center"
+                    >
+                      {sc.icon ? sc.icon : null}
+                    </Flex>
+                    <Typography.Text
+                      style={{
+                        margin: 0,
+                        marginBottom: 0,
+                        fontWeight: 500,
+                        fontSize: FONT_SIZE.HEADING_3,
+                      }}
                     >
                       {sc.title}
-                    </Typography.Title>
+                    </Typography.Text>
                     {lvnzyProject!.score[sc.key] ? (
                       <GradientBar
                         value={getCategoryScore(lvnzyProject!.score[sc.key])}
@@ -133,26 +153,20 @@ export const Brick360Tab = ({
                         <List.Item
                           key={`p-${index}`}
                           style={{
-                            padding: "8px",
-                            borderBottom: "1px solid",
+                            padding: "8px 0",
+                            borderBottom:
+                              index ==
+                              Object.keys((Brick360DataPoints as any)[sc.key])
+                                .map((d) => {
+                                  return sc.dataPoints.find(
+                                    (dp: any) => dp[0] == d
+                                  );
+                                })
+                                .filter((d) => !!d).length -
+                                1
+                                ? "none"
+                                : "1px solid",
                             borderBottomColor: COLORS.borderColor,
-                            backgroundColor: "white",
-                            borderTopLeftRadius: index == 0 ? 8 : 0,
-                            borderTopRightRadius: index == 0 ? 8 : 0,
-                            borderBottomLeftRadius:
-                              index ==
-                              Object.keys((Brick360DataPoints as any)[sc.key])
-                                .length -
-                                1
-                                ? 8
-                                : 0,
-                            borderBottomRightRadius:
-                              index ==
-                              Object.keys((Brick360DataPoints as any)[sc.key])
-                                .length -
-                                1
-                                ? 8
-                                : 0,
                           }}
                           onClick={() => onDataPointClick(sc, item)}
                         >
@@ -167,11 +181,16 @@ export const Brick360Tab = ({
                                     : COLORS.textColorLight,
                               }}
                             >
-                              {capitalize(
-                                (Brick360DataPoints as any)[sc.key][
-                                  (item as any)[0]
-                                ]
-                              )}
+                              <span>
+                                {capitalize(
+                                  (Brick360DataPoints as any)[sc.key][
+                                    (item as any)[0]
+                                  ]
+                                )}{" "}
+                              </span>
+                              <span style={{ fontSize: FONT_SIZE.HEADING_3 }}>
+                                +
+                              </span>
                             </Typography.Text>
                             <Flex
                               style={{

@@ -1,5 +1,5 @@
-import { Button, Divider, Drawer, Flex, Space, Typography } from "antd";
-import { MutableRefObject } from "react";
+import { Button, Divider, Drawer, Flex, Space, Tag } from "antd";
+import { MutableRefObject, useEffect, useState } from "react";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import Brick360Chat from "../liv/brick360-chat";
@@ -15,9 +15,7 @@ interface DetailsDrawerProps {
   selectedDriverTypes: any[];
   surroundingElements: any[];
   mapDrivers: any[];
-  selectedDataPointTitle: string;
-  selectedDataPointCategory: string;
-  selectedDataPoint: any;
+  dataPoint: any;
   lvnzyProjectId: string;
   chatRef: MutableRefObject<any>;
   renderDrawerCloseBtn: () => React.ReactNode;
@@ -33,13 +31,22 @@ export const DetailsDrawer = ({
   selectedDriverTypes,
   surroundingElements,
   mapDrivers,
-  selectedDataPointTitle,
-  selectedDataPointCategory,
-  selectedDataPoint,
+  dataPoint,
   lvnzyProjectId,
   chatRef,
   renderDrawerCloseBtn,
 }: DetailsDrawerProps) => {
+  const [isDrawerExpanded, setIsDrawerExpanded] = useState(false);
+  const [dataPointSelected, setDataPointSelected] = useState<any>();
+
+  useEffect(() => {
+    setIsDrawerExpanded(isOpen);
+  }, [isOpen]);
+
+  useEffect(() => {
+    setDataPointSelected(dataPoint);
+  }, [dataPoint]);
+
   return (
     <Drawer
       title={null}
@@ -47,14 +54,46 @@ export const DetailsDrawer = ({
       styles={{
         body: {
           padding: 0,
+          borderTop: isDrawerExpanded
+            ? `1px solid ${COLORS.borderColor}`
+            : "none",
+          borderLeft: isDrawerExpanded
+            ? `1px solid ${COLORS.borderColor}`
+            : "none",
+          borderRight: isDrawerExpanded
+            ? `1px solid ${COLORS.borderColor}`
+            : "none",
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+          scrollbarWidth: "none",
         },
         header: {
           padding: 16,
         },
+        content: {
+          backgroundColor: isDrawerExpanded ? "white" : "transparent",
+          borderTop: isDrawerExpanded
+            ? `1px solid ${COLORS.borderColor}`
+            : "none",
+          borderLeft: isDrawerExpanded
+            ? `1px solid ${COLORS.borderColor}`
+            : "none",
+          borderRight: isDrawerExpanded
+            ? `1px solid ${COLORS.borderColor}`
+            : "none",
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+        },
+        wrapper: {
+          boxShadow: isDrawerExpanded ? "initial" : "none",
+        },
+        mask: {
+          backgroundColor: "rgba(0,0,0,0.1)",
+        },
       }}
       rootStyle={{
-        maxWidth: 900,
-        marginLeft: isMobile ? 0 : "calc(50% - 450px)",
+        maxWidth: 885,
+        marginLeft: isMobile ? 0 : "calc(50% - 447px)",
       }}
       extra={
         <Space>
@@ -62,9 +101,14 @@ export const DetailsDrawer = ({
         </Space>
       }
       closable={false}
-      height={Math.min(700, window.innerHeight * 0.8)}
-      onClose={onClose}
-      open={isOpen}
+      height={isDrawerExpanded ? Math.min(700, window.innerHeight * 0.8) : 100}
+      onClose={() => {
+        setDataPointSelected(undefined);
+        onClose();
+      }}
+      open={true}
+      mask={isDrawerExpanded ? true : false}
+      maskClosable={true}
     >
       <Flex
         vertical
@@ -72,12 +116,23 @@ export const DetailsDrawer = ({
           position: "relative",
           overflowY: "scroll",
           paddingBottom: 64,
+          scrollbarWidth: "none",
+          paddingTop: 16,
         }}
       >
+        {isDrawerExpanded ? renderDrawerCloseBtn() : null}
         {/* Map view including expand button and drawer close icon button */}
-        {mapVisible ? (
-          <Flex vertical style={{ position: "relative" }}>
-            {renderDrawerCloseBtn()}
+        {mapVisible && isDrawerExpanded ? (
+          <Flex
+            vertical
+            style={{
+              position: "relative",
+              margin: 8,
+              border: "2px solid",
+              borderColor: COLORS.borderColor,
+              borderRadius: 16,
+            }}
+          >
             <Flex
               style={{
                 position: "absolute",
@@ -115,12 +170,11 @@ export const DetailsDrawer = ({
               style={{
                 height: isMobile ? 200 : 300,
                 width: "100%",
-                borderRadius: 16,
               }}
             >
               <MapViewV2
                 projectId={lvnzyProject?.originalProjectId._id}
-                defaultSelectedDriverTypes={selectedDriverTypes}
+                defaultSelectedDriverTypes={selectedDriverTypes || []}
                 surroundingElements={surroundingElements}
                 drivers={mapDrivers.map((d) => {
                   return {
@@ -136,51 +190,62 @@ export const DetailsDrawer = ({
           </Flex>
         ) : null}
 
-        {/* Close button when map view is absent */}
-        {!mapDrivers || !mapDrivers.length ? renderDrawerCloseBtn() : null}
-
         {/* Rest of the content including title, markdown content and chatbox */}
-        <Flex vertical style={{ padding: 16 }}>
-          <Typography.Title level={4} style={{ margin: "8px 0" }}>
-            {selectedDataPointTitle}
-          </Typography.Title>
-          {selectedDataPointCategory == "developer" && (
-            <Typography.Title level={5} style={{ margin: "8px 0" }}>
-              {lvnzyProject?.originalProjectId.info.developerId.name}
-            </Typography.Title>
-          )}
-          <Flex vertical gap={16}>
-            {selectedDataPoint
-              ? selectedDataPoint.reasoning.map((r: string) => {
-                  return (
-                    <Flex
-                      style={{
-                        maxWidth: 500,
-                        backgroundColor: COLORS.bgColorMedium,
-                        borderRadius: 8,
-                        borderColor: COLORS.borderColorMedium,
-                        padding: 8,
-                      }}
-                    >
-                      <div
-                        dangerouslySetInnerHTML={{ __html: r }}
-                        className="reasoning"
-                        style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
-                      ></div>
-                    </Flex>
-                  );
-                })
-              : ""}
-          </Flex>
+        <Flex vertical style={{ padding: 8 }}>
+          {isDrawerExpanded ? (
+            <Flex vertical>
+              <Flex vertical gap={16}>
+                {dataPointSelected?.selectedDataPoint
+                  ? dataPointSelected?.selectedDataPoint.reasoning.map(
+                      (r: string) => {
+                        return (
+                          <Flex
+                            style={{
+                              maxWidth: 850,
+                            }}
+                          >
+                            <div
+                              dangerouslySetInnerHTML={{ __html: r }}
+                              className="reasoning"
+                              style={{
+                                fontSize: FONT_SIZE.HEADING_4,
+                                margin: 0,
+                              }}
+                            ></div>
+                          </Flex>
+                        );
+                      }
+                    )
+                  : ""}
+              </Flex>
 
-          <Divider></Divider>
+              <Divider></Divider>
+              <Flex
+                gap={8}
+                style={{ width: "100%", flexWrap: "wrap", marginBottom: 16 }}
+              >
+                <Tag
+                  onClick={() => {
+                    chatRef.current.handleQuestion("find preschools nearby");
+                  }}
+                >
+                  Find preschools nearby
+                </Tag>
+                <Tag>Show nearest schools</Tag>
+                <Tag>Schools in walking distance</Tag>
+              </Flex>
+            </Flex>
+          ) : null}
 
           <Flex style={{ width: "100%" }}>
             <Brick360Chat
               ref={chatRef}
-              dataPointCategory={selectedDataPointCategory}
-              dataPoint={selectedDataPointTitle}
+              dataPointCategory={dataPointSelected?.selectedDataPointCategory}
+              dataPoint={dataPointSelected?.selectedDataPointTitle}
               lvnzyProjectId={lvnzyProjectId!}
+              onNewChat={() => {
+                setIsDrawerExpanded(true);
+              }}
             ></Brick360Chat>
           </Flex>
         </Flex>

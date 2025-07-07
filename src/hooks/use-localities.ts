@@ -6,5 +6,6 @@ export function useFetchLocalities() {
   return useQuery({
     queryKey: [queryKeys.getAllLocalities],
     queryFn: () => getAllLocalities(),
+    refetchOnWindowFocus: false,
   });
 }

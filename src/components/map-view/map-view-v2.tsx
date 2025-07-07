@@ -356,7 +356,7 @@ const MapViewV2 = ({
     useFetchCorridors();
   const { data: localities, isLoading: isLocalitiesDataLoading } =
     useFetchLocalities();
-  const [selectedDriverTypes, setSelectedDriverTypes] = useState<string[]>([]);
+  const [selectedDriverType, setSelectedDriverType] = useState<string>();
 
   const [uniqueSurroundingElements, setUniqueSurroundingElements] = useState<
     string[]
@@ -450,18 +450,8 @@ const MapViewV2 = ({
       fetchDriverIcons();
       const uniqTypes = Array.from(new Set(driversData.map((d) => d.driver)));
       setUniqueDriverTypes(uniqTypes);
-      if (!selectedDriverTypes) {
-        setSelectedDriverTypes(uniqTypes.slice(0, 1));
-      }
     }
-  }, [drivers, driversData, selectedDriverTypes]); // Added selectedDriverTypes to ensure marker icons update
-
-  // Setting selected driver types if passed
-  useEffect(() => {
-    if (defaultSelectedDriverTypes) {
-      setSelectedDriverTypes(defaultSelectedDriverTypes);
-    }
-  }, [defaultSelectedDriverTypes]);
+  }, [drivers, driversData]); // Added selectedDriverTypes to ensure marker icons update
 
   // Setting the unique surrounding elements for filters
   useEffect(() => {
@@ -805,7 +795,7 @@ const MapViewV2 = ({
           driver.driver === "highway" &&
           !!driver.features &&
           typeof driver.status === "string" &&
-          selectedDriverTypes.includes(driver.driver)
+          (!selectedDriverType || selectedDriverType == driver.driver)
       )
       .flatMap((driver) => {
         const processedFeatures = processRoadFeatures(driver.features);
@@ -919,7 +909,7 @@ const MapViewV2 = ({
           driver.driver === "transit" &&
           !!driver.features &&
           typeof driver.status === "string" &&
-          selectedDriverTypes.includes(driver.driver)
+          (!selectedDriverType || selectedDriverType == driver.driver)
       )
       .flatMap((driver) => {
         //  points from lines
@@ -1091,7 +1081,7 @@ const MapViewV2 = ({
     const filteredDrivers = driversData.filter((driver) => {
       if (!driver.location?.lat || !driver.location?.lng) return false;
       return (
-        selectedDriverTypes.includes(driver.driver) &&
+        (!selectedDriverType || selectedDriverType == driver.driver) &&
         bounds.contains([driver.location.lat, driver.location.lng])
       );
     });
@@ -1284,7 +1274,7 @@ const MapViewV2 = ({
   };
 
   /** Filter for driver types */
-  const renderDriverTypesTag = (k: string, selected: boolean) => {
+  const renderDriverTypesTag = (k: string) => {
     if (!(LivIndexDriversConfig as any)[k]) {
       return null;
     }
@@ -1296,32 +1286,30 @@ const MapViewV2 = ({
           alignItems: "center",
           borderRadius: 16,
           padding: "4px 8px",
-          backgroundColor: selected ? COLORS.primaryColor : "initial",
-          color: selected ? "white" : "initial",
+          backgroundColor:
+            k == selectedDriverType ? COLORS.primaryColor : "initial",
+          color: k == selectedDriverType ? "white" : "initial",
           marginLeft: 4,
           fontSize: FONT_SIZE.HEADING_3,
           cursor: "pointer",
         }}
         onClick={() => {
-          const selDriverTypes = [...selectedDriverTypes];
-          const indexOfItem = selDriverTypes.indexOf(k);
-          if (indexOfItem > -1) {
-            selDriverTypes.splice(indexOfItem, 1);
+          if (k == selectedDriverType) {
+            setSelectedDriverType(undefined);
           } else {
-            selDriverTypes.push(k);
+            setSelectedDriverType(k);
           }
-          setSelectedDriverTypes(selDriverTypes);
         }}
       >
         <DynamicReactIcon
           iconName={icon.name}
           iconSet={icon.set}
           size={20}
-          color={selected ? "white" : COLORS.textColorDark}
+          color={k == selectedDriverType ? "white" : COLORS.textColorDark}
         ></DynamicReactIcon>
         <Typography.Text
           style={{
-            color: selected ? "white" : COLORS.textColorDark,
+            color: k == selectedDriverType ? "white" : COLORS.textColorDark,
             marginLeft: 8,
           }}
         >
@@ -1408,6 +1396,7 @@ const MapViewV2 = ({
         width: "100%",
         height: "100%",
         overflowY: "hidden",
+        borderRadius: 14,
       }}
     >
       {/* Drivers filters */}
@@ -1451,27 +1440,12 @@ const MapViewV2 = ({
               height: 32,
             }}
           >
-            {uniqueDriverTypes
+            {(defaultSelectedDriverTypes || [])
               .filter((d) => !!d)
               .map((k: string) => {
-                return renderDriverTypesTag(k, selectedDriverTypes.includes(k));
+                return renderDriverTypesTag(k);
               })}
           </Flex>
-          <Paragraph
-            ellipsis={{ rows: 1 }}
-            style={{
-              marginLeft: 4,
-              marginTop: 8,
-              marginBottom: 0,
-              color: COLORS.textColorLight,
-            }}
-          >
-            {selectedDriverTypes && selectedDriverTypes.length
-              ? `Showing: ${selectedDriverTypes
-                  .map((d) => (LivIndexDriversConfig as any)[d].label)
-                  .join(", ")}`
-              : "No filter selected"}
-          </Paragraph>
         </Flex>
       ) : null}
 
@@ -1510,6 +1484,7 @@ const MapViewV2 = ({
           zoom={13}
           minZoom={12}
           style={{ height: "100%", width: "100%" }}
+          zoomControl={false}
         >
           <MapResizeHandler />
           <MapCenterHandler projectData={primaryProject} projects={projects} />
@@ -1523,7 +1498,7 @@ const MapViewV2 = ({
             const projectPolygons = processDriversToPolygons(
               primaryProjectBounds,
               false,
-              selectedDriverTypes
+              defaultSelectedDriverTypes
             );
 
             // Render all components
@@ -1555,7 +1530,7 @@ const MapViewV2 = ({
                       polygons={processDriversToPolygons(
                         driversData || [],
                         true,
-                        selectedDriverTypes
+                        defaultSelectedDriverTypes
                       )}
                     />
                   </>

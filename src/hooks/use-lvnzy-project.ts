@@ -17,5 +17,6 @@ export const useFetchLvnzyProjectById = (id: string) => {
       const { data } = await axiosApiInstance.get(`/lvnzy-projects/${id}`);
       return data as LvnzyProject;
     },
+    refetchOnWindowFocus: false,
   });
 };

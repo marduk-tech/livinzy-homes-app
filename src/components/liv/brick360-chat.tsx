@@ -29,6 +29,7 @@ export interface Brick360Props {
   dataPointCategory: string;
   dataPoint: String;
   lvnzyProjectId: string;
+  onNewChat: any;
 }
 interface Brick360ChatRef {
   clearChatData: () => void;
@@ -39,7 +40,7 @@ export interface Brick360Answer {
 }
 
 export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
-  ({ dataPointCategory, dataPoint, lvnzyProjectId }, ref) => {
+  ({ dataPointCategory, dataPoint, lvnzyProjectId, onNewChat }, ref) => {
     const [currentQuestion, setCurrentQuestion] = useState<string>();
     const [currentAnswer, setCurrentAnswer] = useState<
       Brick360Answer | undefined
@@ -73,6 +74,10 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
         setLivThread([]);
         setCurrentQuestion(undefined);
         setCurrentAnswer(undefined);
+      },
+
+      handleQuestion: (q: string) => {
+        handleRequest(q);
       },
     }));
 
@@ -131,6 +136,8 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
         if (!question || question.length < 3) {
           return;
         }
+
+        onNewChat();
 
         captureAnalyticsEvent("question-asked", { question });
         setQueryStreaming(true);
@@ -216,11 +223,11 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             </Flex>
           </Flex>
           {/* <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
-            {a}
+            {a}a
           </Markdown> */}
           <Flex
             style={{
-              maxWidth: 500,
+              maxWidth: 850,
               backgroundColor: COLORS.bgColorMedium,
               borderRadius: 8,
               borderColor: COLORS.borderColorMedium,
@@ -276,7 +283,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
           width: "100%",
         }}
       >
-        <Flex vertical style={{ height: "100%" }}>
+        <Flex vertical style={{ height: "100%", width: "100%" }}>
           {/* Single session of question / answer */}
           {renderQuestionAnswerSection()}
 
@@ -286,7 +293,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             style={{
               position: "fixed",
               bottom: 16,
-              width: "90%",
+              width: "95%",
               maxWidth: 850,
             }}
           >

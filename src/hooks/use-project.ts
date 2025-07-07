@@ -34,5 +34,6 @@ export const useFetchProjectById = (id: string) => {
       const { data } = await axiosApiInstance.get(`/projects/${id}`);
       return data as Project;
     },
+    refetchOnWindowFocus: false,
   });
 };
