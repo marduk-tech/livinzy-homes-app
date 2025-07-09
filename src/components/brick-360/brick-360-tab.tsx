@@ -61,15 +61,6 @@ export const Brick360Tab = ({
         {/* Summary point */}
         {lvnzyProject?.score.summary && (
           <Flex vertical style={{ marginBottom: 16 }}>
-            <Typography.Text
-              style={{
-                fontSize: FONT_SIZE.HEADING_4,
-                marginBottom: 4,
-                color: COLORS.textColorLight,
-              }}
-            >
-              QUICK SNAPSHOT
-            </Typography.Text>
             <Flex
               gap={16}
               style={{

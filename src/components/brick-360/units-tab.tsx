@@ -30,8 +30,8 @@ const getTotalFloors = (lvnzyProject: any) => {
     totalFloors = `${minFloors} - ${maxFloors}`;
   }
   return (
-    <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
-      ` / ${totalFloors} Floors `
+    <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
+      / {totalFloors} Floors
     </Typography.Text>
   );
 };
@@ -67,15 +67,7 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                 getTotalFloors(lvnzyProject)}
             </Flex>
           )}
-          <Flex
-            vertical
-            style={{
-              maxHeight: 400,
-              overflowY: "scroll",
-              scrollbarWidth: "none",
-            }}
-            gap={16}
-          >
+          <Flex vertical gap={8}>
             {lvnzyProject!.meta.costingDetails.configurations.map(
               (c: any, index: number) => {
                 return (
@@ -83,10 +75,12 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                     key={`config-${index}`}
                     vertical
                     style={{
-                      borderLeft: "1px solid",
-                      paddingLeft: 8,
-                      borderLeftColor: COLORS.borderColorMedium,
-                      marginTop: 20,
+                      marginTop: 16,
+                      backgroundColor: COLORS.bgColor,
+                      padding: 8,
+                      borderRadius: 8,
+                      border: "1px solid",
+                      borderColor: COLORS.borderColor,
                     }}
                   >
                     <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
@@ -99,9 +93,10 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                       <Flex
                         style={{
                           overflowX: "auto",
-                          marginTop: 8,
+                          marginTop: 16,
+                          scrollbarWidth: "none",
                         }}
-                        gap={8}
+                        gap={32}
                       >
                         {c.floorplans.map((fp: any, i: number) => {
                           console.log(fp);
@@ -112,6 +107,7 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                               src={fp}
                               style={{
                                 height: 100,
+                                width: "auto",
                               }}
                             />
                           );
