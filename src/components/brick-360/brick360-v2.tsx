@@ -69,8 +69,8 @@ export function Brick360v2() {
       <DynamicReactIcon
         iconName={iconName}
         iconSet={iconSet}
-        color="white"
-        size={16}
+        color={COLORS.textColorDark}
+        size={20}
       ></DynamicReactIcon>
     );
   };

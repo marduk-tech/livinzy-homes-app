@@ -5,9 +5,9 @@ import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import GradientBar from "../common/grading-bar";
 import RatingBar from "../common/rating-bar";
 import { ScrollableContainer } from "../scrollable-container";
-import DynamicReactIcon from "../common/dynamic-react-icon";
 import { SnapshotModal } from "./snapshot-modal";
 import { useState } from "react";
+import DynamicReactIcon from "../common/dynamic-react-icon";
 
 interface Brick360TabProps {
   lvnzyProject: any;
@@ -29,28 +29,43 @@ export const Brick360Tab = ({
     const title = match ? match[1] : null;
     return (
       <Flex
-        align="center"
+        align="flex-start"
         style={{
           padding: "8px",
           backgroundColor: "white",
           borderRadius: 8,
           borderWidth: "1px",
-          borderColor: COLORS.borderColor,
+          borderColor: COLORS.borderColorMedium,
           borderStyle: "solid",
         }}
         onClick={() => {
-          setQuickSnapshotDialogOpen(true);
-          setQuickSnapshotDialogContent(pt);
+          // setQuickSnapshotDialogOpen(true);
+          // setQuickSnapshotDialogContent(pt);
         }}
         gap={4}
+        vertical
       >
-        <DynamicReactIcon
-          size={isPro ? 16 : 20}
-          iconName={isPro ? "FaRegLaugh" : "PiSmileySadBold"}
-          iconSet={isPro ? "fa" : "pi"}
-          color={isPro ? COLORS.primaryColor : COLORS.redIdentifier}
-        ></DynamicReactIcon>
-        <Typography.Text>{title}</Typography.Text>
+        <Flex align="center" gap={4}>
+          <DynamicReactIcon
+            size={isPro ? 16 : 20}
+            iconName={isPro ? "FaRegLaugh" : "PiSmileySadBold"}
+            iconSet={isPro ? "fa" : "pi"}
+            color={isPro ? COLORS.primaryColor : COLORS.redIdentifier}
+          ></DynamicReactIcon>
+          <Typography.Text style={{ fontWeight: 500 }}>{title}</Typography.Text>
+        </Flex>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: pt.replace(`<b>${title}</b><br>`, ""),
+          }}
+          className="reasoning"
+          style={{
+            fontSize: FONT_SIZE.PARA,
+            margin: 0,
+            width: 275,
+            textWrap: "wrap",
+          }}
+        ></div>
       </Flex>
     );
   }
@@ -61,6 +76,15 @@ export const Brick360Tab = ({
         {/* Summary point */}
         {lvnzyProject?.score.summary && (
           <Flex vertical style={{ marginBottom: 16 }}>
+            <Typography.Text
+              style={{
+                fontSize: FONT_SIZE.PARA,
+                marginBottom: 4,
+                color: COLORS.textColorMedium,
+              }}
+            >
+              360 HIGHLIGHTS
+            </Typography.Text>
             <Flex
               gap={16}
               style={{
@@ -89,7 +113,6 @@ export const Brick360Tab = ({
                     gap={4}
                     align="center"
                     style={{
-                      marginBottom: 8,
                       borderBottom: "1px solid",
                       paddingBottom: 8,
                       borderBottomColor: COLORS.borderColor,
@@ -99,8 +122,6 @@ export const Brick360Tab = ({
                       style={{
                         width: 24,
                         height: 24,
-                        backgroundColor: COLORS.textColorDark,
-                        borderRadius: "50%",
                       }}
                       align="center"
                       justify="center"
@@ -143,7 +164,7 @@ export const Brick360Tab = ({
                         <List.Item
                           key={`p-${index}`}
                           style={{
-                            padding: "8px 0",
+                            padding: "6px 0",
                             borderBottom:
                               index ==
                               Object.keys((Brick360DataPoints as any)[sc.key])
@@ -161,33 +182,53 @@ export const Brick360Tab = ({
                           onClick={() => onDataPointClick(sc, item)}
                         >
                           <Flex align="center" style={{ width: "100%" }}>
-                            <Typography.Text
-                              style={{
-                                fontSize: FONT_SIZE.HEADING_4,
-                                width: "60%",
-                                color:
-                                  (item as any)[1].rating > 0
-                                    ? COLORS.textColorDark
-                                    : COLORS.textColorLight,
-                              }}
+                            <Flex
+                              style={{ width: "60%" }}
+                              align="center"
+                              gap={4}
                             >
-                              <span>
+                              <Typography.Text
+                                style={{
+                                  fontSize: FONT_SIZE.HEADING_4,
+                                  color:
+                                    (item as any)[1].rating > 0
+                                      ? COLORS.textColorDark
+                                      : COLORS.textColorLight,
+                                }}
+                              >
                                 {capitalize(
                                   (Brick360DataPoints as any)[sc.key][
                                     (item as any)[0]
                                   ]["label"]
                                 )}{" "}
-                              </span>
-                              <span style={{ fontSize: FONT_SIZE.HEADING_3 }}>
-                                +
-                              </span>
-                            </Typography.Text>
+                              </Typography.Text>
+                              <Flex
+                                style={{
+                                  height: 18,
+                                  width: 18,
+                                  borderRadius: 2,
+                                  backgroundColor: COLORS.bgColorMedium,
+                                }}
+                                align="center"
+                                justify="center"
+                              >
+                                <Typography.Text
+                                  style={{
+                                    fontSize: FONT_SIZE.HEADING_4,
+                                    color: COLORS.textColorLight,
+                                  }}
+                                >
+                                  +
+                                </Typography.Text>
+                              </Flex>
+                            </Flex>
                             <Flex
                               style={{
-                                width: "40%",
                                 height: 24,
-                                justifyContent: "flex-end",
+                                marginLeft: "auto",
+                                width: "40%",
                               }}
+                              justify="flex-end"
                             >
                               <RatingBar
                                 value={(item as any)[1].rating}
