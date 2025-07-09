@@ -1,7 +1,7 @@
 import { Flex, Typography } from "antd";
 import { LvnzyProject } from "../../types/LvnzyProject";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
+import { capitalize, rupeeAmountFormat } from "../../libs/lvnzy-helper";
 import moment from "moment";
 
 type MetaInfoProps = {
@@ -23,30 +23,16 @@ const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
     );
   };
   return (
-    <Flex vertical>
-      {renderText(lvnzyProject?.meta.oneLiner)}
-      {renderText(`Starts: 
-            ${rupeeAmountFormat(
-              lvnzyProject?.meta.costingDetails.configurations[0].cost
-            )} / ${
-        lvnzyProject?.meta.costingDetails.configurations[0].config
-      }`)}
-      {lvnzyProject?.meta.projectTimelines &&
-      lvnzyProject?.meta.projectTimelines.length ? (
-        <Flex>
-          {renderText(
-            `Launched: 
-              ${moment(
-                lvnzyProject?.meta.projectTimelines[0].startDate,
-                "DD-MM-YYYY"
-              ).format("MMM YYYY")},  Completion:
-              ${moment(
-                lvnzyProject?.meta.projectTimelines[0].completionDate,
-                "DD-MM-YYYY"
-              ).format("MMM YYYY")}`
-          )}
-        </Flex>
-      ) : null}
+    <Flex>
+      {renderText(`
+            ${capitalize(
+              lvnzyProject?.meta.projectUnitTypes.split(",")[0]
+            )} · Starts ${rupeeAmountFormat(
+        lvnzyProject?.meta.costingDetails.configurations[0].cost
+      )} · ${moment(
+        lvnzyProject?.meta.projectTimelines[0].completionDate,
+        "DD-MM-YYYY"
+      ).format("MMM YYYY")}`)}
     </Flex>
   );
 };

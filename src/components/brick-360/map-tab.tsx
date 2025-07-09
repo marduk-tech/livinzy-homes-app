@@ -11,9 +11,9 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
   const { isMobile } = useDevice();
   return (
     <ScrollableContainer>
-      <Flex style={{ height: "calc(100vh - 350px)" }} vertical gap={8}>
+      <Flex style={{ height: window.innerHeight - 300 }} vertical gap={8}>
         <MapViewV2
-          fullSize={true}
+          fullSize={false}
           projectId={lvnzyProject?.originalProjectId._id}
           drivers={[
             ...lvnzyProject.connectivity.drivers,

@@ -13,7 +13,7 @@ export function ScrollableContainer({
         paddingRight: 8,
         paddingTop: 8,
         scrollbarWidth: "none",
-        height: "calc(100vh - 300px)",
+        height: window.innerHeight - 250,
       }}
     >
       <Flex vertical>{children}</Flex>

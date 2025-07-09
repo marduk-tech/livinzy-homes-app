@@ -10,13 +10,11 @@ export const ProjectHeader = ({ lvnzyProject }: ProjectHeaderProps) => {
   return (
     <>
       {/* Main project upfront score card including metadata */}
-      <Flex vertical style={{ padding: 0 }}>
+      <Flex vertical style={{ padding: "0 8px" }}>
         <Flex
           vertical
           style={{
             alignItems: "flex-start",
-            margin: "8px 0",
-            padding: "0 8px",
           }}
           gap={8}
         >
@@ -33,7 +31,7 @@ export const ProjectHeader = ({ lvnzyProject }: ProjectHeaderProps) => {
       </Flex>
 
       {/* One liner & timeline */}
-      <Flex vertical style={{ padding: "0 8px", marginBottom: 16 }}>
+      <Flex vertical style={{ marginBottom: 8, padding: "0 8px" }}>
         <MetaInfo lvnzyProject={lvnzyProject!}></MetaInfo>
       </Flex>
     </>
