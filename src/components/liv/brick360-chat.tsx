@@ -71,6 +71,8 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
       uuidv4()
     );
     const [queryStreaming, setQueryStreaming] = useState<boolean>(false);
+    const [queryStreamingText, setQueryStreaminText] = useState<string>();
+
     const [loadingLivThread, setLoadingLivThread] = useState(false);
 
     const [isDrawerExpanded, setIsDrawerExpanded] = useState(false);
@@ -274,7 +276,21 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
           ]);
         }
         setCurrentQuestion(question);
-        setCurrentAnswer({ answer: "..." });
+        setCurrentAnswer({ answer: "" });
+
+        setQueryStreaminText(
+          "<span class='progress-text'>Sending query. Hold on !</span>"
+        );
+        setTimeout(() => {
+          setQueryStreaminText(
+            "<span class='progress-text'>Finding relevant data...</span>"
+          );
+          setTimeout(() => {
+            setQueryStreaminText(
+              "<span class='progress-text'>Preparing the answer...</span>"
+            );
+          }, 3000);
+        }, 2000);
 
         // if this is first question store session info
         if (isFirstQuestion && user?._id) {
@@ -324,15 +340,6 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
       return (
         <Flex vertical>
           <Flex>
-            {queryStreaming && currentQuestion ? (
-              <img
-                src="/images/liv-streaming.gif"
-                style={{
-                  height: 28,
-                  width: 28,
-                }}
-              />
-            ) : null}
             <Flex>
               <Typography.Text
                 style={{
@@ -347,14 +354,32 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
               </Typography.Text>
             </Flex>
           </Flex>
-          {/* <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
-            {a}a
-          </Markdown> */}
+
           <Flex
             style={{
               maxWidth: 850,
+              marginTop: 8,
             }}
+            gap={4}
+            vertical
           >
+            {currentQuestion && queryStreaming ? (
+              <Flex>
+                <img
+                  src="/images/liv-streaming.gif"
+                  style={{
+                    height: 24,
+                    width: 24,
+                  }}
+                />
+                <div
+                  dangerouslySetInnerHTML={{ __html: queryStreamingText || "" }}
+                  className="reasoning"
+                  style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
+                ></div>
+              </Flex>
+            ) : null}
+
             <div
               dangerouslySetInnerHTML={{ __html: a }}
               className="reasoning"

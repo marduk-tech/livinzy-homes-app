@@ -120,6 +120,14 @@ body {
     background-color: rgba(43, 203, 242, 0.1);
     padding: 0 4px;
   }
+
+  .progress-text {
+    color: #444;
+    background-color: #eee;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
 }
 
 .ant-modal-content {
