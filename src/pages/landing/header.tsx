@@ -14,7 +14,7 @@ export function LandingHeader() {
         top: 0,
         width: "100%",
         padding: 16,
-        backgroundColor: "transparent",
+        backgroundColor: "#fdf7f6",
       }}
       align="center"
     >
@@ -33,13 +33,13 @@ export function LandingHeader() {
       </Flex>
       <Flex style={{ marginLeft: "auto", marginRight: 48 }} gap={16}>
         <Link href="/app" style={{ color: COLORS.textColorDark }}>
-          Brickfi App
+          Go to App
         </Link>
         <Link
           href={LandingConstants.consultUsLink}
           style={{ color: COLORS.textColorDark }}
         >
-          Consult Us
+          Brickfi Assist
         </Link>
       </Flex>
     </Flex>

@@ -1,13 +1,24 @@
-import { Flex } from "antd";
+import { Flex, Typography } from "antd";
 import { useDevice } from "../../hooks/use-device";
-import { COLORS } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { SectionCenter, SectionLeft, SectionRight } from "./section";
 import { LandingHeader } from "./header";
 import { LandingFooter } from "./footer";
 import { LandingConstants } from "../../libs/constants";
+import { useState } from "react";
 
 export function MainLanding() {
   const { isMobile } = useDevice();
+  const [requestReportDialogOpen, setRequestReportDialogOpen] = useState(false);
+
+  const whoAreWeText = (
+    <Typography.Text
+      style={{ fontSize: FONT_SIZE.HEADING_2, display: "block" }}
+    >
+      Get the exclusive Brick360 Report — verified, unbiased, marketing free
+      data you won’t find anywhere else.
+    </Typography.Text>
+  );
   return (
     <Flex
       vertical
@@ -21,7 +32,7 @@ export function MainLanding() {
       }}
     >
       <LandingHeader></LandingHeader>
-      <SectionLeft
+      {/* <SectionLeft
         sectionData={{
           heading: "Don’t Leave Your Next Property Purchase to Guesswork",
           mainImgUrl: "/images/landing/slide-1.png",
@@ -29,7 +40,47 @@ export function MainLanding() {
             "Buy your next property with confidence. Consult Brickfi.",
           fullHeight: true,
         }}
-      ></SectionLeft>
+      ></SectionLeft> */}
+      <SectionRight
+        sectionData={{
+          heading: "The Only Report That Safeguards Your Investment",
+          mainImgAltText: "About Brickfi",
+          subHeading: whoAreWeText as any,
+          primaryImageSize: "100%",
+          bgColor: "#fdf7f6",
+          mainImgUrl: "/images/landing/brick360-landing-1.png",
+          btn: {
+            link: "",
+            txt: "Generate Free Report",
+            btnAction: () => {
+              setRequestReportDialogOpen(true);
+            },
+          },
+          imageContainerWidth: 50,
+          fullHeight: true,
+          verticalPadding: 32,
+        }}
+      ></SectionRight>
+
+      <SectionCenter
+        sectionData={{
+          heading: "",
+          mediaUrl: "/images/landing/demo-landing-small.mp4",
+          bgColor: COLORS.textColorDark,
+          textColor: "white",
+          verticalPadding: 60,
+          primaryImageSize: "80%",
+        }}
+      ></SectionCenter>
+      <Flex
+        style={{ backgroundColor: COLORS.textColorDark, paddingTop: 100 }}
+        justify="center"
+      >
+        <img
+          src="/images/landing/divider.png"
+          width={isMobile ? "80%" : "30%"}
+        ></img>
+      </Flex>
       <SectionCenter
         sectionData={{
           heading: "The Intelligent Real Estate Advisory",
@@ -44,30 +95,11 @@ export function MainLanding() {
           primaryImageSize: isMobile ? "100%" : "50%",
         }}
       ></SectionCenter>
-      <Flex style={{ backgroundColor: COLORS.textColorDark }} justify="center">
-        <img
-          src="/images/landing/divider.png"
-          width={isMobile ? "80%" : "30%"}
-        ></img>
-      </Flex>
-      <SectionCenter
-        sectionData={{
-          heading: "",
-          mediaUrl: "/images/landing/demo-landing-small.mp4",
-          bgColor: COLORS.textColorDark,
-          textColor: "white",
-          verticalPadding: 60,
-          primaryImageSize: "80%",
-        }}
-      ></SectionCenter>
       <SectionLeft
         sectionData={{
           heading: "The BrickFi Difference",
           fullHeight: true,
-          btn: {
-            link: LandingConstants.consultUsLink,
-            txt: "Schedule Call",
-          },
+
           subHeading:
             "A combination of technology driven, data backed and personalized experience. ",
           mainImgUrl: "/images/landing/slide-4.png",
@@ -80,6 +112,7 @@ export function MainLanding() {
           heading: "Data to Give a Full Picture",
           fullHeight: true,
           bgColor: "#fdf7f6",
+
           subHeading:
             "Our technology collects data points across different legitimate sources.",
           mainImgUrl: "/images/landing/slide-5.png",
@@ -91,6 +124,13 @@ export function MainLanding() {
         sectionData={{
           heading: "Insights that Lead to Clarity",
           bgColor: "#fdf7f6",
+          btn: {
+            link: "",
+            txt: "Generate Free Report",
+            btnAction: () => {
+              setRequestReportDialogOpen(true);
+            },
+          },
           subHeading:
             "Our AI analyses every data point so that you don’t have to. Get a clear understanding of what to look at, what’s important and why its important.",
           mainImgUrl: "/images/landing/slide-6.png",
@@ -140,10 +180,10 @@ export function MainLanding() {
           heading: "Choose Real Estate To Diversify & Leverage",
           btn: {
             link: LandingConstants.consultUsLink,
-            txt: "Schedule Call",
+            txt: "Schedule Callback",
           },
           subHeading:
-            "Diversify your portfolio with real estate — a stable, physical asset that grows in value over time. Take advantage of leverage to secure high-value investments with lower upfront costs.",
+            "Diversify your portfolio with real estate — a stable, physical asset that grows in value over time. Take advantage of leverage to secure high-value investments with lower upfront costs. With BrickfiAssist, you get unbiased, data backed advice to help you make superior investments.",
           mainImgUrl: "/images/landing/slide-11.png",
           mainImgAltText: "Diversify with real estate",
           primaryImageSize: "80%",

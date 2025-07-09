@@ -1,4 +1,4 @@
-import { Drawer, Flex, Image, Layout, Modal, Select, Typography } from "antd";
+import { Drawer, Flex, Image, Layout, Modal, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
@@ -43,19 +43,32 @@ export const DashboardLayout: React.FC = () => {
   const navLinks: NavLink[] = [
     {
       key: "profile",
-      title: "Profile",
+      title: "My Profile",
       link: "/app/profile",
       icon: { name: "FaRegUserCircle", set: "fa" },
+    },
+    {
+      key: "consult",
+      title: "Brickfi Assist",
+      link: "/app/profile",
+      icon: { name: "FaRegUserCircle", set: "fa" },
+    },
+    {
+      key: "consult",
+      title: "Brickfi Blog",
+      link: "/app/profile",
+      icon: { name: "FaBookOpen", set: "fa6" },
     },
     {
       key: "about",
       title: "About Brickfi",
       link: "/aboutus",
-      icon: { name: "FiInfo", set: "fi" },
+      icon: { name: "RiTeamFill", set: "ri" },
     },
     {
       key: "chat-history",
       title: "Chat History",
+      disabled: true,
       link: "/user-sessions",
       icon: { name: "RiHistoryLine", set: "ri" },
     },
@@ -85,7 +98,7 @@ export const DashboardLayout: React.FC = () => {
                 <Image width={16} src={link.icon.src}></Image>
               )}
 
-              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
+              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
                 {link.title}
               </Typography.Text>
             </Flex>
@@ -160,6 +173,10 @@ export const DashboardLayout: React.FC = () => {
                   }}
                   style={{ marginLeft: "auto", cursor: "pointer" }}
                 >
+                  <img
+                    src="/images/brickfi-assist.png"
+                    style={{ height: 32, width: "auto", marginRight: 8 }}
+                  ></img>
                   <DynamicReactIcon
                     iconName="HiOutlineMenuAlt3"
                     iconSet="hi"
@@ -177,14 +194,12 @@ export const DashboardLayout: React.FC = () => {
           >
             <Flex
               vertical
-              gap={16}
+              gap={24}
               align="flex-start"
               style={{ position: "relative", height: "100%" }}
             >
-              <NavLinks
-                navLinks={navLinks.filter((l) => l.key === "profile")}
-              />
-              {user?.savedLvnzyProjects &&
+              <NavLinks navLinks={navLinks.filter((l) => !l.disabled)} />
+              {/* {user?.savedLvnzyProjects &&
                 user.savedLvnzyProjects.length > 1 && (
                   <Select
                     style={{ minWidth: 200 }}
@@ -203,11 +218,8 @@ export const DashboardLayout: React.FC = () => {
                       })) ?? []),
                     ]}
                   />
-                )}
+                )} */}
               <Flex gap={24} vertical style={{ marginTop: "auto" }}>
-                <NavLinks
-                  navLinks={navLinks.filter((l) => l.key === "about")}
-                />
                 <Typography.Text
                   style={{
                     fontSize: FONT_SIZE.SUB_TEXT,

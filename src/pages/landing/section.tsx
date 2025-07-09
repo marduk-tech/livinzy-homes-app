@@ -55,7 +55,7 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
         padding: sectionData.verticalPadding
           ? `${sectionData.verticalPadding}px 0`
           : sectionData.fullHeight && !isMobile
-          ? 0
+          ? "40px 0"
           : "72px 0",
       }}
     >
@@ -107,8 +107,7 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
             style={{
               alignSelf: "flex-start",
               marginTop: 16,
-              fontWeight: 800,
-              fontSize: FONT_SIZE.HEADING_3,
+              fontSize: FONT_SIZE.HEADING_2,
             }}
           >
             {sectionData.btn.txt}
@@ -234,7 +233,7 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
             style={{
               alignSelf: "flex-start",
               marginTop: 16,
-              fontSize: FONT_SIZE.HEADING_3,
+              fontSize: FONT_SIZE.HEADING_2,
             }}
           >
             {sectionData.btn.txt}
