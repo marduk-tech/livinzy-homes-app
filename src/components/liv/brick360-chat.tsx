@@ -375,7 +375,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                 <div
                   dangerouslySetInnerHTML={{ __html: queryStreamingText || "" }}
                   className="reasoning"
-                  style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
+                  style={{ fontSize: FONT_SIZE.PARA, margin: 0 }}
                 ></div>
               </Flex>
             ) : null}
@@ -383,7 +383,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             <div
               dangerouslySetInnerHTML={{ __html: a }}
               className="reasoning"
-              style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
+              style={{ fontSize: FONT_SIZE.PARA, margin: 0 }}
             ></div>
           </Flex>
         </Flex>
@@ -456,13 +456,13 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
           body: {
             padding: 0,
             borderTop: isDrawerExpanded
-              ? `1px solid ${COLORS.borderColor}`
+              ? `1px solid ${COLORS.borderColorMedium}`
               : "none",
             borderLeft: isDrawerExpanded
-              ? `1px solid ${COLORS.borderColor}`
+              ? `1px solid ${COLORS.borderColorMedium}`
               : "none",
             borderRight: isDrawerExpanded
-              ? `1px solid ${COLORS.borderColor}`
+              ? `1px solid ${COLORS.borderColorMedium}`
               : "none",
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
@@ -491,7 +491,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             boxShadow: isDrawerExpanded ? "initial" : "none",
           },
           mask: {
-            backgroundColor: "rgba(0,0,0,0.1)",
+            backgroundColor: "rgba(0,0,0,0.2)",
           },
         }}
         rootStyle={{
@@ -525,13 +525,25 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
           >
             {isDrawerExpanded && (
               <Flex vertical>
+                <Flex>
+                  <Typography.Text
+                    style={{
+                      backgroundColor: COLORS.textColorDark,
+                      color: "white",
+                      borderRadius: 8,
+                      padding: "4px 8px",
+                      marginBottom: 8,
+                    }}
+                  >
+                    {dataPointSelected.selectedDataPointTitle}
+                  </Typography.Text>
+                </Flex>
                 {/* Map view including expand button and drawer close icon button */}
                 {mapVisible ? (
                   <Flex
                     vertical
                     style={{
                       position: "relative",
-                      margin: 8,
                       border: "2px solid",
                       borderColor: COLORS.borderColor,
                       borderRadius: 16,
@@ -612,7 +624,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                                   dangerouslySetInnerHTML={{ __html: r }}
                                   className="reasoning"
                                   style={{
-                                    fontSize: FONT_SIZE.HEADING_3,
+                                    fontSize: FONT_SIZE.HEADING_4,
                                     margin: 0,
                                   }}
                                 ></div>

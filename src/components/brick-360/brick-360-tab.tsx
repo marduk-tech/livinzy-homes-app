@@ -133,6 +133,7 @@ export const Brick360Tab = ({
                         margin: 0,
                         marginBottom: 0,
                         fontWeight: 500,
+                        color: COLORS.textColorDark,
                         fontSize: FONT_SIZE.HEADING_3,
                       }}
                     >
