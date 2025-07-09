@@ -38,7 +38,6 @@ import {
 } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { ISurroundingElement } from "../types/Project";
-import Brick360Chat from "../components/liv/brick360-chat";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -854,7 +853,6 @@ export function Brick360() {
           <MapViewV2
             fullSize={true}
             surroundingElements={surroundingElements}
-            defaultSelectedDriverTypes={selectedDriverTypes}
             projectId={lvnzyProject?.originalProjectId._id}
             drivers={mapDrivers.map((d) => {
               return {
@@ -1073,7 +1071,6 @@ export function Brick360() {
               >
                 <MapViewV2
                   projectId={lvnzyProject?.originalProjectId._id}
-                  defaultSelectedDriverTypes={selectedDriverTypes}
                   surroundingElements={surroundingElements}
                   drivers={mapDrivers.map((d) => {
                     return {
@@ -1128,14 +1125,14 @@ export function Brick360() {
 
             <Divider></Divider>
 
-            <Flex style={{ width: "100%" }}>
+            {/* <Flex style={{ width: "100%" }}>
               <Brick360Chat
                 ref={chatRef}
                 dataPointCategory={selectedDataPointCategory}
                 dataPoint={selectedDataPointTitle}
                 lvnzyProjectId={lvnzyProjectId!}
               ></Brick360Chat>
-            </Flex>
+            </Flex> */}
           </Flex>
         </Flex>
       </Drawer>
