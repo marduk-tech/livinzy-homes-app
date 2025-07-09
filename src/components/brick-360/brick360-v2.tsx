@@ -155,10 +155,7 @@ export function Brick360v2() {
       <Tabs
         tabBarGutter={24}
         defaultActiveKey="brick-360"
-        tabBarStyle={{
-          borderBottom: "1px solid",
-          borderBottomColor: COLORS.borderColor,
-        }}
+        tabBarStyle={{}}
         style={{ padding: "0 8px" }}
         items={[
           {
