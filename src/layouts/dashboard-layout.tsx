@@ -6,7 +6,7 @@ import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { LoginForm } from "../components/login-forms";
 import { UserDetailsForm } from "../components/user-details-form";
 import { useUser } from "../hooks/use-user";
-import { LocalStorageKeys } from "../libs/constants";
+import { LandingConstants, LocalStorageKeys } from "../libs/constants";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { NavLink } from "../types/Common";
 
@@ -50,7 +50,7 @@ export const DashboardLayout: React.FC = () => {
     {
       key: "consult",
       title: "Brickfi Assist",
-      link: "/app/profile",
+      link: LandingConstants.brickAssistLink,
       icon: { name: "FaRegUserCircle", set: "fa" },
     },
     {
@@ -98,7 +98,7 @@ export const DashboardLayout: React.FC = () => {
                 <Image width={16} src={link.icon.src}></Image>
               )}
 
-              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
+              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
                 {link.title}
               </Typography.Text>
             </Flex>
@@ -167,20 +167,24 @@ export const DashboardLayout: React.FC = () => {
               </Flex>
 
               {user && (
-                <Flex
-                  onClick={() => {
-                    setSidebarOpen(true);
-                  }}
-                  style={{ marginLeft: "auto", cursor: "pointer" }}
-                >
+                <Flex style={{ marginLeft: "auto", cursor: "pointer" }}>
                   <img
                     src="/images/brickfi-assist.png"
+                    onClick={() => {
+                      window.location.replace(LandingConstants.brickAssistLink);
+                    }}
                     style={{ height: 32, width: "auto", marginRight: 8 }}
                   ></img>
-                  <DynamicReactIcon
-                    iconName="HiOutlineMenuAlt3"
-                    iconSet="hi"
-                  ></DynamicReactIcon>
+                  <Flex
+                    onClick={() => {
+                      setSidebarOpen(true);
+                    }}
+                  >
+                    <DynamicReactIcon
+                      iconName="HiOutlineMenuAlt3"
+                      iconSet="hi"
+                    ></DynamicReactIcon>
+                  </Flex>
                 </Flex>
               )}
             </Flex>

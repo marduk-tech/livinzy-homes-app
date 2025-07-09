@@ -36,7 +36,7 @@ export function LandingHeader() {
           Go to App
         </Link>
         <Link
-          href={LandingConstants.consultUsLink}
+          href={LandingConstants.brickAssistLink}
           style={{ color: COLORS.textColorDark }}
         >
           Brickfi Assist

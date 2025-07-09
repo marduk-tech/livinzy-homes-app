@@ -329,5 +329,5 @@ export const SurroundingElementLabels = {
 };
 
 export const LandingConstants = {
-  consultUsLink: "https://xcaklnxh.formester.com/f/NSwf98IzN",
+  brickAssistLink: "/brickassist",
 };

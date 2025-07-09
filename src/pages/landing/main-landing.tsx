@@ -179,7 +179,7 @@ export function MainLanding() {
           verticalPadding: 100,
           heading: "Choose Real Estate To Diversify & Leverage",
           btn: {
-            link: LandingConstants.consultUsLink,
+            link: LandingConstants.brickAssistLink,
             txt: "Schedule Callback",
           },
           subHeading:

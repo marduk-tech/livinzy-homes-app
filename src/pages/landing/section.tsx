@@ -79,6 +79,7 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
           style={{
             ...styles.h1,
             fontSize: isMobile ? 50 : 60,
+            color: sectionData.textColor || "initial",
           }}
         >
           {sectionData.heading}
@@ -178,14 +179,16 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
         align="center"
         justify={isMobile ? "center" : "flex-end"}
       >
-        <img
-          src={sectionData.mainImgUrl}
-          alt={sectionData.mainImgAltText || ""}
-          style={{
-            width: sectionData.primaryImageSize || "100%",
-            maxWidth: 1000,
-          }}
-        ></img>
+        {sectionData.mainImgUrl ? (
+          <img
+            src={sectionData.mainImgUrl}
+            alt={sectionData.mainImgAltText || ""}
+            style={{
+              width: sectionData.primaryImageSize || "100%",
+              maxWidth: 1000,
+            }}
+          ></img>
+        ) : null}
       </Flex>
       <Flex
         vertical
@@ -198,7 +201,7 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
             : sectionData.fullHeight
             ? window.innerHeight
             : "auto",
-          marginLeft: isMobile ? 16 : 64,
+          marginLeft: isMobile ? 16 : 40,
         }}
         align={isMobile ? "center" : "flex-end"}
         justify="center"
