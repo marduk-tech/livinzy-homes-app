@@ -1323,7 +1323,7 @@ const MapViewV2 = ({
           borderRadius: 16,
           padding: "4px 8px",
           backgroundColor:
-            k == selectedSurroundingElement ? COLORS.primaryColor : "initial",
+            k == selectedSurroundingElement ? COLORS.primaryColor : "white",
           color: k == selectedSurroundingElement ? "white" : "initial",
           marginLeft: 4,
           fontSize: FONT_SIZE.HEADING_3,

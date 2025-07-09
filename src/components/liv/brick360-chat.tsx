@@ -364,7 +364,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             vertical
           >
             {currentQuestion && queryStreaming ? (
-              <Flex>
+              <Flex align="center">
                 <img
                   src="/images/liv-streaming.gif"
                   style={{
@@ -491,7 +491,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             boxShadow: isDrawerExpanded ? "initial" : "none",
           },
           mask: {
-            backgroundColor: "rgba(0,0,0,0.2)",
+            backgroundColor: "rgba(0,0,0,0.3)",
           },
         }}
         rootStyle={{
