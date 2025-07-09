@@ -710,7 +710,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                       fontSize: FONT_SIZE.HEADING_3,
                     }}
                     name="query"
-                    placeholder="Need more details. Ask away!"
+                    placeholder="Have a question? Ask away!"
                     prefix={
                       <Flex style={{ marginRight: 8 }}>
                         <DynamicReactIcon
