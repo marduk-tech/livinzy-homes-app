@@ -14,7 +14,7 @@ export function LandingHeader() {
         top: 0,
         width: "100%",
         padding: 16,
-        backgroundColor: "white",
+        backgroundColor: "transparent",
       }}
       align="center"
     >

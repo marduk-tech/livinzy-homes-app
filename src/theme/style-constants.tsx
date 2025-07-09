@@ -14,6 +14,7 @@ export const COLORS = {
   textColorMedium: "#4e6d86",
   textColorLight: "#999",
   textColorVeryLight: "#e1e1e1",
+  bgColorBlue: "#e7f6ff",
 };
 
 export const FONTS = {

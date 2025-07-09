@@ -1,5 +1,5 @@
 import { Flex, Typography } from "antd";
-import MetaInfo from "../../pages/brick-360/meta-info";
+import MetaInfo from "./meta-info";
 import { FONT_SIZE } from "../../theme/style-constants";
 
 interface ProjectHeaderProps {

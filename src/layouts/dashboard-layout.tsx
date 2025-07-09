@@ -20,6 +20,9 @@ export const DashboardLayout: React.FC = () => {
 
   const navigate = useNavigate();
   const { lvnzyProjectId, collectionId } = useParams();
+  const BrokenComponent = () => {
+    throw new Error("This is a test error from BrokenComponent");
+  };
 
   useEffect(() => {
     const userItem = localStorage.getItem(LocalStorageKeys.user);
@@ -93,7 +96,7 @@ export const DashboardLayout: React.FC = () => {
   };
 
   return (
-    <CustomErrorBoundary>
+    <>
       <Modal
         open={loginModalOpen || showUserDetailsForm}
         closable={false}
@@ -119,14 +122,14 @@ export const DashboardLayout: React.FC = () => {
       >
         <Layout
           style={{
-            backgroundColor: "#fefbfb",
+            backgroundColor: "#FFF",
           }}
         >
           <Header
             style={{
               background: "transparent",
               height: "60px",
-              padding: "0 12px",
+              padding: "0 8px",
             }}
           >
             <Flex
@@ -219,7 +222,7 @@ export const DashboardLayout: React.FC = () => {
           <Content
             style={{
               margin: "auto",
-              backgroundColor: "#fefbfb",
+              backgroundColor: "#FFF",
               maxWidth: MAX_WIDTH,
               width: "100%",
               height: "calc(100vh - 100px)",
@@ -233,6 +236,6 @@ export const DashboardLayout: React.FC = () => {
           </Content>
         </Layout>
       </Layout>
-    </CustomErrorBoundary>
+    </>
   );
 };

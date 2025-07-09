@@ -1,5 +1,5 @@
 import * as turf from "@turf/turf";
-import { Flex, Modal, Spin, Tag, Typography } from "antd";
+import { Flex, Modal, Tag, Typography } from "antd";
 import L, { LatLngTuple } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -16,7 +16,6 @@ import {
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useFetchCorridors } from "../../hooks/use-corridors";
-import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
 import { useFetchProjectById } from "../../hooks/use-project";
 import {
   LivIndexDriversConfig,
@@ -330,7 +329,6 @@ const MapViewV2 = ({
   projectId,
   projects,
   fullSize,
-  defaultSelectedDriverTypes,
   surroundingElements,
   projectsNearby,
   projectSqftPricing,
@@ -340,7 +338,6 @@ const MapViewV2 = ({
   projectId?: string;
   projects?: any[];
   fullSize: boolean;
-  defaultSelectedDriverTypes?: string[];
   surroundingElements?: ISurroundingElement[];
   projectsNearby?: {
     projectName: string;
@@ -370,12 +367,6 @@ const MapViewV2 = ({
     content: string;
   }>();
 
-  /**
-   * Fetching driver data for selected drivers
-   */
-  const { data: driversData, isLoading: driversDataLoading } =
-    useFetchAllLivindexPlaces(drivers?.map((d) => d.id));
-
   // Get primary project from projects array instead of fetching
   const { data: primaryProject } = useFetchProjectById(projectId || "");
 
@@ -402,18 +393,17 @@ const MapViewV2 = ({
   const [transitStationIcon, setTransitStationIcon] =
     useState<L.DivIcon | null>(null);
 
+  useEffect(() => {}, [drivers]);
+
   const [roadIcon, setRoadIcon] = useState<L.DivIcon | null>(null);
 
   // Setting icons for simple drivermarkers
   useEffect(() => {
     async function fetchDriverIcons() {
-      console.log("Fetching icons for drivers:", driversData!.length);
+      console.log("Fetching icons for drivers:", drivers!.length);
       const icons = await Promise.all(
-        driversData!.map(async (driver) => {
+        drivers!.map(async (driver) => {
           const iconConfig = (LivIndexDriversConfig as any)[driver.driver];
-          const projectSpecificDetails = drivers?.find(
-            (d) => d.id === driver._id
-          );
 
           if (!iconConfig) {
             console.warn(
@@ -434,7 +424,7 @@ const MapViewV2 = ({
             ? {
                 icon: baseIcon,
                 driverId: driver._id,
-                duration: projectSpecificDetails?.duration,
+                duration: driver?.duration,
               }
             : null;
         })
@@ -446,12 +436,12 @@ const MapViewV2 = ({
     }
 
     // Fetch icons, set unique driver types
-    if (driversData && driversData?.length) {
+    if (drivers && drivers?.length) {
       fetchDriverIcons();
-      const uniqTypes = Array.from(new Set(driversData.map((d) => d.driver)));
+      const uniqTypes = Array.from(new Set(drivers.map((d) => d.driver)));
       setUniqueDriverTypes(uniqTypes);
     }
-  }, [drivers, driversData]); // Added selectedDriverTypes to ensure marker icons update
+  }, [drivers]); // Added selectedDriverTypes to ensure marker icons update
 
   // Setting the unique surrounding elements for filters
   useEffect(() => {
@@ -789,7 +779,7 @@ const MapViewV2 = ({
       return null;
     }
 
-    return driversData
+    return drivers
       ?.filter(
         (driver): driver is RoadDriverPlace =>
           driver.driver === "highway" &&
@@ -903,7 +893,7 @@ const MapViewV2 = ({
       return null;
     }
 
-    return driversData
+    return drivers
       ?.filter(
         (driver): driver is RoadDriverPlace =>
           driver.driver === "transit" &&
@@ -1026,7 +1016,7 @@ const MapViewV2 = ({
     useEffect(() => {
       if (
         !drivers?.length ||
-        !driversData?.length ||
+        !drivers?.length ||
         !!surroundingElements?.length
       ) {
         return;
@@ -1035,7 +1025,7 @@ const MapViewV2 = ({
       const updateIcons = async () => {
         const newIcons: { [key: string]: L.DivIcon } = {};
 
-        for (const driver of driversData) {
+        for (const driver of drivers) {
           if (!driver.location?.lat || !driver.location?.lng) continue;
 
           const driverIcon = simpleDriverMarkerIcons.find(
@@ -1068,17 +1058,13 @@ const MapViewV2 = ({
       };
 
       updateIcons();
-    }, [driversData, showDuration, simpleDriverMarkerIcons, drivers]);
+    }, [drivers, showDuration, simpleDriverMarkerIcons, drivers]);
 
-    if (
-      !drivers?.length ||
-      !driversData?.length ||
-      !!surroundingElements?.length
-    ) {
+    if (!drivers?.length || !drivers?.length || !!surroundingElements?.length) {
       return null;
     }
 
-    const filteredDrivers = driversData.filter((driver) => {
+    const filteredDrivers = drivers.filter((driver) => {
       if (!driver.location?.lat || !driver.location?.lng) return false;
       return (
         (!selectedDriverType || selectedDriverType == driver.driver) &&
@@ -1285,12 +1271,13 @@ const MapViewV2 = ({
           display: "flex",
           alignItems: "center",
           borderRadius: 16,
-          padding: "4px 8px",
+          border: "1px solid",
+          borderColor: COLORS.borderColorDark,
+          padding: "8px 12px",
           backgroundColor:
-            k == selectedDriverType ? COLORS.primaryColor : "initial",
+            k == selectedDriverType ? COLORS.primaryColor : "white",
           color: k == selectedDriverType ? "white" : "initial",
           marginLeft: 4,
-          fontSize: FONT_SIZE.HEADING_3,
           cursor: "pointer",
         }}
         onClick={() => {
@@ -1311,6 +1298,7 @@ const MapViewV2 = ({
           style={{
             color: k == selectedDriverType ? "white" : COLORS.textColorDark,
             marginLeft: 8,
+            fontSize: FONT_SIZE.HEADING_4,
           }}
         >
           {(LivIndexDriversConfig as any)[k]
@@ -1397,91 +1385,62 @@ const MapViewV2 = ({
         height: "100%",
         overflowY: "hidden",
         borderRadius: 14,
+        position: "relative",
       }}
     >
       {/* Drivers filters */}
       {drivers && drivers.length && !surroundingElements?.length && fullSize ? (
-        <Flex vertical style={{ paddingBottom: "8px", marginBottom: 8 }}>
-          {driversDataLoading ? (
-            <Flex
-              style={{
-                height: 50,
-                borderRadius: 16,
-                position: "absolute",
-                top: 250,
-                padding: 8,
-                zIndex: 99999,
-                backgroundColor: "white",
-                left: "calc(50% - 50px)",
-                justifyContent: "center",
-                boxShadow: "0 0 4px",
-              }}
-              align="center"
-              vertical
-              justify="center"
-            >
-              <Spin size="small"></Spin>
-              <Typography.Text
-                style={{
-                  fontSize: FONT_SIZE.PARA,
-                  color: COLORS.textColorLight,
-                }}
-              >
-                Loading map..
-              </Typography.Text>
-            </Flex>
-          ) : null}
-          <Flex
-            style={{
-              width: "100%",
-              overflowX: "scroll",
-              backgroundColor: COLORS.bgColorMedium,
-              scrollbarWidth: "none",
-              height: 32,
-            }}
-          >
-            {(defaultSelectedDriverTypes || [])
-              .filter((d) => !!d)
-              .map((k: string) => {
-                return renderDriverTypesTag(k);
-              })}
-          </Flex>
+        <Flex
+          style={{
+            width: "100%",
+            overflowX: "scroll",
+            scrollbarWidth: "none",
+            height: 32,
+            position: "absolute",
+            zIndex: 9999,
+            bottom: 32,
+            paddingLeft: 8,
+          }}
+        >
+          {(uniqueDriverTypes || [])
+            .filter((d) => !!d)
+            .map((k: string) => {
+              return renderDriverTypesTag(k);
+            })}
         </Flex>
       ) : null}
 
       {/* Surrounding Elements Filters */}
       {surroundingElements && surroundingElements.length && fullSize ? (
-        <Flex vertical style={{ paddingBottom: "8px", marginBottom: 16 }}>
-          <Flex
-            style={{
-              width: "100%",
-              overflowX: "scroll",
-              backgroundColor: COLORS.bgColorMedium,
-              scrollbarWidth: "none",
-              height: 32,
-            }}
-          >
-            {uniqueSurroundingElements.map((k: string) => {
-              return renderSurroundingElementTypes(k);
-            })}
-          </Flex>
+        <Flex
+          style={{
+            width: "100%",
+            overflowX: "scroll",
+            scrollbarWidth: "none",
+            height: 32,
+            position: "absolute",
+            zIndex: 9999,
+            bottom: 32,
+            paddingLeft: 8,
+          }}
+        >
+          {uniqueSurroundingElements.map((k: string) => {
+            return renderSurroundingElementTypes(k);
+          })}
         </Flex>
       ) : null}
 
       {/* Map container */}
       <Flex
         style={{
-          height:
-            fullSize && !projectsNearby?.length && !!drivers?.length
-              ? "calc(100% - 90px)"
-              : "100%",
+          height: "100%",
           width: "100%",
         }}
       >
         <MapContainer
           key={`map-v2`}
           center={[13.110274, 77.6009443]}
-          zoom={13}
+          zoom={fullSize ? 13 : 12}
           minZoom={12}
           style={{ height: "100%", width: "100%" }}
           zoomControl={false}
@@ -1498,7 +1457,7 @@ const MapViewV2 = ({
             const projectPolygons = processDriversToPolygons(
               primaryProjectBounds,
               false,
-              defaultSelectedDriverTypes
+              uniqueDriverTypes
             );
 
             // Render all components
@@ -1528,9 +1487,9 @@ const MapViewV2 = ({
                     />
                     <MapPolygons
                       polygons={processDriversToPolygons(
-                        driversData || [],
+                        drivers || [],
                         true,
-                        defaultSelectedDriverTypes
+                        uniqueDriverTypes
                       )}
                     />
                   </>

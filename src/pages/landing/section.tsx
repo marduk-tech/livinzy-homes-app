@@ -15,9 +15,11 @@ interface SectionProps {
   primaryImageSize?: string;
   mediaUrl?: string;
   btn?: {
-    link: string;
+    link?: string;
     txt: string;
+    btnAction?: any;
   };
+  imageContainerWidth?: number;
 }
 const styles = {
   h1: {
@@ -60,13 +62,15 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
       <Flex
         vertical
         style={{
-          width: isMobile ? "calc(100% - 32px)" : "calc(50% - 64px)",
+          width: isMobile
+            ? "calc(100% - 32px)"
+            : `calc(${sectionData.imageContainerWidth || 40}% - 64px)`,
           minHeight: isMobile
             ? "auto"
             : sectionData.fullHeight
             ? window.innerHeight
             : "auto",
-          marginLeft: isMobile ? 24 : 64,
+          marginLeft: isMobile ? 16 : 64,
         }}
         align={isMobile ? "center" : "flex-end"}
         justify="center"
@@ -94,7 +98,11 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
           <Button
             type="primary"
             onClick={() => {
-              window.location.href = sectionData.btn!.link!;
+              if (sectionData.btn?.btnAction) {
+                sectionData.btn?.btnAction();
+              } else {
+                window.location.href = sectionData.btn!.link!;
+              }
             }}
             style={{
               alignSelf: "flex-start",
@@ -109,7 +117,9 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
       </Flex>
       <Flex
         style={{
-          width: isMobile ? "calc(100% - 32px)" : "calc(50% - 64px)",
+          width: isMobile
+            ? "calc(100% - 32px)"
+            : `calc(${100 - (sectionData.imageContainerWidth || 40)}% - 64px)`,
           minHeight: isMobile
             ? "auto"
             : sectionData.fullHeight
@@ -156,7 +166,9 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
     >
       <Flex
         style={{
-          width: isMobile ? "calc(100% - 32px)" : "calc(40% - 64px)",
+          width: isMobile
+            ? "calc(100% - 32px)"
+            : `calc(${sectionData.imageContainerWidth || 40}% - 64px)`,
           minHeight: isMobile
             ? "auto"
             : sectionData.fullHeight
@@ -171,7 +183,7 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
           src={sectionData.mainImgUrl}
           alt={sectionData.mainImgAltText || ""}
           style={{
-            width: sectionData.primaryImageSize ? "80%" : "100%",
+            width: sectionData.primaryImageSize || "100%",
             maxWidth: 1000,
           }}
         ></img>
@@ -179,13 +191,15 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
       <Flex
         vertical
         style={{
-          width: isMobile ? "calc(100% - 32px)" : "calc(60% - 64px)",
+          width: isMobile
+            ? "calc(100% - 32px)"
+            : `calc(${100 - (sectionData.imageContainerWidth || 40)}% - 64px)`,
           minHeight: isMobile
             ? "auto"
             : sectionData.fullHeight
             ? window.innerHeight
             : "auto",
-          marginLeft: isMobile ? 32 : 64,
+          marginLeft: isMobile ? 16 : 64,
         }}
         align={isMobile ? "center" : "flex-end"}
         justify="center"
@@ -211,12 +225,15 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
           <Button
             type="primary"
             onClick={() => {
-              window.location.href = sectionData.btn!.link!;
+              if (sectionData.btn?.btnAction) {
+                sectionData.btn?.btnAction();
+              } else {
+                window.location.href = sectionData.btn!.link!;
+              }
             }}
             style={{
               alignSelf: "flex-start",
               marginTop: 16,
-              fontWeight: 800,
               fontSize: FONT_SIZE.HEADING_3,
             }}
           >
@@ -279,7 +296,11 @@ const SectionCenter: React.FC<{ sectionData: SectionProps }> = ({
           <Button
             type="primary"
             onClick={() => {
-              window.location.href = sectionData.btn!.link!;
+              if (sectionData.btn?.btnAction) {
+                sectionData.btn?.btnAction();
+              } else {
+                window.location.href = sectionData.btn!.link!;
+              }
             }}
             style={{
               alignSelf: "flex-start",

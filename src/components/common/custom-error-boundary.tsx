@@ -1,7 +1,7 @@
-import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Alert, Button, Space } from "antd";
+import { Button, Flex, Typography } from "antd";
 import { AxiosError } from "axios";
 import { ErrorBoundary } from "react-error-boundary";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 
 export function CustomErrorBoundary({
   children,
@@ -15,33 +15,52 @@ export function CustomErrorBoundary({
   );
 }
 
-export function ErrorBoundaryFallback({
-  error,
-  resetErrorBoundary,
-}: {
-  error: AxiosError<any>;
-  resetErrorBoundary: () => void;
-}) {
+export function ErrorBoundaryFallback({ error }: { error: AxiosError<any> }) {
   const errorMessage =
     error.response?.data.message || error.message || "Something went wrong";
 
   return (
-    <Alert
-      message="Oops, something went wrong!"
-      description={errorMessage}
-      type="error"
-      showIcon
-      icon={<ExclamationCircleOutlined />}
-      action={
-        <Space>
-          <Button onClick={resetErrorBoundary} size="small" type="primary">
-            Try again
-          </Button>
-          <Button onClick={resetErrorBoundary} size="small">
-            Report Issue
-          </Button>
-        </Space>
-      }
-    />
+    <Flex align="center" justify="center" style={{ width: "100%" }}>
+      <Flex
+        vertical
+        align="center"
+        style={{
+          margin: 16,
+          backgroundColor: COLORS.bgColorBlue,
+          borderRadius: 16,
+          padding: "32px 16px",
+          boxShadow: "0px 4px 10px rgba(80, 174, 211, 0.3)",
+          marginTop: 100,
+          maxWidth: 500,
+          minWidth: 300,
+          textAlign: "center",
+        }}
+      >
+        <Typography.Text
+          style={{ fontSize: FONT_SIZE.HEADING_3, fontWeight: "bold" }}
+        >
+          Oops. There was an error!
+        </Typography.Text>
+        <img src="/images/error-img.png" height={150}></img>
+        <Typography.Text style={{ fontSize: FONT_SIZE.PARA, marginTop: 16 }}>
+          Looks like we have encountered an error. <br></br>Please try and
+          reload this page. If the problem persist, please drop a mail to{" "}
+          <a style={{ fontWeight: "bold" }} href="mailto:support@brickfi.in">
+            support@brickfi.in
+          </a>
+          .
+        </Typography.Text>
+        <Button
+          onClick={() => {
+            window.location.reload();
+          }}
+          size="small"
+          type="primary"
+          style={{ marginTop: 32 }}
+        >
+          Reload Page
+        </Button>
+      </Flex>
+    </Flex>
   );
 }

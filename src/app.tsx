@@ -8,7 +8,6 @@ import { queryClient } from "./libs/query-client";
 import { Router } from "./routes/routes";
 import { antTheme } from "./theme/ant-theme";
 import "./theme/globals.scss";
-import { COLORS } from "./theme/style-constants";
 
 export const App: FunctionComponent<AppProps> = () => {
   useEffect(() => {

@@ -1,91 +1,90 @@
-import { Alert, Flex, List, Tag, Typography } from "antd";
+import { Alert, Flex, List, Typography } from "antd";
 import { Brick360DataPoints } from "../../libs/constants";
 import { capitalize, getCategoryScore } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import DynamicReactIcon from "../common/dynamic-react-icon";
 import GradientBar from "../common/grading-bar";
 import RatingBar from "../common/rating-bar";
 import { ScrollableContainer } from "../scrollable-container";
+import DynamicReactIcon from "../common/dynamic-react-icon";
+import { SnapshotModal } from "./snapshot-modal";
+import { useState } from "react";
 
 interface Brick360TabProps {
   lvnzyProject: any;
   scoreParams: any[];
-  onSnapshotClick: () => void;
   onDataPointClick: (category: any, item: any) => void;
 }
 
 export const Brick360Tab = ({
   lvnzyProject,
   scoreParams,
-  onSnapshotClick,
   onDataPointClick,
 }: Brick360TabProps) => {
+  const [quickSnapshotDialogOpen, setQuickSnapshotDialogOpen] = useState(false);
+  const [quickSnapshotDialogContent, setQuickSnapshotDialogContent] =
+    useState<string>("");
+
+  function renderSummaryPoint(pt: string, isPro: boolean) {
+    const match = pt.match(/<b>(.*?)<\/b>/);
+    const title = match ? match[1] : null;
+    return (
+      <Flex
+        align="center"
+        style={{
+          padding: "8px",
+          backgroundColor: "white",
+          borderRadius: 8,
+          borderWidth: "1px",
+          borderColor: COLORS.borderColor,
+          borderStyle: "solid",
+        }}
+        onClick={() => {
+          setQuickSnapshotDialogOpen(true);
+          setQuickSnapshotDialogContent(pt);
+        }}
+        gap={4}
+      >
+        <DynamicReactIcon
+          size={isPro ? 16 : 20}
+          iconName={isPro ? "FaRegLaugh" : "PiSmileySadBold"}
+          iconSet={isPro ? "fa" : "pi"}
+          color={isPro ? COLORS.primaryColor : COLORS.redIdentifier}
+        ></DynamicReactIcon>
+        <Typography.Text>{title}</Typography.Text>
+      </Flex>
+    );
+  }
+
   return (
     <ScrollableContainer>
       <Flex vertical>
+        {/* Summary point */}
         {lvnzyProject?.score.summary && (
-          <Flex
-            style={{
-              borderRadius: 8,
-              cursor: "pointer",
-              padding: "8px 0",
-              backgroundColor: "white",
-            }}
-            onClick={onSnapshotClick}
-          >
-            <Flex
+          <Flex vertical style={{ marginBottom: 16 }}>
+            <Typography.Text
               style={{
-                width: "100%",
-                marginLeft: 0,
-                marginTop: 8,
-                marginBottom: 8,
+                fontSize: FONT_SIZE.HEADING_4,
+                marginBottom: 4,
+                color: COLORS.textColorLight,
               }}
             >
-              <Flex align="center" gap={4}>
-                <DynamicReactIcon
-                  iconName="IoMdListBox"
-                  iconSet="io"
-                  size={22}
-                  color={COLORS.textColorDark}
-                ></DynamicReactIcon>
-                <Typography.Text
-                  style={{
-                    fontSize: FONT_SIZE.HEADING_4,
-                  }}
-                >
-                  360 Snapshot
-                </Typography.Text>
-              </Flex>
-              <Flex
-                style={{
-                  height: 24,
-                  marginLeft: "auto",
-                }}
-              >
-                {lvnzyProject?.score.summary.pros.length ? (
-                  <Tag
-                    color={COLORS.greenIdentifier}
-                    style={{
-                      fontSize: FONT_SIZE.SUB_TEXT,
-                      marginRight: 0,
-                    }}
-                  >
-                    {lvnzyProject?.score.summary.pros.length} pros
-                  </Tag>
-                ) : null}
-                {lvnzyProject?.score.summary.cons.length ? (
-                  <Tag
-                    color={COLORS.redIdentifier}
-                    style={{
-                      fontSize: FONT_SIZE.SUB_TEXT,
-                      marginLeft: 4,
-                      marginRight: 0,
-                    }}
-                  >
-                    {lvnzyProject?.score.summary.cons.length} cons
-                  </Tag>
-                ) : null}
-              </Flex>
+              QUICK SNAPSHOT
+            </Typography.Text>
+            <Flex
+              gap={16}
+              style={{
+                width: "100%",
+                overflowX: "scroll",
+                whiteSpace: "nowrap",
+                scrollbarWidth: "none",
+              }}
+            >
+              {lvnzyProject?.score.summary.pros.map((p: any) => {
+                return renderSummaryPoint(p, true);
+              })}
+              {lvnzyProject?.score.summary.cons.map((p: any) => {
+                return renderSummaryPoint(p, false);
+              })}
             </Flex>
           </Flex>
         )}
@@ -185,7 +184,7 @@ export const Brick360Tab = ({
                                 {capitalize(
                                   (Brick360DataPoints as any)[sc.key][
                                     (item as any)[0]
-                                  ]
+                                  ]["label"]
                                 )}{" "}
                               </span>
                               <span style={{ fontSize: FONT_SIZE.HEADING_3 }}>
@@ -218,6 +217,12 @@ export const Brick360Tab = ({
             })}
         </Flex>
       </Flex>
+
+      <SnapshotModal
+        isOpen={quickSnapshotDialogOpen}
+        onClose={() => setQuickSnapshotDialogOpen(false)}
+        pt={quickSnapshotDialogContent}
+      />
     </ScrollableContainer>
   );
 };

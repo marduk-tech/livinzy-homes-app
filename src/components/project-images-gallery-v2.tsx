@@ -80,7 +80,15 @@ export const ProjectImagesGalleryV2 = ({
 
   return (
     <Flex vertical gap={16}>
-      <Flex wrap="wrap" gap={8}>
+      <Flex
+        style={{
+          width: "100%",
+          overflowX: "scroll",
+          whiteSpace: "nowrap",
+          scrollbarWidth: "none",
+        }}
+        gap={8}
+      >
         {allTags.map((tag) => (
           <Tag.CheckableTag
             key={tag}
@@ -95,6 +103,7 @@ export const ProjectImagesGalleryV2 = ({
               border: `1px solid ${
                 selectedTag === tag ? COLORS.primaryColor : COLORS.borderColor
               }`,
+              marginRight: 0,
               padding: "4px 12px",
               borderRadius: 16,
               backgroundColor:

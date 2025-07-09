@@ -1,4 +1,4 @@
-import { Flex, Image, Tag, Typography } from "antd";
+import { Flex, Image, Typography } from "antd";
 import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { ScrollableContainer } from "../scrollable-container";
@@ -17,18 +17,23 @@ const getTotalFloors = (lvnzyProject: any) => {
     .map((t: any) => t.totalFloors)
     .filter((floors: any) => typeof floors === "number");
   if (floorCounts.length === 0) {
-    return "";
+    return null;
   }
 
   const minFloors = Math.min(...floorCounts);
   const maxFloors = Math.max(...floorCounts);
 
+  let totalFloors = "";
   if (minFloors == maxFloors) {
-    return `${minFloors}`;
+    totalFloors = `${minFloors}`;
   } else {
-    return `${minFloors} -
-                ${maxFloors}`;
+    totalFloors = `${minFloors} - ${maxFloors}`;
   }
+  return (
+    <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
+      ` / ${totalFloors} Floors `
+    </Typography.Text>
+  );
 };
 
 export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
@@ -37,98 +42,87 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
       <Flex
         vertical
         style={{
-          margin: "16px 8px",
+          margin: "8px",
           marginBottom: 8,
         }}
       >
         <Flex vertical style={{ marginBottom: 8 }}>
           {/* Sqft & Configs */}
-          <Typography.Text
-            style={{
-              borderRadius: 8,
-              color: "white",
-            }}
-          >
-            {lvnzyProject?.meta.projectConfigurations && (
-              <Flex>
-                {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
-                  <Tag> {getTotalFloors(lvnzyProject)} Floors</Tag>
-                )}
-                {lvnzyProject?.meta.projectConfigurations.unitsBreakup && (
-                  <Tag>{lvnzyProject?.property.layout.totalUnits} Units</Tag>
-                )}
-                {lvnzyProject?.property.layout.totalLandArea && (
-                  <Tag>
-                    {Math.round(
-                      lvnzyProject?.property.layout.totalLandArea / 4046.8564
-                    )}{" "}
-                    Acre
-                  </Tag>
-                )}
-              </Flex>
-            )}
-            <Flex
-              vertical
-              style={{
-                marginTop: 16,
-                maxHeight: 400,
-                overflowY: "scroll",
-                scrollbarWidth: "none",
-              }}
-              gap={16}
-            >
-              {lvnzyProject!.meta.costingDetails.configurations.map(
-                (c: any, index: number) => {
-                  return (
-                    <Flex
-                      key={`config-${index}`}
-                      vertical
-                      style={{
-                        borderLeft: "1px solid",
-                        paddingLeft: 8,
-                        borderLeftColor: COLORS.borderColorMedium,
-                        marginTop: 20,
-                      }}
-                    >
-                      <Typography.Text
-                        style={{ fontSize: FONT_SIZE.HEADING_4 }}
-                      >
-                        ₹{rupeeAmountFormat(c.cost)}
-                      </Typography.Text>
-                      <Typography.Text
-                        style={{ fontSize: FONT_SIZE.HEADING_3 }}
-                      >
-                        {c.config}
-                      </Typography.Text>
-                      {c.floorplans && c.floorplans.length > 0 && (
-                        <Flex
-                          style={{
-                            overflowX: "auto",
-                            marginTop: 8,
-                          }}
-                          gap={8}
-                        >
-                          {c.floorplans.map((fp: any, i: number) => {
-                            console.log(fp);
-
-                            return (
-                              <Image
-                                key={`fp-${i}`}
-                                src={fp}
-                                style={{
-                                  height: 100,
-                                }}
-                              />
-                            );
-                          })}
-                        </Flex>
-                      )}
-                    </Flex>
-                  );
-                }
+          {lvnzyProject?.meta.projectConfigurations && (
+            <Flex align="center" gap={8}>
+              {lvnzyProject?.property.layout.totalUnits && (
+                <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
+                  {lvnzyProject?.property.layout.totalUnits} Units /
+                </Typography.Text>
+              )}{" "}
+              {lvnzyProject?.property.layout.totalLandArea && (
+                <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
+                  {Math.round(
+                    lvnzyProject?.property.layout.totalLandArea / 4046.8564
+                  )}{" "}
+                  Acre
+                </Typography.Text>
               )}
+              {lvnzyProject?.meta.projectConfigurations.unitsBreakup &&
+                getTotalFloors(lvnzyProject)}
             </Flex>
-          </Typography.Text>
+          )}
+          <Flex
+            vertical
+            style={{
+              maxHeight: 400,
+              overflowY: "scroll",
+              scrollbarWidth: "none",
+            }}
+            gap={16}
+          >
+            {lvnzyProject!.meta.costingDetails.configurations.map(
+              (c: any, index: number) => {
+                return (
+                  <Flex
+                    key={`config-${index}`}
+                    vertical
+                    style={{
+                      borderLeft: "1px solid",
+                      paddingLeft: 8,
+                      borderLeftColor: COLORS.borderColorMedium,
+                      marginTop: 20,
+                    }}
+                  >
+                    <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
+                      {c.config}
+                    </Typography.Text>
+                    <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
+                      ₹{rupeeAmountFormat(c.cost)}
+                    </Typography.Text>
+                    {c.floorplans && c.floorplans.length > 0 && (
+                      <Flex
+                        style={{
+                          overflowX: "auto",
+                          marginTop: 8,
+                        }}
+                        gap={8}
+                      >
+                        {c.floorplans.map((fp: any, i: number) => {
+                          console.log(fp);
+
+                          return (
+                            <Image
+                              key={`fp-${i}`}
+                              src={fp}
+                              style={{
+                                height: 100,
+                              }}
+                            />
+                          );
+                        })}
+                      </Flex>
+                    )}
+                  </Flex>
+                );
+              }
+            )}
+          </Flex>
         </Flex>
       </Flex>
     </ScrollableContainer>

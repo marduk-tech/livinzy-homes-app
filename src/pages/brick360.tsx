@@ -781,7 +781,7 @@ export function Brick360() {
                             `${sc.title} > ${
                               (Brick360DataPoints as any)[sc.key][
                                 (item as any)[0]
-                              ]
+                              ]["label"]
                             }`
                           );
                         }}
@@ -799,7 +799,7 @@ export function Brick360() {
                           >
                             {capitalize(
                               (Brick360DataPoints as any)[sc.key][
-                                (item as any)[0]
+                                (item as any)[0]["label"]
                               ]
                             )}
                           </Typography.Text>

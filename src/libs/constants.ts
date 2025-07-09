@@ -252,8 +252,8 @@ export const Brick360CategoryInfo: Record<
   },
   areaConnectivity: {
     title: "Location",
-    iconName: "GiPathDistance",
-    iconSet: "gi",
+    iconName: "BiMapPin",
+    iconSet: "bi",
   },
   developer: {
     title: "Developer",
@@ -269,25 +269,39 @@ export const Brick360CategoryInfo: Record<
 
 export const Brick360DataPoints = {
   property: {
-    amenities: "Amenities",
-    density: "Density",
-    surroundings: "Surroundings",
-    designAndBuildQuality: "Design/Build Quality",
+    amenities: {
+      label: "Amenities",
+      prompts: [
+        "Outdoor amenities",
+        "Any kid specific amenities?",
+        "Most unique amenity",
+      ],
+    },
+    density: {
+      label: "Density",
+      prompts: [
+        "Total units?",
+        "Breakup units by size/bhk",
+        "Standard open space for plotted projects?",
+      ],
+    },
+    surroundings: { label: "Surroundings" },
+    designAndBuildQuality: { label: "Design/Build Quality" },
   },
   areaConnectivity: {
-    schoolsOffices: "Schools/Offices",
-    conveniences: "Conveniences",
-    transport: "Connectivity",
+    schoolsOffices: { label: "Schools/Offices" },
+    conveniences: { label: "Conveniences" },
+    transport: { label: "Connectivity" },
   },
   developer: {
-    experience: "Experience",
-    timeCommitment: "Time Committment",
-    customerSatisfaction: "Customer Satisfaction",
+    experience: { label: "Experience" },
+    timeCommitment: { label: "Time Committment" },
+    customerSatisfaction: { label: "Customer Satisfaction" },
   },
   financials: {
-    pricePoint: "Price Point",
-    rentalIncome: "Rental Income",
-    growthPotential: "Growth Potential",
+    pricePoint: { label: "Price Point" },
+    rentalIncome: { label: "Rental Income" },
+    growthPotential: { label: "Growth Potential" },
   },
 };
 

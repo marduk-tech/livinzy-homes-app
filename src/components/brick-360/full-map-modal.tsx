@@ -22,39 +22,6 @@ export const FullMapModal = ({
   mapDrivers,
 }: FullMapModalProps) => {
   return (
-    <Modal
-      title={null}
-      open={isOpen}
-      onCancel={onClose}
-      forceRender
-      footer={null}
-      width={isMobile ? "100%" : 900}
-      style={{ top: 30 }}
-      styles={{
-        content: {
-          backgroundColor: COLORS.bgColorMedium,
-          borderRadius: 8,
-          padding: 16,
-          overflowY: "hidden",
-        },
-      }}
-    >
-      <Flex style={{ height: 650, paddingTop: 40 }} vertical gap={8}>
-        <MapViewV2
-          fullSize={true}
-          surroundingElements={surroundingElements}
-          defaultSelectedDriverTypes={selectedDriverTypes}
-          projectId={lvnzyProject?.originalProjectId._id}
-          drivers={mapDrivers.map((d) => {
-            return {
-              id: d.driverId._id,
-              duration: d.durationMins
-                ? d.durationMins
-                : Math.round(d.mapsDurationSeconds / 60),
-            };
-          })}
-        />
-      </Flex>
-    </Modal>
+    
   );
 };
