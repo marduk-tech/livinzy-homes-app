@@ -2,11 +2,11 @@ import { Flex, Modal, Typography } from "antd";
 import { useDevice } from "../../hooks/use-device";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { SectionCenter, SectionLeft, SectionRight } from "./section";
-import { LandingHeader } from "./header";
 import { LandingFooter } from "./footer";
 import { LandingConstants } from "../../libs/constants";
 import { useState } from "react";
 import { Brick360RequestForm } from "../../components/common/brick360-request";
+import LandingHeader from "./header";
 
 export function MainLanding() {
   const { isMobile } = useDevice();
@@ -16,8 +16,9 @@ export function MainLanding() {
     <Typography.Text
       style={{ fontSize: FONT_SIZE.HEADING_2, display: "block" }}
     >
-      Get the exclusive Brick360 Report — verified, unbiased, marketing free
-      data you won’t find anywhere else.
+      Get the exclusive Brick360 Report on new & under construction properties
+      across Bangalore. Verified, unbiased, marketing free insights you won’t
+      find anywhere else.
     </Typography.Text>
   );
   return (
@@ -44,12 +45,12 @@ export function MainLanding() {
       ></SectionLeft> */}
       <SectionRight
         sectionData={{
-          heading: "The Only Report That Safeguards Your Investment",
+          heading: "The Only Report That Safeguards Your Home Investment",
           mainImgAltText: "About Brickfi",
           subHeading: whoAreWeText as any,
           primaryImageSize: "100%",
           bgColor: "#fdf7f6",
-          mainImgUrl: "/images/landing/brick360-landing-1.png",
+          mainImgUrl: "/images/landing/brick360-landing-2.png",
           btn: {
             link: "",
             txt: "Generate Free Report",
@@ -84,9 +85,9 @@ export function MainLanding() {
       </Flex>
       <SectionCenter
         sectionData={{
-          heading: "The Intelligent Real Estate Advisory",
+          heading: "The Intelligent Real Estate",
           mainImgAltText:
-            "Brickfi is a customer focused real estate advisory in Bangalore. Our difference lies in being buyer focused & our technology driven research",
+            "Brickfi is a customer focused real estate platform & advisory in Bangalore. Our difference lies in being buyer focused & our technology driven research",
           mainImgUrl: isMobile
             ? "/images/landing/slide-2-mobile.png"
             : "/images/landing/slide-2.png",
@@ -181,7 +182,7 @@ export function MainLanding() {
           heading: "Choose Real Estate To Diversify & Leverage",
           btn: {
             link: LandingConstants.brickAssistLink,
-            txt: "Schedule Callback",
+            txt: "Explore BrickfiAssist",
           },
           subHeading:
             "Diversify your portfolio with real estate — a stable, physical asset that grows in value over time. Take advantage of leverage to secure high-value investments with lower upfront costs. With BrickfiAssist, you get unbiased, data backed advice to help you make superior investments.",

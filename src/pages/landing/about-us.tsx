@@ -1,9 +1,9 @@
 import { Flex, Typography } from "antd";
 import { useDevice } from "../../hooks/use-device";
-import { LandingHeader } from "./header";
 import { LandingFooter } from "./footer";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { SectionLeft, SectionRight } from "./section";
+import LandingHeader from "./header";
 
 export function AboutUs() {
   const { isMobile } = useDevice();

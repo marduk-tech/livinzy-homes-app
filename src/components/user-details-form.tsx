@@ -49,7 +49,7 @@ export function UserDetailsForm({
         setProfileUpdated(true);
         setTimeout(() => {
           localStorage.setItem(LocalStorageKeys.user, JSON.stringify(user));
-          window.location.replace("/app");
+          window.location.assign("/app");
         }, 500);
       });
   };

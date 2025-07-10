@@ -4,7 +4,7 @@ import Link from "antd/es/typography/Link";
 import { useDevice } from "../../hooks/use-device";
 import { LandingConstants } from "../../libs/constants";
 
-export function LandingHeader() {
+const LandingHeader: React.FC<{ bgColor?: string }> = ({ bgColor }) => {
   const { isMobile } = useDevice();
 
   return (
@@ -14,13 +14,13 @@ export function LandingHeader() {
         top: 0,
         width: "100%",
         padding: 16,
-        backgroundColor: "#fdf7f6",
+        backgroundColor: bgColor || "#fdf7f6",
       }}
       align="center"
     >
       <Flex
         onClick={() => {
-          window.location.replace("/");
+          window.location.assign("/");
         }}
         style={{
           height: 60,
@@ -44,4 +44,6 @@ export function LandingHeader() {
       </Flex>
     </Flex>
   );
-}
+};
+
+export default LandingHeader;

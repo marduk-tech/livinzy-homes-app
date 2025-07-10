@@ -552,7 +552,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                     <Flex
                       style={{
                         position: "absolute",
-                        bottom: 16,
+                        top: 16,
                         right: 16,
                         zIndex: 9999,
                       }}

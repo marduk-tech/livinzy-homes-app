@@ -153,9 +153,9 @@ export const DashboardLayout: React.FC = () => {
               <Flex
                 onClick={() => {
                   if (lvnzyProjectId || collectionId) {
-                    window.location.replace("/app");
+                    window.location.assign("/app");
                   } else {
-                    window.location.replace("/");
+                    window.location.assign("/");
                   }
                 }}
                 style={{ height: 60, display: "flex", alignItems: "center" }}
@@ -171,7 +171,7 @@ export const DashboardLayout: React.FC = () => {
                   <img
                     src="/images/brickfi-assist.png"
                     onClick={() => {
-                      window.location.replace(LandingConstants.brickAssistLink);
+                      window.location.assign(LandingConstants.brickAssistLink);
                     }}
                     style={{ height: 32, width: "auto", marginRight: 8 }}
                   ></img>

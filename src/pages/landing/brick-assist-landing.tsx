@@ -4,8 +4,8 @@ import { LandingFooter } from "./footer";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { SectionLeft, SectionRight } from "./section";
 import { useState } from "react";
-import { LandingHeader } from "./header";
 import { BrickAssistCallback } from "../../components/common/brickassist-callback";
+import LandingHeader from "./header";
 
 export function BrickAssistLanding() {
   const { isMobile } = useDevice();
@@ -38,15 +38,15 @@ export function BrickAssistLanding() {
         width: "100%",
       }}
     >
-      <LandingHeader></LandingHeader>
+      <LandingHeader bgColor="white"></LandingHeader>
       <SectionRight
         sectionData={{
           heading: "Buyer Focused, Unbiased and Data backed.",
           mainImgAltText: "About Brickfi",
           subHeading: whoAreWeText as any,
           primaryImageSize: "100%",
-          bgColor: "transparent",
-          mainImgUrl: "/images/landing/brick-assist-landing-1.png",
+          bgColor: "#fff",
+          mainImgUrl: "/images/landing/aboutus-1.png",
           btn: {
             link: "",
             txt: "Schedule Callback",

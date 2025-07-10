@@ -79,7 +79,7 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
           style={{
             ...styles.h1,
             fontSize: isMobile ? 50 : 60,
-            color: sectionData.textColor || "initial",
+            color: sectionData.textColor || COLORS.textColorDark,
           }}
         >
           {sectionData.heading}

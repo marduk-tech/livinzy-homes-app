@@ -1389,7 +1389,7 @@ const MapViewV2 = ({
       }}
     >
       {/* Drivers filters */}
-      {drivers && drivers.length && !surroundingElements?.length && fullSize ? (
+      {drivers && drivers.length && !surroundingElements?.length ? (
         <Flex
           style={{
             width: "100%",
@@ -1411,7 +1411,7 @@ const MapViewV2 = ({
       ) : null}
 
       {/* Surrounding Elements Filters */}
-      {surroundingElements && surroundingElements.length && fullSize ? (
+      {surroundingElements && surroundingElements.length ? (
         <Flex
           style={{
             width: "100%",
@@ -1440,7 +1440,7 @@ const MapViewV2 = ({
         <MapContainer
           key={`map-v2`}
           center={[13.110274, 77.6009443]}
-          zoom={fullSize ? 13 : 12}
+          zoom={13}
           minZoom={12}
           style={{ height: "100%", width: "100%" }}
           zoomControl={false}
