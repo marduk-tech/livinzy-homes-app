@@ -9,7 +9,7 @@ const mockVal = (str: string, repeat = 1) => ({
 export function BrickAssistCallback() {
   const [form] = Form.useForm();
 
-  const [formSuccess, setFormSuccess] = useState(false);
+  const [formSuccess, setFormSuccess] = useState(true);
 
   return (
     <Flex gap={8} vertical style={{ paddingTop: 24, paddingBottom: 16 }}>
@@ -25,18 +25,8 @@ export function BrickAssistCallback() {
             Wohoo! Your request is submitted.
           </Typography.Text>
           <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_4 }}>
-            Our team including our swarm of AI agents are already processesing
-            your request. Please give us max 24 hours to get back to you with a
-            detailed report.
-          </Typography.Text>
-          <Typography.Text
-            style={{
-              fontSize: FONT_SIZE.HEADING_4,
-              fontWeight: "bold",
-              marginTop: 16,
-            }}
-          >
-            We will notify you via email and message once its ready.
+            Thank you for your request. Our team will call you back at your
+            preferred time.
           </Typography.Text>
         </Flex>
       ) : (
