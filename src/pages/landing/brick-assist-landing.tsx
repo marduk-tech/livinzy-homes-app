@@ -1,15 +1,17 @@
-import { Flex, Typography } from "antd";
+import { Flex, Modal, Typography } from "antd";
 import { useDevice } from "../../hooks/use-device";
 import { LandingFooter } from "./footer";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { SectionLeft, SectionRight } from "./section";
 import { useState } from "react";
 import { LandingHeader } from "./header";
+import { BrickAssistCallback } from "../../components/common/brickassist-callback";
 
 export function BrickAssistLanding() {
   const { isMobile } = useDevice();
 
-  const [requestReportDialogOpen, setRequestReportDialogOpen] = useState(false);
+  const [requestCallbackDialogOpen, setRequestCallbackDialogOpen] =
+    useState(false);
 
   const whoAreWeText = (
     <Typography.Text
@@ -49,7 +51,7 @@ export function BrickAssistLanding() {
             link: "",
             txt: "Schedule Callback",
             btnAction: () => {
-              setRequestReportDialogOpen(true);
+              setRequestCallbackDialogOpen(true);
             },
           },
           imageContainerWidth: 50,
@@ -70,6 +72,19 @@ export function BrickAssistLanding() {
         }}
       ></SectionLeft>
       <LandingFooter></LandingFooter>
+      <Modal
+        open={requestCallbackDialogOpen}
+        closable={true}
+        onClose={() => {
+          setRequestCallbackDialogOpen(false);
+        }}
+        onCancel={() => {
+          setRequestCallbackDialogOpen(false);
+        }}
+        footer={null}
+      >
+        <BrickAssistCallback></BrickAssistCallback>
+      </Modal>
     </Flex>
   );
 }
