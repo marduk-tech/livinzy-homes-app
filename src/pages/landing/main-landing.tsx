@@ -1,4 +1,4 @@
-import { Flex, Typography } from "antd";
+import { Flex, Modal, Typography } from "antd";
 import { useDevice } from "../../hooks/use-device";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { SectionCenter, SectionLeft, SectionRight } from "./section";
@@ -6,6 +6,7 @@ import { LandingHeader } from "./header";
 import { LandingFooter } from "./footer";
 import { LandingConstants } from "../../libs/constants";
 import { useState } from "react";
+import { Brick360RequestForm } from "../../components/common/brick360-request";
 
 export function MainLanding() {
   const { isMobile } = useDevice();
@@ -190,6 +191,19 @@ export function MainLanding() {
         }}
       ></SectionRight>
       <LandingFooter></LandingFooter>
+      <Modal
+        open={requestReportDialogOpen}
+        closable={true}
+        onClose={() => {
+          setRequestReportDialogOpen(false);
+        }}
+        onCancel={() => {
+          setRequestReportDialogOpen(false);
+        }}
+        footer={null}
+      >
+        <Brick360RequestForm></Brick360RequestForm>
+      </Modal>
     </Flex>
   );
 }

@@ -27,11 +27,11 @@ export function Brick360RequestForm() {
 
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [nextClicked, setNextClicked] = useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(true);
+  const [formSuccess, setFormSuccess] = useState(false);
 
   return (
-    <Flex gap={8} vertical style={{ paddingTop: 40, paddingBottom: 32 }}>
-      {formSubmitted ? (
+    <Flex gap={8} vertical style={{ paddingTop: 24, paddingBottom: 16 }}>
+      {formSuccess ? (
         <Flex vertical>
           <Typography.Text
             style={{
@@ -83,24 +83,40 @@ export function Brick360RequestForm() {
             </Form.Item>
             <Form.Item
               label="Your Mobile Number"
-              name="name"
+              name="mobile"
               rules={[{ required: true }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
-              label="Your Email"
-              name="name"
-              rules={[{ required: true }]}
+              label="Email"
+              name="email"
+              rules={[
+                {
+                  type: "email",
+                  message: "Please enter a valid email!",
+                },
+                {
+                  required: true,
+                },
+              ]}
+              validateTrigger="onSubmit"
+              style={{ marginBottom: 0 }}
             >
-              <Input />
+              <Input
+                style={{
+                  width: "100%",
+                  fontSize: FONT_SIZE.HEADING_3,
+                }}
+                placeholder="jondoe@gmail.com"
+              />
             </Form.Item>
           </Form>
         </Flex>
       ) : (
         <Flex vertical>
           <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_1 }}>
-            Search for your project
+            Search Project
           </Typography.Text>
           <AutoComplete
             value={value}
@@ -126,16 +142,27 @@ export function Brick360RequestForm() {
         </Flex>
       )}
 
-      {formSubmitted ? null : (
-        <Flex justify="flex-end" style={{ marginTop: 24 }}>
+      {formSuccess ? null : (
+        <Flex justify="flex-end" style={{ marginTop: 24 }} gap={16}>
           <Button
             disabled={!selectedProjects.length}
             onClick={() => {
-              setNextClicked(true);
+              setNextClicked(!nextClicked);
             }}
           >
-            {!nextClicked ? "Next" : "Submit"}
+            {!nextClicked ? "Next" : "Previous"}
           </Button>
+          {nextClicked ? (
+            <Button
+              disabled={!selectedProjects.length}
+              onClick={() => {
+                setNextClicked(true);
+              }}
+              type="primary"
+            >
+              {!nextClicked ? "Next" : "Submit"}
+            </Button>
+          ) : null}
         </Flex>
       )}
     </Flex>
