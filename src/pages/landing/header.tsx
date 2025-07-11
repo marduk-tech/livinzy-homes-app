@@ -2,7 +2,6 @@ import { Flex } from "antd";
 import { COLORS } from "../../theme/style-constants";
 import Link from "antd/es/typography/Link";
 import { useDevice } from "../../hooks/use-device";
-import { LandingConstants } from "../../libs/constants";
 
 const LandingHeader: React.FC<{ bgColor?: string }> = ({ bgColor }) => {
   const { isMobile } = useDevice();
@@ -35,12 +34,12 @@ const LandingHeader: React.FC<{ bgColor?: string }> = ({ bgColor }) => {
         <Link href="/app" style={{ color: COLORS.textColorDark }}>
           Go to App
         </Link>
-        <Link
+        {/* <Link
           href={LandingConstants.brickAssistLink}
           style={{ color: COLORS.textColorDark }}
         >
           Brickfi Assist
-        </Link>
+        </Link> */}
       </Flex>
     </Flex>
   );

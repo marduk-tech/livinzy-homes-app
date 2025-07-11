@@ -2,7 +2,6 @@ import { Flex, Typography } from "antd";
 import { useDevice } from "../../hooks/use-device";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import Link from "antd/es/typography/Link";
-import { LandingConstants } from "../../libs/constants";
 
 export function LandingFooter() {
   const { isMobile } = useDevice();
@@ -36,12 +35,12 @@ export function LandingFooter() {
         <Link href="/app" style={{ color: COLORS.textColorLight }}>
           Brickfi App
         </Link>
-        <Link
+        {/* <Link
           href={LandingConstants.brickAssistLink}
           style={{ color: COLORS.textColorLight }}
         >
           Consult With Us
-        </Link>
+        </Link> */}
         <Link href="/aboutus" style={{ color: COLORS.textColorLight }}>
           About Us
         </Link>

@@ -3,7 +3,6 @@ import { useDevice } from "../../hooks/use-device";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { SectionCenter, SectionLeft, SectionRight } from "./section";
 import { LandingFooter } from "./footer";
-import { LandingConstants } from "../../libs/constants";
 import { useState } from "react";
 import { Brick360RequestForm } from "../../components/common/brick360-request";
 import LandingHeader from "./header";
@@ -53,9 +52,9 @@ export function MainLanding() {
           mainImgUrl: "/images/landing/brick360-landing-2.png",
           btn: {
             link: "",
-            txt: "Generate Free Report",
+            txt: "Launching Soon",
             btnAction: () => {
-              setRequestReportDialogOpen(true);
+              // setRequestReportDialogOpen(true);
             },
           },
           imageContainerWidth: 50,
@@ -128,9 +127,9 @@ export function MainLanding() {
           bgColor: "#fdf7f6",
           btn: {
             link: "",
-            txt: "Generate Free Report",
+            txt: "Launching Soon",
             btnAction: () => {
-              setRequestReportDialogOpen(true);
+              // setRequestReportDialogOpen(true);
             },
           },
           subHeading:
@@ -180,10 +179,10 @@ export function MainLanding() {
         sectionData={{
           verticalPadding: 100,
           heading: "Choose Real Estate To Diversify & Leverage",
-          btn: {
-            link: LandingConstants.brickAssistLink,
-            txt: "Explore BrickfiAssist",
-          },
+          // btn: {
+          //   link: LandingConstants.brickAssistLink,
+          //   txt: "Explore BrickfiAssist",
+          // },
           subHeading:
             "Diversify your portfolio with real estate — a stable, physical asset that grows in value over time. Take advantage of leverage to secure high-value investments with lower upfront costs. With BrickfiAssist, you get unbiased, data backed advice to help you make superior investments.",
           mainImgUrl: "/images/landing/slide-11.png",

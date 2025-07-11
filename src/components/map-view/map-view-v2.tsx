@@ -1008,7 +1008,7 @@ const MapViewV2 = ({
     bounds: L.LatLngBounds;
   }): JSX.Element | null => {
     const map = useMap();
-    const showDuration = map.getZoom() > 14;
+    const showDuration = map.getZoom() > 12;
     const [markerIcons, setMarkerIcons] = useState<{
       [key: string]: L.DivIcon;
     }>({});
