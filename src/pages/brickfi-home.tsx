@@ -2,7 +2,6 @@ import { Flex } from "antd";
 import React, { ReactNode, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Loader } from "../components/common/loader";
-import { ProjectSearch } from "../components/project-search";
 import { RequestedProjectsList } from "../components/requested-projects-list";
 import { useUser } from "../hooks/use-user";
 import { Brick360v2 } from "../components/brick-360/brick360-v2";
@@ -107,12 +106,12 @@ const BrickfiHome: React.FC = () => {
         <Brick360v2 />
       ) : (
         <>
-          <Flex style={{ padding: "16px 16px 8px 16px" }}>
+          {/* <Flex style={{ padding: "16px 16px 8px 16px" }}>
             <ProjectSearch
               onSelect={handleProjectSelect}
               placeholder="Search for a project"
             />
-          </Flex>
+          </Flex> */}
           {user && <RequestedProjectsList user={user} />}
           {selectedCollection?.projects ? (
             <UserProjects lvnzyProjects={selectedCollection.projects} />

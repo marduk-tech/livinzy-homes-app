@@ -249,7 +249,7 @@ export const Brick360Tab = ({
               );
             })}
         </Flex>
-        <Flex vertical align="center" style={{ marginBottom: 32 }}>
+        {/* <Flex vertical align="center" style={{ marginBottom: 32 }}>
           <Flex>
             <img
               src="/images/brickfi-assist.png"
@@ -266,7 +266,7 @@ export const Brick360Tab = ({
           >
             Schedule a callback.
           </Typography.Text>
-        </Flex>
+        </Flex> */}
       </Flex>
 
       <SnapshotModal
