@@ -27,6 +27,7 @@ export function useUser() {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: [queryKeys.user],
     queryFn: getUser,
+    refetchOnWindowFocus: false,
     retry: 2,
   });
 

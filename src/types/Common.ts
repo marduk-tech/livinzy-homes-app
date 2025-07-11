@@ -8,6 +8,7 @@ export interface NavLink {
     src?: string;
   };
   alignBottom?: boolean;
+  disabled?: boolean;
 }
 
 export interface ILivIndexPlaces {

@@ -38,7 +38,6 @@ import {
 } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { ISurroundingElement } from "../types/Project";
-import Brick360Chat from "../components/liv/brick360-chat";
 const FAKE_TIMER_SECS = 1000;
 const { Paragraph, Text } = Typography;
 
@@ -223,12 +222,12 @@ export function Brick360() {
               setSelectedDriverTypes(["transit", "highway"]);
               break;
           }
-        } else if (selectedDataPointCategory === "investment") {
+        } else if (selectedDataPointCategory === "financials") {
           setMapVisible(true);
           setSelectedDriverTypes([
-            "school",
             "industrial-hitech",
             "industrial-general",
+            "highway",
           ]);
         } else if (
           selectedDataPointCategory === "property" &&
@@ -781,7 +780,7 @@ export function Brick360() {
                             `${sc.title} > ${
                               (Brick360DataPoints as any)[sc.key][
                                 (item as any)[0]
-                              ]
+                              ]["label"]
                             }`
                           );
                         }}
@@ -799,7 +798,7 @@ export function Brick360() {
                           >
                             {capitalize(
                               (Brick360DataPoints as any)[sc.key][
-                                (item as any)[0]
+                                (item as any)[0]["label"]
                               ]
                             )}
                           </Typography.Text>
@@ -850,18 +849,10 @@ export function Brick360() {
           },
         }}
       >
-        <Flex style={{ height: 650 }} vertical gap={8}>
-          <Typography.Title level={3} style={{ marginBottom: 8 }}>
-            {selectedDataPointSubCategory == "surroundings"
-              ? capitalize(selectedDataPointSubCategory)
-              : (Brick360CategoryInfo as any)[selectedDataPointCategory]
-              ? (Brick360CategoryInfo as any)[selectedDataPointCategory].title
-              : ""}
-          </Typography.Title>
+        <Flex style={{ height: 650, paddingTop: 40 }} vertical gap={8}>
           <MapViewV2
             fullSize={true}
             surroundingElements={surroundingElements}
-            defaultSelectedDriverTypes={selectedDriverTypes}
             projectId={lvnzyProject?.originalProjectId._id}
             drivers={mapDrivers.map((d) => {
               return {
@@ -1080,7 +1071,6 @@ export function Brick360() {
               >
                 <MapViewV2
                   projectId={lvnzyProject?.originalProjectId._id}
-                  defaultSelectedDriverTypes={selectedDriverTypes}
                   surroundingElements={surroundingElements}
                   drivers={mapDrivers.map((d) => {
                     return {
@@ -1135,14 +1125,14 @@ export function Brick360() {
 
             <Divider></Divider>
 
-            <Flex style={{ width: "100%" }}>
+            {/* <Flex style={{ width: "100%" }}>
               <Brick360Chat
                 ref={chatRef}
                 dataPointCategory={selectedDataPointCategory}
                 dataPoint={selectedDataPointTitle}
                 lvnzyProjectId={lvnzyProjectId!}
               ></Brick360Chat>
-            </Flex>
+            </Flex> */}
           </Flex>
         </Flex>
       </Drawer>

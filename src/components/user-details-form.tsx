@@ -1,8 +1,10 @@
-import { Button, Form, Input, Select, Typography } from "antd";
+import { Button, Flex, Form, Input, Select, Typography } from "antd";
 import { useUser } from "../hooks/use-user";
 import { useUpdateUserMutation } from "../hooks/user-hooks";
 import { FONT_SIZE } from "../theme/style-constants";
 import { LocalStorageKeys } from "../libs/constants";
+import { useState } from "react";
+import DynamicReactIcon from "./common/dynamic-react-icon";
 
 const sourceOptions = [
   { label: "Direct email", value: "Direct email" },
@@ -25,6 +27,7 @@ export function UserDetailsForm({
   const [form] = Form.useForm();
 
   const { user } = useUser();
+  const [profileUpdated, setProfileUpdated] = useState(false);
 
   const updateUserMutation = useUpdateUserMutation({
     userId: user?._id as string,
@@ -43,8 +46,11 @@ export function UserDetailsForm({
         },
       })
       .then((user: any) => {
-        localStorage.setItem(LocalStorageKeys.user, JSON.stringify(user));
-        window.location.replace("/app");
+        setProfileUpdated(true);
+        setTimeout(() => {
+          localStorage.setItem(LocalStorageKeys.user, JSON.stringify(user));
+          window.location.assign("/app");
+        }, 500);
       });
   };
 
@@ -141,13 +147,29 @@ export function UserDetailsForm({
         )}
 
         <Form.Item style={{ marginTop: 30 }}>
-          <Button
-            loading={updateUserMutation.isPending}
-            type="primary"
-            htmlType="submit"
-          >
-            Save
-          </Button>
+          <Flex gap={8}>
+            <Button
+              loading={updateUserMutation.isPending}
+              type="primary"
+              htmlType="submit"
+              icon={
+                profileUpdated ? (
+                  <DynamicReactIcon
+                    iconName="IoIosCloudDone"
+                    iconSet="io"
+                    color="white"
+                  ></DynamicReactIcon>
+                ) : null
+              }
+              iconPosition="end"
+            >
+              {updateUserMutation.isPending
+                ? "Saving"
+                : profileUpdated
+                ? "Saved"
+                : "Save"}
+            </Button>
+          </Flex>
         </Form.Item>
       </Form>
     );

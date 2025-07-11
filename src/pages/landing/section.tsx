@@ -15,9 +15,11 @@ interface SectionProps {
   primaryImageSize?: string;
   mediaUrl?: string;
   btn?: {
-    link: string;
+    link?: string;
     txt: string;
+    btnAction?: any;
   };
+  imageContainerWidth?: number;
 }
 const styles = {
   h1: {
@@ -53,20 +55,22 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
         padding: sectionData.verticalPadding
           ? `${sectionData.verticalPadding}px 0`
           : sectionData.fullHeight && !isMobile
-          ? 0
+          ? "40px 0"
           : "72px 0",
       }}
     >
       <Flex
         vertical
         style={{
-          width: isMobile ? "calc(100% - 32px)" : "calc(50% - 64px)",
+          width: isMobile
+            ? "calc(100% - 32px)"
+            : `calc(${sectionData.imageContainerWidth || 40}% - 64px)`,
           minHeight: isMobile
             ? "auto"
             : sectionData.fullHeight
             ? window.innerHeight
             : "auto",
-          marginLeft: isMobile ? 32 : 64,
+          marginLeft: isMobile ? 16 : 64,
         }}
         align={isMobile ? "center" : "flex-end"}
         justify="center"
@@ -75,7 +79,7 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
           style={{
             ...styles.h1,
             fontSize: isMobile ? 50 : 60,
-            fontWeight: 1000,
+            color: sectionData.textColor || COLORS.textColorDark,
           }}
         >
           {sectionData.heading}
@@ -95,13 +99,16 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
           <Button
             type="primary"
             onClick={() => {
-              window.location.href = sectionData.btn!.link!;
+              if (sectionData.btn?.btnAction) {
+                sectionData.btn?.btnAction();
+              } else {
+                window.location.href = sectionData.btn!.link!;
+              }
             }}
             style={{
               alignSelf: "flex-start",
               marginTop: 16,
-              fontWeight: 800,
-              fontSize: FONT_SIZE.HEADING_3,
+              fontSize: FONT_SIZE.HEADING_2,
             }}
           >
             {sectionData.btn.txt}
@@ -110,7 +117,9 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
       </Flex>
       <Flex
         style={{
-          width: isMobile ? "calc(100% - 32px)" : "calc(50% - 64px)",
+          width: isMobile
+            ? "calc(100% - 32px)"
+            : `calc(${100 - (sectionData.imageContainerWidth || 40)}% - 64px)`,
           minHeight: isMobile
             ? "auto"
             : sectionData.fullHeight
@@ -157,7 +166,9 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
     >
       <Flex
         style={{
-          width: isMobile ? "calc(100% - 32px)" : "calc(40% - 64px)",
+          width: isMobile
+            ? "calc(100% - 32px)"
+            : `calc(${sectionData.imageContainerWidth || 40}% - 64px)`,
           minHeight: isMobile
             ? "auto"
             : sectionData.fullHeight
@@ -168,25 +179,29 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
         align="center"
         justify={isMobile ? "center" : "flex-end"}
       >
-        <img
-          src={sectionData.mainImgUrl}
-          alt={sectionData.mainImgAltText || ""}
-          style={{
-            width: sectionData.primaryImageSize ? "80%" : "100%",
-            maxWidth: 1000,
-          }}
-        ></img>
+        {sectionData.mainImgUrl ? (
+          <img
+            src={sectionData.mainImgUrl}
+            alt={sectionData.mainImgAltText || ""}
+            style={{
+              width: sectionData.primaryImageSize || "100%",
+              maxWidth: 1000,
+            }}
+          ></img>
+        ) : null}
       </Flex>
       <Flex
         vertical
         style={{
-          width: isMobile ? "calc(100% - 32px)" : "calc(60% - 64px)",
+          width: isMobile
+            ? "calc(100% - 32px)"
+            : `calc(${100 - (sectionData.imageContainerWidth || 40)}% - 64px)`,
           minHeight: isMobile
             ? "auto"
             : sectionData.fullHeight
             ? window.innerHeight
             : "auto",
-          marginLeft: isMobile ? 32 : 64,
+          marginLeft: isMobile ? 16 : 40,
         }}
         align={isMobile ? "center" : "flex-end"}
         justify="center"
@@ -201,6 +216,8 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
               ...styles.h2,
               fontSize: isMobile ? 20 : 24,
               color: sectionData.textColor || COLORS.textColorDark,
+              maxWidth: 600,
+              alignSelf: "flex-start",
             }}
           >
             {sectionData.subHeading as any}
@@ -210,13 +227,16 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
           <Button
             type="primary"
             onClick={() => {
-              window.location.href = sectionData.btn!.link!;
+              if (sectionData.btn?.btnAction) {
+                sectionData.btn?.btnAction();
+              } else {
+                window.location.href = sectionData.btn!.link!;
+              }
             }}
             style={{
               alignSelf: "flex-start",
               marginTop: 16,
-              fontWeight: 800,
-              fontSize: FONT_SIZE.HEADING_3,
+              fontSize: FONT_SIZE.HEADING_2,
             }}
           >
             {sectionData.btn.txt}
@@ -249,7 +269,7 @@ const SectionCenter: React.FC<{ sectionData: SectionProps }> = ({
         style={{
           width: isMobile ? "calc(100% - 32px)" : "100%",
           textAlign: isMobile ? "left" : "center",
-          marginLeft: isMobile ? 32 : 0,
+          marginLeft: isMobile ? 24 : 0,
         }}
         align="center"
         justify="center"
@@ -278,7 +298,11 @@ const SectionCenter: React.FC<{ sectionData: SectionProps }> = ({
           <Button
             type="primary"
             onClick={() => {
-              window.location.href = sectionData.btn!.link!;
+              if (sectionData.btn?.btnAction) {
+                sectionData.btn?.btnAction();
+              } else {
+                window.location.href = sectionData.btn!.link!;
+              }
             }}
             style={{
               alignSelf: "flex-start",

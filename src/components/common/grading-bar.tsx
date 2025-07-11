@@ -1,6 +1,6 @@
 import React from "react";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { Flex } from "antd";
+import { Flex, Typography } from "antd";
 import DynamicReactIcon from "./dynamic-react-icon";
 
 type GradientBarProps = {
@@ -82,16 +82,19 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
     return (
       <Flex
         style={{
-          borderColor: COLORS.bgColorDark,
           color: COLORS.textColorDark,
-          backgroundColor: "transparent",
-          padding: "1px 0",
+          backgroundColor: "white",
           borderRadius: 6,
+          padding: "0 4px",
         }}
         gap={2}
         align="center"
       >
-        <Flex>{value ? Math.round(value * 5) / 100 : ""}</Flex>
+        <Typography.Text
+          style={{ fontWeight: 500, fontSize: FONT_SIZE.HEADING_4 }}
+        >
+          {value ? Math.round(value * 5) / 100 : ""}
+        </Typography.Text>
         {getSmileyIcon(value)}
       </Flex>
     );

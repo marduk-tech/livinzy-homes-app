@@ -15,6 +15,7 @@ export function useFetchCorridors() {
   return useQuery({
     queryKey: [queryKeys.getAllCorridors],
     queryFn: () => getAllCorridors(),
+    refetchOnWindowFocus: false,
   });
 }
 

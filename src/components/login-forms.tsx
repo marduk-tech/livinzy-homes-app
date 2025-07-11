@@ -92,7 +92,7 @@ export function LoginForm() {
           mobile: values.mobileNumber,
         })
         .then((user: any) => {
-          window.location.replace("/app");
+          window.location.assign("/app");
         });
     } catch (error) {
       message.error("Invalid OTP. Please try again.");

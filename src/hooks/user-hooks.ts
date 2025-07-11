@@ -6,13 +6,7 @@ import { queryKeys } from "../libs/constants";
 import { queryClient } from "../libs/query-client";
 import { User } from "../types/User";
 
-export function useUpdateUserMutation({
-  userId,
-  enableToasts = true,
-}: {
-  userId: string;
-  enableToasts?: boolean;
-}) {
+export function useUpdateUserMutation({ userId }: { userId: string }) {
   return useMutation({
     mutationFn: async ({ userData }: { userData: Partial<User> }) => {
       const endpoint = `/user/${userId}`;
@@ -25,11 +19,7 @@ export function useUpdateUserMutation({
     },
 
     onSuccess: () => {
-      if (enableToasts) {
-        notification.success({
-          message: `Profile updated successfully!`,
-        });
-      }
+      console.log("user details saved successfully");
     },
 
     onError: (error: AxiosError<any>) => {

@@ -37,7 +37,7 @@ export function LandingFooter() {
           Brickfi App
         </Link>
         <Link
-          href={LandingConstants.consultUsLink}
+          href={LandingConstants.brickAssistLink}
           style={{ color: COLORS.textColorLight }}
         >
           Consult With Us

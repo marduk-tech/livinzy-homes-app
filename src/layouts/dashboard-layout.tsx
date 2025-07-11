@@ -1,14 +1,14 @@
-import { Drawer, Flex, Image, Layout, Modal, Select, Typography } from "antd";
+import { Drawer, Flex, Image, Layout, Modal, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { LoginForm } from "../components/login-forms";
+import { UserDetailsForm } from "../components/user-details-form";
 import { useUser } from "../hooks/use-user";
+import { LandingConstants, LocalStorageKeys } from "../libs/constants";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { NavLink } from "../types/Common";
-import { UserDetailsForm } from "../components/user-details-form";
-import { LocalStorageKeys } from "../libs/constants";
 
 const { Header, Content } = Layout;
 
@@ -20,6 +20,9 @@ export const DashboardLayout: React.FC = () => {
 
   const navigate = useNavigate();
   const { lvnzyProjectId, collectionId } = useParams();
+  const BrokenComponent = () => {
+    throw new Error("This is a test error from BrokenComponent");
+  };
 
   useEffect(() => {
     const userItem = localStorage.getItem(LocalStorageKeys.user);
@@ -29,10 +32,10 @@ export const DashboardLayout: React.FC = () => {
     } else {
       setLoginModalOpen(false);
     }
-  });
+  }, []);
 
   useEffect(() => {
-    if (user && (!user.profile.email || !user.profile.email)) {
+    if (user && (!user.profile.email || !user.profile.name)) {
       setShowUserDetailsForm(true);
     }
   }, [user]);
@@ -40,19 +43,32 @@ export const DashboardLayout: React.FC = () => {
   const navLinks: NavLink[] = [
     {
       key: "profile",
-      title: "Profile",
+      title: "My Profile",
       link: "/app/profile",
       icon: { name: "FaRegUserCircle", set: "fa" },
     },
     {
+      key: "consult",
+      title: "Brickfi Assist",
+      link: LandingConstants.brickAssistLink,
+      icon: { name: "FaRegUserCircle", set: "fa" },
+    },
+    {
+      key: "consult",
+      title: "Brickfi Blog",
+      link: "/app/profile",
+      icon: { name: "FaBookOpen", set: "fa6" },
+    },
+    {
       key: "about",
       title: "About Brickfi",
-      link: "https://brickfi.in/",
-      icon: { name: "FiInfo", set: "fi" },
+      link: "/aboutus",
+      icon: { name: "RiTeamFill", set: "ri" },
     },
     {
       key: "chat-history",
       title: "Chat History",
+      disabled: true,
       link: "/user-sessions",
       icon: { name: "RiHistoryLine", set: "ri" },
     },
@@ -93,7 +109,7 @@ export const DashboardLayout: React.FC = () => {
   };
 
   return (
-    <CustomErrorBoundary>
+    <>
       <Modal
         open={loginModalOpen || showUserDetailsForm}
         closable={false}
@@ -119,14 +135,14 @@ export const DashboardLayout: React.FC = () => {
       >
         <Layout
           style={{
-            backgroundColor: "transparent",
+            backgroundColor: "#FFF",
           }}
         >
           <Header
             style={{
               background: "transparent",
               height: "60px",
-              padding: "0 12px",
+              padding: "0 8px",
             }}
           >
             <Flex
@@ -137,30 +153,38 @@ export const DashboardLayout: React.FC = () => {
               <Flex
                 onClick={() => {
                   if (lvnzyProjectId || collectionId) {
-                    window.location.replace("/app");
+                    window.location.assign("/app");
                   } else {
-                    window.location.replace("/");
+                    window.location.assign("/");
                   }
                 }}
                 style={{ height: 60, display: "flex", alignItems: "center" }}
               >
                 <img
                   src="/images/brickfi-logo.png"
-                  style={{ height: 20, width: "auto", marginLeft: 4 }}
+                  style={{ height: 16, width: "auto", marginLeft: 4 }}
                 ></img>
               </Flex>
 
               {user && (
-                <Flex
-                  onClick={() => {
-                    setSidebarOpen(true);
-                  }}
-                  style={{ marginLeft: "auto", cursor: "pointer" }}
-                >
-                  <DynamicReactIcon
-                    iconName="HiOutlineMenuAlt3"
-                    iconSet="hi"
-                  ></DynamicReactIcon>
+                <Flex style={{ marginLeft: "auto", cursor: "pointer" }}>
+                  <img
+                    src="/images/brickfi-assist.png"
+                    onClick={() => {
+                      window.location.assign(LandingConstants.brickAssistLink);
+                    }}
+                    style={{ height: 32, width: "auto", marginRight: 8 }}
+                  ></img>
+                  <Flex
+                    onClick={() => {
+                      setSidebarOpen(true);
+                    }}
+                  >
+                    <DynamicReactIcon
+                      iconName="HiOutlineMenuAlt3"
+                      iconSet="hi"
+                    ></DynamicReactIcon>
+                  </Flex>
                 </Flex>
               )}
             </Flex>
@@ -174,14 +198,12 @@ export const DashboardLayout: React.FC = () => {
           >
             <Flex
               vertical
-              gap={16}
+              gap={24}
               align="flex-start"
               style={{ position: "relative", height: "100%" }}
             >
-              <NavLinks
-                navLinks={navLinks.filter((l) => l.key === "profile")}
-              />
-              {user?.savedLvnzyProjects &&
+              <NavLinks navLinks={navLinks.filter((l) => !l.disabled)} />
+              {/* {user?.savedLvnzyProjects &&
                 user.savedLvnzyProjects.length > 1 && (
                   <Select
                     style={{ minWidth: 200 }}
@@ -194,17 +216,14 @@ export const DashboardLayout: React.FC = () => {
                     }}
                     options={[
                       { value: "all", label: "All Collections" },
-                      ...user.savedLvnzyProjects?.map((c) => ({
+                      ...(user.savedLvnzyProjects?.map((c: any) => ({
                         value: c._id,
                         label: c.collectionName,
-                      })),
+                      })) ?? []),
                     ]}
                   />
-                )}
+                )} */}
               <Flex gap={24} vertical style={{ marginTop: "auto" }}>
-                <NavLinks
-                  navLinks={navLinks.filter((l) => l.key === "about")}
-                />
                 <Typography.Text
                   style={{
                     fontSize: FONT_SIZE.SUB_TEXT,
@@ -219,7 +238,7 @@ export const DashboardLayout: React.FC = () => {
           <Content
             style={{
               margin: "auto",
-              backgroundColor: COLORS.bgColorMedium,
+              backgroundColor: "#FFF",
               maxWidth: MAX_WIDTH,
               width: "100%",
               height: "calc(100vh - 100px)",
@@ -233,6 +252,6 @@ export const DashboardLayout: React.FC = () => {
           </Content>
         </Layout>
       </Layout>
-    </CustomErrorBoundary>
+    </>
   );
 };

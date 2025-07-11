@@ -8,6 +8,7 @@ export const queryKeys = {
   getLvnzyProjectById: "getLvnzyProjectById",
   getAllPlaces: "getAllPlaces",
   getAllCorridors: "getAllCorridors",
+  getAllLocalities: "getAllLocalities",
   user: "user",
   paymentById: "paymentById",
 };
@@ -234,9 +235,10 @@ export const PlaceholderContent = `# Liv is the AI Agent for Real Estate.
 `;
 
 export enum BRICK360_CATEGORY {
-  property = "property",
   areaConnectivity = "areaConnectivity",
   developer = "developer",
+  property = "property",
+  financials = "financials",
 }
 
 export const Brick360CategoryInfo: Record<
@@ -250,36 +252,56 @@ export const Brick360CategoryInfo: Record<
   },
   areaConnectivity: {
     title: "Location",
-    iconName: "GiPathDistance",
-    iconSet: "gi",
+    iconName: "BiMapPin",
+    iconSet: "bi",
   },
   developer: {
     title: "Developer",
     iconName: "FaPeopleGroup",
     iconSet: "fa6",
   },
+  financials: {
+    title: "Financials",
+    iconName: "TbPigMoney",
+    iconSet: "tb",
+  },
 };
 
 export const Brick360DataPoints = {
   property: {
-    amenities: "Amenities",
-    density: "Density",
-    surroundings: "Surroundings",
-    designAndBuildQuality: "Design/Build Quality",
+    amenities: {
+      label: "Amenities",
+      prompts: [
+        "Outdoor amenities",
+        "Any kid specific amenities?",
+        "Most unique amenity",
+      ],
+    },
+    density: {
+      label: "Density",
+      prompts: [
+        "Total units?",
+        "Breakup units by size/bhk",
+        "Standard open space for plotted projects?",
+      ],
+    },
+    surroundings: { label: "Surroundings" },
+    designAndBuildQuality: { label: "Design/Build Quality" },
   },
   areaConnectivity: {
-    schoolsOffices: "Schools/Offices",
-    conveniences: "Conveniences",
-    transport: "Connectivity",
+    schoolsOffices: { label: "Schools/Offices" },
+    conveniences: { label: "Conveniences" },
+    transport: { label: "Connectivity" },
   },
   developer: {
-    experience: "Experience",
-    timeCommitment: "Time Committment",
-    customerSatisfaction: "Customer Satisfaction",
+    experience: { label: "Experience" },
+    timeCommitment: { label: "Time Committment" },
+    customerSatisfaction: { label: "Customer Satisfaction" },
   },
-  investment: {
-    growthDrivers: "Growth Drivers",
-    pricePoint: "Price Point",
+  financials: {
+    pricePoint: { label: "Price Point" },
+    rentalIncome: { label: "Rental Income" },
+    growthPotential: { label: "Growth Potential" },
   },
 };
 
@@ -307,5 +329,5 @@ export const SurroundingElementLabels = {
 };
 
 export const LandingConstants = {
-  consultUsLink: "https://xcaklnxh.formester.com/f/NSwf98IzN",
+  brickAssistLink: "/brickassist",
 };
