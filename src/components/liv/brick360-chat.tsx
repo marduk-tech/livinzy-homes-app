@@ -149,7 +149,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                 );
                 break;
               case "conveniences":
-                driverTypes = ["food", "hospital"];
+                driverTypes = ["food", "hospital", "commercial"];
                 setMapDrivers(
                   lvnzyProject.neighborhood.drivers.filter((d: any) =>
                     driverTypes.includes(d.driverId.driver)
