@@ -146,22 +146,32 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                   "industrial-general",
                 ];
                 setMapDrivers(
-                  lvnzyProject.neighborhood.drivers.filter((d: any) =>
-                    driverTypes.includes(d.driverId.driver)
+                  lvnzyProject.neighborhood.drivers.filter(
+                    (d: any) =>
+                      !!d &&
+                      !!d.driverId &&
+                      driverTypes.includes(d.driverId.driver)
                   )
                 );
                 break;
               case "conveniences":
                 driverTypes = ["food", "hospital", "commercial"];
                 setMapDrivers(
-                  lvnzyProject.neighborhood.drivers.filter((d: any) =>
-                    driverTypes.includes(d.driverId.driver)
+                  lvnzyProject.neighborhood.drivers.filter(
+                    (d: any) =>
+                      !!d &&
+                      !!d.driverId &&
+                      driverTypes.includes(d.driverId.driver)
                   )
                 );
                 break;
               case "transport":
                 driverTypes = ["transit", "highway"];
-                setMapDrivers(lvnzyProject.connectivity.drivers);
+                setMapDrivers(
+                  lvnzyProject.connectivity.drivers.filter(
+                    (d: any) => !!d && !!d.driverId
+                  )
+                );
                 break;
             }
             setSelectedDriverTypes(driverTypes);
