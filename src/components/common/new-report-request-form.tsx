@@ -20,6 +20,8 @@ import {
 } from "../../hooks/use-rera-project-search";
 import { useUser } from "../../hooks/use-user";
 import { useCreateUserMutation } from "../../hooks/user-hooks";
+import { queryKeys } from "../../libs/constants";
+import { queryClient } from "../../libs/query-client";
 import { FONT_SIZE } from "../../theme/style-constants";
 
 export const NewReportRequestForm = ({
@@ -41,17 +43,30 @@ export const NewReportRequestForm = ({
 
   const [messageApi, contextHolder] = message.useMessage();
 
+  const [searchValue, setSearchValue] = useState("");
+
   const projectOptions = (projects || [])
     .filter((p) => !selectedProjects.some((s) => s.projectId === p.projectId))
     .map((project) => ({
-      value: project.projectName,
+      value: `${project.projectId}-${project.projectName}`,
       label: project.projectName,
       project,
     }));
 
   const handleSelectProject = (_: any, option: any) => {
+    const newProject = option.project;
+    const alreadySelected = selectedProjects.some(
+      (p) => p.projectId === newProject.projectId
+    );
+
+    if (alreadySelected) {
+      message.warning("This project is already selected.");
+      return;
+    }
+
     if (selectedProjects.length < 3) {
-      setSelectedProjects([...selectedProjects, option.project]);
+      setSelectedProjects([...selectedProjects, newProject]);
+      setSearchValue("");
     } else {
       message.warning("You can select a maximum of 3 projects.");
     }
@@ -82,27 +97,47 @@ export const NewReportRequestForm = ({
     }));
     try {
       if (user) {
-        await createUser.mutateAsync({
-          userData: {
-            profile: user.profile,
-            mobile: user.mobile,
-            countryCode: user.countryCode,
-            requestedReports,
-          },
-        });
-      } else {
-        await createUser.mutateAsync({
-          userData: {
-            profile: {
-              name: formValues.name,
-              email: formValues.email,
+        await createUser
+          .mutateAsync({
+            userData: {
+              profile: user.profile,
+              mobile: user.mobile,
+              countryCode: user.countryCode,
+              requestedReports,
             },
-            mobile: formValues.mobile,
-            countryCode: "91",
-            requestedReports,
-          },
-        });
+          })
+          .then((data) => {
+            if (data.requestedReports) {
+              messageApi.open({
+                type: "success",
+                content: "Reports Requested",
+              });
+            }
+          });
+      } else {
+        await createUser
+          .mutateAsync({
+            userData: {
+              profile: {
+                name: formValues.name,
+                email: formValues.email,
+              },
+              mobile: formValues.mobile,
+              countryCode: "91",
+              requestedReports,
+            },
+          })
+          .then((data) => {
+            if (data.requestedReports) {
+              messageApi.open({
+                type: "success",
+                content: "Reports Requested",
+              });
+            }
+          });
       }
+
+      await queryClient.invalidateQueries({ queryKey: [queryKeys.user] });
 
       setStep(3);
       if (onSuccess) {
@@ -204,8 +239,13 @@ export const NewReportRequestForm = ({
               style={{ width: "100%", marginBottom: 16 }}
               options={projectOptions}
               onSelect={handleSelectProject}
+              value={searchValue}
+              onChange={setSearchValue}
               placeholder="Search for projects..."
               disabled={selectedProjects.length >= 3}
+              filterOption={(inputValue, option) =>
+                option!.label.toLowerCase().includes(inputValue.toLowerCase())
+              }
             >
               <Input.Search loading={isLoading} />
             </AutoComplete>

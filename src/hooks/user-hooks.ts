@@ -60,8 +60,6 @@ export function useCreateUserMutation({
           message: `User created successfully!`,
         });
       }
-
-      await queryClient.invalidateQueries({ queryKey: [queryKeys.user] });
     },
 
     onError: (error: AxiosError<any>) => {

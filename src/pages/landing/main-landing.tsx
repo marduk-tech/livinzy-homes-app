@@ -1,13 +1,13 @@
 import { Flex, Modal, Typography } from "antd";
 import { useState } from "react";
-import { Brick360RequestForm } from "../../components/common/brick360-request";
+
 import { NewReportRequestForm } from "../../components/common/new-report-request-form";
 import { useDevice } from "../../hooks/use-device";
+import { LandingConstants } from "../../libs/constants";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { LandingFooter } from "./footer";
 import LandingHeader from "./header";
 import { SectionCenter, SectionLeft, SectionRight } from "./section";
-import { LandingConstants } from "../../libs/constants";
 
 export function MainLanding() {
   const { isMobile } = useDevice();
@@ -206,7 +206,7 @@ export function MainLanding() {
         }}
         footer={null}
       >
-        <Brick360RequestForm></Brick360RequestForm>
+        {/* <Brick360RequestForm></Brick360RequestForm> */}
       </Modal>
       <NewReportRequestForm
         open={newReportRequestFormOpen}
