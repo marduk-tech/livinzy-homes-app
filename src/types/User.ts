@@ -17,6 +17,10 @@ export interface User {
   requestedProjects?: string[];
   chatSessions: ChatSession[];
   profile: Profile;
+  requestedReports?: {
+    projectName: string;
+    reraId: string;
+  }[];
 }
 
 interface Profile {

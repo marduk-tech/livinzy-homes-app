@@ -54,18 +54,20 @@ export function useCreateUserMutation({
         });
     },
 
-    onSuccess: () => {
+    onSuccess: async () => {
       if (enableToasts) {
         notification.success({
           message: `User created successfully!`,
         });
       }
+
+      await queryClient.invalidateQueries({ queryKey: [queryKeys.user] });
     },
 
     onError: (error: AxiosError<any>) => {
-      notification.error({
-        message: `An unexpected error occurred. Please try again later.`,
-      });
+      // notification.error({
+      //   message: `An unexpected error occurred. Please try again later.`,
+      // });
 
       console.log(error);
     },

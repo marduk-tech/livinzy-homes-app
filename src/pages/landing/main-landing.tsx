@@ -1,15 +1,18 @@
 import { Flex, Modal, Typography } from "antd";
-import { useDevice } from "../../hooks/use-device";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { SectionCenter, SectionLeft, SectionRight } from "./section";
-import { LandingFooter } from "./footer";
 import { useState } from "react";
 import { Brick360RequestForm } from "../../components/common/brick360-request";
+import { NewReportRequestForm } from "../../components/common/new-report-request-form";
+import { useDevice } from "../../hooks/use-device";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { LandingFooter } from "./footer";
 import LandingHeader from "./header";
+import { SectionCenter, SectionLeft, SectionRight } from "./section";
 
 export function MainLanding() {
   const { isMobile } = useDevice();
   const [requestReportDialogOpen, setRequestReportDialogOpen] = useState(false);
+  const [newReportRequestFormOpen, setNewReportRequestFormOpen] =
+    useState(false);
 
   const whoAreWeText = (
     <Typography.Text
@@ -54,7 +57,7 @@ export function MainLanding() {
             link: "",
             txt: "Launching Soon",
             btnAction: () => {
-              // setRequestReportDialogOpen(true);
+              setNewReportRequestFormOpen(true);
             },
           },
           imageContainerWidth: 50,
@@ -129,7 +132,7 @@ export function MainLanding() {
             link: "",
             txt: "Launching Soon",
             btnAction: () => {
-              // setRequestReportDialogOpen(true);
+              setNewReportRequestFormOpen(true);
             },
           },
           subHeading:
@@ -204,6 +207,13 @@ export function MainLanding() {
       >
         <Brick360RequestForm></Brick360RequestForm>
       </Modal>
+      <NewReportRequestForm
+        open={newReportRequestFormOpen}
+        onClose={() => setNewReportRequestFormOpen(false)}
+        onSuccess={() => {
+          setNewReportRequestFormOpen(false);
+        }}
+      />
     </Flex>
   );
 }
