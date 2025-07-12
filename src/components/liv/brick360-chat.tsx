@@ -22,7 +22,10 @@ import { v4 as uuidv4 } from "uuid";
 import { useUser } from "../../hooks/use-user";
 import { axiosApiInstance } from "../../libs/axios-api-Instance";
 import { baseApiUrl, Brick360DataPoints } from "../../libs/constants";
-import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
+import {
+  captureAnalyticsEvent,
+  rupeeAmountFormat,
+} from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { sha256 } from "js-sha256";
@@ -63,6 +66,8 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
     const [mapDrivers, setMapDrivers] = useState<any[]>([]);
     const [surroundingElements, setSurroundingElements] =
       useState<ISurroundingElement[]>();
+
+    const [projectsNearby, setProjectsNearby] = useState<any[]>();
 
     const [mapVisible, setMapVisible] = useState<boolean>(false);
     const [selectedDriverTypes, setSelectedDriverTypes] = useState<any>();
@@ -163,23 +168,36 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             }
             setSelectedDriverTypes(driverTypes);
           } else if (
-            dataPointSelected.selectedDataPointCategory === "financials" &&
-            dataPointSelected.selectedDataPointSubCategory === "growthPotential"
+            dataPointSelected.selectedDataPointCategory === "financials"
           ) {
-            setMapVisible(true);
-            let driverTypes = [
-              "industrial-hitech",
-              "industrial-general",
-              "highway",
-              "transit",
-            ];
-            setSelectedDriverTypes(driverTypes);
-            setMapDrivers([
-              ...lvnzyProject.connectivity.drivers,
-              ...lvnzyProject.neighborhood.drivers.filter((d: any) =>
-                driverTypes.includes(d.driverId.driver)
-              ),
-            ]);
+            if (
+              dataPointSelected.selectedDataPointSubCategory ===
+              "growthPotential"
+            ) {
+              setMapVisible(true);
+              let driverTypes = [
+                "industrial-hitech",
+                "industrial-general",
+                "highway",
+                "transit",
+              ];
+              setSelectedDriverTypes(driverTypes);
+              setMapDrivers([
+                ...lvnzyProject.connectivity.drivers,
+                ...lvnzyProject.neighborhood.drivers.filter((d: any) =>
+                  driverTypes.includes(d.driverId.driver)
+                ),
+              ]);
+            } else if (
+              dataPointSelected.selectedDataPointSubCategory === "pricePoint"
+            ) {
+              setMapVisible(true);
+              setProjectsNearby(
+                lvnzyProject?.investment.corridorPricing.filter(
+                  (p: any) => !!p.sqftCost
+                )
+              );
+            }
           } else if (
             dataPointSelected.selectedDataPointCategory === "property" &&
             dataPointSelected.selectedDataPointSubCategory === "surroundings"
@@ -594,6 +612,13 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                       <MapViewV2
                         projectId={lvnzyProject?.originalProjectId._id}
                         surroundingElements={surroundingElements}
+                        projectSqftPricing={`${rupeeAmountFormat(
+                          `₹${Math.round(
+                            lvnzyProject?.meta.costingDetails.minimumUnitCost /
+                              lvnzyProject?.meta.costingDetails.minimumUnitSize
+                          )}`
+                        )}`}
+                        projectsNearby={projectsNearby}
                         drivers={mapDrivers.map((d) => {
                           return {
                             ...d.driverId,

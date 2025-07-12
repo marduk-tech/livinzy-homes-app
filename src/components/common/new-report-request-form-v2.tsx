@@ -25,6 +25,9 @@ import { useDevice } from "../../hooks/use-device";
 import { LandingFooter } from "../../pages/landing/footer";
 import { queryClient } from "../../libs/query-client";
 import { queryKeys } from "../../libs/constants";
+import DynamicReactIcon from "./dynamic-react-icon";
+import Link from "antd/es/typography/Link";
+import { capitalize } from "../../libs/lvnzy-helper";
 
 export const NewReportRequestFormV2 = () => {
   const [form] = Form.useForm();
@@ -44,7 +47,7 @@ export const NewReportRequestFormV2 = () => {
     .filter((p) => !selectedProjects.some((s) => s.projectId === p.projectId))
     .map((project) => ({
       value: `${project.projectId}-${project.projectName}`,
-      label: project.projectName,
+      label: capitalize(project.projectName),
       project,
     }));
 
@@ -143,9 +146,9 @@ export const NewReportRequestFormV2 = () => {
   };
 
   useEffect(() => {
-    // if (user && user.requestedReports) {
-    //   setReportsLeft(3 - user.requestedReports.length);
-    // }
+    if (user && user.requestedReports) {
+      setReportsLeft(3 - user.requestedReports.length);
+    }
   }, [user]);
 
   return (
@@ -256,51 +259,53 @@ export const NewReportRequestFormV2 = () => {
                       <Tag
                         closable
                         onClose={() => handleRemoveProject(p.projectId)}
+                        style={{ fontSize: FONT_SIZE.HEADING_2, padding: 16 }}
                       >
-                        {p.projectName}
+                        {capitalize(p.projectName)}
                       </Tag>
                     </Col>
                   ))}
                 </Row>
-
-                {/* <Flex style={{ maxWidth: "100%" }} vertical>
-                  <Tag
-                    style={{
-                      width: "100%",
-                      textWrap: "wrap",
-                      backgroundColor: COLORS.bgColorBlue,
-                      padding: "16px 8px",
-                      margin: 0,
-                    }}
-                  >
-                    <Flex vertical>
-                      {" "}
-                      <DynamicReactIcon
-                        iconName="PiSmileyMehLight"
-                        iconSet="pi"
-                        size={32}
-                      ></DynamicReactIcon>
-                      <Typography.Text
-                        style={{ fontSize: FONT_SIZE.HEADING_3 }}
-                      >
+                {!reportsLeft && (
+                  <Flex style={{ maxWidth: "100%" }} vertical>
+                    <Tag
+                      style={{
+                        width: "100%",
+                        textWrap: "wrap",
+                        backgroundColor: COLORS.bgColorBlue,
+                        padding: "16px 8px",
+                        margin: 0,
+                      }}
+                    >
+                      <Flex vertical>
                         {" "}
-                        Oops! Looks like have you already requested max number
-                        of free reports.
-                      </Typography.Text>
-                      <Link
-                        href="/brickassist"
-                        style={{
-                          fontSize: FONT_SIZE.HEADING_3,
-                          marginTop: 16,
-                          color: COLORS.primaryColor,
-                        }}
-                      >
-                        {" "}
-                        Schedule a callback with us to get more reports.
-                      </Link>
-                    </Flex>
-                  </Tag>
-                </Flex> */}
+                        <DynamicReactIcon
+                          iconName="PiSmileyMehLight"
+                          iconSet="pi"
+                          size={32}
+                        ></DynamicReactIcon>
+                        <Typography.Text
+                          style={{ fontSize: FONT_SIZE.HEADING_3 }}
+                        >
+                          {" "}
+                          Oops! Looks like have you already requested max number
+                          of free reports.
+                        </Typography.Text>
+                        <Link
+                          href="/brickassist"
+                          style={{
+                            fontSize: FONT_SIZE.HEADING_3,
+                            marginTop: 16,
+                            color: COLORS.primaryColor,
+                          }}
+                        >
+                          {" "}
+                          Looking for more ? Schedule a callback with us.
+                        </Link>
+                      </Flex>
+                    </Tag>
+                  </Flex>
+                )}
               </Flex>
             )}
             {step === 2 && (
@@ -380,45 +385,47 @@ export const NewReportRequestFormV2 = () => {
               </Flex>
             )}
           </Flex>
-          <Flex style={{ marginTop: 16 }} gap={16}>
-            {step === 1
-              ? [
-                  <Button
-                    key="next"
-                    type="primary"
-                    onClick={handleNext}
-                    disabled={selectedProjects.length === 0}
-                    loading={createUser.isPending && !!user}
-                  >
-                    {user ? "Submit" : "Next"}
-                  </Button>,
-                ]
-              : step == 2
-              ? [
-                  <Button key="back" onClick={() => setStep(1)}>
-                    Back
-                  </Button>,
-                  <Button
-                    key="submit"
-                    type="primary"
-                    loading={createUser.isPending}
-                    onClick={() => form.submit()}
-                  >
-                    Submit
-                  </Button>,
-                ]
-              : [
-                  <Button
-                    style={{ width: 200 }}
-                    key="home"
-                    onClick={() => {
-                      window.location.replace("/");
-                    }}
-                  >
-                    Take me Home
-                  </Button>,
-                ]}
-          </Flex>
+          {reportsLeft > 0 && (
+            <Flex style={{ marginTop: 16 }} gap={16}>
+              {step === 1
+                ? [
+                    <Button
+                      key="next"
+                      type="primary"
+                      onClick={handleNext}
+                      disabled={selectedProjects.length === 0}
+                      loading={createUser.isPending && !!user}
+                    >
+                      {user ? "Submit" : "Next"}
+                    </Button>,
+                  ]
+                : step == 2
+                ? [
+                    <Button key="back" onClick={() => setStep(1)}>
+                      Back
+                    </Button>,
+                    <Button
+                      key="submit"
+                      type="primary"
+                      loading={createUser.isPending}
+                      onClick={() => form.submit()}
+                    >
+                      Submit
+                    </Button>,
+                  ]
+                : [
+                    <Button
+                      style={{ width: 200 }}
+                      key="home"
+                      onClick={() => {
+                        window.location.replace("/");
+                      }}
+                    >
+                      Take me Home
+                    </Button>,
+                  ]}
+            </Flex>
+          )}
         </Flex>
       </Flex>
       <LandingFooter></LandingFooter>

@@ -1,6 +1,6 @@
 import { CaretRightOutlined } from "@ant-design/icons";
 import { Collapse, CollapseProps, Flex, Modal, Typography } from "antd";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { BrickAssistCallback } from "../../components/common/brickassist-callback";
 import { useDevice } from "../../hooks/use-device";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
@@ -28,9 +28,11 @@ export function BrickAssistLanding() {
     );
   };
 
-  const getFaqText = (text: string) => {
+  const getFaqText = (text: string | ReactNode) => {
     return (
-      <p style={{ textAlign: "left", fontSize: FONT_SIZE.HEADING_3 }}>{text}</p>
+      <p style={{ textAlign: "left", fontSize: FONT_SIZE.HEADING_3 }}>
+        {typeof text == "string" ? text : <>{text}</>}
+      </p>
     );
   };
   const faqPanelStyle = {
@@ -58,35 +60,145 @@ export function BrickAssistLanding() {
       key: "2",
       label: getFaqHeading("Is this a paid service ?"),
       style: faqPanelStyle,
-      children: getFaqText(`
-          The service is completely free for our buyers. We usually charge
-          commission from the developer. However, that does not mean, that we
-          prefer or have any bias with any particular developer. Most of the
-          developers have a set commisssion for partners/advisors which is
-          separate from the final cost quoted to the buyer. That means, the
-          buyer does not have to accomodate any part of their cost when it comes
-          to commissions.
-        `),
+      children: getFaqText(
+        <>
+          <b style={{ color: COLORS.primaryColor }}>
+            The service is completely free for our buyers.
+          </b>
+          <br></br>
+          We usually charge commission from the developer. However, that does
+          not mean, that we prefer or have any bias with any particular
+          developer. Most of the developers have a set commisssion for
+          partners/advisors which is separate from the final cost quoted to the
+          buyer. That means, the buyer does not have to accomodate any part of
+          their cost when it comes to commissions.
+        </>
+      ),
     },
     {
       key: "3",
-      label: getFaqHeading("What all to expect during consultation?"),
+      label: getFaqHeading("How are you different from other Brokers ?"),
       style: faqPanelStyle,
-      children: getFaqText(`
-          We initially do a intro call to discuss in detail your set of
-          requirements, provide overview of the Bangalore market in terms of
-          different micro markets,
-        `),
+      children: (
+        <Flex vertical gap={16}>
+          <Typography.Text
+            style={{ textAlign: "left", fontSize: FONT_SIZE.HEADING_3 }}
+          >
+            <p
+              style={{
+                color: COLORS.redIdentifier,
+                margin: 0,
+                fontWeight: "bold",
+              }}
+            >
+              We DON'T sell or market specific projects like other channel
+              partners/brokers.
+            </p>
+            Instead, we offer data backed advise, curation and analysis of
+            projects across Bangalore.
+          </Typography.Text>
+          <Typography.Text
+            style={{ textAlign: "left", fontSize: FONT_SIZE.HEADING_3 }}
+          >
+            {" "}
+            <p
+              style={{
+                color: COLORS.redIdentifier,
+                margin: 0,
+                fontWeight: "bold",
+              }}
+            >
+              We DON'T provide superficial, biased marketing information.
+            </p>{" "}
+            Instead we refer verified sources of information and show both sides
+            of the coin and go deep into understanding a particular project. Our
+            system has been integrated with source like{" "}
+            <span style={{ color: COLORS.primaryColor, marginRight: 8 }}>
+              RERA, Open Street, Google Maps, Open City
+            </span>
+            including how reliable the builder is, the location, upcoming
+            projects near the area, surroundings and more. We make sure you
+            understand the benefits as well as its shortcomings.
+          </Typography.Text>
+          <Typography.Text
+            style={{ textAlign: "left", fontSize: FONT_SIZE.HEADING_3 }}
+          >
+            {" "}
+            <p
+              style={{
+                color: COLORS.redIdentifier,
+                margin: 0,
+                fontWeight: "bold",
+              }}
+            >
+              Our work DOESN'T stop once you make a decision.
+            </p>{" "}
+            We go the extra mile in terms of negotiation, post purchase
+            formalities and any other assistance you might need once you have
+            made your decision.
+          </Typography.Text>
+        </Flex>
+      ),
     },
     {
       key: "4",
+      label: getFaqHeading("What all to expect during consultation?"),
+      style: faqPanelStyle,
+      children: (
+        <Flex vertical gap={16}>
+          <Typography.Text
+            style={{ textAlign: "left", fontSize: FONT_SIZE.HEADING_3 }}
+          >
+            <b>INTRO CALL</b>
+            <br></br>
+            We initially do a intro call to discuss in detail your set of
+            requirements, provide overview of the Bangalore market in terms of
+            different micro markets
+          </Typography.Text>
+          <Typography.Text
+            style={{ textAlign: "left", fontSize: FONT_SIZE.HEADING_3 }}
+          >
+            <b>SHORTLISTING</b>
+            <br></br>
+            Based on your requirements, we shortlist/curate set of projects and
+            share detailed BRICK360 reports to help you understand each property
+            in detail.
+          </Typography.Text>
+          <Typography.Text
+            style={{ textAlign: "left", fontSize: FONT_SIZE.HEADING_3 }}
+          >
+            <b>VISITS</b>
+            <br></br>
+            Once you have selected a few properties, we assist with you visits
+            as well as any other assistance related to pricing, timeline, etc
+            which can help you make an informed decision .
+          </Typography.Text>
+          <Typography.Text
+            style={{ textAlign: "left", fontSize: FONT_SIZE.HEADING_3 }}
+          >
+            <b>DEAL MAKING</b>
+            <br></br>
+            Based on your final selection, we do strategic negotitation
+            including pricing negotiation, unit selection and payment planning.
+          </Typography.Text>
+        </Flex>
+      ),
+    },
+    {
+      key: "5",
       label: getFaqHeading("How do you curate projects?"),
       style: faqPanelStyle,
-      children: getFaqText(`
-          We initially do a intro call to discuss in detail your set of
-          requirements, provide overview of the Bangalore market in terms of
-          different micro markets,
-        `),
+      children: getFaqText(
+        <>
+          We have an in house database of over{" "}
+          <span style={{ color: COLORS.primaryColor }}>
+            2000 projects across Bengaluru
+          </span>{" "}
+          including data around builder credibility, upcoming infra projects
+          near a location, benchmark across projects in Bangalore. This helps us
+          to narrow down the project based on your requirements.
+        </>
+      ),
     },
   ];
 
