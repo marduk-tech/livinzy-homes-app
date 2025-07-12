@@ -97,7 +97,7 @@ export function BrickAssistLanding() {
         height: window.innerHeight,
         overflowY: "scroll",
         position: "relative",
-        paddingTop: isMobile ? 60 : 0,
+        paddingTop: 0,
         overflowX: "hidden",
         scrollbarWidth: "none",
         backgroundColor: "#fdf7f6",
@@ -131,7 +131,7 @@ export function BrickAssistLanding() {
           mainImgAltText: "Consult with Brickfi",
           subHeading:
             "Consult with Brickfi to get an expert advice on your next home purchase. We provide unbiased, data backed and technology driven real estate advisory.",
-          primaryImageSize: isMobile ? "100%" : "80%",
+          primaryImageSize: isMobile ? "75%" : "80%",
           bgColor: COLORS.textColorDark,
           textColor: "white",
           mainImgAlign: "center",

@@ -23,6 +23,7 @@ import { MainLanding } from "../pages/landing/main-landing";
 import { PaymentCallbackPage } from "../pages/payment-callback";
 import { FourOFour } from "../pages/landing/404";
 import { BrickAssistLanding } from "../pages/landing/brick-assist-landing";
+import { NewReportRequestFormV2 } from "../components/common/new-report-request-form-v2";
 
 export const Router = () => {
   const { user, isLoading: userLoading } = useUser();
@@ -62,6 +63,10 @@ export const Router = () => {
       <Route
         path="/brickassist"
         element={<BrickAssistLanding></BrickAssistLanding>}
+      ></Route>
+      <Route
+        path="/requestreport"
+        element={<NewReportRequestFormV2></NewReportRequestFormV2>}
       ></Route>
       <Route element={<DashboardLayout />}>
         <Route path="/app/map-view-345" element={<LivIndexFull />} />

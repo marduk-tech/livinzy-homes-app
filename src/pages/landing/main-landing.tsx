@@ -1,7 +1,5 @@
-import { Flex, Modal, Typography } from "antd";
+import { Flex, Typography } from "antd";
 import { useState } from "react";
-
-import { NewReportRequestForm } from "../../components/common/new-report-request-form";
 import { useDevice } from "../../hooks/use-device";
 import { LandingConstants } from "../../libs/constants";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
@@ -55,11 +53,8 @@ export function MainLanding() {
           bgColor: "#fdf7f6",
           mainImgUrl: "/images/landing/brick360-landing-2.png",
           btn: {
-            link: "",
+            link: "/requestreport",
             txt: "Generate Free Report",
-            btnAction: () => {
-              setNewReportRequestFormOpen(true);
-            },
           },
           imageContainerWidth: 50,
           fullHeight: true,
@@ -195,23 +190,6 @@ export function MainLanding() {
         }}
       ></SectionRight>
       <LandingFooter></LandingFooter>
-      <Modal
-        open={requestReportDialogOpen}
-        closable={true}
-        onClose={() => {
-          setRequestReportDialogOpen(false);
-        }}
-        onCancel={() => {
-          setRequestReportDialogOpen(false);
-        }}
-        footer={null}
-      >
-        {/* <Brick360RequestForm></Brick360RequestForm> */}
-      </Modal>
-      <NewReportRequestForm
-        open={newReportRequestFormOpen}
-        onClose={() => setNewReportRequestFormOpen(false)}
-      />
     </Flex>
   );
 }

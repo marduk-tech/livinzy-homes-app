@@ -51,7 +51,7 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
       color = getGradientColor(value);
     size = size || 22;
 
-    if (value > 80) {
+    if (value >= 80) {
       iconName = "FaRegLaugh";
       iconSet = "fa";
       size = size * 0.8;

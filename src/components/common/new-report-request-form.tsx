@@ -222,9 +222,7 @@ export const NewReportRequestForm = ({
                 <Button
                   key="close"
                   onClick={() => {
-                    if (onClose) {
-                      onClose();
-                    }
+                    handleClose();
                   }}
                 >
                   Close
