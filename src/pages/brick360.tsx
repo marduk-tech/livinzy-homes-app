@@ -586,12 +586,10 @@ export function Brick360() {
                       <MapViewV2
                         projectId={lvnzyProject?.originalProjectId._id}
                         fullSize={true}
-                        projectSqftPricing={`${rupeeAmountFormat(
-                          `₹${Math.round(
-                            lvnzyProject?.meta.costingDetails.minimumUnitCost /
-                              lvnzyProject?.meta.costingDetails.minimumUnitSize
-                          )}`
-                        )}`}
+                        projectSqftPricing={Math.round(
+                          lvnzyProject?.meta.costingDetails.minimumUnitCost /
+                            lvnzyProject?.meta.costingDetails.minimumUnitSize
+                        )}
                         projectsNearby={lvnzyProject?.investment.corridorPricing.filter(
                           (p: any) => !!p.sqftCost
                         )}
