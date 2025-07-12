@@ -34,4 +34,4 @@ export const FONT_SIZE = {
 };
 
 export const MOBILE_MARGIN = 16;
-export const MAX_WIDTH = 1100;
+export const MAX_WIDTH = 1200;

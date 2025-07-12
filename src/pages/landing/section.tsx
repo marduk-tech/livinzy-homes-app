@@ -4,7 +4,7 @@ import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { useNavigate } from "react-router-dom";
 
 interface SectionProps {
-  heading?: string;
+  heading?: string | Element;
   subHeading?: string | Element;
   mainImgUrl?: string;
   mainImgAltText?: string;
@@ -14,6 +14,7 @@ interface SectionProps {
   fullHeight?: boolean;
   primaryImageSize?: string;
   mediaUrl?: string;
+  mainImgAlign?: string;
   btn?: {
     link?: string;
     txt: string;
@@ -27,6 +28,7 @@ const styles = {
     textOverflow: "wrap",
     width: "100%",
     margin: 0,
+    color: COLORS.textColorDark,
   },
   h2: {
     lineHeight: "120%",
@@ -75,26 +77,33 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
         align={isMobile ? "center" : "flex-end"}
         justify="center"
       >
-        <h1
-          style={{
-            ...styles.h1,
-            fontSize: isMobile ? 50 : 60,
-            color: sectionData.textColor || COLORS.textColorDark,
-          }}
-        >
-          {sectionData.heading}
-        </h1>
-        {sectionData.subHeading && (
-          <h2
+        {typeof sectionData.heading == "string" ? (
+          <h1
             style={{
-              ...styles.h2,
-              fontSize: isMobile ? 20 : 24,
+              ...styles.h1,
+              fontSize: isMobile ? 50 : 60,
               color: sectionData.textColor || COLORS.textColorDark,
             }}
           >
-            {sectionData.subHeading as any}
-          </h2>
+            {sectionData.heading}
+          </h1>
+        ) : (
+          <>{sectionData.heading}</>
         )}
+        {sectionData.subHeading ? (
+          typeof sectionData.subHeading == "string" ? (
+            <h2
+              style={{
+                ...styles.h2,
+                color: sectionData.textColor || COLORS.textColorDark,
+              }}
+            >
+              {sectionData.subHeading}
+            </h2>
+          ) : (
+            <>{sectionData.subHeading}</>
+          )
+        ) : null}
         {sectionData.btn && (
           <Button
             type="primary"
@@ -177,7 +186,7 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
           padding: isMobile ? "0 16px" : "0 32px",
         }}
         align="center"
-        justify={isMobile ? "center" : "flex-end"}
+        justify={sectionData.mainImgAlign || isMobile ? "center" : "flex-end"}
       >
         {sectionData.mainImgUrl ? (
           <img
@@ -202,14 +211,20 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
             ? window.innerHeight
             : "auto",
           marginLeft: isMobile ? 16 : 40,
+          marginTop: isMobile ? 32 : 0,
         }}
         align={isMobile ? "center" : "flex-end"}
         justify="center"
         gap={16}
       >
-        <h1 style={{ ...styles.h1, fontSize: isMobile ? 50 : 60 }}>
-          {sectionData.heading}
-        </h1>
+        {typeof sectionData.heading == "string" ? (
+          <h1 style={{ ...styles.h1, fontSize: isMobile ? 50 : 60 }}>
+            {sectionData.heading}
+          </h1>
+        ) : (
+          <>{sectionData.heading}</>
+        )}
+
         {sectionData.subHeading && (
           <h2
             style={{
@@ -269,7 +284,7 @@ const SectionCenter: React.FC<{ sectionData: SectionProps }> = ({
         style={{
           width: isMobile ? "calc(100% - 32px)" : "100%",
           textAlign: isMobile ? "left" : "center",
-          marginLeft: isMobile ? 24 : 0,
+          marginLeft: isMobile ? 16 : 0,
         }}
         align="center"
         justify="center"
@@ -279,21 +294,25 @@ const SectionCenter: React.FC<{ sectionData: SectionProps }> = ({
             ...styles.h1,
             fontSize: isMobile ? 50 : 60,
             color: sectionData.textColor || COLORS.textColorDark,
+            marginBottom: 16,
           }}
         >
           {sectionData.heading}
         </h1>
-        {sectionData.subHeading && (
-          <h2
-            style={{
-              ...styles.h2,
-              fontSize: isMobile ? 20 : 24,
-              color: sectionData.textColor || COLORS.textColorDark,
-            }}
-          >
-            {sectionData.subHeading as any}
-          </h2>
-        )}
+        {sectionData.subHeading ? (
+          typeof sectionData.subHeading == "string" ? (
+            <h2
+              style={{
+                ...styles.h2,
+                color: sectionData.textColor || COLORS.textColorDark,
+              }}
+            >
+              {sectionData.subHeading}
+            </h2>
+          ) : (
+            <>{sectionData.subHeading}</>
+          )
+        ) : null}
         {sectionData.btn && (
           <Button
             type="primary"

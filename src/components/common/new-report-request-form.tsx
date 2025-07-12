@@ -2,13 +2,14 @@ import {
   AutoComplete,
   Button,
   Col,
+  Flex,
   Form,
   Input,
   message,
   Modal,
-  notification,
   Row,
   Tag,
+  Typography,
 } from "antd";
 import { AxiosError } from "axios";
 import { useState } from "react";
@@ -19,15 +20,16 @@ import {
 } from "../../hooks/use-rera-project-search";
 import { useUser } from "../../hooks/use-user";
 import { useCreateUserMutation } from "../../hooks/user-hooks";
+import { FONT_SIZE } from "../../theme/style-constants";
 
 export const NewReportRequestForm = ({
   onSuccess,
   open,
   onClose,
 }: {
-  onSuccess: () => void;
+  onSuccess?: () => void;
   open: boolean;
-  onClose: () => void;
+  onClose?: () => void;
 }) => {
   const [form] = Form.useForm();
   const [step, setStep] = useState(1);
@@ -66,14 +68,20 @@ export const NewReportRequestForm = ({
       message.error("Please select at least one project.");
       return;
     }
+    if (user) {
+      processReportRequest();
+    } else {
+      setStep(2);
+    }
+  };
 
+  const processReportRequest = async (formValues?: any) => {
     const requestedReports = selectedProjects.map((p) => ({
       projectName: p.projectName,
       reraId: p.projectId,
     }));
-
-    if (user) {
-      try {
+    try {
+      if (user) {
         await createUser.mutateAsync({
           userData: {
             profile: user.profile,
@@ -82,51 +90,21 @@ export const NewReportRequestForm = ({
             requestedReports,
           },
         });
-        messageApi.open({
-          type: "success",
-          content: "Project Requested",
-        });
-        if (onSuccess) {
-          onSuccess();
-        }
-      } catch (error) {
-        const axiosError = error as AxiosError<{ message: string }>;
-        const errorMessage =
-          axiosError?.response?.data?.message ||
-          "An unexpected error occurred. Please try again.";
-        messageApi.open({
-          type: "error",
-          content: errorMessage,
+      } else {
+        await createUser.mutateAsync({
+          userData: {
+            profile: {
+              name: formValues.name,
+              email: formValues.email,
+            },
+            mobile: formValues.mobile,
+            countryCode: "91",
+            requestedReports,
+          },
         });
       }
-    } else {
-      setStep(2);
-    }
-  };
 
-  const onFinish = async (values: any) => {
-    const requestedReports = selectedProjects.map((p) => ({
-      projectName: p.projectName,
-      reraId: p.projectId,
-    }));
-
-    try {
-      await createUser.mutateAsync({
-        userData: {
-          profile: {
-            name: values.name,
-            email: values.email,
-          },
-          mobile: values.mobile,
-          countryCode: "91",
-          requestedReports,
-        },
-      });
-      messageApi.open({
-        type: "success",
-        content: "Project Requested",
-      });
-
+      setStep(3);
       if (onSuccess) {
         onSuccess();
       }
@@ -142,11 +120,17 @@ export const NewReportRequestForm = ({
     }
   };
 
+  const onFinish = async (values: any) => {
+    await processReportRequest(values);
+  };
+
   const handleClose = () => {
     setStep(1);
     setSelectedProjects([]);
     form.resetFields();
-    onClose();
+    if (onClose) {
+      onClose();
+    }
   };
 
   if (user && user.requestedReports && user.requestedReports.length >= 3) {
@@ -168,7 +152,7 @@ export const NewReportRequestForm = ({
       {contextHolder}
       <Modal
         open={open}
-        title={step === 1 ? "Request New Reports" : "Your Information"}
+        title={null}
         closable={true}
         onClose={handleClose}
         onCancel={handleClose}
@@ -185,7 +169,8 @@ export const NewReportRequestForm = ({
                   {user ? "Submit" : "Next"}
                 </Button>,
               ]
-            : [
+            : step == 2
+            ? [
                 <Button key="back" onClick={() => setStep(1)}>
                   Back
                 </Button>,
@@ -196,6 +181,18 @@ export const NewReportRequestForm = ({
                   onClick={() => form.submit()}
                 >
                   Submit
+                </Button>,
+              ]
+            : [
+                <Button
+                  key="close"
+                  onClick={() => {
+                    if (onClose) {
+                      onClose();
+                    }
+                  }}
+                >
+                  Close
                 </Button>,
               ]
         }
@@ -262,6 +259,34 @@ export const NewReportRequestForm = ({
               </Form.Item>
             </Form>
           </>
+        )}
+
+        {step == 3 && (
+          <Flex vertical>
+            <Typography.Text
+              style={{
+                fontSize: FONT_SIZE.HEADING_1,
+                lineHeight: "120%",
+                marginBottom: 16,
+              }}
+            >
+              Wohoo! Your request is submitted.
+            </Typography.Text>
+            <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_4 }}>
+              Our team including our swarm of AI agents are already processesing
+              your request. Please give us max 24 hours to get back to you with
+              a detailed report.
+            </Typography.Text>
+            <Typography.Text
+              style={{
+                fontSize: FONT_SIZE.HEADING_4,
+                fontWeight: "bold",
+                marginTop: 16,
+              }}
+            >
+              We will notify you via email and message once its ready.
+            </Typography.Text>
+          </Flex>
         )}
       </Modal>
     </>

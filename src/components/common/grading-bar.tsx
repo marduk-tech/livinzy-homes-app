@@ -45,15 +45,16 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
     return "rgb(255, 105, 97)";
   };
 
-  const getSmileyIcon = (value: number): any => {
+  const getSmileyIcon = (value: number, size?: number): any => {
     let iconName = "FaRegLaugh",
       iconSet: any = "fa",
-      size = 22,
       color = getGradientColor(value);
+    size = size || 22;
+
     if (value > 80) {
       iconName = "FaRegLaugh";
       iconSet = "fa";
-      size = 18;
+      size = size * 0.8;
     } else if (value < 80 && value >= 65) {
       iconName = "PiSmileyBold";
       iconSet = "pi";
@@ -85,17 +86,14 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
           color: COLORS.textColorDark,
           backgroundColor: "white",
           borderRadius: 6,
-          padding: "0 4px",
         }}
         gap={2}
         align="center"
       >
-        <Typography.Text
-          style={{ fontWeight: 500, fontSize: FONT_SIZE.HEADING_4 }}
-        >
+        <Typography.Text style={{ fontWeight: 500, fontSize: FONT_SIZE.PARA }}>
           {value ? Math.round(value * 5) / 100 : ""}
         </Typography.Text>
-        {getSmileyIcon(value)}
+        {getSmileyIcon(value, 18)}
       </Flex>
     );
   }

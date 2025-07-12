@@ -2,8 +2,13 @@ import { Flex } from "antd";
 import { COLORS } from "../../theme/style-constants";
 import Link from "antd/es/typography/Link";
 import { useDevice } from "../../hooks/use-device";
+import { LandingConstants } from "../../libs/constants";
 
-const LandingHeader: React.FC<{ bgColor?: string }> = ({ bgColor }) => {
+const LandingHeader: React.FC<{
+  bgColor?: string;
+  color?: string;
+  logo?: string;
+}> = ({ bgColor, color, logo }) => {
   const { isMobile } = useDevice();
 
   return (
@@ -28,18 +33,25 @@ const LandingHeader: React.FC<{ bgColor?: string }> = ({ bgColor }) => {
           cursor: "pointer",
         }}
       >
-        <img src="/images/brickfi-logo.png" height="20"></img>
+        <img src={logo || "/images/brickfi-logo.png"} height="20"></img>
       </Flex>
-      <Flex style={{ marginLeft: "auto", marginRight: 48 }} gap={16}>
-        <Link href="/app" style={{ color: COLORS.textColorDark }}>
+      <Flex
+        style={{
+          marginLeft: "auto",
+          marginRight: 48,
+          color: color || COLORS.textColorMedium,
+        }}
+        gap={16}
+      >
+        <Link href="/app" style={{ color: color || COLORS.textColorDark }}>
           Go to App
         </Link>
-        {/* <Link
+        <Link
           href={LandingConstants.brickAssistLink}
-          style={{ color: COLORS.textColorDark }}
+          style={{ color: color || COLORS.textColorDark }}
         >
           Brickfi Assist
-        </Link> */}
+        </Link>
       </Flex>
     </Flex>
   );

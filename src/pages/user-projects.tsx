@@ -1,14 +1,17 @@
-import { Flex, Select, Tag, Typography } from "antd";
+import { Flex, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import GradientBar from "../components/common/grading-bar";
 import { Loader } from "../components/common/loader";
 import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
 import { BRICK360_CATEGORY, Brick360CategoryInfo } from "../libs/constants";
-import { getCategoryScore, rupeeAmountFormat } from "../libs/lvnzy-helper";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import {
+  capitalize,
+  getCategoryScore,
+  rupeeAmountFormat,
+} from "../libs/lvnzy-helper";
+import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { LvnzyProject } from "../types/LvnzyProject";
 const { Paragraph } = Typography;
 
@@ -62,12 +65,11 @@ export function UserProjects({
       <Flex
         style={{
           marginBottom: 8,
-          border: "2px solid",
           cursor: "pointer",
           backgroundColor: "white",
           borderColor: COLORS.borderColorMedium,
           borderRadius: 12,
-          width: isMobile ? "100%" : 250,
+          width: isMobile ? "100%" : (MAX_WIDTH - 150) / 4,
         }}
         onClick={() => {
           navigate(`/app/brick360/${itemInfo._id}`);
@@ -77,9 +79,8 @@ export function UserProjects({
           <div
             style={{
               width: "100%",
-              height: isMobile ? 200 : 125,
-              borderTopRightRadius: 12,
-              borderTopLeftRadius: 12,
+              height: isMobile ? 200 : 175,
+              borderRadius: 12,
               backgroundImage: `url(${previewImage})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
@@ -90,67 +91,43 @@ export function UserProjects({
             media={itemInfo.originalProjectId.media}
           ></ProjectGallery> */}
 
-          <Typography.Text
+          <Paragraph
             style={{
               fontSize: FONT_SIZE.HEADING_3,
               fontWeight: 600,
               width: "100%",
-              lineHeight: "120%",
-              padding: "8px",
-              textWrap: "wrap",
+              padding: "4px",
               paddingBottom: 0,
+              marginBottom: 0,
+            }}
+            ellipsis={{
+              rows: 1,
+              expandable: false,
+              symbol: "..",
             }}
           >
             {itemInfo.meta.projectName}
-          </Typography.Text>
-          <Flex vertical style={{ marginTop: "auto", padding: 8 }}>
+          </Paragraph>
+          <Flex vertical style={{ marginTop: "auto", padding: "0 4px" }}>
             <Flex
               vertical={isMobile}
               gap={4}
               align={isMobile ? "flex-start" : "center"}
               style={{ width: "100%", textWrap: "wrap" }}
             >
-              {oneLinerBreakup.length > 0 && (
-                <Typography.Text
-                  style={{
-                    fontSize: FONT_SIZE.SUB_TEXT,
-                    color: COLORS.textColorLight,
-                  }}
-                >
-                  {oneLinerBreakup.slice(0, 3).join(" · ")}
-                </Typography.Text>
-              )}
-              {oneLinerBreakup.length > 3 && (
-                <Tag style={{ fontSize: FONT_SIZE.SUB_TEXT }} color="blue">
-                  {oneLinerBreakup
-                    .slice(3, 4)
-                    .join("")
-                    .replace("(", "")
-                    .replace(")", "")}
-                </Tag>
-              )}
-            </Flex>
-            <Flex gap={4} align="center">
               <Typography.Text
                 style={{
                   fontSize: FONT_SIZE.SUB_TEXT,
                   color: COLORS.textColorLight,
                 }}
               >
-                Starts:{" "}
+                {capitalize(itemInfo.meta.projectUnitTypes.split(",")[0])} ·
+                Starts{" "}
                 {rupeeAmountFormat(
                   itemInfo.meta.costingDetails.minimumUnitCost
                 )}{" "}
-                / {itemInfo.meta.costingDetails.minimumUnitSize} sqft
+                | {itemInfo.meta.costingDetails.minimumUnitSize}sq.ft
               </Typography.Text>
-              {itemInfo.investment && itemInfo.investment.paymentPlan ? (
-                <DynamicReactIcon
-                  iconName="BiSolidOffer"
-                  iconSet="bi"
-                  size={18}
-                  color={COLORS.primaryColor}
-                ></DynamicReactIcon>
-              ) : null}
             </Flex>
 
             <Flex
@@ -171,7 +148,7 @@ export function UserProjects({
                     fontSize: FONT_SIZE.SUB_TEXT,
                   }}
                 >
-                  <Flex vertical style={{ width: "100%" }}>
+                  <Flex vertical style={{ width: "100%" }} justify="flex-start">
                     <Typography.Text
                       style={{
                         fontSize: FONT_SIZE.SUB_TEXT,
@@ -216,13 +193,13 @@ export function UserProjects({
     <Flex
       style={{
         width: "100%",
-        padding: 16,
+        padding: "0 16px",
         paddingBottom: 100,
         border: 0,
       }}
       vertical
     >
-      {uniqueCorridors &&
+      {/* {uniqueCorridors &&
       uniqueCorridors.length > 0 &&
       lvnzyProjects.length > 5 ? (
         <>
@@ -247,7 +224,7 @@ export function UserProjects({
             </Typography.Title>
           </Flex>
         </>
-      ) : null}
+      ) : null} */}
 
       <Flex
         style={{
@@ -255,7 +232,7 @@ export function UserProjects({
           flexWrap: "wrap",
           marginTop: 16,
         }}
-        gap={16}
+        gap={32}
       >
         {filteredProjects.map((p: any) => renderLvnzyProject(p))}
       </Flex>

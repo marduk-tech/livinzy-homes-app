@@ -7,6 +7,7 @@ import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { LandingFooter } from "./footer";
 import LandingHeader from "./header";
 import { SectionCenter, SectionLeft, SectionRight } from "./section";
+import { LandingConstants } from "../../libs/constants";
 
 export function MainLanding() {
   const { isMobile } = useDevice();
@@ -55,7 +56,7 @@ export function MainLanding() {
           mainImgUrl: "/images/landing/brick360-landing-2.png",
           btn: {
             link: "",
-            txt: "Launching Soon",
+            txt: "Generate Free Report",
             btnAction: () => {
               setNewReportRequestFormOpen(true);
             },
@@ -130,7 +131,7 @@ export function MainLanding() {
           bgColor: "#fdf7f6",
           btn: {
             link: "",
-            txt: "Launching Soon",
+            txt: "Generate Free Report",
             btnAction: () => {
               setNewReportRequestFormOpen(true);
             },
@@ -182,10 +183,10 @@ export function MainLanding() {
         sectionData={{
           verticalPadding: 100,
           heading: "Choose Real Estate To Diversify & Leverage",
-          // btn: {
-          //   link: LandingConstants.brickAssistLink,
-          //   txt: "Explore BrickfiAssist",
-          // },
+          btn: {
+            link: LandingConstants.brickAssistLink,
+            txt: "Explore BrickfiAssist",
+          },
           subHeading:
             "Diversify your portfolio with real estate — a stable, physical asset that grows in value over time. Take advantage of leverage to secure high-value investments with lower upfront costs. With BrickfiAssist, you get unbiased, data backed advice to help you make superior investments.",
           mainImgUrl: "/images/landing/slide-11.png",
@@ -210,9 +211,6 @@ export function MainLanding() {
       <NewReportRequestForm
         open={newReportRequestFormOpen}
         onClose={() => setNewReportRequestFormOpen(false)}
-        onSuccess={() => {
-          setNewReportRequestFormOpen(false);
-        }}
       />
     </Flex>
   );
