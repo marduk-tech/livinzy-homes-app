@@ -1,12 +1,12 @@
+import { CaretRightOutlined } from "@ant-design/icons";
 import { Collapse, CollapseProps, Flex, Modal, Typography } from "antd";
-import { useDevice } from "../../hooks/use-device";
-import { LandingFooter } from "./footer";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { SectionCenter, SectionLeft, SectionRight } from "./section";
 import { useState } from "react";
 import { BrickAssistCallback } from "../../components/common/brickassist-callback";
+import { useDevice } from "../../hooks/use-device";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { LandingFooter } from "./footer";
 import LandingHeader from "./header";
-import { CaretRightOutlined } from "@ant-design/icons";
+import { SectionCenter, SectionLeft, SectionRight } from "./section";
 
 export function BrickAssistLanding() {
   const { isMobile } = useDevice();
@@ -14,18 +14,12 @@ export function BrickAssistLanding() {
   const [requestCallbackDialogOpen, setRequestCallbackDialogOpen] =
     useState(false);
 
-  const text = `
-  A dog is a type of domesticated animal.
-  Known for its loyalty and faithfulness,
-  it can be found as a welcome guest in many households across the world.
-`;
-
   const getFaqHeading = (text: string) => {
     return (
       <Typography.Text
         style={{
           fontSize: FONT_SIZE.HEADING_2,
-          textAlign: "lefte",
+          textAlign: "left",
           color: "white",
         }}
       >
@@ -85,7 +79,7 @@ export function BrickAssistLanding() {
         `),
     },
     {
-      key: "3",
+      key: "4",
       label: getFaqHeading("How do you curate projects?"),
       style: faqPanelStyle,
       children: getFaqText(`
@@ -120,14 +114,10 @@ export function BrickAssistLanding() {
         sectionData={{
           heading: (
             <Flex vertical>
-              <img
-                style={{ width: 150 }}
-                src="/images/brickfi-assist.png"
-              ></img>
+              <img style={{ width: 150 }} src="/images/brickfi-assist.png" />
               <h1
                 style={{
                   lineHeight: "100%",
-                  textOverflow: "wrap",
                   width: "100%",
                   margin: 0,
                   fontSize: isMobile ? 50 : 60,

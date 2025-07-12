@@ -1,11 +1,12 @@
 import { Button, Flex } from "antd";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useDevice } from "../../hooks/use-device";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { useNavigate } from "react-router-dom";
 
 interface SectionProps {
-  heading?: string | Element;
-  subHeading?: string | Element;
+  heading?: string | React.ReactNode;
+  subHeading?: string | React.ReactNode;
   mainImgUrl?: string;
   mainImgAltText?: string;
   bgColor?: string;
@@ -148,7 +149,7 @@ const SectionLeft: React.FC<{ sectionData: SectionProps }> = ({
               : "100%",
             maxWidth: 1000,
           }}
-        ></img>
+        />
       </Flex>
     </Flex>
   );
@@ -196,7 +197,7 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
               width: sectionData.primaryImageSize || "100%",
               maxWidth: 1000,
             }}
-          ></img>
+          />
         ) : null}
       </Flex>
       <Flex
@@ -225,19 +226,25 @@ const SectionRight: React.FC<{ sectionData: SectionProps }> = ({
           <>{sectionData.heading}</>
         )}
 
-        {sectionData.subHeading && (
-          <h2
-            style={{
-              ...styles.h2,
-              fontSize: isMobile ? 20 : 24,
-              color: sectionData.textColor || COLORS.textColorDark,
-              maxWidth: 600,
-              alignSelf: "flex-start",
-            }}
-          >
-            {sectionData.subHeading as any}
-          </h2>
-        )}
+        {sectionData.subHeading ? (
+          typeof sectionData.subHeading == "string" ? (
+            <h2
+              style={{
+                ...styles.h2,
+                fontSize: isMobile ? 20 : 24,
+                color: sectionData.textColor || COLORS.textColorDark,
+                maxWidth: 600,
+                alignSelf: "flex-start",
+              }}
+            >
+              {sectionData.subHeading}
+            </h2>
+          ) : (
+            <div style={{ maxWidth: 600, alignSelf: "flex-start" }}>
+              {sectionData.subHeading}
+            </div>
+          )
+        ) : null}
         {sectionData.btn && (
           <Button
             type="primary"
@@ -353,7 +360,7 @@ const SectionCenter: React.FC<{ sectionData: SectionProps }> = ({
               maxWidth: 900,
               margin: "auto",
             }}
-          ></img>
+          />
         ) : sectionData.mediaUrl ? (
           <video
             autoPlay
