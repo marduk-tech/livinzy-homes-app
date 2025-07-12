@@ -22,7 +22,7 @@ import {
   PLACE_TIMELINE,
   SurroundingElementLabels,
 } from "../../libs/constants";
-import { capitalize } from "../../libs/lvnzy-helper";
+import { capitalize, rupeeAmountFormat } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace, ISurroundingElement } from "../../types/Project";
 import DynamicReactIcon, {
@@ -342,9 +342,9 @@ const MapViewV2 = ({
   projectsNearby?: {
     projectName: string;
     sqftCost: number;
-    projectLocation: [number, number];
+    projectLocation: { lat: number; lng: number };
   }[];
-  projectSqftPricing?: string;
+  projectSqftPricing?: number;
   showLocalities?: boolean;
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
@@ -490,7 +490,7 @@ const MapViewV2 = ({
         "io5",
         true,
         projectsNearby && projectsNearby.length
-          ? `${projectSqftPricing} /sqft`
+          ? `₹${rupeeAmountFormat(`${projectSqftPricing}`)} /sqft`
           : undefined,
         undefined,
         {
@@ -1217,46 +1217,55 @@ const MapViewV2 = ({
 
   /**Renders marker for the nearby projects */
   const renderProjectsNearby = () => {
-    return projectsNearby!.map((project) => {
-      if (!project.projectLocation?.[0] || !project.projectLocation?.[1]) {
-        return null;
-      }
+    return projectsNearby!
+      .filter(
+        (p) =>
+          Math.abs(p.sqftCost - projectSqftPricing!) / projectSqftPricing! <=
+          0.35
+      )
+      .map((project) => {
+        if (!project.projectLocation?.lat || !project.projectLocation?.lng) {
+          return null;
+        }
 
-      const projectIcon = projectsNearbyIcons.find(
-        (p) => p.name === project.projectName && p.icon
-      );
+        const projectIcon = projectsNearbyIcons.find(
+          (p) => p.name === project.projectName && p.icon
+        );
 
-      if (!projectIcon?.icon) {
-        return null;
-      }
+        if (!projectIcon?.icon) {
+          return null;
+        }
 
-      return (
-        <Marker
-          key={project.projectName.toLowerCase()}
-          position={project.projectLocation}
-          icon={projectIcon.icon}
-          eventHandlers={{
-            click: () => {
-              setModalContent({
-                title: project.projectName,
-                content: "",
-                tags: [
-                  {
-                    label: `${capitalize(
-                      primaryProject
-                        ? primaryProject?.info?.homeType?.[0] || ""
-                        : ""
-                    )}`,
-                    color: COLORS.primaryColor,
-                  },
-                ],
-              });
-              setInfoModalOpen(true);
-            },
-          }}
-        />
-      );
-    });
+        return (
+          <Marker
+            key={project.projectName.toLowerCase()}
+            position={[
+              project.projectLocation.lat,
+              project.projectLocation.lng,
+            ]}
+            icon={projectIcon.icon}
+            eventHandlers={{
+              click: () => {
+                setModalContent({
+                  title: project.projectName,
+                  content: "",
+                  tags: [
+                    {
+                      label: `${capitalize(
+                        primaryProject
+                          ? primaryProject?.info?.homeType?.[0] || ""
+                          : ""
+                      )}`,
+                      color: COLORS.primaryColor,
+                    },
+                  ],
+                });
+                setInfoModalOpen(true);
+              },
+            }}
+          />
+        );
+      });
   };
 
   /** Filter for driver types */
@@ -1440,7 +1449,7 @@ const MapViewV2 = ({
         <MapContainer
           key={`map-v2`}
           center={[13.110274, 77.6009443]}
-          zoom={13}
+          zoom={14}
           minZoom={12}
           style={{ height: "100%", width: "100%" }}
           zoomControl={false}

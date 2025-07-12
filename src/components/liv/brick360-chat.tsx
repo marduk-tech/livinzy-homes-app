@@ -22,10 +22,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useUser } from "../../hooks/use-user";
 import { axiosApiInstance } from "../../libs/axios-api-Instance";
 import { baseApiUrl, Brick360DataPoints } from "../../libs/constants";
-import {
-  captureAnalyticsEvent,
-  rupeeAmountFormat,
-} from "../../libs/lvnzy-helper";
+import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { sha256 } from "js-sha256";
@@ -118,6 +115,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
       setMapDrivers([]);
       setFollowupPrompts([]);
       setSurroundingElements([]);
+      setProjectsNearby([]);
       if (
         dataPointSelected &&
         dataPointSelected.selectedDataPointCategory &&
@@ -184,8 +182,9 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
               setSelectedDriverTypes(driverTypes);
               setMapDrivers([
                 ...lvnzyProject.connectivity.drivers,
-                ...lvnzyProject.neighborhood.drivers.filter((d: any) =>
-                  driverTypes.includes(d.driverId.driver)
+                ...lvnzyProject.neighborhood.drivers.filter(
+                  (d: any) =>
+                    d && d.driverId && driverTypes.includes(d.driverId.driver)
                 ),
               ]);
             } else if (
@@ -612,12 +611,10 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                       <MapViewV2
                         projectId={lvnzyProject?.originalProjectId._id}
                         surroundingElements={surroundingElements}
-                        projectSqftPricing={`${rupeeAmountFormat(
-                          `₹${Math.round(
-                            lvnzyProject?.meta.costingDetails.minimumUnitCost /
-                              lvnzyProject?.meta.costingDetails.minimumUnitSize
-                          )}`
-                        )}`}
+                        projectSqftPricing={Math.round(
+                          lvnzyProject?.meta.costingDetails.minimumUnitCost /
+                            lvnzyProject?.meta.costingDetails.minimumUnitSize
+                        )}
                         projectsNearby={projectsNearby}
                         drivers={mapDrivers.map((d) => {
                           return {
@@ -808,6 +805,11 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             <MapViewV2
               projectId={lvnzyProject?.originalProjectId._id}
               surroundingElements={surroundingElements}
+              projectSqftPricing={Math.round(
+                lvnzyProject?.meta.costingDetails.minimumUnitCost /
+                  lvnzyProject?.meta.costingDetails.minimumUnitSize
+              )}
+              projectsNearby={projectsNearby}
               drivers={mapDrivers.map((d) => {
                 return {
                   ...d.driverId,
