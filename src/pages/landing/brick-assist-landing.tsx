@@ -321,7 +321,11 @@ export function BrickAssistLanding() {
         }}
         footer={null}
       >
-        <BrickAssistCallback></BrickAssistCallback>
+        <BrickAssistCallback
+          onSuccess={() => {
+            setRequestCallbackDialogOpen(false);
+          }}
+        ></BrickAssistCallback>
       </Modal>
     </Flex>
   );

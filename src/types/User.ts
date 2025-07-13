@@ -10,6 +10,7 @@ export interface User {
   countryCode: string;
   name?: string;
   email?: string;
+  status?: string;
   createdAt: Date;
   updatedAt: Date;
   savedProjects: string[];
@@ -28,4 +29,5 @@ interface Profile {
   email?: string;
   city?: string;
   source?: string;
+  preferredCallbackTime?: string;
 }

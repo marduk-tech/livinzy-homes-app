@@ -10,24 +10,27 @@ import {
   Tag,
   Typography,
 } from "antd";
+import Link from "antd/es/typography/Link";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDevice } from "../../hooks/use-device";
 import {
   ReraProject,
   useReraProjectSearch,
 } from "../../hooks/use-rera-project-search";
 import { useUser } from "../../hooks/use-user";
-import { useCreateUserMutation } from "../../hooks/user-hooks";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import LandingHeader from "../../pages/landing/header";
-import { useDevice } from "../../hooks/use-device";
-import { LandingFooter } from "../../pages/landing/footer";
-import { queryClient } from "../../libs/query-client";
+import {
+  useCreateUserMutation,
+  useSendUserMailMutation,
+} from "../../hooks/user-hooks";
 import { queryKeys } from "../../libs/constants";
-import DynamicReactIcon from "./dynamic-react-icon";
-import Link from "antd/es/typography/Link";
 import { capitalize } from "../../libs/lvnzy-helper";
+import { queryClient } from "../../libs/query-client";
+import { LandingFooter } from "../../pages/landing/footer";
+import LandingHeader from "../../pages/landing/header";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import DynamicReactIcon from "./dynamic-react-icon";
 
 export const NewReportRequestFormV2 = () => {
   const [form] = Form.useForm();
@@ -35,6 +38,7 @@ export const NewReportRequestFormV2 = () => {
   const [selectedProjects, setSelectedProjects] = useState<ReraProject[]>([]);
   const { projects, isLoading } = useReraProjectSearch();
   const createUser = useCreateUserMutation({ enableToasts: false });
+  const sendMail = useSendUserMailMutation();
   const navigate = useNavigate();
   const { user } = useUser();
   const { isMobile } = useDevice();
@@ -93,39 +97,41 @@ export const NewReportRequestFormV2 = () => {
       reraId: p.projectId,
     }));
     try {
+      let responseUser;
       if (user) {
-        await createUser
-          .mutateAsync({
-            userData: {
-              profile: user.profile,
-              mobile: user.mobile,
-              countryCode: user.countryCode,
-              requestedReports,
-            },
-          })
-          .then((data) => {
-            if (data.requestedReports) {
-              setStep(3);
-            }
-          });
+        responseUser = await createUser.mutateAsync({
+          userData: {
+            profile: user.profile,
+            mobile: user.mobile,
+            countryCode: user.countryCode,
+            requestedReports,
+          },
+        });
       } else {
-        await createUser
-          .mutateAsync({
-            userData: {
-              profile: {
-                name: formValues.name,
-                email: formValues.email,
-              },
-              mobile: formValues.mobile,
-              countryCode: "91",
-              requestedReports,
+        responseUser = await createUser.mutateAsync({
+          userData: {
+            profile: {
+              name: formValues.name,
+              email: formValues.email,
             },
-          })
-          .then((data) => {
-            if (data.requestedReports) {
-              setStep(3);
-            }
-          });
+            mobile: formValues.mobile,
+            countryCode: "91",
+            requestedReports,
+          },
+        });
+      }
+
+      if (responseUser) {
+        await sendMail.mutateAsync({
+          userId: responseUser._id,
+          emailType: "report-request",
+          params: {
+            requestedReports,
+          },
+        });
+        if (responseUser.requestedReports) {
+          setStep(3);
+        }
       }
 
       await queryClient.invalidateQueries({ queryKey: [queryKeys.user] });

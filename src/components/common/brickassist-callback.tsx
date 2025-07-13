@@ -1,15 +1,76 @@
 import { Button, Flex, Form, Input, Typography } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useUser } from "../../hooks/use-user";
+import {
+  useCreateUserMutation,
+  useSendUserMailMutation,
+  useUpdateUserMutation,
+} from "../../hooks/user-hooks";
 import { FONT_SIZE } from "../../theme/style-constants";
 
-const mockVal = (str: string, repeat = 1) => ({
-  value: str.repeat(repeat),
-});
-
-export function BrickAssistCallback() {
+export function BrickAssistCallback({ onSuccess }: { onSuccess?: () => void }) {
   const [form] = Form.useForm();
+  const { user } = useUser();
+  const createUser = useCreateUserMutation({});
+  const updateUser = useUpdateUserMutation({ userId: user?._id || "" });
+  const sendMail = useSendUserMailMutation();
 
-  const [formSuccess, setFormSuccess] = useState(true);
+  const [formSuccess, setFormSuccess] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      form.setFieldsValue({
+        name: user.profile.name,
+        mobile: user.mobile,
+      });
+    }
+  }, [user, form]);
+
+  const onFinish = async (values: any) => {
+    let userId = user?._id;
+
+    if (user) {
+      await updateUser.mutateAsync({
+        userData: {
+          status: "callback-request",
+          profile: {
+            ...user.profile,
+            preferredCallbackTime: values.callbackTime,
+          },
+        },
+      });
+    } else {
+      const newUser = await createUser.mutateAsync({
+        userData: {
+          name: values.name,
+          mobile: values.mobile,
+          status: "callback-request",
+          profile: {
+            preferredCallbackTime: values.callbackTime,
+          },
+          countryCode: "91",
+        },
+      });
+      userId = newUser._id;
+    }
+
+    if (userId) {
+      await sendMail.mutateAsync({
+        userId,
+        emailType: "callback-request",
+        params: {
+          name: values.name,
+          mobile: values.mobile,
+          callbackTime: values.callbackTime,
+        },
+      });
+    }
+
+    setFormSuccess(true);
+    if (onSuccess) {
+      onSuccess();
+    }
+  };
 
   return (
     <Flex gap={8} vertical style={{ paddingTop: 24, paddingBottom: 16 }}>
@@ -37,7 +98,7 @@ export function BrickAssistCallback() {
           <Form
             form={form}
             layout="vertical"
-            onFinish={() => {}}
+            onFinish={onFinish}
             style={{
               marginTop: 16,
               maxWidth: "400px",
@@ -51,14 +112,14 @@ export function BrickAssistCallback() {
               name="name"
               rules={[{ required: true }]}
             >
-              <Input />
+              <Input disabled={!!user} />
             </Form.Item>
             <Form.Item
               label="Your Mobile Number"
               name="mobile"
               rules={[{ required: true }]}
             >
-              <Input />
+              <Input disabled={!!user} />
             </Form.Item>
             <Form.Item
               label="What's a good day and time to call you"
@@ -72,7 +133,11 @@ export function BrickAssistCallback() {
 
       {formSuccess ? null : (
         <Flex justify="flex-end" style={{ marginTop: 24 }} gap={16}>
-          <Button onClick={() => {}} type="primary">
+          <Button
+            onClick={() => form.submit()}
+            type="primary"
+            loading={createUser.isPending || updateUser.isPending}
+          >
             {"Submit"}
           </Button>
         </Flex>

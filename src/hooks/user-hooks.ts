@@ -71,3 +71,35 @@ export function useCreateUserMutation({
     },
   });
 }
+
+export function useSendUserMailMutation() {
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      emailType,
+      params,
+    }: {
+      userId: string;
+      emailType: string;
+      params?: any;
+    }) => {
+      const endpoint = `/user/${userId}/send-mail`;
+
+      return await axiosApiInstance
+        .post(endpoint, { emailType, params })
+        .then((response) => {
+          return response.data;
+        });
+    },
+
+    onSuccess: () => {},
+
+    onError: (error: AxiosError<any>) => {
+      notification.error({
+        message: `An unexpected error occurred. Please try again later.`,
+      });
+
+      console.log(error);
+    },
+  });
+}
