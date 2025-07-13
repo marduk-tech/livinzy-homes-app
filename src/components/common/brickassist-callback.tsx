@@ -136,7 +136,9 @@ export function BrickAssistCallback({ onSuccess }: { onSuccess?: () => void }) {
           <Button
             onClick={() => form.submit()}
             type="primary"
-            loading={createUser.isPending || updateUser.isPending}
+            loading={
+              createUser.isPending || updateUser.isPending || sendMail.isPending
+            }
           >
             {"Submit"}
           </Button>
