@@ -232,7 +232,10 @@ export function BrickAssistLanding() {
         sectionData={{
           heading: (
             <Flex vertical>
-              <img style={{ width: 150 }} src="/images/brickfi-assist.png" />
+              <img
+                style={{ width: 150 }}
+                src="/images/brickfi-assist-white.png"
+              />
               <h1
                 style={{
                   lineHeight: "100%",
