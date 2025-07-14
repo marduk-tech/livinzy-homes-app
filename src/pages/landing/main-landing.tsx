@@ -65,7 +65,7 @@ export function MainLanding() {
       <SectionCenter
         sectionData={{
           heading: "",
-          mediaUrl: "/images/landing/demo-landing-small.mp4",
+          mediaUrl: "/images/landing/demo-landing-small-2.mp4",
           bgColor: COLORS.textColorDark,
           textColor: "white",
           verticalPadding: 60,

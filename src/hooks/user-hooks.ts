@@ -39,7 +39,7 @@ export function useUpdateUserMutation({ userId }: { userId: string }) {
 }
 
 export function useCreateUserMutation({
-  enableToasts = true,
+  enableToasts = false,
 }: {
   enableToasts?: boolean;
 }) {

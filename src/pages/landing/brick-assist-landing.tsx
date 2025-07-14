@@ -1,5 +1,5 @@
 import { CaretRightOutlined } from "@ant-design/icons";
-import { Collapse, CollapseProps, Flex, Modal, Typography } from "antd";
+import { Collapse, CollapseProps, Flex, Typography } from "antd";
 import { ReactNode, useState } from "react";
 import { BrickAssistCallback } from "../../components/common/brickassist-callback";
 import { useDevice } from "../../hooks/use-device";
@@ -310,23 +310,13 @@ export function BrickAssistLanding() {
         }}
       ></SectionCenter>
       <LandingFooter></LandingFooter>
-      <Modal
-        open={requestCallbackDialogOpen}
-        closable={true}
+
+      <BrickAssistCallback
+        isOpen={requestCallbackDialogOpen}
         onClose={() => {
           setRequestCallbackDialogOpen(false);
         }}
-        onCancel={() => {
-          setRequestCallbackDialogOpen(false);
-        }}
-        footer={null}
-      >
-        <BrickAssistCallback
-          onSuccess={() => {
-            setRequestCallbackDialogOpen(false);
-          }}
-        ></BrickAssistCallback>
-      </Modal>
+      ></BrickAssistCallback>
     </Flex>
   );
 }

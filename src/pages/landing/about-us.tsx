@@ -63,7 +63,7 @@ export function AboutUs() {
         scrollbarWidth: "none",
       }}
     >
-      <LandingHeader></LandingHeader>
+      <LandingHeader bgColor="white"></LandingHeader>
       <SectionLeft
         sectionData={{
           heading: "Home Ownership for the New India",
