@@ -267,7 +267,7 @@ export const NewReportRequestFormV2 = () => {
       <Flex
         vertical={isMobile}
         style={{
-          paddingTop: isMobile ? 72 : 150,
+          paddingTop: isMobile ? 72 : 125,
           minHeight: "calc(100vh - 100px)",
         }}
       >
@@ -277,7 +277,7 @@ export const NewReportRequestFormV2 = () => {
             width: `calc(${isMobile ? "100%" : "50%"} - 32px)`,
             padding: 16,
             height: "100%",
-            marginTop: isMobile ? 0 : 32,
+            marginTop: 0,
           }}
           vertical
         >
@@ -430,7 +430,7 @@ export const NewReportRequestFormV2 = () => {
                             color: COLORS.textColorLight,
                           }}
                         >
-                          You will need this mobile number to access the
+                          You will need this mobile number later to access the
                           reports.
                         </Typography.Text>
                       </Flex>
