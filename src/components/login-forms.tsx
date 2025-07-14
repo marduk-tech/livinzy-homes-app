@@ -126,14 +126,6 @@ export function LoginForm() {
               ? "Please update your basic details"
               : "Brickfi is only available for private access right now."}
           </Typography.Text>
-          {/* <Typography.Text
-style={{
-fontSize: FONT_SIZE.subText,
-color: COLORS.textColorLight,
-}}
->
-Login with your mobile number to continue.
-</Typography.Text> */}
         </Flex>
         {/* <Divider style={{ marginTop: 8, marginBottom: 32 }} /> */}
 

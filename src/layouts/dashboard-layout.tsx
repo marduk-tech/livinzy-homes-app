@@ -50,9 +50,14 @@ export const DashboardLayout: React.FC = () => {
     {
       key: "consult",
       title: "Brickfi Assist",
-      disabled: true,
       link: LandingConstants.brickAssistLink,
-      icon: { name: "FaRegUserCircle", set: "fa" },
+      icon: { name: "RiHomeSmileFill", set: "ri" },
+    },
+    {
+      key: "about",
+      title: "Request Brick360 Report",
+      link: "/requestreport",
+      icon: { name: "HiDocumentReport", set: "hi" },
     },
     {
       key: "consult",
@@ -64,9 +69,9 @@ export const DashboardLayout: React.FC = () => {
       key: "about",
       title: "About Brickfi",
       link: "/aboutus",
-      disabled: true,
       icon: { name: "RiTeamFill", set: "ri" },
     },
+
     {
       key: "chat-history",
       title: "Chat History",
