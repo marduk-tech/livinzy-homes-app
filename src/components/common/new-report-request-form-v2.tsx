@@ -224,7 +224,7 @@ export const NewReportRequestFormV2 = () => {
         vertical={isMobile}
         style={{
           paddingTop: isMobile ? 72 : 150,
-          height: "calc(100vh - 100px)",
+          minHeight: "calc(100vh - 100px)",
         }}
       >
         <Flex
