@@ -117,18 +117,6 @@ export function MainLanding() {
           primaryImageSize: isMobile ? "100%" : "50%",
         }}
       ></SectionCenter>
-      <SectionLeft
-        sectionData={{
-          heading: "The BrickFi Difference",
-          fullHeight: true,
-
-          subHeading:
-            "A combination of technology driven, data backed and personalized experience. ",
-          mainImgUrl: "/images/landing/slide-4.png",
-          mainImgAltText:
-            "Brickfi offers personalized curation vs biased marketing, 360 reports vs lack of transparency, end to end strategic assistance vs limited guidance.",
-        }}
-      ></SectionLeft>
       <SectionCenter
         sectionData={{
           heading: "Data to Give a Full Picture",
@@ -170,6 +158,19 @@ export function MainLanding() {
             "See location insights visually on a map with Brickfi.",
         }}
       ></SectionCenter>
+      <SectionLeft
+        sectionData={{
+          heading: "The BrickFi Difference",
+          fullHeight: true,
+
+          subHeading:
+            "A combination of technology driven, data backed and personalized experience. ",
+          mainImgUrl: "/images/landing/slide-4.png",
+          mainImgAltText:
+            "Brickfi offers personalized curation vs biased marketing, 360 reports vs lack of transparency, end to end strategic assistance vs limited guidance.",
+        }}
+      ></SectionLeft>
+
       <SectionCenter
         sectionData={{
           verticalPadding: 100,
