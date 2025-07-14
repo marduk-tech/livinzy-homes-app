@@ -416,7 +416,25 @@ export const NewReportRequestFormV2 = () => {
                   </Form.Item>
                   <Form.Item
                     name="mobile"
-                    label="Mobile Number"
+                    label={
+                      <Flex vertical>
+                        {" "}
+                        <Typography.Text
+                          style={{ fontSize: FONT_SIZE.HEADING_3 }}
+                        >
+                          Your mobile number
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{
+                            fontSize: FONT_SIZE.PARA,
+                            color: COLORS.textColorLight,
+                          }}
+                        >
+                          You will need this mobile number to access the
+                          reports.
+                        </Typography.Text>
+                      </Flex>
+                    }
                     rules={[
                       {
                         required: true,
