@@ -72,7 +72,7 @@ const LandingHeader: React.FC<{
                     <Link
                       href={item.link}
                       style={{
-                        color: color || COLORS.textColorMedium,
+                        color: COLORS.textColorMedium,
                         fontSize: FONT_SIZE.HEADING_2,
                       }}
                     >
@@ -88,6 +88,7 @@ const LandingHeader: React.FC<{
                 iconName="RiMenu3Line"
                 iconSet="ri"
                 size={24}
+                color={color || COLORS.textColorDark}
               ></DynamicReactIcon>
             </a>
           </Dropdown>
