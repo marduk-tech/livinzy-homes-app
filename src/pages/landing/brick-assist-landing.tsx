@@ -194,9 +194,15 @@ export function BrickAssistLanding() {
           <span style={{ color: COLORS.primaryColor }}>
             2000 projects across Bengaluru
           </span>{" "}
-          including data around builder credibility, upcoming infra projects
-          near a location, benchmark across projects in Bangalore. This helps us
-          to narrow down the project based on your requirements.
+          including data around{" "}
+          <span style={{ color: COLORS.primaryColor }}>
+            builder credibility, upcoming infra projects near a location,
+            surroundings & more
+          </span>{" "}
+          . This helps us to narrow down the project based on your requirements.
+          For example, if you are looking for a home with more greenery nearby,
+          we can shortlist projects based on surroundings. If you are primary
+          purpose is investment, we can find projects near upcoming tech parks.
         </>
       ),
     },
