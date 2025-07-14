@@ -1,4 +1,5 @@
 import {
+  Alert,
   AutoComplete,
   Button,
   Col,
@@ -12,7 +13,7 @@ import {
 } from "antd";
 import Link from "antd/es/typography/Link";
 import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDevice } from "../../hooks/use-device";
 import {
@@ -43,9 +44,10 @@ export const NewReportRequestFormV2 = () => {
   const { user } = useUser();
   const { isMobile } = useDevice();
   const [reportsLeft, setReportsLeft] = useState(3);
+  const [maxReportsRequested, setMaxReportsRequested] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const [errorMsg, setErrorMsg] = useState<ReactNode>();
 
   const projectOptions = (projects || [])
     .filter((p) => !selectedProjects.some((s) => s.projectId === p.projectId))
@@ -136,14 +138,24 @@ export const NewReportRequestFormV2 = () => {
 
       await queryClient.invalidateQueries({ queryKey: [queryKeys.user] });
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
-      const errorMessage =
-        axiosError?.response?.data?.message ||
-        "An unexpected error occurred. Please try again.";
-      messageApi.open({
-        type: "error",
-        content: errorMessage,
-      });
+      const axiosError = error as AxiosError<{
+        message: string;
+        response: any;
+      }>;
+      if (
+        axiosError.response &&
+        axiosError.response.data &&
+        (axiosError.response as any).data.maxReportsRequested
+      ) {
+        setMaxReportsRequested(true);
+      } else {
+        setErrorMsg(
+          <Alert
+            message="Oops. Looks like there was an error. Please try again."
+            type="error"
+          />
+        );
+      }
     }
   };
 
@@ -151,9 +163,56 @@ export const NewReportRequestFormV2 = () => {
     await processReportRequest(values);
   };
 
+  const renderMaxReportsMsg = () => {
+    return (
+      <Flex style={{ maxWidth: "100%", margin: "8px 0" }} vertical>
+        <Tag
+          style={{
+            width: "100%",
+            textWrap: "wrap",
+            backgroundColor: COLORS.bgColorBlue,
+            padding: "8px 8px",
+            borderRadius: 8,
+            margin: 0,
+          }}
+        >
+          <Flex vertical>
+            {" "}
+            <DynamicReactIcon
+              iconName="PiSmileyMehLight"
+              iconSet="pi"
+              size={32}
+              color={COLORS.primaryColor}
+            ></DynamicReactIcon>
+            <Typography.Text
+              style={{ fontSize: FONT_SIZE.HEADING_3, lineHeight: "110%" }}
+            >
+              {" "}
+              Oops! Looks like have you already requested max number of free
+              reports.
+            </Typography.Text>
+            <Link
+              href="/brickassist"
+              style={{
+                fontSize: FONT_SIZE.HEADING_3,
+                marginTop: 16,
+                color: COLORS.primaryColor,
+              }}
+            >
+              {" "}
+              Looking for more ? Schedule a callback with us.
+            </Link>
+          </Flex>
+        </Tag>
+      </Flex>
+    );
+  };
   useEffect(() => {
     if (user && user.requestedReports) {
       setReportsLeft(3 - user.requestedReports.length);
+      if (3 - user.requestedReports.length <= 0) {
+        setMaxReportsRequested(true);
+      }
     }
   }, [user]);
 
@@ -272,46 +331,6 @@ export const NewReportRequestFormV2 = () => {
                     </Col>
                   ))}
                 </Row>
-                {!reportsLeft && (
-                  <Flex style={{ maxWidth: "100%" }} vertical>
-                    <Tag
-                      style={{
-                        width: "100%",
-                        textWrap: "wrap",
-                        backgroundColor: COLORS.bgColorBlue,
-                        padding: "16px 8px",
-                        margin: 0,
-                      }}
-                    >
-                      <Flex vertical>
-                        {" "}
-                        <DynamicReactIcon
-                          iconName="PiSmileyMehLight"
-                          iconSet="pi"
-                          size={32}
-                        ></DynamicReactIcon>
-                        <Typography.Text
-                          style={{ fontSize: FONT_SIZE.HEADING_3 }}
-                        >
-                          {" "}
-                          Oops! Looks like have you already requested max number
-                          of free reports.
-                        </Typography.Text>
-                        <Link
-                          href="/brickassist"
-                          style={{
-                            fontSize: FONT_SIZE.HEADING_3,
-                            marginTop: 16,
-                            color: COLORS.primaryColor,
-                          }}
-                        >
-                          {" "}
-                          Looking for more ? Schedule a callback with us.
-                        </Link>
-                      </Flex>
-                    </Tag>
-                  </Flex>
-                )}
               </Flex>
             )}
             {step === 2 && (
@@ -391,6 +410,8 @@ export const NewReportRequestFormV2 = () => {
               </Flex>
             )}
           </Flex>
+          {maxReportsRequested && renderMaxReportsMsg()}
+          {errorMsg && errorMsg}
           {reportsLeft > 0 && (
             <Flex style={{ marginTop: 16 }} gap={16}>
               {step === 1
