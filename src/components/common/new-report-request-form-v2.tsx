@@ -38,7 +38,8 @@ export const NewReportRequestFormV2 = () => {
   const [form] = Form.useForm();
   const [step, setStep] = useState(1);
   const [selectedProjects, setSelectedProjects] = useState<ReraProject[]>([]);
-  const { projects, isLoading } = useReraProjectSearch();
+  const { projects, isLoading: reraProjectNamesLoading } =
+    useReraProjectSearch();
   const createUser = useCreateUserMutation({ enableToasts: false });
   const sendMail = useSendUserMailMutation();
   const navigate = useNavigate();
@@ -47,16 +48,24 @@ export const NewReportRequestFormV2 = () => {
   const [reportsLeft, setReportsLeft] = useState(3);
   const [maxReportsRequested, setMaxReportsRequested] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [projectOptions, setProjectOptions] = useState<any[]>([]);
 
   const [errorMsg, setErrorMsg] = useState<ReactNode>();
 
-  const projectOptions = (projects || [])
-    .filter((p) => !selectedProjects.some((s) => s.projectId === p.projectId))
-    .map((project) => ({
-      value: `${project.projectId}-${project.projectName}`,
-      label: capitalize(project.projectName),
-      project,
-    }));
+  useEffect(() => {
+    if (projects && projects.length) {
+      const projectOptions: any[] = (projects || [])
+        .filter(
+          (p) => !selectedProjects.some((s) => s.projectId === p.projectId)
+        )
+        .map((project) => ({
+          value: `${project.projectId}-${project.projectName}`,
+          label: capitalize(project.projectName),
+          project,
+        }));
+      setProjectOptions(projectOptions);
+    }
+  }, [projects]);
 
   const handleSelectProject = (_: any, option: any) => {
     const newProject = option.project;
@@ -319,10 +328,14 @@ export const NewReportRequestFormV2 = () => {
                       .toLowerCase()
                       .includes(inputValue.toLowerCase())
                   }
-                  placeholder="Search for projects..."
+                  placeholder={
+                    reraProjectNamesLoading
+                      ? "Loading projects.."
+                      : "Search for projects..."
+                  }
                   disabled={!reportsLeft || selectedProjects.length >= 3}
                 >
-                  <Input.Search loading={isLoading} />
+                  <Input.Search loading={reraProjectNamesLoading} />
                 </AutoComplete>
 
                 <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
