@@ -330,8 +330,8 @@ export const NewReportRequestFormV2 = () => {
                   }
                   placeholder={
                     reraProjectNamesLoading
-                      ? "Loading projects.."
-                      : "Search for projects..."
+                      ? "Loading projects, please wait.."
+                      : "Search project name..."
                   }
                   disabled={!reportsLeft || selectedProjects.length >= 3}
                 >
