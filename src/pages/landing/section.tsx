@@ -5,6 +5,7 @@ import { useDevice } from "../../hooks/use-device";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 
 interface SectionProps {
+  id?: string;
   heading?: string | React.ReactNode;
   subHeading?: string | React.ReactNode;
   mainImgUrl?: string;
@@ -275,6 +276,7 @@ const SectionCenter: React.FC<{ sectionData: SectionProps }> = ({
 
   return (
     <Flex
+      id={sectionData.id || `${Math.round(Math.random() * 1000)}`}
       vertical
       style={{
         width: "100%",

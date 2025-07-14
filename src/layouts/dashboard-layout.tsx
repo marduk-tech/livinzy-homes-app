@@ -58,7 +58,6 @@ export const DashboardLayout: React.FC = () => {
       key: "consult",
       title: "Brickfi Blog",
       link: "/app/profile",
-      disabled: true,
       icon: { name: "FaBookOpen", set: "fa6" },
     },
     {
@@ -171,13 +170,13 @@ export const DashboardLayout: React.FC = () => {
 
               {user && (
                 <Flex style={{ marginLeft: "auto", cursor: "pointer" }}>
-                  {/* <img
+                  <img
                     src="/images/brickfi-assist.png"
                     onClick={() => {
                       window.location.assign(LandingConstants.brickAssistLink);
                     }}
                     style={{ height: 32, width: "auto", marginRight: 8 }}
-                  ></img> */}
+                  ></img>
                   <Flex
                     onClick={() => {
                       setSidebarOpen(true);

@@ -1,5 +1,5 @@
 import { Flex } from "antd";
-import { COLORS } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import Link from "antd/es/typography/Link";
 import { useDevice } from "../../hooks/use-device";
 import { LandingConstants } from "../../libs/constants";
@@ -43,14 +43,41 @@ const LandingHeader: React.FC<{
         }}
         gap={16}
       >
-        <Link href="/app" style={{ color: color || COLORS.textColorDark }}>
-          Go to App
+        <Link
+          href={LandingConstants.genReportLink}
+          style={{
+            color: color || COLORS.textColorMedium,
+            fontSize: FONT_SIZE.PARA,
+          }}
+        >
+          Brick360 Report
+        </Link>
+        <Link
+          href={LandingConstants.blogLink}
+          style={{
+            color: color || COLORS.textColorMedium,
+            fontSize: FONT_SIZE.PARA,
+          }}
+        >
+          Blog
         </Link>
         <Link
           href={LandingConstants.brickAssistLink}
-          style={{ color: color || COLORS.textColorDark }}
+          style={{
+            color: color || COLORS.textColorMedium,
+            fontSize: FONT_SIZE.PARA,
+          }}
         >
           Brickfi Assist
+        </Link>
+        <Link
+          href="/app"
+          style={{
+            color: color || COLORS.textColorMedium,
+            fontSize: FONT_SIZE.PARA,
+          }}
+        >
+          My Account
         </Link>
       </Flex>
     </Flex>

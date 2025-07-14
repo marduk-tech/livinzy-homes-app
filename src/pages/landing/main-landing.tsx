@@ -1,5 +1,5 @@
 import { Flex, Typography } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDevice } from "../../hooks/use-device";
 import { LandingConstants } from "../../libs/constants";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
@@ -12,15 +12,36 @@ export function MainLanding() {
   const [requestReportDialogOpen, setRequestReportDialogOpen] = useState(false);
   const [newReportRequestFormOpen, setNewReportRequestFormOpen] =
     useState(false);
-
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      const element = document.querySelector(hash);
+      if (element) {
+        // Optional: add smooth scrolling
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, []);
   const whoAreWeText = (
-    <Typography.Text
-      style={{ fontSize: FONT_SIZE.HEADING_2, display: "block" }}
-    >
-      Get the exclusive Brick360 Report on new & under construction properties
-      across Bangalore. Verified, unbiased, marketing free insights you won’t
-      find anywhere else.
-    </Typography.Text>
+    <Flex vertical>
+      <a
+        href="#demo-brkfi"
+        style={{
+          fontSize: FONT_SIZE.HEADING_3,
+          display: "block",
+          color: COLORS.primaryColor,
+        }}
+      >
+        SEE DEMO BRICK360 REPORT
+      </a>
+      <Typography.Text
+        style={{ fontSize: FONT_SIZE.HEADING_2, display: "block" }}
+      >
+        Get the exclusive Brick360 Report on new & under construction properties
+        across Bangalore. Verified, unbiased, marketing free insights you won’t
+        find anywhere else.
+      </Typography.Text>
+    </Flex>
   );
   return (
     <Flex
@@ -64,16 +85,17 @@ export function MainLanding() {
 
       <SectionCenter
         sectionData={{
+          id: "demo-brkfi",
           heading: "",
-          mediaUrl: "/images/landing/demo-landing-small-2.mp4",
-          bgColor: COLORS.textColorDark,
+          mediaUrl: "/images/landing/demo-landing-small-2.mp4?v=1",
+          bgColor: "#32495e",
           textColor: "white",
           verticalPadding: 60,
           primaryImageSize: "80%",
         }}
       ></SectionCenter>
       <Flex
-        style={{ backgroundColor: COLORS.textColorDark, paddingTop: 100 }}
+        style={{ backgroundColor: "#32495e", paddingTop: 100 }}
         justify="center"
       >
         <img
@@ -89,7 +111,7 @@ export function MainLanding() {
           mainImgUrl: isMobile
             ? "/images/landing/slide-2-mobile.png"
             : "/images/landing/slide-2.png",
-          bgColor: COLORS.textColorDark,
+          bgColor: "#32495e",
           textColor: "white",
           verticalPadding: 60,
           primaryImageSize: isMobile ? "100%" : "50%",
