@@ -125,6 +125,9 @@ export const NewReportRequestFormV2 = () => {
       }
 
       if (responseUser) {
+        if (responseUser.requestedReports) {
+          setStep(3);
+        }
         await sendMail.mutateAsync({
           userId: responseUser._id,
           emailType: "report-request",
@@ -132,9 +135,6 @@ export const NewReportRequestFormV2 = () => {
             requestedReports,
           },
         });
-        if (responseUser.requestedReports) {
-          setStep(3);
-        }
       }
 
       await queryClient.invalidateQueries({ queryKey: [queryKeys.user] });
@@ -189,8 +189,8 @@ export const NewReportRequestFormV2 = () => {
               style={{ fontSize: FONT_SIZE.HEADING_3, lineHeight: "110%" }}
             >
               {" "}
-              Oops! Looks like have you already requested max number of free
-              reports.
+              Oops! Looks like this mobile number has already requested max
+              number of free reports.
             </Typography.Text>
             <Link
               href="/brickassist"
@@ -432,8 +432,9 @@ export const NewReportRequestFormV2 = () => {
               </Flex>
             )}
           </Flex>
-          {maxReportsRequested && renderMaxReportsMsg()}
-          {errorMsg && errorMsg}
+          {}
+          {step !== 3 && maxReportsRequested ? renderMaxReportsMsg() : null}
+          {step !== 3 && errorMsg ? errorMsg : null}
           {reportsLeft > 0 && (
             <Flex style={{ marginTop: 16 }} gap={16}>
               {step === 1
