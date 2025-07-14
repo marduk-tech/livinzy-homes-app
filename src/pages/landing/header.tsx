@@ -1,8 +1,9 @@
-import { Flex } from "antd";
+import { Dropdown, Flex } from "antd";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import Link from "antd/es/typography/Link";
 import { useDevice } from "../../hooks/use-device";
 import { LandingConstants } from "../../libs/constants";
+import DynamicReactIcon from "../../components/common/dynamic-react-icon";
 
 const LandingHeader: React.FC<{
   bgColor?: string;
@@ -10,6 +11,24 @@ const LandingHeader: React.FC<{
   logo?: string;
 }> = ({ bgColor, color, logo }) => {
   const { isMobile } = useDevice();
+  const navItems = [
+    {
+      link: LandingConstants.genReportLink,
+      label: "Brick360 Report",
+    },
+    {
+      link: LandingConstants.blogLink,
+      label: "Blog",
+    },
+    {
+      link: LandingConstants.brickAssistLink,
+      label: "Brickfi Assist",
+    },
+    {
+      link: LandingConstants.appLink,
+      label: "My Account",
+    },
+  ];
 
   return (
     <Flex
@@ -38,47 +57,55 @@ const LandingHeader: React.FC<{
       <Flex
         style={{
           marginLeft: "auto",
-          marginRight: 48,
+          marginRight: 32,
           color: color || COLORS.textColorMedium,
         }}
         gap={16}
       >
-        <Link
-          href={LandingConstants.genReportLink}
-          style={{
-            color: color || COLORS.textColorMedium,
-            fontSize: FONT_SIZE.PARA,
-          }}
-        >
-          Brick360 Report
-        </Link>
-        <Link
-          href={LandingConstants.blogLink}
-          style={{
-            color: color || COLORS.textColorMedium,
-            fontSize: FONT_SIZE.PARA,
-          }}
-        >
-          Blog
-        </Link>
-        <Link
-          href={LandingConstants.brickAssistLink}
-          style={{
-            color: color || COLORS.textColorMedium,
-            fontSize: FONT_SIZE.PARA,
-          }}
-        >
-          Brickfi Assist
-        </Link>
-        <Link
-          href="/app"
-          style={{
-            color: color || COLORS.textColorMedium,
-            fontSize: FONT_SIZE.PARA,
-          }}
-        >
-          My Account
-        </Link>
+        {isMobile ? (
+          <Dropdown
+            menu={{
+              items: navItems.map((item) => {
+                return {
+                  key: item.label,
+                  label: (
+                    <Link
+                      href={item.link}
+                      style={{
+                        color: color || COLORS.textColorMedium,
+                        fontSize: FONT_SIZE.HEADING_2,
+                      }}
+                    >
+                      {item.label}
+                    </Link>
+                  ),
+                };
+              }),
+            }}
+          >
+            <a onClick={(e) => e.preventDefault()}>
+              <DynamicReactIcon
+                iconName="RiMenu3Line"
+                iconSet="ri"
+                size={24}
+              ></DynamicReactIcon>
+            </a>
+          </Dropdown>
+        ) : (
+          navItems.map((item) => {
+            return (
+              <Link
+                href={item.link}
+                style={{
+                  color: color || COLORS.textColorMedium,
+                  fontSize: FONT_SIZE.PARA,
+                }}
+              >
+                {item.label}
+              </Link>
+            );
+          })
+        )}
       </Flex>
     </Flex>
   );
