@@ -183,19 +183,24 @@ export const NewReportRequestFormV2 = () => {
             backgroundColor: COLORS.bgColorBlue,
             padding: "8px 8px",
             borderRadius: 8,
+            border: 0,
             margin: 0,
           }}
         >
           <Flex vertical>
             {" "}
-            <DynamicReactIcon
+            {/* <DynamicReactIcon
               iconName="PiSmileyMehLight"
               iconSet="pi"
               size={32}
               color={COLORS.primaryColor}
-            ></DynamicReactIcon>
+            ></DynamicReactIcon> */}
             <Typography.Text
-              style={{ fontSize: FONT_SIZE.HEADING_3, lineHeight: "110%" }}
+              style={{
+                fontSize: FONT_SIZE.HEADING_4,
+                lineHeight: "110%",
+                color: COLORS.textColorMedium,
+              }}
             >
               {" "}
               Oops! Looks like this mobile number has already requested max
@@ -204,7 +209,7 @@ export const NewReportRequestFormV2 = () => {
             <Link
               href="/brickassist"
               style={{
-                fontSize: FONT_SIZE.HEADING_3,
+                fontSize: FONT_SIZE.HEADING_4,
                 marginTop: 16,
                 color: COLORS.primaryColor,
               }}
@@ -291,6 +296,8 @@ export const NewReportRequestFormV2 = () => {
               padding: 16,
               backgroundColor: COLORS.bgColor,
               marginTop: 8,
+              border: "1px solid",
+              borderColor: COLORS.borderColor,
               borderRadius: 16,
             }}
           >
