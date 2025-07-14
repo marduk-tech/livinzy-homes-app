@@ -32,6 +32,7 @@ import { LandingFooter } from "../../pages/landing/footer";
 import LandingHeader from "../../pages/landing/header";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import DynamicReactIcon from "./dynamic-react-icon";
+const { Paragraph } = Typography;
 
 export const NewReportRequestFormV2 = () => {
   const [form] = Form.useForm();
@@ -318,16 +319,37 @@ export const NewReportRequestFormV2 = () => {
                   <Input.Search loading={isLoading} />
                 </AutoComplete>
 
-                <Row gutter={[16, 16]}>
+                <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
                   {selectedProjects.map((p) => (
-                    <Col key={p.projectId}>
-                      <Tag
-                        closable
-                        onClose={() => handleRemoveProject(p.projectId)}
-                        style={{ fontSize: FONT_SIZE.HEADING_2, padding: 16 }}
+                    <Col key={p.projectId} style={{ width: "100%" }}>
+                      <Flex
+                        style={{
+                          width: "100%",
+                          borderBottom: "1px solid",
+                          borderColor: COLORS.borderColor,
+                        }}
                       >
-                        {capitalize(p.projectName)}
-                      </Tag>
+                        <Paragraph
+                          style={{
+                            fontSize: FONT_SIZE.HEADING_2,
+                            marginBottom: 8,
+                          }}
+                          ellipsis={{ rows: 2 }}
+                        >
+                          {capitalize(p.projectName)}
+                        </Paragraph>
+                        <Flex
+                          style={{ marginLeft: "auto" }}
+                          onClick={() => handleRemoveProject(p.projectId)}
+                        >
+                          <DynamicReactIcon
+                            iconName="IoMdCloseCircle"
+                            iconSet="io"
+                            color={COLORS.textColorDark}
+                            size={32}
+                          ></DynamicReactIcon>
+                        </Flex>
+                      </Flex>
                     </Col>
                   ))}
                 </Row>
