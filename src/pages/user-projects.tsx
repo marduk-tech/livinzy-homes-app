@@ -145,7 +145,6 @@ export function UserProjects({
                   style={{
                     borderColor: COLORS.borderColor,
                     borderRadius: 8,
-                    fontSize: FONT_SIZE.SUB_TEXT,
                   }}
                 >
                   <Flex vertical style={{ width: "100%" }} justify="flex-start">

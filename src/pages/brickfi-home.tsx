@@ -1,4 +1,4 @@
-import { Flex } from "antd";
+import { Alert, Flex } from "antd";
 import React, { ReactNode, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Loader } from "../components/common/loader";
@@ -116,8 +116,11 @@ const BrickfiHome: React.FC = () => {
           {selectedCollection?.projects ? (
             <UserProjects lvnzyProjects={selectedCollection.projects} />
           ) : (
-            <Flex justify="center" align="center" style={{ height: "50vh" }}>
-              No projects found. Add some projects to get started.
+            <Flex style={{ margin: 16, marginTop: 100 }}>
+              <Alert
+                message="No projects found. Please reach out to Brickfi Team."
+                type="info"
+              ></Alert>
             </Flex>
           )}
         </>
