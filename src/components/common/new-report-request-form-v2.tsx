@@ -208,6 +208,36 @@ export const NewReportRequestFormV2 = () => {
       </Flex>
     );
   };
+
+  const renderBanner = () => {
+    return (
+      <Flex
+        style={{
+          width: `calc(${isMobile ? "100%" : "50%"} - 32px)`,
+          padding: 16,
+        }}
+        justify="center"
+      >
+        {/* <img
+            src="/images/landing/brick360-request-1.png"
+            style={{
+              height: isMobile ? 200 : 400,
+              marginTop: isMobile ? 0 : 50,
+            }}
+          /> */}
+        <div
+          style={{
+            backgroundImage: `url(/images/landing/brick360-request-1.png)`,
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+            height: isMobile ? 200 : 400,
+            width: isMobile ? "100%" : "80%",
+          }}
+        ></div>
+      </Flex>
+    );
+  };
   useEffect(() => {
     if (user && user.requestedReports) {
       setReportsLeft(3 - user.requestedReports.length);
@@ -227,31 +257,7 @@ export const NewReportRequestFormV2 = () => {
           minHeight: "calc(100vh - 100px)",
         }}
       >
-        <Flex
-          style={{
-            width: `calc(${isMobile ? "100%" : "50%"} - 32px)`,
-            padding: 16,
-          }}
-          justify="center"
-        >
-          {/* <img
-            src="/images/landing/brick360-request-1.png"
-            style={{
-              height: isMobile ? 200 : 400,
-              marginTop: isMobile ? 0 : 50,
-            }}
-          /> */}
-          <div
-            style={{
-              backgroundImage: `url(/images/landing/brick360-request-1.png)`,
-              backgroundPosition: "center",
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-              height: isMobile ? 200 : 400,
-              width: isMobile ? "100%" : "80%",
-            }}
-          ></div>
-        </Flex>
+        {isMobile ? null : renderBanner()}
         <Flex
           style={{
             width: `calc(${isMobile ? "100%" : "50%"} - 32px)`,
@@ -477,6 +483,7 @@ export const NewReportRequestFormV2 = () => {
             </Flex>
           )}
         </Flex>
+        {isMobile ? renderBanner() : null}
       </Flex>
       <LandingFooter></LandingFooter>
     </>
