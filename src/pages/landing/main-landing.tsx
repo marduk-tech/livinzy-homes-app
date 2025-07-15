@@ -135,11 +135,8 @@ export function MainLanding() {
           heading: "Insights that Lead to Clarity",
           bgColor: "#fdf7f6",
           btn: {
-            link: "",
+            link: "/requestreport",
             txt: "Generate Free Report",
-            btnAction: () => {
-              setNewReportRequestFormOpen(true);
-            },
           },
           subHeading:
             "Our AI analyses every data point so that you don’t have to. Get a clear understanding of what to look at, what’s important and why its important.",
