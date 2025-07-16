@@ -1,7 +1,11 @@
-import { Flex, Select, Typography } from "antd";
+import { AutoComplete, Button, Flex, Select, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useFetchAllLivindexPlaces } from "../../../../hooks/use-livindex-places";
 import { useFetchProjects } from "../../../../hooks/use-project";
+import {
+  useFetchProjectsForMapView,
+  useProjectSearch,
+} from "../../../../hooks/use-project-search";
 import {
   LivIndexDriversConfig,
   ProjectHomeType,
@@ -14,12 +18,30 @@ import { getProjectTypeIcon } from "../../map-old/project-type-icon";
 import MapViewV2 from "../../map-view-v2";
 
 export function LivIndexFull() {
+  const [homeTypeFilter, setHomeTypeFilter] = useState("apartment");
+
   const { data: livindexPlaces, isLoading: livindexPlacesLoading } =
     useFetchAllLivindexPlaces();
 
-  const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null
+  );
+  const [searchValue, setSearchValue] = useState("");
 
-  const [homeTypeFilter, setHomeTypeFilter] = useState("apartment");
+  // Use different hooks based on whether there's a selected project (search mode)
+  const isSearchMode = !!selectedProjectId;
+  const { data: allProjects, isLoading: allProjectsLoading } =
+    useFetchProjects();
+  const { data: typeFilteredProjects, isLoading: filteredProjectsLoading } =
+    useFetchProjectsForMapView(homeTypeFilter);
+
+  // Use appropriate data and loading state based on mode
+  const projects = isSearchMode ? allProjects : typeFilteredProjects;
+  const projectIsLoading = isSearchMode
+    ? allProjectsLoading
+    : filteredProjectsLoading;
+
+  const { projects: searchProjects } = useProjectSearch();
   const [driverFilters, setDriverFilters] = useState<string[]>([
     "industrial-hitech",
     "airport",
@@ -27,57 +49,36 @@ export function LivIndexFull() {
 
   const [filteredProjects, setFilteredProjects] = useState<any[]>([]);
   const [filteredDrivers, setFilteredDrivers] = useState<IDriverPlace[]>([]);
-  const [selectedDriverTypes, setSelectedDriverTypes] = useState<string[]>([
-    "industrial-hitech",
-    "airport",
-  ]);
 
   useEffect(() => {
     if (projects && projects.length) {
-      const validProjects = projects.filter((p) => {
-        return (
-          p.info &&
-          p.info.homeType &&
-          p.info.location &&
-          typeof p.info.location.lat === "number" &&
-          typeof p.info.location.lng === "number"
-        );
-      });
-      console.log("Total projects:", projects.length);
-      console.log("Valid projects with coordinates:", validProjects.length);
-
-      // Log any projects with invalid coordinates for debugging
-      const invalidProjects = projects.filter(
-        (p) =>
-          p.info &&
-          p.info.location &&
-          (typeof p.info.location.lat !== "number" ||
-            typeof p.info.location.lng !== "number")
-      );
-      if (invalidProjects.length > 0) {
-        console.warn(
-          "Projects with invalid coordinates:",
-          invalidProjects.map((p) => ({
-            id: p._id,
-            name: p.info?.name,
-            location: p.info?.location,
-          }))
-        );
-      }
-
-      const filtered = validProjects.filter((p) =>
-        p.info.homeType.includes(homeTypeFilter)
-      );
+      console.log("Total projects from API:", projects.length);
+      console.log("Projects filtered by homeType:", homeTypeFilter);
       console.log(
-        "Filtered by homeType:",
-        filtered.length,
-        "homeType:",
-        homeTypeFilter
+        "Search mode:",
+        isSearchMode,
+        "Selected project ID:",
+        selectedProjectId
       );
 
-      setFilteredProjects(filtered);
+      if (isSearchMode && selectedProjectId) {
+        // In search mode, show only the selected project
+        const selectedProject = projects.find(
+          (p) => p._id === selectedProjectId
+        );
+        if (selectedProject) {
+          setFilteredProjects([selectedProject]);
+        } else {
+          setFilteredProjects([]);
+        }
+      } else {
+        // Normal mode - show all projects (API already filters by type)
+        setFilteredProjects(projects);
+      }
+    } else {
+      setFilteredProjects([]);
     }
-  }, [projects, homeTypeFilter]);
+  }, [projects, homeTypeFilter, isSearchMode, selectedProjectId]);
 
   // update filtered drivers when places or filters change
   useEffect(() => {
@@ -88,7 +89,6 @@ export function LivIndexFull() {
       );
       console.log("Filtered drivers count:", drivers.length);
       setFilteredDrivers(drivers);
-      setSelectedDriverTypes(driverFilters);
     }
   }, [livindexPlaces, driverFilters]);
 
@@ -99,26 +99,80 @@ export function LivIndexFull() {
 
   const handleHomeTypeSelect = (value: string) => {
     setHomeTypeFilter(value);
+    // Clear project search when dropdown is used (exit search mode)
+    setSearchValue("");
+    setSelectedProjectId(null);
   };
   const handleDriverSelect = (value: string[]) => {
     setDriverFilters(value);
-    setSelectedDriverTypes(value);
   };
+
+  const handleProjectSelect = (_: any, option: any) => {
+    setSelectedProjectId(option.projectId);
+    setSearchValue(option.label);
+
+    // When a project is selected, we switch to search mode
+    // This will use the allProjects data and filter to show only the selected project
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value);
+    if (!value) {
+      setSelectedProjectId(null);
+      // When search is cleared, we exit search mode and return to normal filtering
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchValue("");
+    setSelectedProjectId(null);
+  };
+
+  const projectOptions =
+    searchProjects?.map((project) => ({
+      value: project.projectId,
+      label: project.projectName,
+      projectId: project.projectId,
+    })) || [];
 
   if (livindexPlacesLoading) {
     return <Loader />;
   }
 
   if (livindexPlaces) {
+    console.log(projects);
+
     return (
       <Flex vertical style={{ height: "calc(100vh - 64px)" }}>
         <Flex
           gap={16}
           style={{ padding: 8, backgroundColor: "white", zIndex: 1 }}
         >
+          <AutoComplete
+            style={{ width: 300 }}
+            options={projectOptions}
+            value={searchValue}
+            onChange={handleSearchChange}
+            onSelect={handleProjectSelect}
+            filterOption={(inputValue, option) =>
+              option!.label.toLowerCase().includes(inputValue.toLowerCase())
+            }
+            placeholder="Search for project name..."
+          />
+          {isSearchMode && (
+            <Button
+              type="default"
+              onClick={clearSearch}
+              style={{ flexShrink: 0 }}
+            >
+              Clear Search
+            </Button>
+          )}
           <Select
-            defaultValue="apartment"
+            value={homeTypeFilter}
             style={{ width: 200 }}
+            loading={projectIsLoading}
+            disabled={isSearchMode}
             onChange={handleHomeTypeSelect}
             options={Object.keys(ProjectHomeType).map((k: string) => {
               return {
@@ -153,70 +207,45 @@ export function LivIndexFull() {
           />
         </Flex>
         <Flex style={{ flex: 1, position: "relative", minHeight: "600px" }}>
-          {filteredProjects && (
-            <>
-              <Flex
-                gap={8}
+          <>
+            <Flex
+              gap={8}
+              style={{
+                position: "absolute",
+                bottom: 8,
+                left: 8,
+                right: 8,
+                zIndex: 1000,
+                padding: "0 8px",
+              }}
+            >
+              <Typography.Text
                 style={{
-                  position: "absolute",
-                  bottom: 8,
-                  left: 8,
-                  right: 8,
-                  zIndex: 1000,
-                  padding: "0 8px",
+                  backgroundColor: "white",
+                  padding: "4px 8px",
+                  borderRadius: 4,
+                  marginLeft: "auto",
                 }}
               >
-                <Typography.Text
-                  style={{
-                    backgroundColor: "white",
-                    padding: "4px 8px",
-                    borderRadius: 4,
-                    marginLeft: "auto",
-                  }}
-                >
-                  {filteredProjects.length} projects
-                </Typography.Text>
-                {/* <Select
-                  style={{ minWidth: 250, backgroundColor: "white" }}
-                  placeholder="Navigate to project"
-                  value={selectedProject}
-                  onChange={(value) => {
-                    console.log("Selected project changed to:", value);
-                    
-                    if (
-                      !value ||
-                      filteredProjects.some((p) => p._id === value)
-                    ) {
-                      setSelectedProject(value);
-                    } else {
-                      console.warn(
-                        "Selected project not in filtered list:",
-                        value
-                      );
-                      setSelectedProject(undefined);
-                    }
-                  }}
-                  options={filteredProjects.map((p) => ({
-                    label:
-                      p.info?.name ||
-                      p.info?.projectName ||
-                      "Unnamed Project",
-                    value: p._id,
-                  }))}
-                /> */}
-              </Flex>
-              <MapViewV2
-                key={"map-all"}
-                drivers={filteredDrivers.map((p) => ({
-                  ...p,
-                  duration: p.distance ? Math.round(p.distance / 60) : 0,
-                }))}
-                projects={filteredProjects}
-                fullSize={false}
-                showLocalities={true}
-              />
-            </>
-          )}
+                {projectIsLoading
+                  ? "Loading projects..."
+                  : isSearchMode
+                  ? `Showing search result: ${filteredProjects.length} project`
+                  : `${filteredProjects.length} projects`}
+              </Typography.Text>
+            </Flex>
+            <MapViewV2
+              key="stable-map-view"
+              drivers={filteredDrivers.map((p) => ({
+                ...p,
+                duration: p.distance ? Math.round(p.distance / 60) : 0,
+              }))}
+              projects={filteredProjects}
+              projectId={selectedProjectId || undefined}
+              fullSize={false}
+              showLocalities={true}
+            />
+          </>
         </Flex>
       </Flex>
     );
