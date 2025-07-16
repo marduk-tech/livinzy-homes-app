@@ -16,15 +16,18 @@ export function BrickAssistLanding() {
 
   const getFaqHeading = (text: string) => {
     return (
-      <Typography.Text
+      <h3
         style={{
           fontSize: FONT_SIZE.HEADING_2,
           textAlign: "left",
           color: "white",
+          margin: 0,
+          fontWeight: 500,
+          lineHeight: "120%",
         }}
       >
         {text}
-      </Typography.Text>
+      </h3>
     );
   };
 
@@ -77,7 +80,7 @@ export function BrickAssistLanding() {
     },
     {
       key: "3",
-      label: getFaqHeading("How are you different from other Brokers ?"),
+      label: getFaqHeading("How are you different from other brokers ?"),
       style: faqPanelStyle,
       children: (
         <Flex vertical gap={16}>
@@ -235,6 +238,7 @@ export function BrickAssistLanding() {
               <img
                 style={{ width: 150 }}
                 src="/images/brickfi-assist-white.png"
+                alt="Brickfi Assist"
               />
               <h1
                 style={{
@@ -249,7 +253,8 @@ export function BrickAssistLanding() {
               </h1>
             </Flex>
           ),
-          mainImgAltText: "Consult with Brickfi",
+          mainImgAltText:
+            "Brickfi Assist | Expert property advice with Brickfi",
           subHeading:
             "Consult with Brickfi to get an expert advice on your next home purchase. We provide unbiased, data backed and technology driven real estate advisory.",
           primaryImageSize: isMobile ? "75%" : "80%",
@@ -283,7 +288,7 @@ export function BrickAssistLanding() {
               data backed research to help you make confident decisions.
             </Typography.Text>
           ),
-          mainImgAltText: "About Brickfi",
+          mainImgAltText: "Brickfi Assist - End to End Property Consultation",
           primaryImageSize: "100%",
           mainImgUrl: "/images/landing/brick-assist-landing-2.png",
           imageContainerWidth: 50,
@@ -305,7 +310,7 @@ export function BrickAssistLanding() {
                     style={{
                       color: "white",
                       fontSize: FONT_SIZE.HEADING_3,
-                      marginTop: 8,
+                      marginTop: 4,
                     }}
                     rotate={isActive ? 90 : 0}
                   />

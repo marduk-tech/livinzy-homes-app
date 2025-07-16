@@ -3,8 +3,6 @@ import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 //Layouts
 import { DashboardLayout } from "../layouts/dashboard-layout";
 
-// Pages
-import LandMeasurementConvertor from "../components/sides/land-measurement-convertor";
 import { ProfilePage } from "../pages/profile-page";
 import { SignUpForm } from "../pages/signup";
 import UserSessions from "../pages/user-sessions";
@@ -13,7 +11,6 @@ import { Capacitor } from "@capacitor/core";
 import posthog from "posthog-js";
 import { useEffect } from "react";
 import LivProjectPro from "../components/liv-project-pro";
-import { LivIndexFull } from "../components/map-view/map-old/liv-index-all/livindex-full";
 import { useUser } from "../hooks/use-user";
 import { posthogkey } from "../libs/constants";
 import { Brick360Full } from "../pages/brick360-full";
@@ -24,6 +21,7 @@ import { PaymentCallbackPage } from "../pages/payment-callback";
 import { FourOFour } from "../pages/landing/404";
 import { BrickAssistLanding } from "../pages/landing/brick-assist-landing";
 import { NewReportRequestFormV2 } from "../components/common/new-report-request-form-v2";
+import { LivIndexFull } from "../components/map-view/map-old/liv-index-all/livindex-full";
 
 export const Router = () => {
   const { user, isLoading: userLoading } = useUser();
@@ -54,10 +52,6 @@ export const Router = () => {
 
   return (
     <Routes>
-      <Route
-        path="/sides/unit-connvertor"
-        element={<LandMeasurementConvertor />}
-      />
       <Route path="/" element={<MainLanding />} />
       <Route path="/aboutus" element={<AboutUs />} />
       <Route
