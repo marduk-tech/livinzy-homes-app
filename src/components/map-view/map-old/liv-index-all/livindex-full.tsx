@@ -208,7 +208,7 @@ export function LivIndexFull() {
               <MapViewV2
                 key={"map-all"}
                 drivers={filteredDrivers.map((p) => ({
-                  id: p._id,
+                  ...p,
                   duration: p.distance ? Math.round(p.distance / 60) : 0,
                 }))}
                 projects={filteredProjects}
