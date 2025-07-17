@@ -5,7 +5,6 @@ import { Loader } from "../components/common/loader";
 import { ProfileEditModal } from "../components/profile-edit-modal";
 import { useAuth } from "../hooks/use-auth";
 import { useDevice } from "../hooks/use-device";
-import { useFetchProjects } from "../hooks/use-project";
 import { useUser } from "../hooks/use-user";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 
@@ -14,7 +13,6 @@ export function ProfilePage() {
   const { user, isLoading } = useUser();
 
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
-  const { data: projects, isLoading: projectIsLoading } = useFetchProjects();
   const { logout } = useAuth();
 
   const handleLogout = () => {
@@ -25,16 +23,11 @@ export function ProfilePage() {
 
   const [showProfileEditForm, setShowProfileEditForm] = useState(false);
 
-  if (isLoading || projectIsLoading) {
+  if (isLoading) {
     return <Loader />;
   }
 
-  if (user && projects) {
-    const userSavedProjects = user?.savedProjects || [];
-    const savedProjects = projects?.filter((project) =>
-      userSavedProjects.includes(project._id)
-    );
-
+  if (user) {
     return (
       <>
         <Modal
@@ -54,9 +47,11 @@ export function ProfilePage() {
             <Typography.Title level={4}>Your Profile</Typography.Title>
             <Flex
               style={{
-                padding: 16,
-                backgroundColor: "white",
+                padding: 8,
+                backgroundColor: COLORS.bgColor,
                 borderRadius: 8,
+                border: "1px solid",
+                borderColor: COLORS.borderColor,
               }}
               vertical
             >
