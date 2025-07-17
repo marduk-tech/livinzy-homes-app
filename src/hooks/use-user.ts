@@ -15,13 +15,15 @@ export function useUser() {
       throw new Error("User not found in local storage");
     }
 
-    const userInfo = (await axiosApiInstance
-      .get(`/auth/myinfo/${user._id}`, {})
-      .then((data) => {
-        return data.data;
-      })) as User;
+    // Refresh the user object in the background.
+    // TODO: This should be done using an expiry logic.
+    axiosApiInstance.get(`/auth/myinfo/${user._id}`, {}).then((data) => {
+      if (data && data.data && data.data.mobile) {
+        localStorage.setItem(LocalStorageKeys.user, JSON.stringify(data.data));
+      }
+    });
 
-    return userInfo;
+    return user;
   };
 
   const { data, isLoading, isError, error, refetch } = useQuery({

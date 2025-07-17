@@ -3,7 +3,6 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { Loader } from "../common/loader";
-import { useDevice } from "../../hooks/use-device";
 import { useFetchLvnzyProjectById } from "../../hooks/use-lvnzy-project";
 
 import { Brick360Tab } from "./brick-360-tab";
@@ -20,15 +19,12 @@ import {
   Brick360DataPoints,
 } from "../../libs/constants";
 import { COLORS } from "../../theme/style-constants";
-import { ISurroundingElement } from "../../types/Project";
 import Brick360Chat from "../liv/brick360-chat";
 
 const FAKE_TIMER_SECS = 100;
 
 export function Brick360v2() {
   const { lvnzyProjectId } = useParams();
-
-  const { isMobile } = useDevice();
 
   const brick360ChatRef = useRef<{
     expandChat: () => void;
@@ -43,19 +39,11 @@ export function Brick360v2() {
     ReactNode | undefined
   >();
 
-  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedDataPointCategory, setSelectedDataPointCategory] =
     useState<any>();
   const [selectedDataPointSubCategory, setSelectedDataPointSubCategory] =
     useState<any>();
 
-  const [selectedDriverTypes, setSelectedDriverTypes] = useState<any>();
-
-  const [mapVisible, setMapVisible] = useState<boolean>(false);
-
-  const [mapDrivers, setMapDrivers] = useState<any[]>([]);
-  const [surroundingElements, setSurroundingElements] =
-    useState<ISurroundingElement[]>();
   const [selectedDataPoint, setSelectedDataPoint] = useState<any>();
   const [fakeTimeoutProgress, setFakeTimeoutProgress] = useState<any>(10);
   const [selectedDataPointTitle, setSelectedDataPointTitle] = useState("");
@@ -88,18 +76,6 @@ export function Brick360v2() {
       });
     }, FAKE_TIMER_SECS);
   });
-
-  useEffect(() => {
-    if (!lvnzyProject) {
-      return;
-    }
-    setMapDrivers(
-      [
-        ...(lvnzyProject as any)["neighborhood"].drivers,
-        ...(lvnzyProject as any)["connectivity"].drivers,
-      ].filter((d) => !!d.driverId && !!d.driverId._id)
-    );
-  }, [lvnzyProject]);
 
   // Setting main data points category
   useEffect(() => {

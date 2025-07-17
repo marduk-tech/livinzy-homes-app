@@ -1,6 +1,6 @@
 import { Drawer, Flex, Image, Layout, Modal, Typography } from "antd";
 import React, { useEffect, useState } from "react";
-import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
+import { Link, Outlet, useParams } from "react-router-dom";
 import { CustomErrorBoundary } from "../components/common/custom-error-boundary";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { LoginForm } from "../components/login-forms";
@@ -18,11 +18,7 @@ export const DashboardLayout: React.FC = () => {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [showUserDetailsForm, setShowUserDetailsForm] = useState(false);
 
-  const navigate = useNavigate();
   const { lvnzyProjectId, collectionId } = useParams();
-  const BrokenComponent = () => {
-    throw new Error("This is a test error from BrokenComponent");
-  };
 
   useEffect(() => {
     const userItem = localStorage.getItem(LocalStorageKeys.user);
@@ -173,27 +169,25 @@ export const DashboardLayout: React.FC = () => {
                 ></img>
               </Flex>
 
-              {user && (
-                <Flex style={{ marginLeft: "auto", cursor: "pointer" }}>
-                  <img
-                    src="/images/brickfi-assist.png"
-                    onClick={() => {
-                      window.location.assign(LandingConstants.brickAssistLink);
-                    }}
-                    style={{ height: 32, width: "auto", marginRight: 8 }}
-                  ></img>
-                  <Flex
-                    onClick={() => {
-                      setSidebarOpen(true);
-                    }}
-                  >
-                    <DynamicReactIcon
-                      iconName="HiOutlineMenuAlt3"
-                      iconSet="hi"
-                    ></DynamicReactIcon>
-                  </Flex>
+              <Flex style={{ marginLeft: "auto", cursor: "pointer" }}>
+                <img
+                  src="/images/brickfi-assist.png"
+                  onClick={() => {
+                    window.location.assign(LandingConstants.brickAssistLink);
+                  }}
+                  style={{ height: 32, width: "auto", marginRight: 8 }}
+                ></img>
+                <Flex
+                  onClick={() => {
+                    setSidebarOpen(true);
+                  }}
+                >
+                  <DynamicReactIcon
+                    iconName="HiOutlineMenuAlt3"
+                    iconSet="hi"
+                  ></DynamicReactIcon>
                 </Flex>
-              )}
+              </Flex>
             </Flex>
           </Header>
           <Drawer
@@ -254,7 +248,7 @@ export const DashboardLayout: React.FC = () => {
             }}
           >
             <CustomErrorBoundary>
-              <Outlet />
+              <Outlet></Outlet>
             </CustomErrorBoundary>
           </Content>
         </Layout>

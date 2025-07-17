@@ -1,5 +1,5 @@
 import { Alert, Flex } from "antd";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Loader } from "../components/common/loader";
 import { RequestedProjectsList } from "../components/requested-projects-list";
@@ -17,8 +17,6 @@ const BrickfiHome: React.FC = () => {
   const { user, isLoading: userLoading } = useUser();
   const { lvnzyProjectId, collectionId } = useParams();
 
-  const [drawerFixedContent, setDrawerFixedContent] = useState<ReactNode>(null);
-  const [drawerVisibility, setDrawerVisibility] = useState<boolean>(false);
   const [selectedCollection, setSelectedCollection] =
     useState<SavedLvnzyProject | null>(null);
   const [isLoadingCollection, setIsLoadingCollection] = useState(true);
