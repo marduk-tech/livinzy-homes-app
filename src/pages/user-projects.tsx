@@ -1,5 +1,5 @@
 import { Flex, Typography } from "antd";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GradientBar from "../components/common/grading-bar";
 import { Loader } from "../components/common/loader";
@@ -24,7 +24,6 @@ export function UserProjects({
 
   const navigate = useNavigate();
   const [selectedCorridor, setSelectedCorridor] = useState<string>("all");
-  const [uniqueCorridors, setUniqueCorridors] = useState<string[]>();
   const { isMobile } = useDevice();
 
   const filteredProjects = lvnzyProjects.filter(
@@ -33,20 +32,6 @@ export function UserProjects({
       selectedCorridor == "all" ||
       p.meta.projectCorridors.split(",").includes(selectedCorridor)
   );
-
-  useEffect(() => {
-    const uniqC: string[] = [];
-    if (lvnzyProjects && lvnzyProjects.length) {
-      lvnzyProjects.forEach((p) => {
-        p.meta.projectCorridors.split(",").forEach((c: string) => {
-          if (!uniqC.includes(c)) {
-            uniqC.push(c);
-          }
-        });
-      });
-    }
-    setUniqueCorridors(uniqC);
-  }, [lvnzyProjects]);
 
   const renderLvnzyProject = (itemInfo: any) => {
     const oneLinerBreakup = itemInfo.meta.oneLiner
