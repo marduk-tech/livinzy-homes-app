@@ -1,5 +1,5 @@
 import { Flex, Progress, Typography } from "antd";
-import { FONT_SIZE } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 
 interface FakeProgressProps {
   progress: number;
@@ -23,15 +23,15 @@ export const FakeProgress = ({ progress, projectName }: FakeProgressProps) => {
       {/* <Flex vertical>
         <DataSources disableDetailsDialog={true}></DataSources>
       </Flex> */}
-      {/* <Typography.Title
-        level={2}
+      <Typography.Text
         style={{
           margin: 0,
           padding: 8,
+          fontSize: FONT_SIZE.HEADING_1,
         }}
       >
-        {projectName}
-      </Typography.Title> */}
+        Loading Brick360 Report
+      </Typography.Text>
       <Flex vertical style={{ marginTop: 16 }}>
         {" "}
         <Typography.Text
@@ -43,7 +43,11 @@ export const FakeProgress = ({ progress, projectName }: FakeProgressProps) => {
             ? "Analysing"
             : "Finishing up"}
         </Typography.Text>
-        <Progress percent={progress} style={{ padding: 8 }} />
+        <Progress
+          strokeColor={COLORS.primaryColor}
+          percent={progress}
+          style={{ padding: 8 }}
+        />
       </Flex>
     </Flex>
   );
