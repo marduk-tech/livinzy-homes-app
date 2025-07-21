@@ -37,9 +37,9 @@ export const FakeProgress = ({ progress, projectName }: FakeProgressProps) => {
         <Typography.Text
           style={{ padding: "0 8px", fontSize: FONT_SIZE.HEADING_2 }}
         >
-          {progress < 20
+          {progress < 35
             ? "Fetching Data"
-            : progress < 60
+            : progress < 70
             ? "Analysing"
             : "Finishing up"}
         </Typography.Text>

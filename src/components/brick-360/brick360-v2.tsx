@@ -20,7 +20,7 @@ import {
 import { COLORS } from "../../theme/style-constants";
 import Brick360Chat from "../liv/brick360-chat";
 
-const FAKE_TIMER_SECS = 500;
+const FAKE_TIMER_SECS = 700;
 
 export function Brick360v2() {
   const { lvnzyProjectId } = useParams();
