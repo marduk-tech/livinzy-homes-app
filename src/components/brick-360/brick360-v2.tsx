@@ -2,7 +2,6 @@ import { Flex, Tabs, Typography } from "antd";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import DynamicReactIcon from "../common/dynamic-react-icon";
-import { Loader } from "../common/loader";
 import { useFetchLvnzyProjectById } from "../../hooks/use-lvnzy-project";
 
 import { Brick360Tab } from "./brick-360-tab";
@@ -67,7 +66,7 @@ export function Brick360v2() {
   useEffect(() => {
     const interval = setInterval(() => {
       setFakeTimeoutProgress((prevFakeTimeoutProgress: any) => {
-        if (prevFakeTimeoutProgress >= 130) {
+        if (!lvnzyProjectIsLoading) {
           // Stop at 10
           clearInterval(interval);
           return prevFakeTimeoutProgress;
@@ -103,18 +102,18 @@ export function Brick360v2() {
   }, [lvnzyProject]);
 
   if (lvnzyProjectIsLoading) {
-    return <Loader></Loader>;
+    return <FakeProgress progress={fakeTimeoutProgress} projectName={""} />;
   }
 
-  // Fake progress bar
-  if (fakeTimeoutProgress < 130) {
-    return (
-      <FakeProgress
-        progress={fakeTimeoutProgress}
-        projectName={lvnzyProject?.meta.projectName}
-      />
-    );
-  }
+  // // Fake progress bar
+  // if (fakeTimeoutProgress < 130) {
+  //   return (
+  //     <FakeProgress
+  //       progress={fakeTimeoutProgress}
+  //       projectName={lvnzyProject?.meta.projectName}
+  //     />
+  //   );
+  // }
 
   return (
     <Flex

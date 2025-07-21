@@ -1,5 +1,5 @@
 import { Flex, Progress, Typography } from "antd";
-import { DataSources } from "../common/data-sources";
+import { FONT_SIZE } from "../../theme/style-constants";
 
 interface FakeProgressProps {
   progress: number;
@@ -20,10 +20,10 @@ export const FakeProgress = ({ progress, projectName }: FakeProgressProps) => {
         left: `calc(50% - ${progressWidth / 2}px)`,
       }}
     >
-      <Flex vertical>
+      {/* <Flex vertical>
         <DataSources disableDetailsDialog={true}></DataSources>
-      </Flex>
-      <Typography.Title
+      </Flex> */}
+      {/* <Typography.Title
         level={2}
         style={{
           margin: 0,
@@ -31,14 +31,16 @@ export const FakeProgress = ({ progress, projectName }: FakeProgressProps) => {
         }}
       >
         {projectName}
-      </Typography.Title>
+      </Typography.Title> */}
       <Flex vertical style={{ marginTop: 16 }}>
         {" "}
-        <Typography.Text style={{ padding: "0 8px" }}>
+        <Typography.Text
+          style={{ padding: "0 8px", fontSize: FONT_SIZE.HEADING_3 }}
+        >
           {progress < 20
-            ? "Starting up"
-            : progress < 80
-            ? "Collecting Data"
+            ? "Fetching Data"
+            : progress < 60
+            ? "Analysing"
             : "Finishing up"}
         </Typography.Text>
         <Progress percent={progress} style={{ padding: 8 }} />
