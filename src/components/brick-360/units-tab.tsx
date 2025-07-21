@@ -30,10 +30,35 @@ const getTotalFloors = (lvnzyProject: any) => {
     totalFloors = `${minFloors} - ${maxFloors}`;
   }
   return (
-    <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
-      / {totalFloors} Floors
+    <Typography.Text
+      style={{
+        fontSize: FONT_SIZE.HEADING_4,
+        marginLeft: 4,
+        color: COLORS.textColorLight,
+      }}
+    >
+      {totalFloors} Floors
     </Typography.Text>
   );
+};
+
+const getMinMaxSize = (configs: any[]) => {
+  let sizes: number[] = [];
+  configs.forEach((c: any) => {
+    const split = c.config.split("-");
+    if (split.length > 1) {
+      sizes.push(parseInt(split[1]));
+    }
+  });
+  if (sizes.length) {
+    sizes = sizes.sort((a, b) => a - b);
+    return (
+      <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
+        {sizes[0]} - {sizes[sizes.length - 1]} sq.ft
+      </Typography.Text>
+    );
+  }
+  return null;
 };
 
 export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
@@ -48,25 +73,45 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
       >
         <Flex vertical style={{ marginBottom: 8 }}>
           {/* Sqft & Configs */}
-          {lvnzyProject?.meta.projectConfigurations && (
-            <Flex align="center" gap={8}>
-              {lvnzyProject?.property.layout.totalUnits && (
-                <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
-                  {lvnzyProject?.property.layout.totalUnits} Units /
-                </Typography.Text>
-              )}{" "}
-              {lvnzyProject?.property.layout.totalLandArea && (
-                <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
-                  {Math.round(
-                    lvnzyProject?.property.layout.totalLandArea / 4046.8564
-                  )}{" "}
-                  Acre
-                </Typography.Text>
-              )}
-              {lvnzyProject?.meta.projectConfigurations.unitsBreakup &&
-                getTotalFloors(lvnzyProject)}
-            </Flex>
-          )}
+
+          <Flex align="center" gap={8}>
+            {lvnzyProject?.meta.costingDetails && (
+              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
+                ₹
+                {rupeeAmountFormat(
+                  `${Math.round(
+                    lvnzyProject?.meta.costingDetails.minimumUnitCost /
+                      lvnzyProject?.meta.costingDetails.minimumUnitSize
+                  )}`
+                )}
+                / sq.ft ·
+              </Typography.Text>
+            )}{" "}
+            {getMinMaxSize(lvnzyProject?.meta.costingDetails.configurations)}
+          </Flex>
+          <Flex>
+            {lvnzyProject?.property.layout.totalUnits && (
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.HEADING_4,
+                  marginRight: 4,
+                  color: COLORS.textColorLight,
+                }}
+              >
+                {lvnzyProject?.property.layout.totalUnits} Units (
+                {Math.round(
+                  lvnzyProject?.property.layout.totalLandArea / 4046.8564
+                )}{" "}
+                Acre)
+              </Typography.Text>
+            )}{" "}
+            ·
+            {lvnzyProject?.meta.projectConfigurations &&
+            lvnzyProject!.meta.projectConfigurations.unitsBreakup
+              ? getTotalFloors(lvnzyProject)
+              : null}
+          </Flex>
+
           <Flex vertical gap={8}>
             {lvnzyProject!.meta.costingDetails.configurations.map(
               (c: any, index: number) => {

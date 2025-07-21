@@ -1280,13 +1280,12 @@ const MapViewV2 = ({
           display: "flex",
           alignItems: "center",
           borderRadius: 16,
-          border: "1px solid",
-          borderColor: COLORS.borderColorDark,
-          padding: "8px 12px",
+          padding: "4px 8px",
+          marginRight: 4,
           backgroundColor:
             k == selectedDriverType ? COLORS.primaryColor : "white",
           color: k == selectedDriverType ? "white" : "initial",
-          marginLeft: 4,
+          marginLeft: 0,
           cursor: "pointer",
         }}
         onClick={() => {
@@ -1306,8 +1305,9 @@ const MapViewV2 = ({
         <Typography.Text
           style={{
             color: k == selectedDriverType ? "white" : COLORS.textColorDark,
-            marginLeft: 8,
-            fontSize: FONT_SIZE.HEADING_4,
+            marginLeft: 4,
+            fontSize: FONT_SIZE.SUB_TEXT,
+            fontWeight: 500,
           }}
         >
           {(LivIndexDriversConfig as any)[k]

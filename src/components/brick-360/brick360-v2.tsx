@@ -180,7 +180,7 @@ export function Brick360v2() {
                   size={20}
                 ></DynamicReactIcon>
                 <Typography.Text color={COLORS.textColorDark}>
-                  Units
+                  Price/Units
                 </Typography.Text>
               </Flex>
             ),
