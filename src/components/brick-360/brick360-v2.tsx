@@ -69,9 +69,9 @@ export function Brick360v2() {
         if (!lvnzyProjectIsLoading) {
           // Stop at 10
           clearInterval(interval);
-          return prevFakeTimeoutProgress;
+          return 100;
         }
-        return prevFakeTimeoutProgress + 10;
+        return Math.min(95, prevFakeTimeoutProgress + 10);
       });
     }, FAKE_TIMER_SECS);
   });
