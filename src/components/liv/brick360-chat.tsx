@@ -237,15 +237,18 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
     }, [dataPoint]);
 
     useEffect(() => {
-      if (user && lvnzyProject && dataPoint) {
+      if (user && lvnzyProject) {
         const sessionId = sha256(`${user._id}:${lvnzyProject._id}`);
         setCurrentSessionId(sessionId);
         fetchHistory(sessionId);
       }
-    }, [user, lvnzyProject, dataPoint]);
+    }, [user, lvnzyProject]);
 
     const fetchHistory = async (historySessionId: string) => {
       try {
+        if (loadingLivThread) {
+          return;
+        }
         setLoadingLivThread(true);
         const response = await axiosApiInstance.post("/ai/history", {
           sessionId: historySessionId,
