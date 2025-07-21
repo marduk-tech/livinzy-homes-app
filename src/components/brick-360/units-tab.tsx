@@ -54,7 +54,10 @@ const getMinMaxSize = (configs: any[]) => {
     sizes = sizes.sort((a, b) => a - b);
     return (
       <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
-        {sizes[0]} - {sizes[sizes.length - 1]} sq.ft
+        {sizes[0] == sizes[sizes.length - 1]
+          ? sizes[0]
+          : `${sizes[0]} - ${sizes[sizes.length - 1]}`}{" "}
+        sq.ft
       </Typography.Text>
     );
   }
