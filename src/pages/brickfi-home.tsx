@@ -1,4 +1,4 @@
-import { Alert, Flex } from "antd";
+import { Button, Flex, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Loader } from "../components/common/loader";
@@ -6,6 +6,10 @@ import { RequestedProjectsList } from "../components/requested-projects-list";
 import { useUser } from "../hooks/use-user";
 import { Brick360v2 } from "../components/brick-360/brick360-v2";
 import { UserProjects } from "./user-projects";
+import { axiosApiInstance } from "../libs/axios-api-Instance";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { LandingConstants } from "../libs/constants";
 
 interface SavedLvnzyProject {
   _id: string;
@@ -17,70 +21,67 @@ const BrickfiHome: React.FC = () => {
   const { user, isLoading: userLoading } = useUser();
   const { lvnzyProjectId, collectionId } = useParams();
 
-  const [selectedCollection, setSelectedCollection] =
-    useState<SavedLvnzyProject | null>(null);
-  const [isLoadingCollection, setIsLoadingCollection] = useState(true);
+  const [lvnzyProjects, setLvnzyProjects] = useState<any[]>([]);
+  const [projectsLoading, setProjectsLoadng] = useState(true);
 
-  const tabs = [
-    {
-      label: "List",
-      iconName: "MdOutlineMapsHomeWork",
-      iconSet: "md",
-      key: "list",
-    },
-    { label: "Map", iconName: "FaMapMarked", iconSet: "fa", key: "map" },
-    { label: "Assist", iconName: "GiOilySpiral", iconSet: "gi", key: "assist" },
-  ];
-  const [selectedTabKey, setSelectedTabKey] = React.useState<string>(
-    tabs[0].key
-  );
+  const fetchLvnzyProjectsByIds = async (ids: string) => {
+    const { data } = await axiosApiInstance.post(`/lvnzy-projects/${ids}`, {
+      ids,
+    });
+    setLvnzyProjects(data);
+    setProjectsLoadng(false);
+  };
 
   useEffect(() => {
-    setIsLoadingCollection(true);
-
+    if (userLoading) {
+      return;
+    }
     if (!user) {
-      setIsLoadingCollection(false);
+      setProjectsLoadng(false);
       return;
     }
 
     if (!user.savedLvnzyProjects || user.savedLvnzyProjects.length === 0) {
-      setSelectedCollection(null);
-      setIsLoadingCollection(false);
+      setLvnzyProjects([]);
+      setProjectsLoadng(false);
       return;
     }
 
-    if (collectionId === "all") {
-      // Combine projects from all collections
-      const allProjects = user.savedLvnzyProjects.reduce(
-        (acc: any[], curr: SavedLvnzyProject) => {
-          // Only add unique projects based on _id
-          const uniqueProjects = curr.projects.filter(
-            (project: any) => !acc.some((p: any) => p._id === project._id)
-          );
-          return [...acc, ...uniqueProjects];
-        },
-        []
-      );
-
-      setSelectedCollection({
-        _id: "all",
-        collectionName: "All Collections",
-        projects: allProjects,
-      });
-    } else if (collectionId) {
-      setSelectedCollection(
-        user.savedLvnzyProjects.find(
-          (c: SavedLvnzyProject) => c._id === collectionId
-        ) || null
+    if (collectionId === "inv-friendly") {
+      fetchLvnzyProjectsByIds(
+        "687b4d291541e1a0ecb321ca,687b401e8a68a0900797180b,67f0046ca58ac2b37e530f2b"
       );
     } else {
-      setSelectedCollection(user.savedLvnzyProjects[0]);
-    }
+      if (collectionId === "all") {
+        // Combine projects from all collections
+        const allProjects = user.savedLvnzyProjects.reduce(
+          (acc: any[], curr: SavedLvnzyProject) => {
+            // Only add unique projects based on _id
+            const uniqueProjects = curr.projects.filter(
+              (project: any) => !acc.some((p: any) => p._id === project._id)
+            );
+            return [...acc, ...uniqueProjects];
+          },
+          []
+        );
 
-    setIsLoadingCollection(false);
+        setLvnzyProjects(allProjects);
+      } else if (collectionId) {
+        const collection =
+          user.savedLvnzyProjects.find(
+            (c: SavedLvnzyProject) => c._id === collectionId
+          ) || null;
+        if (collection && collection.projects) {
+          setLvnzyProjects(collection.projects);
+        }
+      } else {
+        setLvnzyProjects(user.savedLvnzyProjects[0].projects);
+      }
+      setProjectsLoadng(false);
+    }
   }, [collectionId, user]);
 
-  if (userLoading || isLoadingCollection) {
+  if (userLoading || projectsLoading) {
     return <Loader></Loader>;
   }
 
@@ -111,14 +112,48 @@ const BrickfiHome: React.FC = () => {
             />
           </Flex> */}
           {user && <RequestedProjectsList user={user} />}
-          {selectedCollection?.projects ? (
-            <UserProjects lvnzyProjects={selectedCollection.projects} />
+          {lvnzyProjects && lvnzyProjects.length ? (
+            <UserProjects lvnzyProjects={lvnzyProjects} />
           ) : (
-            <Flex style={{ margin: 16, marginTop: 100 }}>
-              <Alert
-                message="No projects found. Please reach out to Brickfi Team."
-                type="info"
-              ></Alert>
+            <Flex
+              vertical
+              style={{ margin: 16, marginTop: 100 }}
+              align="center"
+            >
+              <DynamicReactIcon
+                size={60}
+                iconName="TbHomeSearch"
+                iconSet="tb"
+                color={COLORS.textColorLight}
+              ></DynamicReactIcon>
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.HEADING_2,
+                  fontWeight: 500,
+                  marginTop: 24,
+                }}
+              >
+                No Projects Found
+              </Typography.Text>
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.HEADING_4,
+                  textAlign: "center",
+                  color: COLORS.textColorLight,
+                }}
+              >
+                There are no projects added to your account. Please request a
+                report by clicking button below or shoot an email at
+                support@brickfi.in for help.
+              </Typography.Text>
+              <Button
+                style={{ marginTop: 48, fontSize: FONT_SIZE.HEADING_2 }}
+                onClick={() => {
+                  window.location.assign(LandingConstants.genReportFormLink);
+                }}
+              >
+                Request New Report
+              </Button>
             </Flex>
           )}
         </>

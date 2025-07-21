@@ -20,3 +20,19 @@ export const useFetchLvnzyProjectById = (id: string) => {
     refetchOnWindowFocus: false,
   });
 };
+
+/**
+ * Custom hook to fetch projecst by multiple Ids
+ * @param {string} ids - comma separate list of Ids
+ * @returns {UseQueryResult<Project, Error>} The result of the useQuery hook containing a single project
+ */
+export const useFetchLvnzyProjectsByIds = (ids: string) => {
+  return useQuery<LvnzyProject, Error>({
+    queryKey: [queryKeys.getLvnzyProjectsByIds, ids],
+    queryFn: async () => {
+      const { data } = await axiosApiInstance.get(`/lvnzy-projects/${ids}`);
+      return data as LvnzyProject;
+    },
+    refetchOnWindowFocus: false,
+  });
+};

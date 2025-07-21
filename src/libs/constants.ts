@@ -6,6 +6,7 @@ export const queryKeys = {
   projects: "projects",
   getProjectById: "getProjectById",
   getLvnzyProjectById: "getLvnzyProjectById",
+  getLvnzyProjectsByIds: "getLvnzyProjectsByIds",
   projectsMapView: "projectsMapView",
   getAllPlaces: "getAllPlaces",
   getAllCorridors: "getAllCorridors",
@@ -333,5 +334,6 @@ export const LandingConstants = {
   brickAssistLink: "/brickassist",
   blogLink: "https://blog.brickfi.in/#demo-brkfi",
   genReportLink: "/",
+  genReportFormLink: "/requestreport",
   appLink: "/app",
 };

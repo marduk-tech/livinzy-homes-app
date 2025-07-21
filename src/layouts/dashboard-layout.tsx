@@ -52,7 +52,7 @@ export const DashboardLayout: React.FC = () => {
     {
       key: "about",
       title: "Request Brick360 Report",
-      link: "/requestreport",
+      link: LandingConstants.genReportFormLink,
       icon: { name: "HiDocumentReport", set: "hi" },
     },
     {

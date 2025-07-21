@@ -1,4 +1,4 @@
-import { Flex, Typography } from "antd";
+import { Flex, Tooltip, Typography } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GradientBar from "../components/common/grading-bar";
@@ -46,6 +46,10 @@ export function UserProjects({
       imgs && imgs.length
         ? (imgs.find((i: any) => i.isPreview) || imgs[0]).image.url!
         : "";
+
+    const primaryCorridor = itemInfo.meta.projectCorridors.sort(
+      (a: any, b: any) => a.approxDistanceInKms - b.approxDistanceInKms
+    )[0].corridorName;
     return (
       <Flex
         style={{
@@ -76,44 +80,43 @@ export function UserProjects({
             media={itemInfo.originalProjectId.media}
           ></ProjectGallery> */}
 
-          <Paragraph
-            style={{
-              fontSize: FONT_SIZE.HEADING_3,
-              fontWeight: 600,
-              width: "100%",
-              padding: "4px",
-              paddingBottom: 0,
-              marginBottom: 0,
-            }}
-            ellipsis={{
-              rows: 1,
-              expandable: false,
-              symbol: "..",
-            }}
-          >
-            {itemInfo.meta.projectName}
-          </Paragraph>
-          <Flex vertical style={{ marginTop: "auto", padding: "0 4px" }}>
-            <Flex
-              vertical={isMobile}
-              gap={4}
-              align={isMobile ? "flex-start" : "center"}
-              style={{ width: "100%", textWrap: "wrap" }}
+          <Tooltip title={itemInfo.meta.projectName}>
+            <Paragraph
+              style={{
+                fontSize: FONT_SIZE.HEADING_2,
+                fontWeight: 600,
+                width: "100%",
+                padding: "4px",
+                paddingBottom: 0,
+                marginBottom: 0,
+              }}
+              ellipsis={{
+                rows: 1,
+                expandable: false,
+                symbol: "..",
+              }}
             >
-              <Typography.Text
-                style={{
-                  fontSize: FONT_SIZE.SUB_TEXT,
-                  color: COLORS.textColorLight,
-                }}
-              >
-                {capitalize(itemInfo.meta.projectUnitTypes.split(",")[0])} ·
-                Starts{" "}
-                {rupeeAmountFormat(
-                  itemInfo.meta.costingDetails.minimumUnitCost
-                )}{" "}
-                | {itemInfo.meta.costingDetails.minimumUnitSize}sq.ft
-              </Typography.Text>
-            </Flex>
+              {itemInfo.meta.projectName}
+            </Paragraph>
+          </Tooltip>
+          <Flex vertical style={{ marginTop: "auto", padding: "0 4px" }}>
+            <Paragraph
+              style={{
+                fontSize: FONT_SIZE.PARA,
+                color: COLORS.textColorLight,
+                marginBottom: 0,
+              }}
+              ellipsis={{
+                rows: 1,
+                expandable: false,
+                symbol: "..",
+              }}
+            >
+              {capitalize(itemInfo.meta.projectUnitTypes.split(",")[0])} · ₹
+              {rupeeAmountFormat(itemInfo.meta.costingDetails.minimumUnitCost)}-
+              {itemInfo.meta.costingDetails.minimumUnitSize}sq.ft ·{" "}
+              {primaryCorridor}
+            </Paragraph>
 
             <Flex
               style={{
@@ -135,7 +138,9 @@ export function UserProjects({
                   <Flex vertical style={{ width: "100%" }} justify="flex-start">
                     <Typography.Text
                       style={{
-                        fontSize: FONT_SIZE.SUB_TEXT,
+                        fontSize: isMobile
+                          ? FONT_SIZE.PARA
+                          : FONT_SIZE.SUB_TEXT,
                         color: COLORS.textColorLight,
                       }}
                     >
