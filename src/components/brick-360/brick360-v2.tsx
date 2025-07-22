@@ -46,9 +46,15 @@ export function Brick360v2() {
   const [selectedDataPoint, setSelectedDataPoint] = useState<any>();
   const [fakeTimeoutProgress, setFakeTimeoutProgress] = useState<any>(10);
   const [selectedDataPointTitle, setSelectedDataPointTitle] = useState("");
+  const [fakeInterval, setFakeInterval] = useState<any>();
 
   const [isConfigurationsModalOpen, setIsConfigurationsModalOpen] =
     useState(false);
+
+  const isLvnzyProjectLoadingRef = useRef(lvnzyProjectIsLoading);
+  useEffect(() => {
+    isLvnzyProjectLoadingRef.current = lvnzyProjectIsLoading;
+  }, [lvnzyProjectIsLoading]);
 
   // Get data category icon
   const getDataCategoryIcon = (iconName: string, iconSet: any) => {
@@ -64,16 +70,19 @@ export function Brick360v2() {
 
   // Fake timeout and progress
   useEffect(() => {
-    const interval = setInterval(() => {
-      setFakeTimeoutProgress((prevFakeTimeoutProgress: any) => {
-        if (!lvnzyProjectIsLoading) {
-          // Stop at 10
-          clearInterval(interval);
-          return 100;
-        }
-        return Math.min(95, prevFakeTimeoutProgress + 10);
-      });
-    }, FAKE_TIMER_SECS);
+    if (!fakeInterval) {
+      const interval = setInterval(() => {
+        setFakeTimeoutProgress((prevFakeTimeoutProgress: any) => {
+          if (!isLvnzyProjectLoadingRef.current) {
+            // Stop at 10
+            clearInterval(interval);
+            return 100;
+          }
+          return Math.min(95, prevFakeTimeoutProgress + 10);
+        });
+      }, FAKE_TIMER_SECS);
+      setFakeInterval(interval);
+    }
   });
 
   // Setting main data points category

@@ -18,6 +18,7 @@ export const useFetchLvnzyProjectById = (id: string) => {
       return data as LvnzyProject;
     },
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
 

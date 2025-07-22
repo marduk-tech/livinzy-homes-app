@@ -18,6 +18,7 @@ export const queryKeys = {
 export const LocalStorageKeys = {
   authToken: "authToken",
   user: "user",
+  tour: "tour",
 };
 
 export const env = import.meta.env.VITE_ENV;

@@ -1,12 +1,16 @@
-import { Alert, Flex, List, Typography } from "antd";
-import { Brick360DataPoints } from "../../libs/constants";
+import { Alert, Flex, List, Tour, TourProps, Typography } from "antd";
+import {
+  BRICK360_CATEGORY,
+  Brick360DataPoints,
+  LocalStorageKeys,
+} from "../../libs/constants";
 import { capitalize, getCategoryScore } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import GradientBar from "../common/grading-bar";
 import RatingBar from "../common/rating-bar";
 import { ScrollableContainer } from "../scrollable-container";
 import { SnapshotModal } from "./snapshot-modal";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 
 interface Brick360TabProps {
@@ -23,6 +27,43 @@ export const Brick360Tab = ({
   const [quickSnapshotDialogOpen, setQuickSnapshotDialogOpen] = useState(false);
   const [quickSnapshotDialogContent, setQuickSnapshotDialogContent] =
     useState<string>("");
+
+  const [tourOpen, setTourOpen] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem(LocalStorageKeys.tour) !== "opened") {
+      setTimeout(() => {
+        setTourOpen(true);
+      }, 1000);
+    }
+  });
+
+  const steps: TourProps["steps"] = [
+    {
+      title: (
+        <Typography.Text
+          style={{ fontSize: FONT_SIZE.HEADING_3, color: "white" }}
+        >
+          Click card to know more details
+        </Typography.Text>
+      ),
+      description: "See more details of this rating by clicking on this icon.",
+      placement: "bottom",
+      type: "primary",
+      cover: (
+        <img
+          alt="tour.png"
+          src="/images/tour-1.png"
+          style={{
+            border: `3px solid ${COLORS.borderColor}`,
+            borderRadius: 8,
+          }}
+        />
+      ),
+      target: () => ref1.current,
+    },
+  ];
+  const ref1 = useRef(null);
 
   function renderSummaryPoint(pt: string, isPro: boolean) {
     const match = pt.match(/<b>(.*?)<\/b>/);
@@ -164,6 +205,12 @@ export const Brick360Tab = ({
                       renderItem={(item, index) => (
                         <List.Item
                           key={`p-${index}`}
+                          ref={
+                            index == 0 &&
+                            sc.key == BRICK360_CATEGORY.areaConnectivity
+                              ? ref1
+                              : null
+                          }
                           style={{
                             padding: "6px 0",
                             borderBottom:
@@ -268,6 +315,14 @@ export const Brick360Tab = ({
           </Typography.Text>
         </Flex> */}
       </Flex>
+      <Tour
+        open={tourOpen}
+        onClose={() => {
+          setTourOpen(false);
+          localStorage.setItem(LocalStorageKeys.tour, "opened");
+        }}
+        steps={steps}
+      />
 
       <SnapshotModal
         isOpen={quickSnapshotDialogOpen}
