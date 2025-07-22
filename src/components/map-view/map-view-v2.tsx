@@ -16,6 +16,7 @@ import {
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useFetchCorridors } from "../../hooks/use-corridors";
+import { useFetchLocalities } from "../../hooks/use-localities";
 import { useFetchProjectById } from "../../hooks/use-project";
 import {
   LivIndexDriversConfig,
@@ -28,10 +29,9 @@ import { IDriverPlace, ISurroundingElement } from "../../types/Project";
 import DynamicReactIcon, {
   dynamicImportMap,
 } from "../common/dynamic-react-icon";
-import { MapPolygons } from "./map-polygons";
-import { useFetchLocalities } from "../../hooks/use-localities";
 import { CorridorMarkerIcon } from "./corridor-marker-icon";
 import { LocalityMarkerIcon } from "./locality-marker-icon";
+import { MapPolygons } from "./map-polygons";
 
 type GeoJSONCoordinate = [number, number];
 type GeoJSONLineString = GeoJSONCoordinate[];
@@ -797,9 +797,68 @@ const MapViewV2 = ({
         ].includes(driver.status as PLACE_TIMELINE);
 
         const handleRoadDriverClick = () => {
+          // calculate travel time content for road drivers
+          const calculateRoadContent = () => {
+            let content = driver.details?.description || "";
+
+            if (
+              primaryProject?.info?.location?.lat &&
+              primaryProject?.info?.location?.lng
+            ) {
+              try {
+                let roadLng: number, roadLat: number;
+
+                // use drver location if available, otherwise calculate center of road
+                if (driver.location?.lat && driver.location?.lng) {
+                  roadLng = driver.location.lng;
+                  roadLat = driver.location.lat;
+                } else {
+                  // calculate center point of the road for distance calculation
+                  const allCoordinates = processedFeatures.flatMap(
+                    (feature) => feature.coordinates
+                  );
+                  if (allCoordinates.length > 0) {
+                    const roadLine = turf.lineString(allCoordinates);
+                    const roadCenter = turf.center(
+                      turf.featureCollection([roadLine])
+                    );
+                    [roadLng, roadLat] = roadCenter.geometry.coordinates;
+                  } else {
+                    return content;
+                  }
+                }
+
+                const from = turf.point([roadLng, roadLat]);
+                const to = turf.point([
+                  primaryProject.info.location.lng,
+                  primaryProject.info.location.lat,
+                ]);
+                const distance = turf.distance(from, to, {
+                  units: "kilometers",
+                });
+
+                // find duration from the drivers array
+                const matchingDriver = drivers?.find(
+                  (d) => d._id === driver._id
+                );
+                const duration = matchingDriver?.duration;
+                if (duration) {
+                  const travelTimeText = `\n\nTravel time: ${duration} mins (${distance.toFixed(
+                    1
+                  )} Kms)\nNote: Average time considering peak/non peak hours. Can vary 10-20% based on real time traffic.`;
+                  content = content + travelTimeText;
+                }
+              } catch (error) {
+                console.error("Error calculating road distance:", error);
+              }
+            }
+
+            return content;
+          };
+
           setModalContent({
             title: driver.name,
-            content: driver.details?.description || "",
+            content: calculateRoadContent(),
             tags: [
               {
                 label: "Road",
@@ -965,9 +1024,52 @@ const MapViewV2 = ({
                 icon={transitStationIcon!}
                 eventHandlers={{
                   click: () => {
+                    // calculate travel time content for transit drivers
+                    const calculateTransitContent = () => {
+                      let content = driver.details?.description || "";
+
+                      if (
+                        primaryProject?.info?.location?.lat &&
+                        primaryProject?.info?.location?.lng
+                      ) {
+                        try {
+                          // use the station coordinates (feature coordinates) instead of driver.location
+                          const [stationLng, stationLat] =
+                            feature.geometry.coordinates;
+                          const from = turf.point([stationLng, stationLat]);
+                          const to = turf.point([
+                            primaryProject.info.location.lng,
+                            primaryProject.info.location.lat,
+                          ]);
+                          const distance = turf.distance(from, to, {
+                            units: "kilometers",
+                          });
+
+                          // find duration from the drivers array
+                          const matchingDriver = drivers?.find(
+                            (d) => d._id === driver._id
+                          );
+                          const duration = matchingDriver?.duration;
+                          if (duration) {
+                            const travelTimeText = `\n\nTravel time: ${duration} mins (${distance.toFixed(
+                              1
+                            )} Kms)\nNote: Average time considering peak/non peak hours. Can vary 10-20% based on real time traffic.`;
+                            content = content + travelTimeText;
+                          }
+                        } catch (error) {
+                          console.error(
+                            "Error calculating transit distance:",
+                            error
+                          );
+                        }
+                      }
+
+                      return content;
+                    };
+
                     setModalContent({
                       title: driver.name,
-                      content: driver.details?.description || "",
+                      content: calculateTransitContent(),
                       tags: [
                         {
                           label:
@@ -1100,6 +1202,44 @@ const MapViewV2 = ({
             (d) => d.id === driver._id
           );
 
+          // calculate distance from driver to project location
+          const calculateDistanceAndContent = () => {
+            let content = driver.details?.description || "";
+            let distance = 0;
+
+            if (
+              primaryProject?.info?.location?.lat &&
+              primaryProject?.info?.location?.lng &&
+              driver.location?.lat &&
+              driver.location?.lng
+            ) {
+              try {
+                const from = turf.point([
+                  driver.location.lng,
+                  driver.location.lat,
+                ]);
+                const to = turf.point([
+                  primaryProject.info.location.lng,
+                  primaryProject.info.location.lat,
+                ]);
+                distance = turf.distance(from, to, { units: "kilometers" });
+
+                const duration =
+                  projectSpecificDetails?.duration || driver.duration;
+                if (duration) {
+                  const travelTimeText = `\n\nTravel time: ${duration} mins (${distance.toFixed(
+                    1
+                  )} Kms)\nNote: Average time considering peak/non peak hours. Can vary 10-20% based on real time traffic.`;
+                  content = content + travelTimeText;
+                }
+              } catch (error) {
+                console.error("Error calculating distance:", error);
+              }
+            }
+
+            return content;
+          };
+
           return (
             <Marker
               key={driver._id}
@@ -1109,7 +1249,7 @@ const MapViewV2 = ({
                 click: () => {
                   setModalContent({
                     title: driver.name,
-                    content: driver.details?.description || "",
+                    content: calculateDistanceAndContent(),
                     tags: [
                       {
                         label: (LivIndexDriversConfig as any)[driver.driver]
