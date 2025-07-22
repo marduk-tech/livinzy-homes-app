@@ -1,5 +1,5 @@
 import * as turf from "@turf/turf";
-import { Flex, Modal, Tag, Typography } from "antd";
+import { Flex, Modal, Select, Tag, Typography } from "antd";
 import L, { LatLngTuple } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -64,6 +64,22 @@ type RoadDriverPlace = IDriverPlace & {
   features: GeoJSONFeature[];
   status: PLACE_TIMELINE;
 };
+
+// category mappings
+const DRIVER_CATEGORIES = {
+  Schools: ["school", "university"],
+  Workplace: ["industrial-hitech", "industrial-general"],
+  Conveniences: ["food", "hospital", "commercial"],
+  Connectivity: ["highway", "transit"],
+  "Growth Potential": [
+    "industrial-hitech",
+    "industrial-general",
+    "highway",
+    "transit",
+  ],
+};
+
+type DriverCategoryKey = keyof typeof DRIVER_CATEGORIES;
 
 /**
  * Gets the icon for map.
@@ -333,6 +349,7 @@ const MapViewV2 = ({
   projectsNearby,
   projectSqftPricing,
   showLocalities,
+  isFromTab = false,
 }: {
   drivers?: any[];
   projectId?: string;
@@ -346,6 +363,7 @@ const MapViewV2 = ({
   }[];
   projectSqftPricing?: number;
   showLocalities?: boolean;
+  isFromTab?: boolean;
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
@@ -354,6 +372,13 @@ const MapViewV2 = ({
   const { data: localities, isLoading: isLocalitiesDataLoading } =
     useFetchLocalities();
   const [selectedDriverType, setSelectedDriverType] = useState<string>();
+
+  const [selectedCategories, setSelectedCategories] = useState<
+    DriverCategoryKey[]
+  >(["Workplace"]);
+  const [allowedDriverTypes, setAllowedDriverTypes] = useState<string[]>(
+    DRIVER_CATEGORIES.Workplace
+  );
 
   const [uniqueSurroundingElements, setUniqueSurroundingElements] = useState<
     string[]
@@ -392,6 +417,28 @@ const MapViewV2 = ({
   );
   const [transitStationIcon, setTransitStationIcon] =
     useState<L.DivIcon | null>(null);
+
+  // update all allowed driver types when categories is changed (only when from tab)
+  useEffect(() => {
+    if (isFromTab) {
+      const allowedTypes = selectedCategories.flatMap(
+        (category) => DRIVER_CATEGORIES[category]
+      );
+      const uniqueAllowedTypes = Array.from(new Set(allowedTypes));
+      setAllowedDriverTypes(uniqueAllowedTypes);
+
+      // reset selectedDriverType driver type if it's no longer allowed
+      if (
+        selectedDriverType &&
+        !uniqueAllowedTypes.includes(selectedDriverType)
+      ) {
+        setSelectedDriverType(undefined);
+      }
+    } else {
+      // When not from tab, allow all driver types (empty array means no filtering)
+      setAllowedDriverTypes([]);
+    }
+  }, [selectedCategories, selectedDriverType, isFromTab]);
 
   useEffect(() => {}, [drivers]);
 
@@ -435,13 +482,15 @@ const MapViewV2 = ({
       setSimpleDriverMarkerIcons(validIcons);
     }
 
-    // Fetch icons, set unique driver types
+    // Fetch icons, set unique driver types filtered by allowed types
     if (drivers && drivers?.length) {
       fetchDriverIcons();
-      const uniqTypes = Array.from(new Set(drivers.map((d) => d.driver)));
+      const uniqTypes = Array.from(
+        new Set(drivers.map((d) => d.driver))
+      ).filter((type) => !isFromTab || allowedDriverTypes.includes(type));
       setUniqueDriverTypes(uniqTypes);
     }
-  }, [drivers]); // Added selectedDriverTypes to ensure marker icons update
+  }, [drivers, allowedDriverTypes, isFromTab]); // Added selectedDriverTypes to ensure marker icons update
 
   // Setting the unique surrounding elements for filters
   useEffect(() => {
@@ -785,6 +834,7 @@ const MapViewV2 = ({
           driver.driver === "highway" &&
           !!driver.features &&
           typeof driver.status === "string" &&
+          (!isFromTab || allowedDriverTypes.includes(driver.driver)) &&
           (!selectedDriverType || selectedDriverType == driver.driver)
       )
       .flatMap((driver) => {
@@ -958,6 +1008,7 @@ const MapViewV2 = ({
           driver.driver === "transit" &&
           !!driver.features &&
           typeof driver.status === "string" &&
+          (!isFromTab || allowedDriverTypes.includes(driver.driver)) &&
           (!selectedDriverType || selectedDriverType == driver.driver)
       )
       .flatMap((driver) => {
@@ -1169,6 +1220,7 @@ const MapViewV2 = ({
     const filteredDrivers = drivers.filter((driver) => {
       if (!driver.location?.lat || !driver.location?.lng) return false;
       return (
+        (!isFromTab || allowedDriverTypes.includes(driver.driver)) &&
         (!selectedDriverType || selectedDriverType == driver.driver) &&
         bounds.contains([driver.location.lat, driver.location.lng])
       );
@@ -1537,6 +1589,39 @@ const MapViewV2 = ({
         position: "relative",
       }}
     >
+      {/* Category selection dropdown - only show when from tab */}
+      {isFromTab && !infoModalOpen && (
+        <Flex
+          style={{
+            position: "absolute",
+            top: 16,
+            left: 16,
+            zIndex: 1000,
+            backgroundColor: "white",
+            borderRadius: 8,
+            padding: 8,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+          }}
+        >
+          <Select
+            mode="multiple"
+            value={selectedCategories}
+            onChange={(values: DriverCategoryKey[]) => {
+              // 2 selections max
+              if (values.length <= 2) {
+                setSelectedCategories(values);
+              }
+            }}
+            style={{ width: 250 }}
+            placeholder="Select driver categories"
+            maxTagCount={2}
+            options={Object.keys(DRIVER_CATEGORIES).map((key) => ({
+              label: key,
+              value: key as DriverCategoryKey,
+            }))}
+          />
+        </Flex>
+      )}
       {/* Drivers filters */}
       {drivers && drivers.length && !surroundingElements?.length ? (
         <Flex
@@ -1552,7 +1637,7 @@ const MapViewV2 = ({
           }}
         >
           {(uniqueDriverTypes || [])
-            .filter((d) => !!d)
+            .filter((d) => !!d && (!isFromTab || allowedDriverTypes.includes(d)))
             .map((k: string) => {
               return renderDriverTypesTag(k);
             })}

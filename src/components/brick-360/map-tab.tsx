@@ -82,6 +82,7 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
           fullSize={false}
           projectId={lvnzyProject?.originalProjectId._id}
           drivers={drivers}
+          isFromTab={true}
         />
         <Modal
           title={null}
@@ -111,6 +112,7 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
               projectId={lvnzyProject?.originalProjectId._id}
               drivers={drivers}
               fullSize={true}
+              isFromTab={true}
             />
           </Flex>
         </Modal>
