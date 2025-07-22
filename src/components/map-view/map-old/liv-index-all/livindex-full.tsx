@@ -1,4 +1,4 @@
-import { AutoComplete, Button, Flex, Select, Typography } from "antd";
+import { AutoComplete, Flex, Select, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useFetchAllLivindexPlaces } from "../../../../hooks/use-livindex-places";
 import { useFetchProjects } from "../../../../hooks/use-project";
@@ -154,20 +154,12 @@ export function LivIndexFull() {
             value={searchValue}
             onChange={handleSearchChange}
             onSelect={handleProjectSelect}
+            allowClear={true}
             filterOption={(inputValue, option) =>
               option!.label.toLowerCase().includes(inputValue.toLowerCase())
             }
             placeholder="Search for project name..."
           />
-          {isSearchMode && (
-            <Button
-              type="default"
-              onClick={clearSearch}
-              style={{ flexShrink: 0 }}
-            >
-              Clear Search
-            </Button>
-          )}
           <Select
             value={homeTypeFilter}
             style={{ width: 200 }}
@@ -243,7 +235,7 @@ export function LivIndexFull() {
               projects={filteredProjects}
               projectId={selectedProjectId || undefined}
               fullSize={false}
-              showLocalities={true}
+              showLocalities={false}
             />
           </>
         </Flex>
