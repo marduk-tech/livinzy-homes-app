@@ -18,7 +18,7 @@ import { getProjectTypeIcon } from "../../map-old/project-type-icon";
 import MapViewV2 from "../../map-view-v2";
 
 export function LivIndexFull() {
-  const [homeTypeFilter, setHomeTypeFilter] = useState("apartment");
+  const [homeTypeFilter, setHomeTypeFilter] = useState("");
 
   const { data: livindexPlaces, isLoading: livindexPlacesLoading } =
     useFetchAllLivindexPlaces();
