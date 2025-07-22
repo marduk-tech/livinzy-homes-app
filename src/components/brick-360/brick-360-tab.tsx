@@ -47,7 +47,7 @@ export const Brick360Tab = ({
           Click card to know more details
         </Typography.Text>
       ),
-      description: "See more details of this rating by clicking on this icon.",
+      description: "See more details of this rating by clicking this row.",
       placement: "bottom",
       type: "primary",
       cover: (
