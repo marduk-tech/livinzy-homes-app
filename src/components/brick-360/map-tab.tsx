@@ -1,10 +1,10 @@
 import { Button, Flex, Modal } from "antd";
+import { useEffect, useState } from "react";
+import { useDevice } from "../../hooks/use-device";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import DynamicReactIcon from "../common/dynamic-react-icon";
 import MapViewV2 from "../map-view/map-view-v2";
 import { ScrollableContainer } from "../scrollable-container";
-import { useDevice } from "../../hooks/use-device";
-import DynamicReactIcon from "../common/dynamic-react-icon";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { useEffect, useState } from "react";
 
 interface MapTabProps {
   lvnzyProject: any;
@@ -14,6 +14,8 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
   const { isMobile } = useDevice();
   const [isMapFullScreen, setIsMapFullScreen] = useState(false);
   const [drivers, setDrivers] = useState<any[]>([]);
+  const [surroundingElements, setSurroundingElements] = useState<any[]>([]);
+
   useEffect(() => {
     if (!lvnzyProject) {
       return;
@@ -31,6 +33,10 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
         };
       })
     );
+
+    if (lvnzyProject.property?.surroundings) {
+      setSurroundingElements(lvnzyProject.property.surroundings);
+    }
   }, [lvnzyProject]);
 
   return (
@@ -82,6 +88,7 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
           fullSize={false}
           projectId={lvnzyProject?.originalProjectId._id}
           drivers={drivers}
+          surroundingElements={surroundingElements}
           isFromTab={true}
         />
         <Modal
@@ -111,6 +118,7 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
             <MapViewV2
               projectId={lvnzyProject?.originalProjectId._id}
               drivers={drivers}
+              surroundingElements={surroundingElements}
               fullSize={true}
               isFromTab={true}
             />

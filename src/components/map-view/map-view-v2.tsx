@@ -77,6 +77,7 @@ const DRIVER_CATEGORIES = {
     "highway",
     "transit",
   ],
+  Surroundings: [],
 };
 
 type DriverCategoryKey = keyof typeof DRIVER_CATEGORIES;
@@ -722,7 +723,8 @@ const MapViewV2 = ({
       !surroundingElements ||
       !surroundingElements.length ||
       !surroundingElementIcons ||
-      !surroundingElementIcons.length
+      !surroundingElementIcons.length ||
+      (isFromTab && !selectedCategories.includes("Surroundings"))
     ) {
       return null;
     }
@@ -822,7 +824,9 @@ const MapViewV2 = ({
     if (
       !drivers ||
       !drivers.length ||
-      !!surroundingElements?.length ||
+      (!!surroundingElements?.length &&
+        selectedCategories.length === 1 &&
+        selectedCategories.includes("Surroundings")) ||
       !roadIcon
     ) {
       return null;
@@ -996,7 +1000,9 @@ const MapViewV2 = ({
     if (
       !drivers ||
       !drivers.length ||
-      !!surroundingElements?.length ||
+      (!!surroundingElements?.length &&
+        selectedCategories.length === 1 &&
+        selectedCategories.includes("Surroundings")) ||
       !transitStationIcon
     ) {
       return null;
@@ -1170,7 +1176,9 @@ const MapViewV2 = ({
       if (
         !drivers?.length ||
         !drivers?.length ||
-        !!surroundingElements?.length
+        (!!surroundingElements?.length &&
+          selectedCategories.length === 1 &&
+          selectedCategories.includes("Surroundings"))
       ) {
         return;
       }
@@ -1213,7 +1221,13 @@ const MapViewV2 = ({
       updateIcons();
     }, [drivers, showDuration, simpleDriverMarkerIcons, drivers]);
 
-    if (!drivers?.length || !drivers?.length || !!surroundingElements?.length) {
+    if (
+      !drivers?.length ||
+      !drivers?.length ||
+      (!!surroundingElements?.length &&
+        selectedCategories.length === 1 &&
+        selectedCategories.includes("Surroundings"))
+    ) {
       return null;
     }
 
@@ -1623,7 +1637,10 @@ const MapViewV2 = ({
         </Flex>
       )}
       {/* Drivers filters */}
-      {drivers && drivers.length && !surroundingElements?.length ? (
+      {drivers &&
+      drivers.length &&
+      (!surroundingElements?.length ||
+        selectedCategories.some((cat) => cat !== "Surroundings")) ? (
         <Flex
           style={{
             width: "100%",
@@ -1632,12 +1649,19 @@ const MapViewV2 = ({
             height: 32,
             position: "absolute",
             zIndex: 9999,
-            bottom: 32,
+            bottom:
+              surroundingElements &&
+              surroundingElements.length &&
+              selectedCategories.includes("Surroundings")
+                ? 72
+                : 32,
             paddingLeft: 8,
           }}
         >
           {(uniqueDriverTypes || [])
-            .filter((d) => !!d && (!isFromTab || allowedDriverTypes.includes(d)))
+            .filter(
+              (d) => !!d && (!isFromTab || allowedDriverTypes.includes(d))
+            )
             .map((k: string) => {
               return renderDriverTypesTag(k);
             })}
@@ -1645,7 +1669,9 @@ const MapViewV2 = ({
       ) : null}
 
       {/* Surrounding Elements Filters */}
-      {surroundingElements && surroundingElements.length ? (
+      {surroundingElements &&
+      surroundingElements.length &&
+      (selectedCategories.includes("Surroundings") || !isFromTab) ? (
         <Flex
           style={{
             width: "100%",
@@ -1706,7 +1732,10 @@ const MapViewV2 = ({
                 {projectsNearby?.length && projectsNearbyIcons?.length
                   ? renderProjectsNearby()
                   : null}
-                {drivers && drivers.length && !surroundingElements?.length ? (
+                {drivers &&
+                drivers.length &&
+                (!surroundingElements?.length ||
+                  selectedCategories.some((cat) => cat !== "Surroundings")) ? (
                   <>
                     <BoundsAwareDrivers
                       renderRoadDrivers={(bounds) => (
