@@ -31,7 +31,7 @@ export const Brick360Tab = ({
   const [tourOpen, setTourOpen] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem(LocalStorageKeys.tour) !== "opened") {
+    if (localStorage.getItem(LocalStorageKeys.tour) !== "already-opened") {
       setTimeout(() => {
         setTourOpen(true);
       }, 1000);
@@ -319,7 +319,7 @@ export const Brick360Tab = ({
         open={tourOpen}
         onClose={() => {
           setTourOpen(false);
-          localStorage.setItem(LocalStorageKeys.tour, "opened");
+          localStorage.setItem(LocalStorageKeys.tour, "already-opened");
         }}
         steps={steps}
       />
