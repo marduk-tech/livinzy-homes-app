@@ -1,5 +1,5 @@
 import * as turf from "@turf/turf";
-import { Flex, Modal, Tag, Typography } from "antd";
+import { Flex, Modal, Select, Tag, Typography } from "antd";
 import L, { LatLngTuple } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -16,6 +16,7 @@ import {
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useFetchCorridors } from "../../hooks/use-corridors";
+import { useFetchLocalities } from "../../hooks/use-localities";
 import { useFetchProjectById } from "../../hooks/use-project";
 import {
   LivIndexDriversConfig,
@@ -28,10 +29,9 @@ import { IDriverPlace, ISurroundingElement } from "../../types/Project";
 import DynamicReactIcon, {
   dynamicImportMap,
 } from "../common/dynamic-react-icon";
-import { MapPolygons } from "./map-polygons";
-import { useFetchLocalities } from "../../hooks/use-localities";
 import { CorridorMarkerIcon } from "./corridor-marker-icon";
 import { LocalityMarkerIcon } from "./locality-marker-icon";
+import { MapPolygons } from "./map-polygons";
 
 type GeoJSONCoordinate = [number, number];
 type GeoJSONLineString = GeoJSONCoordinate[];
@@ -64,6 +64,23 @@ type RoadDriverPlace = IDriverPlace & {
   features: GeoJSONFeature[];
   status: PLACE_TIMELINE;
 };
+
+// category mappings
+const DRIVER_CATEGORIES = {
+  Schools: ["school", "university"],
+  Workplace: ["industrial-hitech", "industrial-general"],
+  Conveniences: ["food", "hospital", "commercial"],
+  Connectivity: ["highway", "transit"],
+  "Growth Potential": [
+    "industrial-hitech",
+    "industrial-general",
+    "highway",
+    "transit",
+  ],
+  Surroundings: [],
+};
+
+type DriverCategoryKey = keyof typeof DRIVER_CATEGORIES;
 
 /**
  * Gets the icon for map.
@@ -333,6 +350,7 @@ const MapViewV2 = ({
   projectsNearby,
   projectSqftPricing,
   showLocalities,
+  isFromTab = false,
 }: {
   drivers?: any[];
   projectId?: string;
@@ -346,6 +364,7 @@ const MapViewV2 = ({
   }[];
   projectSqftPricing?: number;
   showLocalities?: boolean;
+  isFromTab?: boolean;
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
@@ -354,6 +373,13 @@ const MapViewV2 = ({
   const { data: localities, isLoading: isLocalitiesDataLoading } =
     useFetchLocalities();
   const [selectedDriverType, setSelectedDriverType] = useState<string>();
+
+  const [selectedCategories, setSelectedCategories] = useState<
+    DriverCategoryKey[]
+  >(["Workplace"]);
+  const [allowedDriverTypes, setAllowedDriverTypes] = useState<string[]>(
+    DRIVER_CATEGORIES.Workplace
+  );
 
   const [uniqueSurroundingElements, setUniqueSurroundingElements] = useState<
     string[]
@@ -392,6 +418,28 @@ const MapViewV2 = ({
   );
   const [transitStationIcon, setTransitStationIcon] =
     useState<L.DivIcon | null>(null);
+
+  // update all allowed driver types when categories is changed (only when from tab)
+  useEffect(() => {
+    if (isFromTab) {
+      const allowedTypes = selectedCategories.flatMap(
+        (category) => DRIVER_CATEGORIES[category]
+      );
+      const uniqueAllowedTypes = Array.from(new Set(allowedTypes));
+      setAllowedDriverTypes(uniqueAllowedTypes);
+
+      // reset selectedDriverType driver type if it's no longer allowed
+      if (
+        selectedDriverType &&
+        !uniqueAllowedTypes.includes(selectedDriverType)
+      ) {
+        setSelectedDriverType(undefined);
+      }
+    } else {
+      // When not from tab, allow all driver types (empty array means no filtering)
+      setAllowedDriverTypes([]);
+    }
+  }, [selectedCategories, selectedDriverType, isFromTab]);
 
   useEffect(() => {}, [drivers]);
 
@@ -435,13 +483,15 @@ const MapViewV2 = ({
       setSimpleDriverMarkerIcons(validIcons);
     }
 
-    // Fetch icons, set unique driver types
+    // Fetch icons, set unique driver types filtered by allowed types
     if (drivers && drivers?.length) {
       fetchDriverIcons();
-      const uniqTypes = Array.from(new Set(drivers.map((d) => d.driver)));
+      const uniqTypes = Array.from(
+        new Set(drivers.map((d) => d.driver))
+      ).filter((type) => !isFromTab || allowedDriverTypes.includes(type));
       setUniqueDriverTypes(uniqTypes);
     }
-  }, [drivers]); // Added selectedDriverTypes to ensure marker icons update
+  }, [drivers, allowedDriverTypes, isFromTab]); // Added selectedDriverTypes to ensure marker icons update
 
   // Setting the unique surrounding elements for filters
   useEffect(() => {
@@ -673,7 +723,8 @@ const MapViewV2 = ({
       !surroundingElements ||
       !surroundingElements.length ||
       !surroundingElementIcons ||
-      !surroundingElementIcons.length
+      !surroundingElementIcons.length ||
+      (isFromTab && !selectedCategories.includes("Surroundings"))
     ) {
       return null;
     }
@@ -773,7 +824,9 @@ const MapViewV2 = ({
     if (
       !drivers ||
       !drivers.length ||
-      !!surroundingElements?.length ||
+      (!!surroundingElements?.length &&
+        selectedCategories.length === 1 &&
+        selectedCategories.includes("Surroundings")) ||
       !roadIcon
     ) {
       return null;
@@ -785,6 +838,7 @@ const MapViewV2 = ({
           driver.driver === "highway" &&
           !!driver.features &&
           typeof driver.status === "string" &&
+          (!isFromTab || allowedDriverTypes.includes(driver.driver)) &&
           (!selectedDriverType || selectedDriverType == driver.driver)
       )
       .flatMap((driver) => {
@@ -797,9 +851,68 @@ const MapViewV2 = ({
         ].includes(driver.status as PLACE_TIMELINE);
 
         const handleRoadDriverClick = () => {
+          // calculate travel time content for road drivers
+          const calculateRoadContent = () => {
+            let content = driver.details?.description || "";
+
+            if (
+              primaryProject?.info?.location?.lat &&
+              primaryProject?.info?.location?.lng
+            ) {
+              try {
+                let roadLng: number, roadLat: number;
+
+                // use drver location if available, otherwise calculate center of road
+                if (driver.location?.lat && driver.location?.lng) {
+                  roadLng = driver.location.lng;
+                  roadLat = driver.location.lat;
+                } else {
+                  // calculate center point of the road for distance calculation
+                  const allCoordinates = processedFeatures.flatMap(
+                    (feature) => feature.coordinates
+                  );
+                  if (allCoordinates.length > 0) {
+                    const roadLine = turf.lineString(allCoordinates);
+                    const roadCenter = turf.center(
+                      turf.featureCollection([roadLine])
+                    );
+                    [roadLng, roadLat] = roadCenter.geometry.coordinates;
+                  } else {
+                    return content;
+                  }
+                }
+
+                const from = turf.point([roadLng, roadLat]);
+                const to = turf.point([
+                  primaryProject.info.location.lng,
+                  primaryProject.info.location.lat,
+                ]);
+                const distance = turf.distance(from, to, {
+                  units: "kilometers",
+                });
+
+                // find duration from the drivers array
+                const matchingDriver = drivers?.find(
+                  (d) => d._id === driver._id
+                );
+                const duration = matchingDriver?.duration;
+                if (duration) {
+                  const travelTimeText = `\n\nTravel time: ${duration} mins (${distance.toFixed(
+                    1
+                  )} Kms)\nNote: Average time considering peak/non peak hours. Can vary 10-20% based on real time traffic.`;
+                  content = content + travelTimeText;
+                }
+              } catch (error) {
+                console.error("Error calculating road distance:", error);
+              }
+            }
+
+            return content;
+          };
+
           setModalContent({
             title: driver.name,
-            content: driver.details?.description || "",
+            content: calculateRoadContent(),
             tags: [
               {
                 label: "Road",
@@ -887,7 +1000,9 @@ const MapViewV2 = ({
     if (
       !drivers ||
       !drivers.length ||
-      !!surroundingElements?.length ||
+      (!!surroundingElements?.length &&
+        selectedCategories.length === 1 &&
+        selectedCategories.includes("Surroundings")) ||
       !transitStationIcon
     ) {
       return null;
@@ -899,6 +1014,7 @@ const MapViewV2 = ({
           driver.driver === "transit" &&
           !!driver.features &&
           typeof driver.status === "string" &&
+          (!isFromTab || allowedDriverTypes.includes(driver.driver)) &&
           (!selectedDriverType || selectedDriverType == driver.driver)
       )
       .flatMap((driver) => {
@@ -965,9 +1081,52 @@ const MapViewV2 = ({
                 icon={transitStationIcon!}
                 eventHandlers={{
                   click: () => {
+                    // calculate travel time content for transit drivers
+                    const calculateTransitContent = () => {
+                      let content = driver.details?.description || "";
+
+                      if (
+                        primaryProject?.info?.location?.lat &&
+                        primaryProject?.info?.location?.lng
+                      ) {
+                        try {
+                          // use the station coordinates (feature coordinates) instead of driver.location
+                          const [stationLng, stationLat] =
+                            feature.geometry.coordinates;
+                          const from = turf.point([stationLng, stationLat]);
+                          const to = turf.point([
+                            primaryProject.info.location.lng,
+                            primaryProject.info.location.lat,
+                          ]);
+                          const distance = turf.distance(from, to, {
+                            units: "kilometers",
+                          });
+
+                          // find duration from the drivers array
+                          const matchingDriver = drivers?.find(
+                            (d) => d._id === driver._id
+                          );
+                          const duration = matchingDriver?.duration;
+                          if (duration) {
+                            const travelTimeText = `\n\nTravel time: ${duration} mins (${distance.toFixed(
+                              1
+                            )} Kms)\nNote: Average time considering peak/non peak hours. Can vary 10-20% based on real time traffic.`;
+                            content = content + travelTimeText;
+                          }
+                        } catch (error) {
+                          console.error(
+                            "Error calculating transit distance:",
+                            error
+                          );
+                        }
+                      }
+
+                      return content;
+                    };
+
                     setModalContent({
                       title: driver.name,
-                      content: driver.details?.description || "",
+                      content: calculateTransitContent(),
                       tags: [
                         {
                           label:
@@ -1017,7 +1176,9 @@ const MapViewV2 = ({
       if (
         !drivers?.length ||
         !drivers?.length ||
-        !!surroundingElements?.length
+        (!!surroundingElements?.length &&
+          selectedCategories.length === 1 &&
+          selectedCategories.includes("Surroundings"))
       ) {
         return;
       }
@@ -1060,13 +1221,20 @@ const MapViewV2 = ({
       updateIcons();
     }, [drivers, showDuration, simpleDriverMarkerIcons, drivers]);
 
-    if (!drivers?.length || !drivers?.length || !!surroundingElements?.length) {
+    if (
+      !drivers?.length ||
+      !drivers?.length ||
+      (!!surroundingElements?.length &&
+        selectedCategories.length === 1 &&
+        selectedCategories.includes("Surroundings"))
+    ) {
       return null;
     }
 
     const filteredDrivers = drivers.filter((driver) => {
       if (!driver.location?.lat || !driver.location?.lng) return false;
       return (
+        (!isFromTab || allowedDriverTypes.includes(driver.driver)) &&
         (!selectedDriverType || selectedDriverType == driver.driver) &&
         bounds.contains([driver.location.lat, driver.location.lng])
       );
@@ -1100,6 +1268,44 @@ const MapViewV2 = ({
             (d) => d.id === driver._id
           );
 
+          // calculate distance from driver to project location
+          const calculateDistanceAndContent = () => {
+            let content = driver.details?.description || "";
+            let distance = 0;
+
+            if (
+              primaryProject?.info?.location?.lat &&
+              primaryProject?.info?.location?.lng &&
+              driver.location?.lat &&
+              driver.location?.lng
+            ) {
+              try {
+                const from = turf.point([
+                  driver.location.lng,
+                  driver.location.lat,
+                ]);
+                const to = turf.point([
+                  primaryProject.info.location.lng,
+                  primaryProject.info.location.lat,
+                ]);
+                distance = turf.distance(from, to, { units: "kilometers" });
+
+                const duration =
+                  projectSpecificDetails?.duration || driver.duration;
+                if (duration) {
+                  const travelTimeText = `\n\nTravel time: ${duration} mins (${distance.toFixed(
+                    1
+                  )} Kms)\nNote: Average time considering peak/non peak hours. Can vary 10-20% based on real time traffic.`;
+                  content = content + travelTimeText;
+                }
+              } catch (error) {
+                console.error("Error calculating distance:", error);
+              }
+            }
+
+            return content;
+          };
+
           return (
             <Marker
               key={driver._id}
@@ -1109,7 +1315,7 @@ const MapViewV2 = ({
                 click: () => {
                   setModalContent({
                     title: driver.name,
-                    content: driver.details?.description || "",
+                    content: calculateDistanceAndContent(),
                     tags: [
                       {
                         label: (LivIndexDriversConfig as any)[driver.driver]
@@ -1397,8 +1603,44 @@ const MapViewV2 = ({
         position: "relative",
       }}
     >
+      {/* Category selection dropdown - only show when from tab */}
+      {isFromTab && !infoModalOpen && (
+        <Flex
+          style={{
+            position: "absolute",
+            top: 16,
+            left: 16,
+            zIndex: 1000,
+            backgroundColor: "white",
+            borderRadius: 8,
+            padding: 8,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+          }}
+        >
+          <Select
+            mode="multiple"
+            value={selectedCategories}
+            onChange={(values: DriverCategoryKey[]) => {
+              // 2 selections max
+              if (values.length <= 2) {
+                setSelectedCategories(values);
+              }
+            }}
+            style={{ width: 250 }}
+            placeholder="Select driver categories"
+            maxTagCount={2}
+            options={Object.keys(DRIVER_CATEGORIES).map((key) => ({
+              label: key,
+              value: key as DriverCategoryKey,
+            }))}
+          />
+        </Flex>
+      )}
       {/* Drivers filters */}
-      {drivers && drivers.length && !surroundingElements?.length ? (
+      {drivers &&
+      drivers.length &&
+      (!surroundingElements?.length ||
+        selectedCategories.some((cat) => cat !== "Surroundings")) ? (
         <Flex
           style={{
             width: "100%",
@@ -1407,12 +1649,19 @@ const MapViewV2 = ({
             height: 32,
             position: "absolute",
             zIndex: 9999,
-            bottom: 32,
+            bottom:
+              surroundingElements &&
+              surroundingElements.length &&
+              selectedCategories.includes("Surroundings")
+                ? 72
+                : 32,
             paddingLeft: 8,
           }}
         >
           {(uniqueDriverTypes || [])
-            .filter((d) => !!d)
+            .filter(
+              (d) => !!d && (!isFromTab || allowedDriverTypes.includes(d))
+            )
             .map((k: string) => {
               return renderDriverTypesTag(k);
             })}
@@ -1420,7 +1669,9 @@ const MapViewV2 = ({
       ) : null}
 
       {/* Surrounding Elements Filters */}
-      {surroundingElements && surroundingElements.length ? (
+      {surroundingElements &&
+      surroundingElements.length &&
+      (selectedCategories.includes("Surroundings") || !isFromTab) ? (
         <Flex
           style={{
             width: "100%",
@@ -1481,7 +1732,10 @@ const MapViewV2 = ({
                 {projectsNearby?.length && projectsNearbyIcons?.length
                   ? renderProjectsNearby()
                   : null}
-                {drivers && drivers.length && !surroundingElements?.length ? (
+                {drivers &&
+                drivers.length &&
+                (!surroundingElements?.length ||
+                  selectedCategories.some((cat) => cat !== "Surroundings")) ? (
                   <>
                     <BoundsAwareDrivers
                       renderRoadDrivers={(bounds) => (
