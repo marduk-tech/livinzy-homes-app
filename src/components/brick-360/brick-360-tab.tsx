@@ -73,9 +73,9 @@ export const Brick360Tab = ({
         align="flex-start"
         style={{
           padding: "8px",
-          backgroundColor: "white",
+          backgroundColor: isPro ? "#f7fcff" : "#fffafa",
           borderRadius: 8,
-          borderWidth: "1px",
+          borderWidth: "0.05px",
           borderColor: COLORS.borderColorMedium,
           borderStyle: "solid",
         }}
@@ -103,7 +103,7 @@ export const Brick360Tab = ({
           dangerouslySetInnerHTML={{
             __html: pt.replace(`<b>${title}</b><br>`, ""),
           }}
-          className="reasoning"
+          className={`reasoning ${isPro ? "" : "con"}`}
           style={{
             fontSize: FONT_SIZE.HEADING_4,
             margin: 0,

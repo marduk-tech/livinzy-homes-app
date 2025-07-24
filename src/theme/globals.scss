@@ -130,6 +130,12 @@ body {
     border-radius: 8px;
     font-size: 14px;
   }
+  &.con {
+    .highlight {
+      color: #ff8080;
+      background-color: #fff1f1;
+    }
+  }
 }
 
 .ant-modal-content {
