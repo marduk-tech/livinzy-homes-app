@@ -2,7 +2,13 @@ import * as turf from "@turf/turf";
 import { Flex, Modal, Select, Tag, Typography } from "antd";
 import L, { LatLngTuple } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { renderToString } from "react-dom/server";
 const { Paragraph } = Typography;
 
@@ -23,7 +29,11 @@ import {
   PLACE_TIMELINE,
   SurroundingElementLabels,
 } from "../../libs/constants";
-import { capitalize, rupeeAmountFormat } from "../../libs/lvnzy-helper";
+import {
+  capitalize,
+  driverStatusLabel,
+  rupeeAmountFormat,
+} from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace, ISurroundingElement } from "../../types/Project";
 import DynamicReactIcon, {
@@ -63,6 +73,7 @@ interface GeoJSONPointFeature extends GeoJSONFeature {
 type RoadDriverPlace = IDriverPlace & {
   features: GeoJSONFeature[];
   status: PLACE_TIMELINE;
+  tags?: string[];
 };
 
 // category mappings
@@ -391,6 +402,7 @@ const MapViewV2 = ({
     title: string;
     tags?: { label: string; color: string }[];
     content: string;
+    subHeading?: ReactNode;
   }>();
 
   // Get primary project from projects array instead of fetching
@@ -815,6 +827,32 @@ const MapViewV2 = ({
       });
   };
 
+  const fetchTravelDurationElement = (distance: number, duration: number) => {
+    return (
+      <Flex vertical style={{ marginBottom: 16 }}>
+        <Flex align="center" gap={4}>
+          <DynamicReactIcon
+            iconName="PiClockCountdownDuotone"
+            iconSet="pi"
+            size={18}
+            color={COLORS.textColorDark}
+          ></DynamicReactIcon>
+          <Typography.Text>
+            {duration} mins ({distance.toFixed(1)} Kms)
+          </Typography.Text>
+        </Flex>
+        <Typography.Text
+          style={{
+            fontSize: FONT_SIZE.SUB_TEXT,
+            color: COLORS.textColorLight,
+          }}
+        >
+          Average time considering peak/non peak hours. Can vary 10-20% based on
+          real time traffic.
+        </Typography.Text>
+      </Flex>
+    );
+  };
   /**
    * Renders the road drivers
    */
@@ -851,75 +889,16 @@ const MapViewV2 = ({
         ].includes(driver.status as PLACE_TIMELINE);
 
         const handleRoadDriverClick = () => {
-          // calculate travel time content for road drivers
-          const calculateRoadContent = () => {
-            let content = driver.details?.description || "";
-
-            if (
-              primaryProject?.info?.location?.lat &&
-              primaryProject?.info?.location?.lng
-            ) {
-              try {
-                let roadLng: number, roadLat: number;
-
-                // use drver location if available, otherwise calculate center of road
-                if (driver.location?.lat && driver.location?.lng) {
-                  roadLng = driver.location.lng;
-                  roadLat = driver.location.lat;
-                } else {
-                  // calculate center point of the road for distance calculation
-                  const allCoordinates = processedFeatures.flatMap(
-                    (feature) => feature.coordinates
-                  );
-                  if (allCoordinates.length > 0) {
-                    const roadLine = turf.lineString(allCoordinates);
-                    const roadCenter = turf.center(
-                      turf.featureCollection([roadLine])
-                    );
-                    [roadLng, roadLat] = roadCenter.geometry.coordinates;
-                  } else {
-                    return content;
-                  }
-                }
-
-                const from = turf.point([roadLng, roadLat]);
-                const to = turf.point([
-                  primaryProject.info.location.lng,
-                  primaryProject.info.location.lat,
-                ]);
-                const distance = turf.distance(from, to, {
-                  units: "kilometers",
-                });
-
-                // find duration from the drivers array
-                const matchingDriver = drivers?.find(
-                  (d) => d._id === driver._id
-                );
-                const duration = matchingDriver?.duration;
-                if (duration) {
-                  const travelTimeText = `\n\nTravel time: ${duration} mins (${distance.toFixed(
-                    1
-                  )} Kms)\nNote: Average time considering peak/non peak hours. Can vary 10-20% based on real time traffic.`;
-                  content = content + travelTimeText;
-                }
-              } catch (error) {
-                console.error("Error calculating road distance:", error);
-              }
-            }
-
-            return content;
-          };
-
           setModalContent({
             title: driver.name,
-            content: calculateRoadContent(),
+            content: driver.details?.description || "",
             tags: [
               {
                 label: "Road",
                 color: COLORS.primaryColor,
               },
               {
-                label: isDashed ? "Under Construction" : "Operational",
+                label: driverStatusLabel(driver.status),
                 color: isDashed ? "warning" : "success",
               },
             ],
@@ -1081,52 +1060,13 @@ const MapViewV2 = ({
                 icon={transitStationIcon!}
                 eventHandlers={{
                   click: () => {
-                    // calculate travel time content for transit drivers
-                    const calculateTransitContent = () => {
-                      let content = driver.details?.description || "";
-
-                      if (
-                        primaryProject?.info?.location?.lat &&
-                        primaryProject?.info?.location?.lng
-                      ) {
-                        try {
-                          // use the station coordinates (feature coordinates) instead of driver.location
-                          const [stationLng, stationLat] =
-                            feature.geometry.coordinates;
-                          const from = turf.point([stationLng, stationLat]);
-                          const to = turf.point([
-                            primaryProject.info.location.lng,
-                            primaryProject.info.location.lat,
-                          ]);
-                          const distance = turf.distance(from, to, {
-                            units: "kilometers",
-                          });
-
-                          // find duration from the drivers array
-                          const matchingDriver = drivers?.find(
-                            (d) => d._id === driver._id
-                          );
-                          const duration = matchingDriver?.duration;
-                          if (duration) {
-                            const travelTimeText = `\n\nTravel time: ${duration} mins (${distance.toFixed(
-                              1
-                            )} Kms)\nNote: Average time considering peak/non peak hours. Can vary 10-20% based on real time traffic.`;
-                            content = content + travelTimeText;
-                          }
-                        } catch (error) {
-                          console.error(
-                            "Error calculating transit distance:",
-                            error
-                          );
-                        }
-                      }
-
-                      return content;
-                    };
-
                     setModalContent({
                       title: driver.name,
-                      content: calculateTransitContent(),
+                      subHeading: fetchTravelDurationElement(
+                        driver.distance!,
+                        driver.duration
+                      ),
+                      content: driver.details?.description || "",
                       tags: [
                         {
                           label:
@@ -1136,11 +1076,15 @@ const MapViewV2 = ({
                           color: COLORS.primaryColor,
                         },
                         {
-                          label: isDashed
-                            ? "Under Construction"
-                            : "Operational",
+                          label: driverStatusLabel(driver.status),
                           color: isDashed ? "warning" : "success",
                         },
+                        ...(driver.tags || []).map((t: string) => {
+                          return {
+                            label: capitalize(t),
+                            color: "info",
+                          };
+                        }),
                       ],
                     });
                     setInfoModalOpen(true);
@@ -1247,17 +1191,6 @@ const MapViewV2 = ({
           const markerIcon = markerIcons[driver._id];
           if (!markerIcon) return null;
 
-          const statusText =
-            driver.status === PLACE_TIMELINE.CONSTRUCTION
-              ? "Under Construction"
-              : [
-                  PLACE_TIMELINE.LAUNCHED,
-                  PLACE_TIMELINE.POST_LAUNCH,
-                  PLACE_TIMELINE.PARTIAL_LAUNCH,
-                ].includes(driver.status as PLACE_TIMELINE)
-              ? "Operational"
-              : "Planning Stage";
-
           const isDashed = ![
             PLACE_TIMELINE.LAUNCHED,
             PLACE_TIMELINE.POST_LAUNCH,
@@ -1268,44 +1201,6 @@ const MapViewV2 = ({
             (d) => d.id === driver._id
           );
 
-          // calculate distance from driver to project location
-          const calculateDistanceAndContent = () => {
-            let content = driver.details?.description || "";
-            let distance = 0;
-
-            if (
-              primaryProject?.info?.location?.lat &&
-              primaryProject?.info?.location?.lng &&
-              driver.location?.lat &&
-              driver.location?.lng
-            ) {
-              try {
-                const from = turf.point([
-                  driver.location.lng,
-                  driver.location.lat,
-                ]);
-                const to = turf.point([
-                  primaryProject.info.location.lng,
-                  primaryProject.info.location.lat,
-                ]);
-                distance = turf.distance(from, to, { units: "kilometers" });
-
-                const duration =
-                  projectSpecificDetails?.duration || driver.duration;
-                if (duration) {
-                  const travelTimeText = `\n\nTravel time: ${duration} mins (${distance.toFixed(
-                    1
-                  )} Kms)\nNote: Average time considering peak/non peak hours. Can vary 10-20% based on real time traffic.`;
-                  content = content + travelTimeText;
-                }
-              } catch (error) {
-                console.error("Error calculating distance:", error);
-              }
-            }
-
-            return content;
-          };
-
           return (
             <Marker
               key={driver._id}
@@ -1315,7 +1210,13 @@ const MapViewV2 = ({
                 click: () => {
                   setModalContent({
                     title: driver.name,
-                    content: calculateDistanceAndContent(),
+                    subHeading: fetchTravelDurationElement(
+                      driver.distance,
+                      driver.duration
+                    ),
+                    content: driver.details?.info
+                      ? driver.details.info.summary
+                      : driver.details?.description || "",
                     tags: [
                       {
                         label: (LivIndexDriversConfig as any)[driver.driver]
@@ -1323,7 +1224,7 @@ const MapViewV2 = ({
                         color: COLORS.primaryColor,
                       },
                       {
-                        label: statusText,
+                        label: driverStatusLabel(driver.status),
                         color: isDashed
                           ? COLORS.yellowIdentifier
                           : COLORS.greenIdentifier,
@@ -1336,6 +1237,12 @@ const MapViewV2 = ({
                             },
                           ]
                         : []),
+                      ...(driver.tags || []).map((t: string) => {
+                        return {
+                          label: capitalize(t),
+                          color: COLORS.textColorDark,
+                        };
+                      }),
                     ],
                   });
                   setInfoModalOpen(true);
@@ -1786,23 +1693,35 @@ const MapViewV2 = ({
               gap={8}
             >
               {modalContent?.tags.map((t) => (
-                <Tag style={{ margin: 0 }} color={t.color}>
+                <Tag
+                  style={{
+                    margin: 0,
+                    fontSize: FONT_SIZE.SUB_TEXT,
+                    borderColor: COLORS.textColorDark,
+                    padding: "0 4px",
+                  }}
+                >
                   {t.label}
                 </Tag>
               ))}
             </Flex>
           ) : null}
-          <Typography.Text
+          <Paragraph
             style={{
-              fontSize: FONT_SIZE.HEADING_1,
+              fontSize: FONT_SIZE.HEADING_2,
               fontWeight: 500,
-              lineHeight: "120%",
-              marginBottom: 16,
-              marginTop: 16,
+              marginBottom: 8,
+              marginTop: 8,
+              paddingBottom: 1,
+              minHeight: 32,
+            }}
+            ellipsis={{
+              rows: 2,
             }}
           >
             {modalContent?.title}
-          </Typography.Text>
+          </Paragraph>
+          {modalContent?.subHeading && modalContent.subHeading}
 
           {modalContent && modalContent.content ? (
             <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">

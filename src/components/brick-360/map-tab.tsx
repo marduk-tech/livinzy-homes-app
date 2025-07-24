@@ -27,6 +27,7 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
       ].map((d) => {
         return {
           ...d.driverId,
+          distance: d.distanceKms,
           duration: d.durationMins
             ? d.durationMins
             : Math.round(d.mapsDurationSeconds / 60),

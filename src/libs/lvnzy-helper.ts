@@ -1,5 +1,5 @@
 import posthog from "posthog-js";
-import { env } from "./constants";
+import { env, PLACE_TIMELINE } from "./constants";
 import { useLocation } from "react-router-dom";
 
 export const nestedPropertyAccessor = (
@@ -25,6 +25,20 @@ export const capitalize = (input: string) => {
     return "";
   }
   return input.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+export const driverStatusLabel = (status: string) => {
+  if (status == PLACE_TIMELINE.ANNOUNCED) {
+    return "Proposed";
+  } else if (status == PLACE_TIMELINE.PRE_CONSTRUCTION) {
+    return "Land Acquisition/Planning";
+  } else if (status == PLACE_TIMELINE.CONSTRUCTION) {
+    return "Under Construction";
+  } else if (status == PLACE_TIMELINE.LAUNCHED) {
+    return "Ready for Operation";
+  } else {
+    return "Operational";
+  }
 };
 
 export const rupeeAmountFormat = (amt: string) => {
