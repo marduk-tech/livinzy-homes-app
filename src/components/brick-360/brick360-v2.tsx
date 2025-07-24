@@ -17,7 +17,7 @@ import {
   Brick360CategoryInfo,
   Brick360DataPoints,
 } from "../../libs/constants";
-import { COLORS } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import Brick360Chat from "../liv/brick360-chat";
 
 const FAKE_TIMER_SECS = 700;
@@ -152,7 +152,12 @@ export function Brick360v2() {
                   color={COLORS.textColorDark}
                   size={20}
                 ></DynamicReactIcon>
-                <Typography.Text color={COLORS.textColorDark}>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.HEADING_3,
+                    color: COLORS.textColorDark,
+                  }}
+                >
                   Brick 360
                 </Typography.Text>
               </Flex>
@@ -187,7 +192,12 @@ export function Brick360v2() {
                   color={COLORS.textColorDark}
                   size={20}
                 ></DynamicReactIcon>
-                <Typography.Text color={COLORS.textColorDark}>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.HEADING_3,
+                    color: COLORS.textColorDark,
+                  }}
+                >
                   Price/Units
                 </Typography.Text>
               </Flex>
@@ -204,7 +214,12 @@ export function Brick360v2() {
                   color={COLORS.textColorDark}
                   size={20}
                 ></DynamicReactIcon>
-                <Typography.Text color={COLORS.textColorDark}>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.HEADING_3,
+                    color: COLORS.textColorDark,
+                  }}
+                >
                   Map
                 </Typography.Text>
               </Flex>
@@ -221,7 +236,12 @@ export function Brick360v2() {
                   color={COLORS.textColorDark}
                   size={20}
                 ></DynamicReactIcon>
-                <Typography.Text color={COLORS.textColorDark}>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.HEADING_3,
+                    color: COLORS.textColorDark,
+                  }}
+                >
                   Media
                 </Typography.Text>
               </Flex>

@@ -31,6 +31,21 @@ const BrickfiHome: React.FC = () => {
     setLvnzyProjects(data);
     setProjectsLoadng(false);
   };
+  useEffect(() => {
+    if (collectionId == "inv-friendly") {
+      const description =
+        "Investory friendly properties with partial payment and free EMI schemes.";
+      document.title = `Brickfi | Investory Friendly Properties`;
+      [
+        "name='description'",
+        "property='og:description'",
+        "property='twitter:description'",
+      ].forEach((mQ) => {
+        let meta = document.querySelector(`meta[${mQ}]`);
+        meta?.setAttribute("content", description);
+      });
+    }
+  }, [collectionId]);
 
   useEffect(() => {
     if (userLoading) {

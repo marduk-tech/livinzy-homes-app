@@ -73,11 +73,12 @@ export const Brick360Tab = ({
         align="flex-start"
         style={{
           padding: "8px",
-          backgroundColor: "white",
+          backgroundColor: isPro ? "#f7fcff" : "#fffafa",
           borderRadius: 8,
-          borderWidth: "1px",
+          borderWidth: "0.05px",
           borderColor: COLORS.borderColorMedium,
           borderStyle: "solid",
+          width: 1000,
         }}
         onClick={() => {
           // setQuickSnapshotDialogOpen(true);
@@ -88,22 +89,27 @@ export const Brick360Tab = ({
       >
         <Flex align="center" gap={4}>
           <DynamicReactIcon
-            size={isPro ? 16 : 20}
+            size={isPro ? 20 : 24}
             iconName={isPro ? "FaRegLaugh" : "PiSmileySadBold"}
             iconSet={isPro ? "fa" : "pi"}
             color={isPro ? COLORS.primaryColor : COLORS.redIdentifier}
           ></DynamicReactIcon>
-          <Typography.Text style={{ fontWeight: 500 }}>{title}</Typography.Text>
+          <Typography.Text
+            style={{ fontWeight: 500, fontSize: FONT_SIZE.HEADING_2 }}
+          >
+            {title}
+          </Typography.Text>
         </Flex>
         <div
           dangerouslySetInnerHTML={{
             __html: pt.replace(`<b>${title}</b><br>`, ""),
           }}
-          className="reasoning"
+          className={`reasoning ${isPro ? "" : "con"}`}
           style={{
-            fontSize: FONT_SIZE.PARA,
+            fontSize: FONT_SIZE.HEADING_4,
             margin: 0,
             width: 275,
+            color: COLORS.textColorMedium,
             textWrap: "wrap",
           }}
         ></div>
@@ -145,7 +151,7 @@ export const Brick360Tab = ({
           </Flex>
         )}
         {/*  data points */}
-        <Flex vertical gap={32} style={{ paddingBottom: 40, paddingTop: 16 }}>
+        <Flex vertical gap={24} style={{ paddingBottom: 40, paddingTop: 0 }}>
           {scoreParams &&
             scoreParams.map((sc) => {
               return (
@@ -175,7 +181,7 @@ export const Brick360Tab = ({
                         marginBottom: 0,
                         fontWeight: 500,
                         color: COLORS.textColorDark,
-                        fontSize: FONT_SIZE.HEADING_3,
+                        fontSize: FONT_SIZE.HEADING_2,
                       }}
                     >
                       {sc.title}
@@ -237,7 +243,7 @@ export const Brick360Tab = ({
                             >
                               <Typography.Text
                                 style={{
-                                  fontSize: FONT_SIZE.HEADING_4,
+                                  fontSize: FONT_SIZE.HEADING_3,
                                   color:
                                     (item as any)[1].rating > 0
                                       ? COLORS.textColorDark
@@ -263,7 +269,7 @@ export const Brick360Tab = ({
                                 <Typography.Text
                                   style={{
                                     fontSize: FONT_SIZE.HEADING_4,
-                                    color: COLORS.textColorLight,
+                                    color: COLORS.textColorMedium,
                                   }}
                                 >
                                   +

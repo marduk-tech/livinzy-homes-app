@@ -34,7 +34,7 @@ body {
   background-color: white;
   overflow-y: "scroll";
   scrollbar-width: none;
-  letter-spacing: -0.6px;
+  letter-spacing: -0.3px;
   color: #2d3f4e;
   /* Add any other styles you want to reset or modify */
 }
@@ -129,6 +129,12 @@ body {
     padding: 4px 8px;
     border-radius: 8px;
     font-size: 14px;
+  }
+  &.con {
+    .highlight {
+      color: #ff8080;
+      background-color: #fff1f1;
+    }
   }
 }
 

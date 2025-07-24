@@ -85,19 +85,23 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
           </Flex>
         )}
 
-        <MapViewV2
-          fullSize={false}
-          projectId={lvnzyProject?.originalProjectId._id}
-          drivers={drivers}
-          surroundingElements={surroundingElements}
-          isFromTab={true}
-        />
+        {!isMapFullScreen && (
+          <MapViewV2
+            fullSize={false}
+            projectId={lvnzyProject?.originalProjectId._id}
+            drivers={drivers}
+            surroundingElements={surroundingElements}
+            isFromTab={true}
+          />
+        )}
+
         <Modal
           title={null}
           open={isMapFullScreen}
           onCancel={() => {
             setIsMapFullScreen(false);
           }}
+          mask={true}
           forceRender
           footer={null}
           width={isMobile ? "100%" : 900}
