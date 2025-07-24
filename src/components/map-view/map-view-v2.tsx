@@ -442,10 +442,10 @@ const MapViewV2 = ({
 
       // reset selectedDriverType driver type if it's no longer allowed
       if (
-        selectedDriverType &&
+        !selectedDriverType ||
         !uniqueAllowedTypes.includes(selectedDriverType)
       ) {
-        setSelectedDriverType(undefined);
+        setSelectedDriverType(uniqueAllowedTypes[0]);
       }
     } else {
       // When not from tab, allow all driver types (empty array means no filtering)
@@ -747,6 +747,9 @@ const MapViewV2 = ({
       )
       .map((element: ISurroundingElement, index: number) => {
         let plygn;
+        if (!element.geometry) {
+          return null;
+        }
         const positions = element.geometry.map((g: any) => {
           if (Array.isArray(g)) {
             return g.map((subG) => {

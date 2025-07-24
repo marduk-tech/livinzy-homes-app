@@ -7,6 +7,7 @@ import { useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import DynamicReactIcon from "../common/dynamic-react-icon";
+import { useDevice } from "../../hooks/use-device";
 
 type MetaInfoProps = {
   lvnzyProject: LvnzyProject;
@@ -14,6 +15,7 @@ type MetaInfoProps = {
 
 const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
   const [isPmtPlanModalOpen, setIsPmtPlanModalOpen] = useState(false);
+  const { isMobile } = useDevice();
   const renderText = (text: string, color?: string) => {
     return (
       <Typography.Text
@@ -103,7 +105,7 @@ const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
       >
         <Flex
           style={{
-            height: 600,
+            height: isMobile ? 400 : 600,
             overflowY: "scroll",
             scrollbarWidth: "none",
             paddingTop: 32,
