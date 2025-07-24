@@ -41,7 +41,7 @@ const BrickfiHome: React.FC = () => {
         "property='og:description'",
         "property='twitter:description'",
       ].forEach((mQ) => {
-        let meta = document.querySelector(mQ);
+        let meta = document.querySelector(`meta[${mQ}]`);
         meta?.setAttribute("content", description);
       });
     }
