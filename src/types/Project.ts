@@ -187,7 +187,7 @@ export interface IDriverPlace {
   megaDriver: string;
   status: string;
   distance?: number;
-
+  duration: number;
   features: {
     type: string;
     coordinates: number[][][];

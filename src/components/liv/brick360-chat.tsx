@@ -632,6 +632,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                         drivers={mapDrivers.map((d) => {
                           return {
                             ...d.driverId,
+                            distance: d.distanceKms,
                             duration: d.durationMins
                               ? d.durationMins
                               : Math.round(d.mapsDurationSeconds / 60),
@@ -826,6 +827,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
               drivers={mapDrivers.map((d) => {
                 return {
                   ...d.driverId,
+                  distance: d.distanceKms,
                   duration: d.durationMins
                     ? d.durationMins
                     : Math.round(d.mapsDurationSeconds / 60),
