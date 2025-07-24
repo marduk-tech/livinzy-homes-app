@@ -78,6 +78,7 @@ export const Brick360Tab = ({
           borderWidth: "0.05px",
           borderColor: COLORS.borderColorMedium,
           borderStyle: "solid",
+          width: 1000,
         }}
         onClick={() => {
           // setQuickSnapshotDialogOpen(true);
