@@ -34,7 +34,7 @@ const getTotalFloors = (lvnzyProject: any) => {
       style={{
         fontSize: FONT_SIZE.HEADING_4,
         marginLeft: 4,
-        color: COLORS.textColorLight,
+        color: COLORS.textColorMedium,
       }}
     >
       {totalFloors} Floors
@@ -86,8 +86,8 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                     lvnzyProject?.meta.costingDetails.minimumUnitCost /
                       lvnzyProject?.meta.costingDetails.minimumUnitSize
                   )}`
-                )}
-                / sq.ft ·
+                )}{" "}
+                per sq.ft ·
               </Typography.Text>
             )}{" "}
             {getMinMaxSize(lvnzyProject?.meta.costingDetails.configurations)}
@@ -98,7 +98,7 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                 style={{
                   fontSize: FONT_SIZE.HEADING_4,
                   marginRight: 4,
-                  color: COLORS.textColorLight,
+                  color: COLORS.textColorMedium,
                 }}
               >
                 {lvnzyProject?.property.layout.totalUnits} Units (
