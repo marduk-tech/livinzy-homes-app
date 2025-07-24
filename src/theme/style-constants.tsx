@@ -28,7 +28,7 @@ export const FONT_SIZE = {
   SUB_TEXT: 12,
   PARA: 14,
   HEADING_1: isMobile ? 30 : 32,
-  HEADING_2: isMobile ? 22 : 24,
+  HEADING_2: isMobile ? 21 : 21,
   HEADING_3: 18,
   HEADING_4: 16,
 };

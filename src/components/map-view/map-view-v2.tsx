@@ -1470,7 +1470,8 @@ const MapViewV2 = ({
           style={{
             color:
               k == selectedSurroundingElement ? "white" : COLORS.textColorDark,
-            marginLeft: 8,
+            marginLeft: 4,
+            fontSize: FONT_SIZE.SUB_TEXT,
           }}
         >
           {(SurroundingElementLabels as any)[k]
