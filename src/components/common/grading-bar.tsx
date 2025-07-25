@@ -90,7 +90,9 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
         gap={2}
         align="center"
       >
-        <Typography.Text style={{ fontWeight: 500, fontSize: FONT_SIZE.PARA }}>
+        <Typography.Text
+          style={{ fontWeight: 500, fontSize: FONT_SIZE.HEADING_3 }}
+        >
           {value ? Math.round(value * 5) / 100 : ""}
         </Typography.Text>
         {getSmileyIcon(value, 18)}

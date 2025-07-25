@@ -181,7 +181,7 @@ export const Brick360Tab = ({
                         marginBottom: 0,
                         fontWeight: 500,
                         color: COLORS.textColorDark,
-                        fontSize: FONT_SIZE.HEADING_2,
+                        fontSize: FONT_SIZE.HEADING_3,
                       }}
                     >
                       {sc.title}
@@ -243,7 +243,7 @@ export const Brick360Tab = ({
                             >
                               <Typography.Text
                                 style={{
-                                  fontSize: FONT_SIZE.HEADING_3,
+                                  fontSize: FONT_SIZE.HEADING_4,
                                   color:
                                     (item as any)[1].rating > 0
                                       ? COLORS.textColorDark
