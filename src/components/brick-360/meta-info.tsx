@@ -52,13 +52,13 @@ const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
               color: COLORS.textColorDark,
             }}
           >
-            {lvnzyProject?.meta.costingDetails.configurations[0].config
-              .replace("Apartments", "")
-              .replace("Apartment", "")}{" "}
-            ·{" "}
             {rupeeAmountFormat(
               lvnzyProject?.meta.costingDetails.configurations[0].cost
             )}{" "}
+            ·{" "}
+            {lvnzyProject?.meta.costingDetails.configurations[0].config
+              .replace("Apartments", "")
+              .replace("Apartment", "")}{" "}
           </Typography.Text>
           {pmtPlan ? (
             <Flex

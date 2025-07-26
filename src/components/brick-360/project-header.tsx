@@ -34,6 +34,7 @@ export const ProjectHeader = ({ lvnzyProject }: ProjectHeaderProps) => {
               margin: "0",
               lineHeight: "100%",
               fontSize: FONT_SIZE.HEADING_1,
+              fontWeight: 500,
             }}
           >
             {lvnzyProject?.meta.projectName}
