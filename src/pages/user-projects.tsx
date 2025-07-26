@@ -13,6 +13,7 @@ import {
 } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { LvnzyProject } from "../types/LvnzyProject";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
 const { Paragraph } = Typography;
 
 export function UserProjects({
@@ -50,6 +51,14 @@ export function UserProjects({
     const primaryCorridor = itemInfo.meta.projectCorridors.sort(
       (a: any, b: any) => a.approxDistanceInKms - b.approxDistanceInKms
     )[0].corridorName;
+    let pmtPlan;
+    try {
+      pmtPlan = itemInfo.originalProjectId.info.financialPlan
+        .split("\n")[0]
+        .replaceAll("#", "");
+    } catch (err) {
+      console.log("could not find pmt plan");
+    }
     return (
       <Flex
         style={{
@@ -103,7 +112,7 @@ export function UserProjects({
             <Paragraph
               style={{
                 fontSize: FONT_SIZE.PARA,
-                color: COLORS.textColorLight,
+                color: COLORS.textColorMedium,
                 marginBottom: 0,
               }}
               ellipsis={{
@@ -118,6 +127,35 @@ export function UserProjects({
               {primaryCorridor}
             </Paragraph>
 
+            {pmtPlan ? (
+              <Flex
+                style={{
+                  border: `1px solid ${COLORS.textColorDark}`,
+                  width: "fit-content",
+                  padding: "0 4px",
+                  borderRadius: 4,
+                  marginTop: 8,
+                }}
+                align="center"
+                gap={4}
+              >
+                <DynamicReactIcon
+                  iconName="RiDiscountPercentFill"
+                  iconSet="ri"
+                  size={18}
+                  color={COLORS.textColorDark}
+                ></DynamicReactIcon>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.HEADING_4,
+                    color: COLORS.textColorDark,
+                    fontWeight: 600,
+                  }}
+                >
+                  {pmtPlan}
+                </Typography.Text>{" "}
+              </Flex>
+            ) : null}
             <Flex
               style={{
                 paddingTop: 8,
