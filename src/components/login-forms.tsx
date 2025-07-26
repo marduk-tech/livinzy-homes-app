@@ -177,7 +177,7 @@ export function LoginForm() {
                     >
                       <PhoneInput
                         disabled={loginStatus === "OTP_SENT"}
-                        placeholder="Login with your mobile number"
+                        placeholder="Enter 10 digit mobile "
                         enableArrow
                         enableSearch
                         disableParentheses
@@ -268,13 +268,17 @@ By signing up, you agree to the terms & conditions.
                 );
               }}
             </Form.Item>
-            <Form.Item style={{ marginTop: 20 }}>
+            <Form.Item style={{ marginTop: 32 }}>
               <Button
                 type="primary"
                 htmlType="submit"
                 loading={
                   generateOtpMutation.isPending || loginMutation.isPending
                 }
+                style={{
+                  fontSize: FONT_SIZE.HEADING_2,
+                  backgroundColor: COLORS.textColorDark,
+                }}
               >
                 {loginStatus === "OTP_SENT" ? "Verify OTP" : "Send OTP"}
               </Button>
