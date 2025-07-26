@@ -65,9 +65,10 @@ export function UserProjects({
           marginBottom: 8,
           cursor: "pointer",
           backgroundColor: "white",
-          borderColor: COLORS.borderColorMedium,
-          borderRadius: 12,
+          borderColor: COLORS.borderColor,
           width: isMobile ? "100%" : (MAX_WIDTH - 150) / 4,
+          borderBottom: "1px solid",
+          paddingBottom: 24,
         }}
         onClick={() => {
           navigate(`/app/brick360/${itemInfo._id}`);
@@ -159,8 +160,6 @@ export function UserProjects({
             <Flex
               style={{
                 paddingTop: 8,
-                marginTop: 8,
-                borderTop: "1px solid",
                 borderTopColor: COLORS.borderColor,
                 justifyContent: "space-between",
                 width: "100%",
@@ -179,7 +178,7 @@ export function UserProjects({
                         fontSize: isMobile
                           ? FONT_SIZE.PARA
                           : FONT_SIZE.SUB_TEXT,
-                        color: COLORS.textColorLight,
+                        color: COLORS.textColorMedium,
                       }}
                     >
                       {(Brick360CategoryInfo as any)[item].title}
@@ -259,7 +258,7 @@ export function UserProjects({
           flexWrap: "wrap",
           marginTop: 16,
         }}
-        gap={32}
+        gap={16}
       >
         {filteredProjects.map((p: any) => renderLvnzyProject(p))}
       </Flex>
