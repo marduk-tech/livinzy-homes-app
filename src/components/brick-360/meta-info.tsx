@@ -47,18 +47,19 @@ const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
         <Flex align="center" gap={8}>
           <Typography.Text
             style={{
-              fontSize: FONT_SIZE.HEADING_3,
+              fontSize: FONT_SIZE.HEADING_2,
               margin: 0,
               color: COLORS.textColorDark,
             }}
           >
             {rupeeAmountFormat(
-              lvnzyProject?.meta.costingDetails.configurations[0].cost
+              lvnzyProject?.meta.costingDetails.minimumUnitCost
             )}{" "}
             ·{" "}
-            {lvnzyProject?.meta.costingDetails.configurations[0].config
-              .replace("Apartments", "")
-              .replace("Apartment", "")}{" "}
+            {rupeeAmountFormat(
+              lvnzyProject?.meta.costingDetails.minimumUnitSize
+            )}
+            sqft
           </Typography.Text>
           {pmtPlan ? (
             <Flex
