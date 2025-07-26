@@ -105,7 +105,7 @@ export function UserProjects({
           <Flex vertical style={{ marginTop: "auto", padding: "0 4px" }}>
             <Paragraph
               style={{
-                fontSize: FONT_SIZE.PARA,
+                fontSize: FONT_SIZE.HEADING_3,
                 color: COLORS.textColorMedium,
                 marginBottom: 0,
               }}

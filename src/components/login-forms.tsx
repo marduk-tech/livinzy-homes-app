@@ -112,19 +112,20 @@ export function LoginForm() {
       >
         <Flex vertical>
           <Typography.Text
-            style={{ fontSize: FONT_SIZE.HEADING_1, fontWeight: "bold" }}
+            style={{ fontSize: FONT_SIZE.HEADING_1 * 1.35, fontWeight: 500 }}
           >
             Welcome To Brickfi
           </Typography.Text>
           <Typography.Text
             style={{
-              fontSize: FONT_SIZE.PARA,
+              fontSize: FONT_SIZE.HEADING_3,
               marginBottom: 24,
+              color: COLORS.textColorMedium,
             }}
           >
             {showUserDetailsForm
               ? "Please update your basic details"
-              : "Brickfi is only available for private access right now."}
+              : "Login/Signup with your mobile number "}
           </Typography.Text>
         </Flex>
         {/* <Divider style={{ marginTop: 8, marginBottom: 32 }} /> */}
