@@ -555,19 +555,23 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
           >
             {isDrawerExpanded && (
               <Flex vertical>
-                <Flex>
-                  <Typography.Text
-                    style={{
-                      backgroundColor: COLORS.textColorDark,
-                      color: "white",
-                      borderRadius: 8,
-                      padding: "4px 8px",
-                      marginBottom: 8,
-                    }}
-                  >
-                    {dataPointSelected.selectedDataPointTitle}
-                  </Typography.Text>
-                </Flex>
+                {/* Data point selected title */}
+                {dataPointSelected && (
+                  <Flex>
+                    <Typography.Text
+                      style={{
+                        backgroundColor: COLORS.textColorDark,
+                        color: "white",
+                        borderRadius: 8,
+                        padding: "4px 8px",
+                        marginBottom: 8,
+                      }}
+                    >
+                      {dataPointSelected.selectedDataPointTitle}
+                    </Typography.Text>
+                  </Flex>
+                )}
+
                 {/* Map view including expand button and drawer close icon button */}
                 {mapVisible ? (
                   <Flex
@@ -644,79 +648,81 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                   </Flex>
                 ) : null}
 
-                {/* Data point selected */}
-                <Flex vertical style={{ paddingTop: 8 }}>
-                  <Flex vertical gap={16} style={{ marginBottom: 24 }}>
-                    {dataPointSelected?.selectedDataPoint
-                      ? dataPointSelected?.selectedDataPoint.reasoning.map(
-                          (r: string) => {
-                            return (
-                              <Flex
-                                style={{
-                                  maxWidth: 850,
-                                }}
-                              >
-                                <div
-                                  dangerouslySetInnerHTML={{ __html: r }}
-                                  className="reasoning"
+                {/* Data point selected content */}
+                {dataPointSelected && (
+                  <Flex vertical style={{ paddingTop: 8 }}>
+                    <Flex vertical gap={16} style={{ marginBottom: 24 }}>
+                      {dataPointSelected?.selectedDataPoint
+                        ? dataPointSelected?.selectedDataPoint.reasoning.map(
+                            (r: string) => {
+                              return (
+                                <Flex
                                   style={{
-                                    fontSize: FONT_SIZE.HEADING_4,
-                                    margin: 0,
+                                    maxWidth: 850,
                                   }}
-                                ></div>
-                              </Flex>
-                            );
-                          }
-                        )
-                      : ""}
-                  </Flex>
-
-                  {/* Followup Prompts */}
-                  {followUpPrompts &&
-                  followUpPrompts.length &&
-                  !currentQuestion ? (
-                    <Flex
-                      gap={4}
-                      style={{
-                        width: "100%",
-                        flexWrap: "wrap",
-                        marginBottom: 16,
-                      }}
-                    >
-                      <Divider
-                        style={{
-                          fontSize: FONT_SIZE.HEADING_4,
-                          color: COLORS.textColorLight,
-                          margin: 0,
-                          marginBottom: 24,
-                        }}
-                        orientation="left"
-                      >
-                        Ask next
-                      </Divider>
-                      {followUpPrompts.map((p: string) => {
-                        return (
-                          <Tag
-                            style={{
-                              backgroundColor: COLORS.bgColorBlue,
-                              fontSize: FONT_SIZE.HEADING_4,
-                              padding: "4px",
-                              borderRadius: 8,
-                              marginBottom: 4,
-                              fontWeight: 500,
-                              borderColor: COLORS.borderColorMedium,
-                            }}
-                            onClick={() => {
-                              handleRequest(p);
-                            }}
-                          >
-                            {p}
-                          </Tag>
-                        );
-                      })}
+                                >
+                                  <div
+                                    dangerouslySetInnerHTML={{ __html: r }}
+                                    className="reasoning"
+                                    style={{
+                                      fontSize: FONT_SIZE.HEADING_4,
+                                      margin: 0,
+                                    }}
+                                  ></div>
+                                </Flex>
+                              );
+                            }
+                          )
+                        : ""}
                     </Flex>
-                  ) : null}
-                </Flex>
+
+                    {/* Followup Prompts */}
+                    {followUpPrompts &&
+                    followUpPrompts.length &&
+                    !currentQuestion ? (
+                      <Flex
+                        gap={4}
+                        style={{
+                          width: "100%",
+                          flexWrap: "wrap",
+                          marginBottom: 16,
+                        }}
+                      >
+                        <Divider
+                          style={{
+                            fontSize: FONT_SIZE.HEADING_4,
+                            color: COLORS.textColorLight,
+                            margin: 0,
+                            marginBottom: 24,
+                          }}
+                          orientation="left"
+                        >
+                          Ask next
+                        </Divider>
+                        {followUpPrompts.map((p: string) => {
+                          return (
+                            <Tag
+                              style={{
+                                backgroundColor: COLORS.bgColorBlue,
+                                fontSize: FONT_SIZE.HEADING_4,
+                                padding: "4px",
+                                borderRadius: 8,
+                                marginBottom: 4,
+                                fontWeight: 500,
+                                borderColor: COLORS.borderColorMedium,
+                              }}
+                              onClick={() => {
+                                handleRequest(p);
+                              }}
+                            >
+                              {p}
+                            </Tag>
+                          );
+                        })}
+                      </Flex>
+                    ) : null}
+                  </Flex>
+                )}
 
                 {/* Single session of question / answer */}
                 {renderQuestionAnswerSection()}
