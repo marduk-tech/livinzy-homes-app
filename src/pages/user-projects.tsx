@@ -8,6 +8,7 @@ import { useUser } from "../hooks/use-user";
 import { BRICK360_CATEGORY, Brick360CategoryInfo } from "../libs/constants";
 import {
   capitalize,
+  fetchPmtPlan,
   getCategoryScore,
   rupeeAmountFormat,
 } from "../libs/lvnzy-helper";
@@ -51,14 +52,7 @@ export function UserProjects({
     const primaryCorridor = itemInfo.meta.projectCorridors.sort(
       (a: any, b: any) => a.approxDistanceInKms - b.approxDistanceInKms
     )[0].corridorName;
-    let pmtPlan;
-    try {
-      pmtPlan = itemInfo.originalProjectId.info.financialPlan
-        .split("\n")[0]
-        .replaceAll("#", "");
-    } catch (err) {
-      console.log("could not find pmt plan");
-    }
+    let pmtPlan = fetchPmtPlan(itemInfo.originalProjectId.info.financialPlan);
     return (
       <Flex
         style={{

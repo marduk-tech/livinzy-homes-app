@@ -1,6 +1,6 @@
 import { Flex, Typography } from "antd";
 import MetaInfo from "./meta-info";
-import { FONT_SIZE } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 
 interface ProjectHeaderProps {
   lvnzyProject: any;
@@ -18,6 +18,17 @@ export const ProjectHeader = ({ lvnzyProject }: ProjectHeaderProps) => {
           }}
           gap={8}
         >
+          <Typography.Text
+            style={{
+              margin: "0",
+              lineHeight: "100%",
+              fontSize: FONT_SIZE.HEADING_3,
+              textTransform: "uppercase",
+              color: COLORS.textColorMedium,
+            }}
+          >
+            {lvnzyProject?.originalProjectId.info.developerId.name}
+          </Typography.Text>
           <Typography.Text
             style={{
               margin: "0",
