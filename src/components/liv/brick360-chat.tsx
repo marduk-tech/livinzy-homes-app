@@ -244,6 +244,26 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
       }
     }, [user, lvnzyProject]);
 
+    const initiateQueryStreamingText = () => {
+      setQueryStreaminText(
+        "<span class='progress-text'>Checking on this. Hold on !</span>"
+      );
+      setTimeout(() => {
+        setQueryStreaminText(
+          "<span class='progress-text'>Found relevant info...</span>"
+        );
+        setTimeout(() => {
+          setQueryStreaminText(
+            "<span class='progress-text'>Preparing the answer...</span>"
+          );
+          setTimeout(() => {
+            setQueryStreaminText(
+              "<span class='progress-text'>Taking a bit longer...</span>"
+            );
+          }, 5000);
+        }, 3000);
+      }, 2000);
+    };
     const fetchHistory = async (historySessionId: string) => {
       try {
         if (loadingLivThread) {
@@ -307,20 +327,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
         }
         setCurrentQuestion(question);
         setCurrentAnswer({ answer: "" });
-
-        setQueryStreaminText(
-          "<span class='progress-text'>Sending query. Hold on !</span>"
-        );
-        setTimeout(() => {
-          setQueryStreaminText(
-            "<span class='progress-text'>Finding relevant data...</span>"
-          );
-          setTimeout(() => {
-            setQueryStreaminText(
-              "<span class='progress-text'>Preparing the answer...</span>"
-            );
-          }, 3000);
-        }, 2000);
+        initiateQueryStreamingText();
 
         // if this is first question store session info
         if (isFirstQuestion && user?._id) {
@@ -398,14 +405,14 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                 <img
                   src="/images/liv-streaming.gif"
                   style={{
-                    height: 24,
-                    width: 24,
+                    height: 26,
+                    width: 26,
                   }}
                 />
                 <div
                   dangerouslySetInnerHTML={{ __html: queryStreamingText || "" }}
                   className="reasoning"
-                  style={{ fontSize: FONT_SIZE.PARA, margin: 0 }}
+                  style={{ fontSize: FONT_SIZE.HEADING_3, margin: 0 }}
                 ></div>
               </Flex>
             ) : null}
@@ -413,7 +420,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             <div
               dangerouslySetInnerHTML={{ __html: a }}
               className="reasoning"
-              style={{ fontSize: FONT_SIZE.PARA, margin: 0 }}
+              style={{ fontSize: FONT_SIZE.HEADING_3, margin: 0 }}
             ></div>
           </Flex>
         </Flex>
@@ -665,7 +672,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                                     dangerouslySetInnerHTML={{ __html: r }}
                                     className="reasoning"
                                     style={{
-                                      fontSize: FONT_SIZE.HEADING_4,
+                                      fontSize: FONT_SIZE.HEADING_3,
                                       margin: 0,
                                     }}
                                   ></div>
@@ -693,7 +700,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                             fontSize: FONT_SIZE.HEADING_4,
                             color: COLORS.textColorLight,
                             margin: 0,
-                            marginBottom: 24,
+                            marginBottom: 8,
                           }}
                           orientation="left"
                         >
@@ -708,8 +715,8 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                                 padding: "4px",
                                 borderRadius: 8,
                                 marginBottom: 4,
-                                fontWeight: 500,
-                                borderColor: COLORS.borderColorMedium,
+                                fontWeight: 600,
+                                borderColor: COLORS.borderColor,
                               }}
                               onClick={() => {
                                 handleRequest(p);

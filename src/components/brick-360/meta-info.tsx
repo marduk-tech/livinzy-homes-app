@@ -105,7 +105,7 @@ const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
       >
         <Flex
           style={{
-            height: isMobile ? 400 : 600,
+            height: 600,
             overflowY: "scroll",
             scrollbarWidth: "none",
             paddingTop: 32,

@@ -151,7 +151,7 @@ export const Brick360Tab = ({
           </Flex>
         )}
         {/*  data points */}
-        <Flex vertical gap={24} style={{ paddingBottom: 40, paddingTop: 0 }}>
+        <Flex vertical gap={24} style={{ paddingBottom: 60, paddingTop: 0 }}>
           {scoreParams &&
             scoreParams.map((sc) => {
               return (
