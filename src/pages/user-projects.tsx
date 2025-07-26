@@ -65,9 +65,8 @@ export function UserProjects({
           marginBottom: 8,
           cursor: "pointer",
           backgroundColor: "white",
-          borderColor: COLORS.borderColor,
           width: isMobile ? "100%" : (MAX_WIDTH - 150) / 4,
-          borderBottom: "1px solid",
+          borderBottom: `1px solid ${COLORS.borderColor}`,
           paddingBottom: 24,
         }}
         onClick={() => {
