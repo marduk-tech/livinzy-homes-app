@@ -60,7 +60,7 @@ export function UserProjects({
           cursor: "pointer",
           backgroundColor: "white",
           width: isMobile ? "100%" : (MAX_WIDTH - 150) / 4,
-          borderBottom: `1px solid ${COLORS.borderColor}`,
+          borderBottom: isMobile ? `1px solid ${COLORS.borderColor}` : "none",
           paddingBottom: 24,
         }}
         onClick={() => {
@@ -87,7 +87,6 @@ export function UserProjects({
             <Paragraph
               style={{
                 fontSize: FONT_SIZE.HEADING_2,
-                fontWeight: 600,
                 width: "100%",
                 padding: "4px",
                 paddingBottom: 0,
@@ -105,7 +104,7 @@ export function UserProjects({
           <Flex vertical style={{ marginTop: "auto", padding: "0 4px" }}>
             <Paragraph
               style={{
-                fontSize: FONT_SIZE.HEADING_3,
+                fontSize: FONT_SIZE.HEADING_4,
                 color: COLORS.textColorMedium,
                 marginBottom: 0,
               }}
@@ -124,9 +123,7 @@ export function UserProjects({
             {pmtPlan ? (
               <Flex
                 style={{
-                  border: `1px solid ${COLORS.textColorDark}`,
                   width: "fit-content",
-                  padding: "0 4px",
                   borderRadius: 4,
                   marginTop: 8,
                 }}
@@ -141,9 +138,8 @@ export function UserProjects({
                 ></DynamicReactIcon>
                 <Typography.Text
                   style={{
-                    fontSize: FONT_SIZE.HEADING_4,
+                    fontSize: FONT_SIZE.PARA,
                     color: COLORS.textColorDark,
-                    fontWeight: 600,
                   }}
                 >
                   {pmtPlan}
@@ -251,7 +247,7 @@ export function UserProjects({
           flexWrap: "wrap",
           marginTop: 16,
         }}
-        gap={16}
+        gap={24}
       >
         {filteredProjects.map((p: any) => renderLvnzyProject(p))}
       </Flex>
