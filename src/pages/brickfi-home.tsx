@@ -48,7 +48,7 @@ const BrickfiHome: React.FC = () => {
   }, [collectionId]);
 
   useEffect(() => {
-    if (userLoading) {
+    if (userLoading || !!lvnzyProjectId) {
       return;
     }
     if (!user) {
