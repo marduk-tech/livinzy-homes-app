@@ -86,7 +86,6 @@ const BrickfiHome: React.FC = () => {
       } else {
         if (!user.savedLvnzyProjects || user.savedLvnzyProjects.length === 0) {
           setLvnzyProjects([]);
-          return;
         } else {
           setLvnzyProjects(user.savedLvnzyProjects[0].projects);
         }
