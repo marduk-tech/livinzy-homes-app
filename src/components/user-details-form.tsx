@@ -47,7 +47,7 @@ export function UserDetailsForm({
       .then((user: any) => {
         setProfileUpdated(true);
         setTimeout(() => {
-          window.location.assign("/app");
+          window.location.reload();
         }, 500);
       });
   };
