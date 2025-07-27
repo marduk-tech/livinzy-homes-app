@@ -79,3 +79,13 @@ export const getCategoryScore = (dataPt: any) => {
   }
   return totRating / ct;
 };
+
+export const fetchPmtPlan = (txt: any) => {
+  let pmtPlan;
+  try {
+    pmtPlan = txt.split("\n")[0].replaceAll("#", "");
+  } catch (err) {
+    console.log("could not find pmt plan");
+  }
+  return pmtPlan;
+};

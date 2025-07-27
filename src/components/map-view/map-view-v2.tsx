@@ -850,7 +850,11 @@ const MapViewV2 = ({
       });
   };
 
-  const fetchTravelDurationElement = (distance: number, duration: number) => {
+  const fetchTravelDurationElement = (
+    distance: number,
+    duration: number,
+    prefix?: string
+  ) => {
     return (
       <Flex vertical style={{ marginBottom: 16 }}>
         <Flex align="center" gap={4}>
@@ -861,7 +865,8 @@ const MapViewV2 = ({
             color={COLORS.textColorDark}
           ></DynamicReactIcon>
           <Typography.Text>
-            {duration} mins ({distance.toFixed(1)} Kms)
+            {prefix ? `${prefix} - ` : ""} {duration} mins (
+            {distance.toFixed(1)} Kms)
           </Typography.Text>
         </Flex>
         <Typography.Text
@@ -1087,13 +1092,14 @@ const MapViewV2 = ({
                       title: driver.name,
                       subHeading: fetchTravelDurationElement(
                         driver.distance!,
-                        driver.duration
+                        driver.duration,
+                        "Nearest station "
                       ),
                       content: driver.details?.description || "",
                       tags: [
                         {
                           label:
-                            "Station: " +
+                            "Current Station: " +
                             (feature.properties?.name ||
                               feature.properties?.Name),
                           color: COLORS.primaryColor,

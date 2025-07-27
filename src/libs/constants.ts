@@ -285,25 +285,52 @@ export const Brick360DataPoints = {
       prompts: [
         "Total units?",
         "Breakup units by size/bhk",
-        "Standard open space for plotted projects?",
+        "What's the usual open space?",
       ],
     },
     surroundings: { label: "Surroundings" },
     designAndBuildQuality: { label: "Design/Build Quality" },
   },
   areaConnectivity: {
-    schoolsOffices: { label: "Schools/Offices" },
-    conveniences: { label: "Conveniences" },
-    transport: { label: "Connectivity" },
+    schoolsOffices: {
+      label: "Schools/Offices",
+      prompts: [
+        "List international schools",
+        "Nearest tech park?",
+        "Type of companies",
+      ],
+    },
+    conveniences: {
+      label: "Conveniences",
+      prompts: ["Dining options in walking distance?", "Nearest hospital?"],
+    },
+    transport: {
+      label: "Connectivity",
+    },
   },
   developer: {
-    experience: { label: "Experience" },
-    timeCommitment: { label: "Time Committment" },
-    customerSatisfaction: { label: "Customer Satisfaction" },
+    experience: {
+      label: "Experience",
+      prompts: ["All past projects", "Largest project"],
+    },
+    timeCommitment: {
+      label: "Time Committment",
+      prompts: ["Most delayed project", "Projects with no extension"],
+    },
+    customerSatisfaction: {
+      label: "Customer Satisfaction",
+      prompts: ["Describe few complaints", "Most common complaint"],
+    },
   },
   financials: {
-    pricePoint: { label: "Price Point" },
-    rentalIncome: { label: "Rental Income" },
+    pricePoint: {
+      label: "Price Point",
+      prompts: ["Projects priced higher", "Is this price high or low?"],
+    },
+    rentalIncome: {
+      label: "Rental Income",
+      prompts: ["Highest rental nearby", "List 1BHK rentals"],
+    },
     growthPotential: { label: "Growth Potential" },
   },
 };

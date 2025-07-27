@@ -112,19 +112,20 @@ export function LoginForm() {
       >
         <Flex vertical>
           <Typography.Text
-            style={{ fontSize: FONT_SIZE.HEADING_1, fontWeight: "bold" }}
+            style={{ fontSize: FONT_SIZE.HEADING_1 * 1.35, fontWeight: 500 }}
           >
             Welcome To Brickfi
           </Typography.Text>
           <Typography.Text
             style={{
-              fontSize: FONT_SIZE.PARA,
+              fontSize: FONT_SIZE.HEADING_3,
               marginBottom: 24,
+              color: COLORS.textColorMedium,
             }}
           >
             {showUserDetailsForm
               ? "Please update your basic details"
-              : "Brickfi is only available for private access right now."}
+              : "Login/Signup with your mobile number "}
           </Typography.Text>
         </Flex>
         {/* <Divider style={{ marginTop: 8, marginBottom: 32 }} /> */}
@@ -176,7 +177,7 @@ export function LoginForm() {
                     >
                       <PhoneInput
                         disabled={loginStatus === "OTP_SENT"}
-                        placeholder="Login with your mobile number"
+                        placeholder="Enter 10 digit mobile "
                         enableArrow
                         enableSearch
                         disableParentheses
@@ -267,13 +268,17 @@ By signing up, you agree to the terms & conditions.
                 );
               }}
             </Form.Item>
-            <Form.Item style={{ marginTop: 20 }}>
+            <Form.Item style={{ marginTop: 32 }}>
               <Button
                 type="primary"
                 htmlType="submit"
                 loading={
                   generateOtpMutation.isPending || loginMutation.isPending
                 }
+                style={{
+                  fontSize: FONT_SIZE.HEADING_2,
+                  backgroundColor: COLORS.textColorDark,
+                }}
               >
                 {loginStatus === "OTP_SENT" ? "Verify OTP" : "Send OTP"}
               </Button>

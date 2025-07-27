@@ -244,6 +244,26 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
       }
     }, [user, lvnzyProject]);
 
+    const initiateQueryStreamingText = () => {
+      setQueryStreaminText(
+        "<span class='progress-text'>Checking on this. Hold on !</span>"
+      );
+      setTimeout(() => {
+        setQueryStreaminText(
+          "<span class='progress-text'>Found relevant info...</span>"
+        );
+        setTimeout(() => {
+          setQueryStreaminText(
+            "<span class='progress-text'>Preparing the answer...</span>"
+          );
+          setTimeout(() => {
+            setQueryStreaminText(
+              "<span class='progress-text'>Taking a bit longer...</span>"
+            );
+          }, 5000);
+        }, 3000);
+      }, 2000);
+    };
     const fetchHistory = async (historySessionId: string) => {
       try {
         if (loadingLivThread) {
@@ -307,20 +327,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
         }
         setCurrentQuestion(question);
         setCurrentAnswer({ answer: "" });
-
-        setQueryStreaminText(
-          "<span class='progress-text'>Sending query. Hold on !</span>"
-        );
-        setTimeout(() => {
-          setQueryStreaminText(
-            "<span class='progress-text'>Finding relevant data...</span>"
-          );
-          setTimeout(() => {
-            setQueryStreaminText(
-              "<span class='progress-text'>Preparing the answer...</span>"
-            );
-          }, 3000);
-        }, 2000);
+        initiateQueryStreamingText();
 
         // if this is first question store session info
         if (isFirstQuestion && user?._id) {
@@ -398,14 +405,14 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                 <img
                   src="/images/liv-streaming.gif"
                   style={{
-                    height: 24,
-                    width: 24,
+                    height: 26,
+                    width: 26,
                   }}
                 />
                 <div
                   dangerouslySetInnerHTML={{ __html: queryStreamingText || "" }}
                   className="reasoning"
-                  style={{ fontSize: FONT_SIZE.PARA, margin: 0 }}
+                  style={{ fontSize: FONT_SIZE.HEADING_3, margin: 0 }}
                 ></div>
               </Flex>
             ) : null}
@@ -413,7 +420,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             <div
               dangerouslySetInnerHTML={{ __html: a }}
               className="reasoning"
-              style={{ fontSize: FONT_SIZE.PARA, margin: 0 }}
+              style={{ fontSize: FONT_SIZE.HEADING_3, margin: 0 }}
             ></div>
           </Flex>
         </Flex>
@@ -555,19 +562,23 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
           >
             {isDrawerExpanded && (
               <Flex vertical>
-                <Flex>
-                  <Typography.Text
-                    style={{
-                      backgroundColor: COLORS.textColorDark,
-                      color: "white",
-                      borderRadius: 8,
-                      padding: "4px 8px",
-                      marginBottom: 8,
-                    }}
-                  >
-                    {dataPointSelected.selectedDataPointTitle}
-                  </Typography.Text>
-                </Flex>
+                {/* Data point selected title */}
+                {dataPointSelected && (
+                  <Flex>
+                    <Typography.Text
+                      style={{
+                        backgroundColor: COLORS.textColorDark,
+                        color: "white",
+                        borderRadius: 8,
+                        padding: "4px 8px",
+                        marginBottom: 8,
+                      }}
+                    >
+                      {dataPointSelected.selectedDataPointTitle}
+                    </Typography.Text>
+                  </Flex>
+                )}
+
                 {/* Map view including expand button and drawer close icon button */}
                 {mapVisible ? (
                   <Flex
@@ -644,79 +655,81 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                   </Flex>
                 ) : null}
 
-                {/* Data point selected */}
-                <Flex vertical style={{ paddingTop: 8 }}>
-                  <Flex vertical gap={16} style={{ marginBottom: 24 }}>
-                    {dataPointSelected?.selectedDataPoint
-                      ? dataPointSelected?.selectedDataPoint.reasoning.map(
-                          (r: string) => {
-                            return (
-                              <Flex
-                                style={{
-                                  maxWidth: 850,
-                                }}
-                              >
-                                <div
-                                  dangerouslySetInnerHTML={{ __html: r }}
-                                  className="reasoning"
+                {/* Data point selected content */}
+                {dataPointSelected && (
+                  <Flex vertical style={{ paddingTop: 8 }}>
+                    <Flex vertical gap={16} style={{ marginBottom: 24 }}>
+                      {dataPointSelected?.selectedDataPoint
+                        ? dataPointSelected?.selectedDataPoint.reasoning.map(
+                            (r: string) => {
+                              return (
+                                <Flex
                                   style={{
-                                    fontSize: FONT_SIZE.HEADING_4,
-                                    margin: 0,
+                                    maxWidth: 850,
                                   }}
-                                ></div>
-                              </Flex>
-                            );
-                          }
-                        )
-                      : ""}
-                  </Flex>
-
-                  {/* Followup Prompts */}
-                  {followUpPrompts &&
-                  followUpPrompts.length &&
-                  !currentQuestion ? (
-                    <Flex
-                      gap={4}
-                      style={{
-                        width: "100%",
-                        flexWrap: "wrap",
-                        marginBottom: 16,
-                      }}
-                    >
-                      <Divider
-                        style={{
-                          fontSize: FONT_SIZE.HEADING_4,
-                          color: COLORS.textColorLight,
-                          margin: 0,
-                          marginBottom: 24,
-                        }}
-                        orientation="left"
-                      >
-                        Ask next
-                      </Divider>
-                      {followUpPrompts.map((p: string) => {
-                        return (
-                          <Tag
-                            style={{
-                              backgroundColor: COLORS.bgColorBlue,
-                              fontSize: FONT_SIZE.HEADING_4,
-                              padding: "4px",
-                              borderRadius: 8,
-                              marginBottom: 4,
-                              fontWeight: 500,
-                              borderColor: COLORS.borderColorMedium,
-                            }}
-                            onClick={() => {
-                              handleRequest(p);
-                            }}
-                          >
-                            {p}
-                          </Tag>
-                        );
-                      })}
+                                >
+                                  <div
+                                    dangerouslySetInnerHTML={{ __html: r }}
+                                    className="reasoning"
+                                    style={{
+                                      fontSize: FONT_SIZE.HEADING_3,
+                                      margin: 0,
+                                    }}
+                                  ></div>
+                                </Flex>
+                              );
+                            }
+                          )
+                        : ""}
                     </Flex>
-                  ) : null}
-                </Flex>
+
+                    {/* Followup Prompts */}
+                    {followUpPrompts &&
+                    followUpPrompts.length &&
+                    !currentQuestion ? (
+                      <Flex
+                        gap={4}
+                        style={{
+                          width: "100%",
+                          flexWrap: "wrap",
+                          marginBottom: 16,
+                        }}
+                      >
+                        <Divider
+                          style={{
+                            fontSize: FONT_SIZE.HEADING_4,
+                            color: COLORS.textColorLight,
+                            margin: 0,
+                            marginBottom: 8,
+                          }}
+                          orientation="left"
+                        >
+                          Ask next
+                        </Divider>
+                        {followUpPrompts.map((p: string) => {
+                          return (
+                            <Tag
+                              style={{
+                                backgroundColor: COLORS.bgColorBlue,
+                                fontSize: FONT_SIZE.HEADING_4,
+                                padding: "4px",
+                                borderRadius: 8,
+                                marginBottom: 4,
+                                fontWeight: 600,
+                                borderColor: COLORS.borderColor,
+                              }}
+                              onClick={() => {
+                                handleRequest(p);
+                              }}
+                            >
+                              {p}
+                            </Tag>
+                          );
+                        })}
+                      </Flex>
+                    ) : null}
+                  </Flex>
+                )}
 
                 {/* Single session of question / answer */}
                 {renderQuestionAnswerSection()}

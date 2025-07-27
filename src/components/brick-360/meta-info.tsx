@@ -1,13 +1,16 @@
 import { Flex, Modal, Typography } from "antd";
 import { LvnzyProject } from "../../types/LvnzyProject";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import { capitalize, rupeeAmountFormat } from "../../libs/lvnzy-helper";
+import {
+  capitalize,
+  fetchPmtPlan,
+  rupeeAmountFormat,
+} from "../../libs/lvnzy-helper";
 import moment from "moment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import DynamicReactIcon from "../common/dynamic-react-icon";
-import { useDevice } from "../../hooks/use-device";
 
 type MetaInfoProps = {
   lvnzyProject: LvnzyProject;
@@ -15,7 +18,15 @@ type MetaInfoProps = {
 
 const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
   const [isPmtPlanModalOpen, setIsPmtPlanModalOpen] = useState(false);
-  const { isMobile } = useDevice();
+  const [pmtPlan, setPmtPlan] = useState();
+  useEffect(() => {
+    if (lvnzyProject && lvnzyProject.originalProjectId.info.financialPlan) {
+      setPmtPlan(
+        fetchPmtPlan(lvnzyProject.originalProjectId.info.financialPlan)
+      );
+    }
+  }, [lvnzyProject]);
+
   const renderText = (text: string, color?: string) => {
     return (
       <Typography.Text
@@ -29,38 +40,40 @@ const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
       </Typography.Text>
     );
   };
+
   return (
     <>
       <Flex vertical style={{ marginTop: 4 }}>
         <Flex align="center" gap={8}>
           <Typography.Text
             style={{
-              fontSize: FONT_SIZE.HEADING_3,
+              fontSize: FONT_SIZE.HEADING_2,
               margin: 0,
               color: COLORS.textColorDark,
             }}
           >
-            {lvnzyProject?.meta.costingDetails.configurations[0].config
-              .replace("Apartments", "")
-              .replace("Apartment", "")}{" "}
+            {rupeeAmountFormat(
+              lvnzyProject?.meta.costingDetails.minimumUnitCost
+            )}{" "}
             ·{" "}
             {rupeeAmountFormat(
-              lvnzyProject?.meta.costingDetails.configurations[0].cost
-            )}{" "}
+              lvnzyProject?.meta.costingDetails.minimumUnitSize
+            )}
+            sqft
           </Typography.Text>
-          {lvnzyProject.originalProjectId.info &&
-          lvnzyProject.originalProjectId.info.financialPlan ? (
+          {pmtPlan ? (
             <Flex
               align="center"
               style={{
-                padding: "0 8px",
+                padding: "2px 8px",
                 borderRadius: 8,
-                backgroundColor: COLORS.primaryColor,
+                backgroundColor: COLORS.textColorDark,
+                border: `1px solid ${COLORS.textColorDark}`,
               }}
               gap={2}
             >
               <DynamicReactIcon
-                iconName="RiMoneyRupeeCircleLine"
+                iconName="RiDiscountPercentFill"
                 iconSet="ri"
                 size={20}
                 color="white"
@@ -75,7 +88,7 @@ const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
                   setIsPmtPlanModalOpen(true);
                 }}
               >
-                Payment Plan
+                {pmtPlan}
               </Typography.Text>
             </Flex>
           ) : null}
@@ -105,7 +118,7 @@ const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
       >
         <Flex
           style={{
-            height: isMobile ? 400 : 600,
+            height: 600,
             overflowY: "scroll",
             scrollbarWidth: "none",
             paddingTop: 32,

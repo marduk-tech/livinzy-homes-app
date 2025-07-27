@@ -8,11 +8,13 @@ import { useUser } from "../hooks/use-user";
 import { BRICK360_CATEGORY, Brick360CategoryInfo } from "../libs/constants";
 import {
   capitalize,
+  fetchPmtPlan,
   getCategoryScore,
   rupeeAmountFormat,
 } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { LvnzyProject } from "../types/LvnzyProject";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
 const { Paragraph } = Typography;
 
 export function UserProjects({
@@ -50,15 +52,16 @@ export function UserProjects({
     const primaryCorridor = itemInfo.meta.projectCorridors.sort(
       (a: any, b: any) => a.approxDistanceInKms - b.approxDistanceInKms
     )[0].corridorName;
+    let pmtPlan = fetchPmtPlan(itemInfo.originalProjectId.info.financialPlan);
     return (
       <Flex
         style={{
           marginBottom: 8,
           cursor: "pointer",
           backgroundColor: "white",
-          borderColor: COLORS.borderColorMedium,
-          borderRadius: 12,
           width: isMobile ? "100%" : (MAX_WIDTH - 150) / 4,
+          borderBottom: `1px solid ${COLORS.borderColor}`,
+          paddingBottom: 24,
         }}
         onClick={() => {
           navigate(`/app/brick360/${itemInfo._id}`);
@@ -102,8 +105,8 @@ export function UserProjects({
           <Flex vertical style={{ marginTop: "auto", padding: "0 4px" }}>
             <Paragraph
               style={{
-                fontSize: FONT_SIZE.PARA,
-                color: COLORS.textColorLight,
+                fontSize: FONT_SIZE.HEADING_3,
+                color: COLORS.textColorMedium,
                 marginBottom: 0,
               }}
               ellipsis={{
@@ -118,11 +121,38 @@ export function UserProjects({
               {primaryCorridor}
             </Paragraph>
 
+            {pmtPlan ? (
+              <Flex
+                style={{
+                  border: `1px solid ${COLORS.textColorDark}`,
+                  width: "fit-content",
+                  padding: "0 4px",
+                  borderRadius: 4,
+                  marginTop: 8,
+                }}
+                align="center"
+                gap={4}
+              >
+                <DynamicReactIcon
+                  iconName="RiDiscountPercentFill"
+                  iconSet="ri"
+                  size={18}
+                  color={COLORS.textColorDark}
+                ></DynamicReactIcon>
+                <Typography.Text
+                  style={{
+                    fontSize: FONT_SIZE.HEADING_4,
+                    color: COLORS.textColorDark,
+                    fontWeight: 600,
+                  }}
+                >
+                  {pmtPlan}
+                </Typography.Text>{" "}
+              </Flex>
+            ) : null}
             <Flex
               style={{
                 paddingTop: 8,
-                marginTop: 8,
-                borderTop: "1px solid",
                 borderTopColor: COLORS.borderColor,
                 justifyContent: "space-between",
                 width: "100%",
@@ -141,7 +171,7 @@ export function UserProjects({
                         fontSize: isMobile
                           ? FONT_SIZE.PARA
                           : FONT_SIZE.SUB_TEXT,
-                        color: COLORS.textColorLight,
+                        color: COLORS.textColorMedium,
                       }}
                     >
                       {(Brick360CategoryInfo as any)[item].title}
@@ -221,7 +251,7 @@ export function UserProjects({
           flexWrap: "wrap",
           marginTop: 16,
         }}
-        gap={32}
+        gap={16}
       >
         {filteredProjects.map((p: any) => renderLvnzyProject(p))}
       </Flex>
