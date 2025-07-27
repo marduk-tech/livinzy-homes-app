@@ -22,6 +22,7 @@ import { FourOFour } from "../pages/landing/404";
 import { BrickAssistLanding } from "../pages/landing/brick-assist-landing";
 import { NewReportRequestFormV2 } from "../components/common/new-report-request-form-v2";
 import { LivIndexFull } from "../components/map-view/map-old/liv-index-all/livindex-full";
+import { MetroMapperPage } from "../pages/metro-mapper";
 
 export const Router = () => {
   const { user, isLoading: userLoading } = useUser();
@@ -64,6 +65,7 @@ export const Router = () => {
       ></Route>
       <Route element={<DashboardLayout />}>
         <Route path="/app/map-view-345" element={<LivIndexFull />} />
+        <Route path="/app/metro-mapper" element={<MetroMapperPage />} />
         <Route path="/app/:collectionId?" element={<BrickfiHome />} />
         <Route path="/app/profile" element={<ProfilePage />} />
 

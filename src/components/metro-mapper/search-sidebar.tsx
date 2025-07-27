@@ -1,0 +1,222 @@
+import { Empty, Flex, Input, Spin, Typography } from "antd";
+import { useState } from "react";
+import { SearchResult, usePlaceSearch } from "../../hooks/use-place-search";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { IDriverPlace } from "../../types/Project";
+import DynamicReactIcon from "../common/dynamic-react-icon";
+
+import { NearestTransitStationsDisplay } from "./nearest-transit-stations-display";
+import { SearchResultItem } from "./search-result-item";
+
+interface SearchSidebarProps {
+  onResultSelect: (result: SearchResult) => void;
+  transitDrivers: IDriverPlace[];
+}
+
+export const SearchSidebar: React.FC<SearchSidebarProps> = ({
+  onResultSelect,
+  transitDrivers,
+}) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedResult, setSelectedResult] = useState<SearchResult | null>(
+    null
+  );
+  const { results, isLoading, isEmpty } = usePlaceSearch(
+    searchQuery,
+    transitDrivers
+  );
+
+  const handleResultClick = (result: SearchResult) => {
+    onResultSelect(result);
+    setSelectedResult(result);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const renderSearchContent = () => {
+    if (searchQuery.length < 2) {
+      return (
+        <Flex
+          vertical
+          align="center"
+          justify="center"
+          style={{
+            padding: "40px 20px",
+            textAlign: "center",
+            color: COLORS.textColorLight,
+          }}
+        >
+          <DynamicReactIcon
+            iconName="IoSearch"
+            iconSet="io5"
+            size={48}
+            color={COLORS.textColorLight}
+          />
+          <Typography.Text
+            style={{
+              fontSize: FONT_SIZE.HEADING_4,
+              color: COLORS.textColorLight,
+              marginTop: 16,
+            }}
+          >
+            Search places in Bangalore
+          </Typography.Text>
+          <Typography.Text
+            style={{
+              fontSize: FONT_SIZE.SUB_TEXT,
+              color: COLORS.textColorLight,
+              marginTop: 8,
+            }}
+          >
+            Find metro stations, localities, projects, schools, hospitals and
+            more
+          </Typography.Text>
+        </Flex>
+      );
+    }
+
+    if (isLoading) {
+      return (
+        <Flex align="center" justify="center" style={{ padding: "40px 20px" }}>
+          <Spin size="large" />
+        </Flex>
+      );
+    }
+
+    if (isEmpty) {
+      return (
+        <Flex align="center" justify="center" style={{ padding: "40px 20px" }}>
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={
+              <Typography.Text style={{ color: COLORS.textColorLight }}>
+                No results found for "{searchQuery}"
+              </Typography.Text>
+            }
+          />
+        </Flex>
+      );
+    }
+
+    return (
+      <Flex vertical>
+        {/* Results Header */}
+        <Flex
+          style={{
+            padding: "12px 16px",
+            backgroundColor: COLORS.bgColorMedium,
+            borderBottom: `1px solid ${COLORS.borderColor}`,
+          }}
+        >
+          <Typography.Text
+            style={{
+              fontSize: FONT_SIZE.SUB_TEXT,
+              color: COLORS.textColorDark,
+              fontWeight: 500,
+            }}
+          >
+            {results.length} result{results.length !== 1 ? "s" : ""} found
+          </Typography.Text>
+        </Flex>
+
+        {/* Results List */}
+        <Flex
+          vertical
+          style={{
+            maxHeight: "calc(100vh - 300px)",
+            overflowY: "auto",
+            scrollbarWidth: "thin",
+          }}
+        >
+          {results.map((result) => (
+            <SearchResultItem
+              key={result.id}
+              result={result}
+              onClick={handleResultClick}
+            />
+          ))}
+        </Flex>
+      </Flex>
+    );
+  };
+
+  return (
+    <Flex
+      vertical
+      style={{
+        width: "25%",
+        backgroundColor: "white",
+        borderLeft: `1px solid ${COLORS.borderColor}`,
+        height: "100%",
+      }}
+    >
+      {/* Search Header */}
+      <Flex
+        vertical
+        style={{
+          padding: "16px",
+          borderBottom: `1px solid ${COLORS.borderColor}`,
+        }}
+      >
+        <Typography.Title
+          level={5}
+          style={{
+            margin: 0,
+            marginBottom: 12,
+            color: COLORS.textColorDark,
+          }}
+        >
+          Search Places
+        </Typography.Title>
+
+        <Input
+          size="large"
+          placeholder="Search metro stations, areas, places..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          prefix={
+            <DynamicReactIcon
+              iconName="IoSearch"
+              iconSet="io5"
+              size={18}
+              color={COLORS.textColorLight}
+            />
+          }
+          allowClear
+          style={{
+            borderRadius: 8,
+          }}
+        />
+      </Flex>
+
+      {/* Search Content */}
+      <Flex vertical style={{ flex: 1 }}>
+        {renderSearchContent()}
+      </Flex>
+
+      <NearestTransitStationsDisplay selectedResult={selectedResult} />
+
+      {/* Footer */}
+      {/* <Flex
+        style={{
+          padding: "12px 16px",
+          borderTop: `1px solid ${COLORS.borderColor}`,
+          backgroundColor: COLORS.bgColorMedium,
+        }}
+      >
+        <Typography.Text
+          style={{
+            fontSize: FONT_SIZE.SUB_TEXT,
+            color: COLORS.textColorLight,
+            textAlign: "center",
+            width: "100%",
+          }}
+        >
+          Powered by Brickfi 
+        </Typography.Text>
+      </Flex> */}
+    </Flex>
+  );
+};

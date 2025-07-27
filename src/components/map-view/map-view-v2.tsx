@@ -19,6 +19,7 @@ import {
   TileLayer,
   useMap,
 } from "react-leaflet";
+
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useFetchCorridors } from "../../hooks/use-corridors";
@@ -352,6 +353,23 @@ const processDriversToPolygons = (
     .filter((p): p is NonNullable<typeof p> => p !== null);
 };
 
+// Helper component to capture map instance
+const MapInstanceCapture = ({
+  onMapReady,
+}: {
+  onMapReady: (map: any) => void;
+}) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (map) {
+      onMapReady(map);
+    }
+  }, [map, onMapReady]);
+
+  return null;
+};
+
 const MapViewV2 = ({
   drivers,
   projectId,
@@ -362,6 +380,7 @@ const MapViewV2 = ({
   projectSqftPricing,
   showLocalities,
   isFromTab = false,
+  onMapReady,
 }: {
   drivers?: any[];
   projectId?: string;
@@ -376,6 +395,7 @@ const MapViewV2 = ({
   projectSqftPricing?: number;
   showLocalities?: boolean;
   isFromTab?: boolean;
+  onMapReady?: (map: any) => void;
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
@@ -1613,11 +1633,13 @@ const MapViewV2 = ({
           center={[13.110274, 77.6009443]}
           zoom={14}
           minZoom={12}
+          maxZoom={19}
           style={{ height: "100%", width: "100%" }}
           zoomControl={false}
         >
           <MapResizeHandler />
           <MapCenterHandler projectData={primaryProject} projects={projects} />
+          {onMapReady && <MapInstanceCapture onMapReady={onMapReady} />}
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
