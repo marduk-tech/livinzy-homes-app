@@ -44,10 +44,10 @@ export function MetroMapper() {
         <div style="
           width: 30px;
           height: 30px;
-          background-color: #ff4444;
+          background-color: ${COLORS.primaryColor};
           border: 3px solid white;
           border-radius: 50%;
-          box-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+          box-shadow: 0 0 10px rgba(56, 182, 255, 0.6);
           animation: pulse 1.5s infinite;
           display: flex;
           align-items: center;
@@ -124,24 +124,11 @@ export function MetroMapper() {
 
   return (
     <Flex vertical style={{ height: "calc(100vh - 64px)" }}>
-      <Flex
-        style={{
-          padding: "16px 24px",
-          backgroundColor: "white",
-          zIndex: 1,
-          borderBottom: `1px solid ${COLORS.borderColor}`,
-        }}
-      >
-        <Typography.Title level={3} style={{ margin: 0 }}>
-          Metro Lines & Transit Network
-        </Typography.Title>
-      </Flex>
-
       <Flex style={{ flex: 1 }}>
         <Flex
           style={{ width: "75%", position: "relative", minHeight: "600px" }}
         >
-          <Flex
+          {/* <Flex
             style={{
               position: "absolute",
               bottom: 16,
@@ -158,7 +145,7 @@ export function MetroMapper() {
             >
               {transitDrivers.length} metro lines displayed
             </Typography.Text>
-          </Flex>
+          </Flex> */}
 
           <MapViewV2
             key="metro-mapper-view"

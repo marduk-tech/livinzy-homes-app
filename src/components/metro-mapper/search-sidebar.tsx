@@ -33,9 +33,17 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+
+    if (selectedResult) {
+      setSelectedResult(null);
+    }
   };
 
   const renderSearchContent = () => {
+    if (selectedResult) {
+      return null;
+    }
+
     if (searchQuery.length < 2) {
       return (
         <Flex
@@ -147,8 +155,7 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
       vertical
       style={{
         width: "25%",
-        backgroundColor: "white",
-        borderLeft: `1px solid ${COLORS.borderColor}`,
+
         height: "100%",
       }}
     >
@@ -191,12 +198,15 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
         />
       </Flex>
 
-      {/* Search Content */}
-      <Flex vertical style={{ flex: 1 }}>
-        {renderSearchContent()}
-      </Flex>
-
-      <NearestTransitStationsDisplay selectedResult={selectedResult} />
+      {/* Nearest Transit Stations - Show below search input when result is selected */}
+      {selectedResult ? (
+        <NearestTransitStationsDisplay selectedResult={selectedResult} />
+      ) : (
+        /* Search Content */
+        <Flex vertical style={{ flex: 1, minHeight: 0 }}>
+          {renderSearchContent()}
+        </Flex>
+      )}
 
       {/* Footer */}
       {/* <Flex

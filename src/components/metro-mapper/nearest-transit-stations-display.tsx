@@ -29,6 +29,7 @@ export const NearestTransitStationsDisplay: React.FC<
           padding: "16px",
           borderTop: `1px solid ${COLORS.borderColor}`,
           backgroundColor: COLORS.bgColorMedium,
+          flex: 1,
         }}
         align="center"
         justify="center"
@@ -53,6 +54,7 @@ export const NearestTransitStationsDisplay: React.FC<
           padding: "16px",
           borderTop: `1px solid ${COLORS.borderColor}`,
           backgroundColor: COLORS.bgColorMedium,
+          flex: 1,
         }}
         align="center"
         justify="center"
@@ -70,6 +72,8 @@ export const NearestTransitStationsDisplay: React.FC<
       style={{
         borderTop: `1px solid ${COLORS.borderColor}`,
         backgroundColor: "white",
+        flex: 1,
+        minHeight: 0,
       }}
     >
       <Flex
@@ -99,7 +103,15 @@ export const NearestTransitStationsDisplay: React.FC<
       </Flex>
 
       {/* Transit Stations List */}
-      <Flex vertical style={{ maxHeight: "200px", overflowY: "auto" }}>
+      <Flex
+        vertical
+        style={{
+          flex: 1,
+          maxHeight: "calc(95vh - 200px)",
+          overflowY: "auto",
+          minHeight: 0,
+        }}
+      >
         {[...transitStationsData.nearestStations]
           .sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance))
           .map((station) => (
