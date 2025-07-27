@@ -56,12 +56,6 @@ const BrickfiHome: React.FC = () => {
       return;
     }
 
-    if (!user.savedLvnzyProjects || user.savedLvnzyProjects.length === 0) {
-      setLvnzyProjects([]);
-      setProjectsLoadng(false);
-      return;
-    }
-
     if (collectionId === "inv-friendly") {
       fetchLvnzyProjectsByIds(
         "67f0f60f3ef53b74b67d12f5,67e83fe1a06e471b3d14b6b5,687b4d291541e1a0ecb321ca,687b401e8a68a0900797180b,67f0046ca58ac2b37e530f2b,6870af1904ec49de98b9b1fa,680736af3ff1a71676450fbb,68073ba59f670b1afc3f03f4"
@@ -90,7 +84,12 @@ const BrickfiHome: React.FC = () => {
           setLvnzyProjects(collection.projects);
         }
       } else {
-        setLvnzyProjects(user.savedLvnzyProjects[0].projects);
+        if (!user.savedLvnzyProjects || user.savedLvnzyProjects.length === 0) {
+          setLvnzyProjects([]);
+          return;
+        } else {
+          setLvnzyProjects(user.savedLvnzyProjects[0].projects);
+        }
       }
       setProjectsLoadng(false);
     }
