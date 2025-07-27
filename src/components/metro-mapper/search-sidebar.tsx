@@ -1,5 +1,5 @@
 import { Empty, Flex, Input, Spin, Typography } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SearchResult, usePlaceSearch } from "../../hooks/use-place-search";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace } from "../../types/Project";
@@ -18,11 +18,22 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
   transitDrivers,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(
     null
   );
+
+  // Debounce search query to reduce API wait times
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const { results, isLoading, isEmpty } = usePlaceSearch(
-    searchQuery,
+    debouncedSearchQuery,
     transitDrivers
   );
 
@@ -44,7 +55,7 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
       return null;
     }
 
-    if (searchQuery.length < 2) {
+    if (debouncedSearchQuery.length < 2) {
       return (
         <Flex
           vertical
@@ -100,7 +111,7 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
             image={Empty.PRESENTED_IMAGE_SIMPLE}
             description={
               <Typography.Text style={{ color: COLORS.textColorLight }}>
-                No results found for "{searchQuery}"
+                No results found for "{debouncedSearchQuery}"
               </Typography.Text>
             }
           />
