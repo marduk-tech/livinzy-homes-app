@@ -3,11 +3,15 @@ import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { queryKeys } from "../libs/constants";
 import { IDriverPlace } from "../types/Project";
 
-export const getAllLivIndexPlaces = async (driversIds?: string[]) => {
+export const getAllLivIndexPlaces = async (
+  driversIds?: string[],
+  driverTypes?: string[]
+) => {
   const endpoint = `/livindex-places`;
   return axiosApiInstance
     .post("/livindex-places", {
       driverIds: driversIds || [],
+      driverTypes: driverTypes || [],
     })
     .then((response) => {
       return response.data as IDriverPlace[];
@@ -16,11 +20,11 @@ export const getAllLivIndexPlaces = async (driversIds?: string[]) => {
 
 export function useFetchAllLivindexPlaces(
   driverIds?: string[],
-  mapTitle?: string
+  driverTypes?: string[]
 ) {
   return useQuery<IDriverPlace[]>({
-    queryKey: [queryKeys.getAllPlaces, mapTitle],
-    queryFn: () => getAllLivIndexPlaces(driverIds),
+    queryKey: [queryKeys.getAllPlaces, driverTypes || "", driverIds || ""],
+    queryFn: () => getAllLivIndexPlaces(driverIds, driverTypes),
     refetchOnWindowFocus: false,
   });
 }

@@ -95,7 +95,7 @@ export const MapView = ({
   onProjectClick?: any;
   mapTitle?: string;
 }) => {
-  const { data: livIndexPlaces } = useFetchAllLivindexPlaces(drivers, mapTitle);
+  const { data: livIndexPlaces } = useFetchAllLivindexPlaces(drivers);
   const { data: projectData } = useFetchProjectById(projectId!);
   const [mapDrivers, setMapDrivers] = useState<string[]>();
   const { data: corridors, isLoading: isCorridorsDataLoading } =

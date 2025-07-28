@@ -73,8 +73,10 @@ interface GeoJSONPointFeature extends GeoJSONFeature {
 
 type RoadDriverPlace = IDriverPlace & {
   features: GeoJSONFeature[];
-  status: PLACE_TIMELINE;
-  tags?: string[];
+};
+
+type TransitDriverPlace = IDriverPlace & {
+  features: GeoJSONFeature[];
 };
 
 // category mappings
@@ -1017,7 +1019,7 @@ const MapViewV2 = ({
 
     return drivers
       ?.filter(
-        (driver): driver is RoadDriverPlace =>
+        (driver): driver is TransitDriverPlace =>
           driver.driver === "transit" &&
           !!driver.features &&
           typeof driver.status === "string" &&
@@ -1090,16 +1092,23 @@ const MapViewV2 = ({
                   click: () => {
                     setModalContent({
                       title: driver.name,
-                      subHeading: fetchTravelDurationElement(
-                        driver.distance!,
-                        driver.duration,
-                        "Nearest station "
-                      ),
-                      content: driver.details?.description || "",
+                      subHeading:
+                        driver.distance && driver.duration
+                          ? fetchTravelDurationElement(
+                              driver.distance!,
+                              driver.duration,
+                              "Nearest station "
+                            )
+                          : "",
+                      content: driver.details
+                        ? driver.details.info
+                          ? driver.details.info.summary || ""
+                          : driver.details?.description
+                        : "",
                       tags: [
                         {
                           label:
-                            "Current Station: " +
+                            "Station: " +
                             (feature.properties?.name ||
                               feature.properties?.Name),
                           color: COLORS.primaryColor,

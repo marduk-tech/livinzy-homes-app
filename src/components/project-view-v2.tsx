@@ -1,16 +1,13 @@
-import { Button, Flex, Image, Modal, Row, Typography } from "antd";
+import { Flex, Typography } from "antd";
 import React, { useState } from "react";
-import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import { useDevice } from "../hooks/use-device";
-import { useFetchAllLivindexPlaces } from "../hooks/use-livindex-places";
 import { useFetchProjectById } from "../hooks/use-project";
 import { captureAnalyticsEvent, rupeeAmountFormat } from "../libs/lvnzy-helper";
 import { sortedMedia } from "../libs/utils";
 import "../theme/scroll-bar.css";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { IMedia, IUI, Project } from "../types/Project";
-import DynamicReactIcon from "./common/dynamic-react-icon";
+import { Project } from "../types/Project";
 import { Loader } from "./common/loader";
 import ProjectGallery from "./project-gallery";
 
@@ -68,8 +65,6 @@ const ProjectViewV2: React.FC<{
   const { data: projectData, isLoading: projectDataLoading } =
     useFetchProjectById(projectId!);
 
-  const { data: allLivIndexPlaces, isLoading: allLivIndexPlacesLoading } =
-    useFetchAllLivindexPlaces();
   const [toggleMapView, setToggleMapView] = useState(false);
 
   if (!projectData) {
