@@ -55,46 +55,36 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
       return null;
     }
 
-    if (debouncedSearchQuery.length < 2) {
-      return (
-        <Flex
-          vertical
-          align="center"
-          justify="center"
-          style={{
-            padding: "40px 20px",
-            textAlign: "center",
-            color: COLORS.textColorLight,
-          }}
-        >
-          <DynamicReactIcon
-            iconName="IoSearch"
-            iconSet="io5"
-            size={48}
-            color={COLORS.textColorLight}
-          />
-          <Typography.Text
-            style={{
-              fontSize: FONT_SIZE.HEADING_4,
-              color: COLORS.textColorLight,
-              marginTop: 16,
-            }}
-          >
-            Search places in Bangalore
-          </Typography.Text>
-          <Typography.Text
-            style={{
-              fontSize: FONT_SIZE.SUB_TEXT,
-              color: COLORS.textColorLight,
-              marginTop: 8,
-            }}
-          >
-            Find metro stations, localities, projects, schools, hospitals and
-            more
-          </Typography.Text>
-        </Flex>
-      );
-    }
+    // if (debouncedSearchQuery.length < 2) {
+    //   return (
+    //     <Flex
+    //       vertical
+    //       align="center"
+    //       justify="center"
+    //       style={{
+    //         padding: "40px 20px",
+    //         textAlign: "center",
+    //         color: COLORS.textColorLight,
+    //       }}
+    //     >
+    //       <DynamicReactIcon
+    //         iconName="IoSearch"
+    //         iconSet="io5"
+    //         size={48}
+    //         color={COLORS.textColorLight}
+    //       />
+    //       <Typography.Text
+    //         style={{
+    //           fontSize: FONT_SIZE.SUB_TEXT,
+    //           color: COLORS.textColorLight,
+    //           marginTop: 8,
+    //         }}
+    //       >
+    //         Search a place to see if a metro is coming near you !
+    //       </Typography.Text>
+    //     </Flex>
+    //   );
+    // }
 
     if (isLoading) {
       return (
@@ -122,7 +112,7 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
     return (
       <Flex vertical>
         {/* Results Header */}
-        <Flex
+        {/* <Flex
           style={{
             padding: "12px 16px",
             backgroundColor: COLORS.bgColorMedium,
@@ -138,7 +128,7 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
           >
             {results.length} result{results.length !== 1 ? "s" : ""} found
           </Typography.Text>
-        </Flex>
+        </Flex> */}
 
         {/* Results List */}
         <Flex
@@ -166,37 +156,26 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
       vertical
       style={{
         height: "100%",
+        width: "100%",
       }}
     >
       {/* Search Header */}
       <Flex
         vertical
         style={{
-          padding: "16px",
-          borderBottom: `1px solid ${COLORS.borderColor}`,
+          padding: "0 16px",
         }}
       >
-        <Typography.Title
-          level={5}
-          style={{
-            margin: 0,
-            marginBottom: 12,
-            color: COLORS.textColorDark,
-          }}
-        >
-          Search Places
-        </Typography.Title>
-
         <Input
           size="large"
-          placeholder="Search metro stations, areas, places..."
+          placeholder="Search your place"
           value={searchQuery}
           onChange={handleSearchChange}
           prefix={
             <DynamicReactIcon
               iconName="IoSearch"
               iconSet="io5"
-              size={18}
+              size={FONT_SIZE.HEADING_3}
               color={COLORS.textColorLight}
             />
           }

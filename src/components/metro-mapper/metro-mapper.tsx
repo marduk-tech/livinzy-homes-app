@@ -1,9 +1,9 @@
-import { Flex } from "antd";
+import { Flex, Typography } from "antd";
 import L from "leaflet";
 import { useEffect, useRef, useState } from "react";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
 import { SearchResult } from "../../hooks/use-place-search";
-import { COLORS } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace } from "../../types/Project";
 import { Loader } from "../common/loader";
 import MapViewV2 from "../map-view/map-view-v2";
@@ -127,7 +127,11 @@ export function MetroMapper() {
 
   const SearchContainer = () => {
     return (
-      <Flex style={{ width: isMobile ? "100%" : "25%" }}>
+      <Flex
+        style={{
+          width: isMobile ? "100%" : "30%",
+        }}
+      >
         <SearchSidebar
           onResultSelect={handleSearchResultSelect}
           transitDrivers={transitDrivers}
@@ -137,14 +141,31 @@ export function MetroMapper() {
   };
 
   return (
-    <Flex vertical style={{ height: "calc(100vh - 64px)" }}>
+    <Flex
+      vertical
+      style={{ height: "calc(100vh - 104px)", marginTop: 24, marginBottom: 16 }}
+    >
+      <Flex
+        vertical
+        style={{ marginBottom: 0, padding: isMobile ? "0 16px" : 0 }}
+      >
+        <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_1 }}>
+          Find if a metro is coming near you!
+        </Typography.Text>
+        <Typography.Text
+          style={{ fontSize: FONT_SIZE.HEADING_3, marginBottom: 24 }}
+        >
+          This tool helps you find any nearest operational or upcoming metro or
+          suburban railway stations.
+        </Typography.Text>
+      </Flex>
       <Flex style={{ flex: 1 }} vertical={isMobile}>
         {isMobile && <SearchContainer></SearchContainer>}
         <Flex
           style={{
-            width: isMobile ? "100%" : "75%",
+            width: isMobile ? "100%" : "70%",
             position: "relative",
-            minHeight: "600px",
+            height: isMobile ? 400 : "100%",
           }}
         >
           <MapViewV2

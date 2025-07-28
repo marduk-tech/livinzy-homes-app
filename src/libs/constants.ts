@@ -366,3 +366,24 @@ export const LandingConstants = {
   genReportFormLink: "/requestreport",
   appLink: "/app",
 };
+
+export const DRIVER_CATEGORIES = {
+  schools: {
+    drivers: ["school", "university"],
+  },
+  workplace: {
+    drivers: ["industrial-hitech", "industrial-general"],
+  },
+  conveniences: {
+    drivers: ["food", "hospital", "commercial"],
+  },
+  connectivity: {
+    drivers: ["highway", "transit"],
+  },
+  "growth potential": {
+    drivers: ["industrial-hitech", "industrial-general", "highway", "transit"],
+  },
+  surroundings: {
+    drivers: [],
+  },
+};

@@ -26,6 +26,7 @@ import { useFetchCorridors } from "../../hooks/use-corridors";
 import { useFetchLocalities } from "../../hooks/use-localities";
 import { useFetchProjectById } from "../../hooks/use-project";
 import {
+  DRIVER_CATEGORIES,
   LivIndexDriversConfig,
   PLACE_TIMELINE,
   SurroundingElementLabels,
@@ -77,21 +78,6 @@ type RoadDriverPlace = IDriverPlace & {
 
 type TransitDriverPlace = IDriverPlace & {
   features: GeoJSONFeature[];
-};
-
-// category mappings
-const DRIVER_CATEGORIES = {
-  Schools: ["school", "university"],
-  Workplace: ["industrial-hitech", "industrial-general"],
-  Conveniences: ["food", "hospital", "commercial"],
-  Connectivity: ["highway", "transit"],
-  "Growth Potential": [
-    "industrial-hitech",
-    "industrial-general",
-    "highway",
-    "transit",
-  ],
-  Surroundings: [],
 };
 
 type DriverCategoryKey = keyof typeof DRIVER_CATEGORIES;
@@ -409,9 +395,9 @@ const MapViewV2 = ({
 
   const [selectedCategories, setSelectedCategories] = useState<
     DriverCategoryKey[]
-  >(["Workplace"]);
+  >(["workplace"]);
   const [allowedDriverTypes, setAllowedDriverTypes] = useState<string[]>(
-    DRIVER_CATEGORIES.Workplace
+    DRIVER_CATEGORIES.workplace.drivers
   );
 
   const [uniqueSurroundingElements, setUniqueSurroundingElements] = useState<
@@ -457,7 +443,7 @@ const MapViewV2 = ({
   useEffect(() => {
     if (isFromTab) {
       const allowedTypes = selectedCategories.flatMap(
-        (category) => DRIVER_CATEGORIES[category]
+        (category) => DRIVER_CATEGORIES[category].drivers
       );
       const uniqueAllowedTypes = Array.from(new Set(allowedTypes));
       setAllowedDriverTypes(uniqueAllowedTypes);
@@ -758,7 +744,7 @@ const MapViewV2 = ({
       !surroundingElements.length ||
       !surroundingElementIcons ||
       !surroundingElementIcons.length ||
-      (isFromTab && !selectedCategories.includes("Surroundings"))
+      (isFromTab && !selectedCategories.includes("surroundings"))
     ) {
       return null;
     }
@@ -894,7 +880,7 @@ const MapViewV2 = ({
       !drivers.length ||
       (!!surroundingElements?.length &&
         selectedCategories.length === 1 &&
-        selectedCategories.includes("Surroundings")) ||
+        selectedCategories.includes("surroundings")) ||
       !roadIcon
     ) {
       return null;
@@ -1011,7 +997,7 @@ const MapViewV2 = ({
       !drivers.length ||
       (!!surroundingElements?.length &&
         selectedCategories.length === 1 &&
-        selectedCategories.includes("Surroundings")) ||
+        selectedCategories.includes("surroundings")) ||
       !transitStationIcon
     ) {
       return null;
@@ -1160,7 +1146,7 @@ const MapViewV2 = ({
         !drivers?.length ||
         (!!surroundingElements?.length &&
           selectedCategories.length === 1 &&
-          selectedCategories.includes("Surroundings"))
+          selectedCategories.includes("surroundings"))
       ) {
         return;
       }
@@ -1208,7 +1194,7 @@ const MapViewV2 = ({
       !drivers?.length ||
       (!!surroundingElements?.length &&
         selectedCategories.length === 1 &&
-        selectedCategories.includes("Surroundings"))
+        selectedCategories.includes("surroundings"))
     ) {
       return null;
     }
@@ -1573,10 +1559,10 @@ const MapViewV2 = ({
               }
             }}
             style={{ width: 250 }}
-            placeholder="Select driver categories"
+            placeholder="Choose a parameter"
             maxTagCount={2}
             options={Object.keys(DRIVER_CATEGORIES).map((key) => ({
-              label: key,
+              label: capitalize(key),
               value: key as DriverCategoryKey,
             }))}
           />
@@ -1586,7 +1572,7 @@ const MapViewV2 = ({
       {drivers &&
       drivers.length &&
       (!surroundingElements?.length ||
-        selectedCategories.some((cat) => cat !== "Surroundings")) ? (
+        selectedCategories.some((cat) => cat !== "surroundings")) ? (
         <Flex
           style={{
             width: "100%",
@@ -1598,7 +1584,7 @@ const MapViewV2 = ({
             bottom:
               surroundingElements &&
               surroundingElements.length &&
-              selectedCategories.includes("Surroundings")
+              selectedCategories.includes("surroundings")
                 ? 72
                 : 32,
             paddingLeft: 8,
@@ -1617,7 +1603,7 @@ const MapViewV2 = ({
       {/* Surrounding Elements Filters */}
       {surroundingElements &&
       surroundingElements.length &&
-      (selectedCategories.includes("Surroundings") || !isFromTab) ? (
+      (selectedCategories.includes("surroundings") || !isFromTab) ? (
         <Flex
           style={{
             width: "100%",
@@ -1683,7 +1669,7 @@ const MapViewV2 = ({
                 {drivers &&
                 drivers.length &&
                 (!surroundingElements?.length ||
-                  selectedCategories.some((cat) => cat !== "Surroundings")) ? (
+                  selectedCategories.some((cat) => cat !== "surroundings")) ? (
                   <>
                     <BoundsAwareDrivers
                       renderRoadDrivers={(bounds) => (
