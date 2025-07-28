@@ -149,7 +149,9 @@ export function MetroMapper() {
         vertical
         style={{ marginBottom: 0, padding: isMobile ? "0 16px" : 0 }}
       >
-        <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_1 }}>
+        <Typography.Text
+          style={{ fontSize: FONT_SIZE.HEADING_1, lineHeight: "120%" }}
+        >
           Find if a metro is coming near you!
         </Typography.Text>
         <Typography.Text
