@@ -1,4 +1,4 @@
-import { Flex, Typography } from "antd";
+import { Flex } from "antd";
 import L from "leaflet";
 import { useEffect, useRef, useState } from "react";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
@@ -8,14 +8,17 @@ import { IDriverPlace } from "../../types/Project";
 import { Loader } from "../common/loader";
 import MapViewV2 from "../map-view/map-view-v2";
 import { SearchSidebar } from "./search-sidebar";
+import { useDevice } from "../../hooks/use-device";
 
 export function MetroMapper() {
   const { data: livindexPlaces, isLoading: livindexPlacesLoading } =
-    useFetchAllLivindexPlaces();
+    useFetchAllLivindexPlaces(undefined, ["transit"]);
 
   const [transitDrivers, setTransitDrivers] = useState<IDriverPlace[]>([]);
   const [mapInstance, setMapInstance] = useState<any>(null);
   const temporaryMarkerRef = useRef<L.Marker | null>(null);
+
+  const { isMobile } = useDevice();
 
   // Filter only transit drivers from all places
   useEffect(() => {
@@ -122,31 +125,28 @@ export function MetroMapper() {
     }, 800);
   };
 
+  const SearchContainer = () => {
+    return (
+      <Flex style={{ width: isMobile ? "100%" : "25%" }}>
+        <SearchSidebar
+          onResultSelect={handleSearchResultSelect}
+          transitDrivers={transitDrivers}
+        />
+      </Flex>
+    );
+  };
+
   return (
     <Flex vertical style={{ height: "calc(100vh - 64px)" }}>
-      <Flex style={{ flex: 1 }}>
+      <Flex style={{ flex: 1 }} vertical={isMobile}>
+        {isMobile && <SearchContainer></SearchContainer>}
         <Flex
-          style={{ width: "75%", position: "relative", minHeight: "600px" }}
+          style={{
+            width: isMobile ? "100%" : "75%",
+            position: "relative",
+            minHeight: "600px",
+          }}
         >
-          {/* <Flex
-            style={{
-              position: "absolute",
-              bottom: 16,
-              left: 16,
-              zIndex: 1000,
-              backgroundColor: "white",
-              padding: "8px 12px",
-              borderRadius: 8,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-            }}
-          >
-            <Typography.Text
-              style={{ fontSize: 14, color: COLORS.textColorDark }}
-            >
-              {transitDrivers.length} metro lines displayed
-            </Typography.Text>
-          </Flex> */}
-
           <MapViewV2
             key="metro-mapper-view"
             drivers={transitDrivers.map((driver) => ({
@@ -161,10 +161,7 @@ export function MetroMapper() {
           />
         </Flex>
 
-        <SearchSidebar
-          onResultSelect={handleSearchResultSelect}
-          transitDrivers={transitDrivers}
-        />
+        {!isMobile && <SearchContainer></SearchContainer>}
       </Flex>
     </Flex>
   );

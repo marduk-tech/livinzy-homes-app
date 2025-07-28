@@ -165,8 +165,6 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
     <Flex
       vertical
       style={{
-        width: "25%",
-
         height: "100%",
       }}
     >

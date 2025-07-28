@@ -1,4 +1,4 @@
-import { ProjectHomeType } from "../libs/constants";
+import { PLACE_TIMELINE, ProjectHomeType } from "../libs/constants";
 import { ILivIndexPlaces } from "./Common";
 
 export interface IMedia {
@@ -175,6 +175,7 @@ export interface IDriverPlace {
     description: string;
     footfall: number;
     icon?: string;
+    info: any;
   };
   location?: {
     lat: number;
@@ -185,9 +186,10 @@ export interface IDriverPlace {
   };
   driver: string;
   megaDriver: string;
-  status: string;
+  status: PLACE_TIMELINE;
   distance?: number;
   duration: number;
+  tags?: string[];
   features: {
     type: string;
     coordinates: number[][][];
