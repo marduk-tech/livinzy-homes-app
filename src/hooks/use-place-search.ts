@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { Locality } from "../types/Locality";
+import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { IDriverPlace } from "../types/Project";
 import { useFetchAllLivindexPlaces } from "./use-livindex-places";
 import { useFetchLocalities } from "./use-localities";
@@ -16,61 +15,77 @@ export interface SearchResult {
   address?: string;
 }
 
-export interface OSMResult {
+export interface GooglePlacesResult {
   place_id: string;
-  display_name: string;
-  lat: string;
-  lon: string;
-  type: string;
-  class: string;
-  importance: number;
+  name: string;
+  formatted_address: string;
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+  types: string[];
+  business_status?: string;
+  rating?: number;
 }
 
-// OpenStreetMap Nominatim API search for Bangalore region
-const searchNominatim = async (query: string): Promise<OSMResult[]> => {
+const searchGooglePlaces = async (
+  query: string
+): Promise<GooglePlacesResult[]> => {
   if (!query.trim()) return [];
 
   try {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?` +
-        `q=${encodeURIComponent(query + " Bangalore")}&` +
-        `format=json&limit=5&` +
-        `viewbox=77.4126,12.7905,77.8129,13.1439&bounded=1&` +
-        `addressdetails=1`
-    );
+    const response = await axiosApiInstance.get(`/places/search`, {
+      params: {
+        q: query,
+        location: "12.9716,77.5946",
+        radius: 50000,
+      },
+    });
 
-    if (!response.ok) {
-      throw new Error("Nominatim API error");
+    if (response.data && response.data.results) {
+      return response.data.results.slice(0, 5).map((place: any) => ({
+        place_id: place.place_id || `custom-${Date.now()}-${Math.random()}`,
+        name: place.name,
+        formatted_address: place.formatted_address || place.vicinity || "",
+        geometry: {
+          location: {
+            lat: place.geometry?.location?.lat || 12.9716,
+            lng: place.geometry?.location?.lng || 77.5946,
+          },
+        },
+        types: place.types || ["establishment"],
+        business_status: place.business_status,
+        rating: place.rating,
+      }));
     }
-
-    return await response.json();
   } catch (error) {
-    console.error("Nominatim search error:", error);
-    return [];
+    console.error("Backend Google Places search error:", error);
   }
+
+  return [];
 };
 
 export const usePlaceSearch = (
   query: string,
   transitDrivers: IDriverPlace[] = []
 ) => {
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-
-  // Fetch internal data sources
+  // internal data sources
   const { projects: projectsData } = useProjectSearch();
   const { data: localitiesData } = useFetchLocalities();
   const { data: livindexPlaces } = useFetchAllLivindexPlaces();
 
-  // External OSM search
-  const { data: osmResults, isLoading: osmLoading } = useQuery<OSMResult[]>({
-    queryKey: ["osm-search", query],
-    queryFn: () => searchNominatim(query),
-    enabled: query.length >= 3,
-    refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-  });
+  // Google Places search
+  const { data: googlePlacesResults, isLoading: googlePlacesLoading } =
+    useQuery<GooglePlacesResult[]>({
+      queryKey: ["google-places-search", query],
+      queryFn: () => searchGooglePlaces(query),
+      enabled: query.length >= 3,
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    });
 
-  // Combined search processing
   const { data: combinedResults, isLoading: processingResults } = useQuery<
     SearchResult[]
   >({
@@ -81,7 +96,7 @@ export const usePlaceSearch = (
       localitiesData,
       transitDrivers,
       livindexPlaces,
-      osmResults,
+      googlePlacesResults,
     ],
     queryFn: async () => {
       if (!query.trim() || query.length < 2) return [];
@@ -155,7 +170,7 @@ export const usePlaceSearch = (
           .filter(
             (place) =>
               place.name.toLowerCase().includes(searchTerm) &&
-              place.driver !== "transit" // Exclude transit as we handle it separately
+              place.driver !== "transit" // we handle it separately
           )
           .slice(0, 3)
           .map((place) => ({
@@ -185,21 +200,23 @@ export const usePlaceSearch = (
         results.push(...placeMatches);
       }
 
-      // OSM Results
-      if (osmResults && osmResults.length > 0) {
-        const osmMatches = osmResults.slice(0, 5).map((osmResult) => ({
-          id: `osm-${osmResult.place_id}`,
-          name: osmResult.display_name.split(",")[0], // Get the main name
-          type: "osm" as const,
-          coordinates: [
-            parseFloat(osmResult.lat),
-            parseFloat(osmResult.lon),
-          ] as [number, number],
-          description: osmResult.type || "Place",
-          address: osmResult.display_name,
-          icon: getOSMIcon(osmResult.class, osmResult.type),
-        }));
-        results.push(...osmMatches);
+      // Google Places Results
+      if (googlePlacesResults && googlePlacesResults.length > 0) {
+        const googlePlacesMatches = googlePlacesResults
+          .slice(0, 5)
+          .map((placeResult) => ({
+            id: `google-places-${placeResult.place_id}`,
+            name: placeResult.name,
+            type: "osm" as const, // Keep as "osm" for compatibility with existing UI
+            coordinates: [
+              placeResult.geometry.location.lat,
+              placeResult.geometry.location.lng,
+            ] as [number, number],
+            description: getGooglePlacesDescription(placeResult.types),
+            address: placeResult.formatted_address,
+            icon: getGooglePlacesIcon(placeResult.types),
+          }));
+        results.push(...googlePlacesMatches);
       }
 
       // remove duplicates and sort by relevance
@@ -241,46 +258,141 @@ export const usePlaceSearch = (
 
   return {
     results: combinedResults || [],
-    isLoading: osmLoading || processingResults,
+    isLoading: googlePlacesLoading || processingResults,
     isEmpty: !combinedResults || combinedResults.length === 0,
   };
 };
 
-// helper function to get appropriate icon for OSM results
-const getOSMIcon = (osmClass: string, osmType: string): string => {
-  switch (osmClass) {
-    case "amenity":
-      switch (osmType) {
-        case "school":
-        case "university":
-        case "college":
-          return "IoMdSchool";
-        case "hospital":
-        case "clinic":
-          return "FaRegHospital";
-        case "restaurant":
-        case "cafe":
-        case "food_court":
-          return "MdRestaurant";
-        case "bank":
-          return "FaUniversity";
-        case "fuel":
-          return "MdLocalGasStation";
-        default:
-          return "IoLocationOutline";
-      }
-    case "shop":
-      return "FaStore";
-    case "leisure":
-      return "GiMountainRoad";
-    case "tourism":
-      return "MdAttractions";
-    case "office":
-      return "MdBusiness";
-    case "highway":
-    case "road":
-      return "FaRoad";
-    default:
-      return "IoLocationOutline";
+const getGooglePlacesIcon = (types: string[]): string => {
+  if (
+    types.includes("school") ||
+    types.includes("university") ||
+    types.includes("secondary_school")
+  ) {
+    return "IoMdSchool";
   }
+  if (
+    types.includes("hospital") ||
+    types.includes("doctor") ||
+    types.includes("pharmacy")
+  ) {
+    return "FaRegHospital";
+  }
+  if (
+    types.includes("restaurant") ||
+    types.includes("meal_takeaway") ||
+    types.includes("food")
+  ) {
+    return "MdRestaurant";
+  }
+  if (
+    types.includes("bank") ||
+    types.includes("atm") ||
+    types.includes("finance")
+  ) {
+    return "FaUniversity";
+  }
+  if (types.includes("gas_station") || types.includes("fuel")) {
+    return "MdLocalGasStation";
+  }
+  if (
+    types.includes("shopping_mall") ||
+    types.includes("store") ||
+    types.includes("clothing_store")
+  ) {
+    return "FaStore";
+  }
+  if (
+    types.includes("park") ||
+    types.includes("amusement_park") ||
+    types.includes("zoo")
+  ) {
+    return "GiMountainRoad";
+  }
+  if (
+    types.includes("tourist_attraction") ||
+    types.includes("museum") ||
+    types.includes("art_gallery")
+  ) {
+    return "MdAttractions";
+  }
+  if (types.includes("subway_station") || types.includes("transit_station")) {
+    return "MdOutlineDirectionsTransit";
+  }
+  if (
+    types.includes("locality") ||
+    types.includes("sublocality") ||
+    types.includes("neighborhood")
+  ) {
+    return "IoLocationOutline";
+  }
+
+  return "IoLocationOutline";
+};
+
+const getGooglePlacesDescription = (types: string[]): string => {
+  if (
+    types.includes("school") ||
+    types.includes("university") ||
+    types.includes("secondary_school")
+  ) {
+    return "Educational Institution";
+  }
+  if (
+    types.includes("hospital") ||
+    types.includes("doctor") ||
+    types.includes("pharmacy")
+  ) {
+    return "Healthcare Facility";
+  }
+  if (
+    types.includes("restaurant") ||
+    types.includes("meal_takeaway") ||
+    types.includes("food")
+  ) {
+    return "Restaurant/Food";
+  }
+  if (
+    types.includes("bank") ||
+    types.includes("atm") ||
+    types.includes("finance")
+  ) {
+    return "Banking/Finance";
+  }
+  if (types.includes("gas_station") || types.includes("fuel")) {
+    return "Gas Station";
+  }
+  if (
+    types.includes("shopping_mall") ||
+    types.includes("store") ||
+    types.includes("clothing_store")
+  ) {
+    return "Shopping";
+  }
+  if (
+    types.includes("park") ||
+    types.includes("amusement_park") ||
+    types.includes("zoo")
+  ) {
+    return "Recreation/Park";
+  }
+  if (
+    types.includes("tourist_attraction") ||
+    types.includes("museum") ||
+    types.includes("art_gallery")
+  ) {
+    return "Tourist Attraction";
+  }
+  if (types.includes("subway_station") || types.includes("transit_station")) {
+    return "Transit Station";
+  }
+  if (
+    types.includes("locality") ||
+    types.includes("sublocality") ||
+    types.includes("neighborhood")
+  ) {
+    return "Locality/Area";
+  }
+
+  return "Place";
 };
