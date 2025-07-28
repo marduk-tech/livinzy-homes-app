@@ -1,14 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { IDriverPlace } from "../types/Project";
-import { useFetchAllLivindexPlaces } from "./use-livindex-places";
-import { useFetchLocalities } from "./use-localities";
-import { useProjectSearch } from "./use-project-search";
 
 export interface SearchResult {
   id: string;
   name: string;
-  type: "project" | "locality" | "transit" | "place" | "osm";
+  type: "transit" | "osm";
   coordinates: [number, number];
   description?: string;
   icon?: string;
@@ -71,11 +68,6 @@ export const usePlaceSearch = (
   query: string,
   transitDrivers: IDriverPlace[] = []
 ) => {
-  // internal data sources
-  const { projects: projectsData } = useProjectSearch();
-  const { data: localitiesData } = useFetchLocalities();
-  const { data: livindexPlaces } = useFetchAllLivindexPlaces();
-
   // Google Places search
   const { data: googlePlacesResults, isLoading: googlePlacesLoading } =
     useQuery<GooglePlacesResult[]>({
@@ -89,64 +81,12 @@ export const usePlaceSearch = (
   const { data: combinedResults, isLoading: processingResults } = useQuery<
     SearchResult[]
   >({
-    queryKey: [
-      "combined-search",
-      query,
-      projectsData,
-      localitiesData,
-      transitDrivers,
-      livindexPlaces,
-      googlePlacesResults,
-    ],
+    queryKey: ["combined-search", query, transitDrivers, googlePlacesResults],
     queryFn: async () => {
       if (!query.trim() || query.length < 2) return [];
 
       const results: SearchResult[] = [];
       const searchTerm = query.toLowerCase();
-
-      // Search Projects
-      if (projectsData) {
-        const projectMatches = projectsData
-          .filter((project) =>
-            project.projectName.toLowerCase().includes(searchTerm)
-          )
-          .slice(0, 3)
-          .map((project) => ({
-            id: `project-${project.projectId}`,
-            name: project.projectName,
-            type: "project" as const,
-            // Bangalore coords
-            coordinates: [12.9716, 77.5946] as [number, number],
-            description: "Real Estate Project",
-            icon: "MdHomeWork",
-          }));
-        results.push(...projectMatches);
-      }
-
-      // search Localities
-      if (localitiesData) {
-        const localityMatches = localitiesData
-          .filter(
-            (locality) =>
-              locality.name.toLowerCase().includes(searchTerm) ||
-              locality.aliases?.some((alias) =>
-                alias.toLowerCase().includes(searchTerm)
-              )
-          )
-          .slice(0, 3)
-          .map((locality) => ({
-            id: `locality-${locality._id}`,
-            name: locality.name,
-            type: "locality" as const,
-            coordinates: [locality.location.lat, locality.location.lng] as [
-              number,
-              number
-            ],
-            description: "Locality/Area",
-            icon: "IoLocationOutline",
-          }));
-        results.push(...localityMatches);
-      }
 
       // search Transit Stations
       const transitMatches = transitDrivers
@@ -164,42 +104,6 @@ export const usePlaceSearch = (
         }));
       results.push(...transitMatches);
 
-      // search LivIndex Places (schools, hospitals, etc.)
-      if (livindexPlaces) {
-        const placeMatches = livindexPlaces
-          .filter(
-            (place) =>
-              place.name.toLowerCase().includes(searchTerm) &&
-              place.driver !== "transit" // we handle it separately
-          )
-          .slice(0, 3)
-          .map((place) => ({
-            id: `place-${place._id}`,
-            name: place.name,
-            type: "place" as const,
-            coordinates: place.location
-              ? ([place.location.lat, place.location.lng] as [number, number])
-              : ([12.9716, 77.5946] as [number, number]),
-            description:
-              place.driver === "school"
-                ? "Educational Institution"
-                : place.driver === "hospital"
-                ? "Healthcare Facility"
-                : place.driver === "commercial"
-                ? "Commercial Area"
-                : "Place of Interest",
-            icon:
-              place.driver === "school"
-                ? "IoMdSchool"
-                : place.driver === "hospital"
-                ? "FaRegHospital"
-                : place.driver === "commercial"
-                ? "FaStore"
-                : "IoLocationOutline",
-          }));
-        results.push(...placeMatches);
-      }
-
       // Google Places Results
       if (googlePlacesResults && googlePlacesResults.length > 0) {
         const googlePlacesMatches = googlePlacesResults
@@ -207,7 +111,7 @@ export const usePlaceSearch = (
           .map((placeResult) => ({
             id: `google-places-${placeResult.place_id}`,
             name: placeResult.name,
-            type: "osm" as const, // Keep as "osm" for compatibility with existing UI
+            type: "osm" as const,
             coordinates: [
               placeResult.geometry.location.lat,
               placeResult.geometry.location.lng,
@@ -233,10 +137,7 @@ export const usePlaceSearch = (
         .sort((a, b) => {
           const typePriority = {
             transit: 1,
-            locality: 2,
-            project: 3,
-            place: 4,
-            osm: 5,
+            osm: 2,
           };
           const aPriority = typePriority[a.type] || 6;
           const bPriority = typePriority[b.type] || 6;
