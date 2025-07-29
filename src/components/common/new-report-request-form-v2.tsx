@@ -45,7 +45,7 @@ export const NewReportRequestFormV2 = () => {
   const navigate = useNavigate();
   const { user } = useUser();
   const { isMobile } = useDevice();
-  const [reportsLeft, setReportsLeft] = useState(3);
+  const [reportsLeft, setReportsLeft] = useState();
   const [maxReportsRequested, setMaxReportsRequested] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [projectOptions, setProjectOptions] = useState<any[]>([]);
@@ -57,6 +57,13 @@ export const NewReportRequestFormV2 = () => {
       const projectOptions: any[] = (projects || [])
         .filter(
           (p) => !selectedProjects.some((s) => s.projectId === p.projectId)
+        )
+        .sort((projectA, projectB) =>
+          projectA.readyScore && projectB.readyScore
+            ? 0
+            : projectA.readyScore
+            ? -1
+            : 1
         )
         .map((project) => ({
           value: `${project.projectId}-${project.projectName}`,

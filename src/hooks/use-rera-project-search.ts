@@ -4,6 +4,8 @@ import { axiosApiInstance } from "../libs/axios-api-Instance";
 export interface ReraProject {
   projectName: string;
   projectId: string;
+  projectReraNumber: string;
+  readyScore?: boolean;
 }
 
 export const useReraProjectSearch = () => {
