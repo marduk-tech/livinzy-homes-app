@@ -1,14 +1,15 @@
-import { Flex, Typography } from "antd";
+import { Button, Flex, Modal, Typography } from "antd";
 import L from "leaflet";
 import { useEffect, useRef, useState } from "react";
+import { useDevice } from "../../hooks/use-device";
 import { useFetchAllLivindexPlaces } from "../../hooks/use-livindex-places";
 import { SearchResult } from "../../hooks/use-place-search";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace } from "../../types/Project";
+import DynamicReactIcon from "../common/dynamic-react-icon";
 import { Loader } from "../common/loader";
 import MapViewV2 from "../map-view/map-view-v2";
 import { SearchSidebar } from "./search-sidebar";
-import { useDevice } from "../../hooks/use-device";
 
 export function MetroMapper() {
   const { data: livindexPlaces, isLoading: livindexPlacesLoading } =
@@ -17,6 +18,7 @@ export function MetroMapper() {
   const [transitDrivers, setTransitDrivers] = useState<IDriverPlace[]>([]);
   const [mapInstance, setMapInstance] = useState<any>(null);
   const temporaryMarkerRef = useRef<L.Marker | null>(null);
+  const [isMapFullScreen, setIsMapFullScreen] = useState(false);
 
   const { isMobile } = useDevice();
 
@@ -170,6 +172,44 @@ export function MetroMapper() {
             height: isMobile ? 400 : "100%",
           }}
         >
+          {!isMapFullScreen && (
+            <Flex
+              style={{
+                position: "absolute",
+                top: 16,
+                right: 16,
+                zIndex: 9999,
+              }}
+            >
+              <Button
+                size="small"
+                icon={
+                  <DynamicReactIcon
+                    iconName="FaExpand"
+                    color="white"
+                    iconSet="fa"
+                    size={16}
+                  />
+                }
+                style={{
+                  marginLeft: "auto",
+                  marginBottom: 8,
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  backgroundColor: COLORS.textColorDark,
+                  color: "white",
+                  fontSize: FONT_SIZE.HEADING_4,
+                  height: 28,
+                }}
+                onClick={() => {
+                  setIsMapFullScreen(true);
+                }}
+              >
+                Expand
+              </Button>
+            </Flex>
+          )}
+
           <MapViewV2
             key="metro-mapper-view"
             drivers={transitDrivers.map((driver) => ({
@@ -187,6 +227,45 @@ export function MetroMapper() {
 
         {!isMobile && <SearchContainer></SearchContainer>}
       </Flex>
+
+      {/* Full map view modal */}
+      <Modal
+        title={null}
+        open={isMapFullScreen}
+        onCancel={() => {
+          setIsMapFullScreen(false);
+        }}
+        mask={true}
+        forceRender
+        footer={null}
+        width={isMobile ? "100%" : 900}
+        style={{ top: 10 }}
+        styles={{
+          content: {
+            backgroundColor: COLORS.bgColorMedium,
+            borderRadius: 8,
+            padding: 0,
+            overflowY: "hidden",
+          },
+        }}
+      >
+        <Flex
+          style={{ height: Math.min(window.innerHeight - 20, 800) }}
+          vertical
+          gap={8}
+        >
+          <MapViewV2
+            key="metro-mapper-fullscreen"
+            drivers={transitDrivers.map((driver) => ({
+              ...driver,
+            }))}
+            fullSize={true}
+            isFromTab={false}
+            showLocalities={false}
+            showCorridors={false}
+          />
+        </Flex>
+      </Modal>
     </Flex>
   );
 }
