@@ -130,8 +130,11 @@ export function MetroMapper() {
   const SearchContainer = () => {
     return (
       <Flex
+        vertical
         style={{
           width: isMobile ? "100%" : "30%",
+          height: isMobile ? "auto" : "100%",
+          marginBottom: isMobile ? 16 : 0,
         }}
       >
         <SearchSidebar
@@ -163,13 +166,18 @@ export function MetroMapper() {
           suburban railway stations.
         </Typography.Text>
       </Flex>
-      <Flex style={{ flex: 1 }} vertical={isMobile}>
-        {isMobile && <SearchContainer></SearchContainer>}
+      {/* Main Content Area */}
+      <Flex style={{ flex: 1 }} vertical={isMobile} gap={isMobile ? 16 : 0}>
+        {/* Mobile: Search at top */}
+        {isMobile && <SearchContainer />}
+
+        {/* Map Container */}
         <Flex
           style={{
             width: isMobile ? "100%" : "70%",
             position: "relative",
-            height: isMobile ? 400 : "100%",
+            height: isMobile ? 300 : "100%",
+            flex: isMobile ? "none" : 1,
           }}
         >
           {!isMapFullScreen && (
@@ -225,7 +233,8 @@ export function MetroMapper() {
           />
         </Flex>
 
-        {!isMobile && <SearchContainer></SearchContainer>}
+        {/* Desktop: Search sidebar on right */}
+        {!isMobile && <SearchContainer />}
       </Flex>
 
       {/* Full map view modal */}

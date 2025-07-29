@@ -1,4 +1,4 @@
-import { Flex, Spin, Typography } from "antd";
+import { Card, Flex, Spin, Typography } from "antd";
 import { useNearestTransitStations } from "../../hooks/use-nearest-transit-stations";
 import { SearchResult } from "../../hooks/use-place-search";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
@@ -24,22 +24,25 @@ export const NearestTransitStationsDisplay: React.FC<
 
   if (isLoading) {
     return (
-      <Flex
+      <Card
         style={{
-          padding: "16px",
-          borderTop: `1px solid ${COLORS.borderColor}`,
-          backgroundColor: COLORS.bgColorMedium,
-          flex: 1,
+          marginTop: 16,
+          borderRadius: 8,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
         }}
-        align="center"
-        justify="center"
-        gap={8}
       >
-        <Spin size="small" />
-        <Typography.Text style={{ color: COLORS.textColorLight }}>
-          Finding nearest transit stations...
-        </Typography.Text>
-      </Flex>
+        <Flex
+          align="center"
+          justify="center"
+          gap={8}
+          style={{ padding: "24px" }}
+        >
+          <Spin size="small" />
+          <Typography.Text style={{ color: COLORS.textColorLight }}>
+            Finding nearest transit stations...
+          </Typography.Text>
+        </Flex>
+      </Card>
     );
   }
 
@@ -49,98 +52,98 @@ export const NearestTransitStationsDisplay: React.FC<
     transitStationsData.nearestStations.length === 0
   ) {
     return (
-      <Flex
+      <Card
         style={{
-          padding: "16px",
-          borderTop: `1px solid ${COLORS.borderColor}`,
-          backgroundColor: COLORS.bgColorMedium,
-          flex: 1,
+          marginTop: 16,
+          borderRadius: 8,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
         }}
-        align="center"
-        justify="center"
       >
-        <Typography.Text style={{ color: COLORS.textColorLight }}>
-          No nearby transit stations found
-        </Typography.Text>
-      </Flex>
+        <Flex align="center" justify="center" style={{ padding: "24px" }}>
+          <Typography.Text style={{ color: COLORS.textColorLight }}>
+            No nearby transit stations found
+          </Typography.Text>
+        </Flex>
+      </Card>
     );
   }
 
   return (
-    <Flex
-      vertical
+    <Card
       style={{
-        borderTop: `1px solid ${COLORS.borderColor}`,
-        backgroundColor: "white",
-        flex: 1,
-        minHeight: 0,
+        marginTop: 16,
+        borderRadius: 8,
       }}
+      title={
+        <Flex align="center" gap={8}>
+          <DynamicReactIcon
+            iconName="MdOutlineDirectionsTransit"
+            iconSet="md"
+            size={16}
+            color={COLORS.textColorDark}
+          />
+          <Typography.Text
+            style={{
+              fontSize: FONT_SIZE.HEADING_4,
+              color: COLORS.textColorDark,
+              fontWeight: 600,
+              margin: 0,
+            }}
+          >
+            Nearest Transit Stations
+          </Typography.Text>
+        </Flex>
+      }
+      bodyStyle={{ padding: 0 }}
     >
-      <Flex
-        style={{
-          padding: "12px 16px",
-          backgroundColor: COLORS.bgColorMedium,
-          borderBottom: `1px solid ${COLORS.borderColor}`,
-        }}
-        align="center"
-        gap={8}
-      >
-        <DynamicReactIcon
-          iconName="MdOutlineDirectionsTransit"
-          iconSet="md"
-          size={16}
-          color={COLORS.textColorDark}
-        />
-        <Typography.Text
-          style={{
-            fontSize: FONT_SIZE.SUB_TEXT,
-            color: COLORS.textColorDark,
-            fontWeight: 500,
-          }}
-        >
-          Nearest Transit Stations
-        </Typography.Text>
-      </Flex>
-
       {/* Transit Stations List */}
       <Flex
         vertical
         style={{
-          flex: 1,
-          maxHeight: "calc(95vh - 200px)",
+          maxHeight: 400,
           overflowY: "auto",
-          minHeight: 0,
         }}
       >
         {[...transitStationsData.nearestStations]
           .sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance))
-          .map((station) => (
+          .map((station, index) => (
             <Flex
               key={station.stationId}
               style={{
-                padding: "12px 16px",
-                borderBottom: `1px solid ${COLORS.borderColor}`,
+                padding: "16px 20px",
+                borderBottom:
+                  index < transitStationsData.nearestStations.length - 1
+                    ? `1px solid ${COLORS.borderColor}`
+                    : "none",
+                transition: "background-color 0.2s ease",
               }}
-              gap={12}
+              gap={16}
               align="start"
+              className="station-item"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = COLORS.bgColorMedium;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }}
             >
               {/* Metro Icon */}
               <Flex
                 style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 6,
-                  backgroundColor: "#1890ff",
+                  width: 40,
+                  height: 40,
+                  borderRadius: 8,
+                  backgroundColor: COLORS.primaryColor,
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
-                  marginTop: 2,
+                  boxShadow: "0 2px 4px rgba(24, 144, 255, 0.2)",
                 }}
               >
                 <DynamicReactIcon
                   iconName="MdOutlineDirectionsTransit"
                   iconSet="md"
-                  size={16}
+                  size={20}
                   color="white"
                 />
               </Flex>
@@ -151,9 +154,9 @@ export const NearestTransitStationsDisplay: React.FC<
                 <Typography.Text
                   style={{
                     fontSize: FONT_SIZE.SUB_TEXT,
-                    color: "#1890ff",
+                    color: COLORS.primaryColor,
                     fontWeight: 600,
-                    marginBottom: 2,
+                    marginBottom: 4,
                   }}
                   ellipsis={{ tooltip: station.metroLineName }}
                 >
@@ -164,44 +167,46 @@ export const NearestTransitStationsDisplay: React.FC<
                 <Typography.Text
                   style={{
                     fontSize: FONT_SIZE.HEADING_4,
-                    fontWeight: 500,
+                    fontWeight: 600,
                     color: COLORS.textColorDark,
-                    marginBottom: 4,
+                    marginBottom: 8,
                   }}
                   ellipsis={{ tooltip: station.stationName }}
                 >
                   {station.stationName}
                 </Typography.Text>
 
-                <Flex gap={12}>
-                  <Flex align="center" gap={4}>
+                <Flex gap={16}>
+                  <Flex align="center" gap={6}>
                     <DynamicReactIcon
                       iconName="IoLocation"
                       iconSet="io5"
-                      size={12}
+                      size={14}
                       color={COLORS.textColorLight}
                     />
                     <Typography.Text
                       style={{
                         fontSize: FONT_SIZE.SUB_TEXT,
                         color: COLORS.textColorLight,
+                        fontWeight: 500,
                       }}
                     >
                       {station.distance} km
                     </Typography.Text>
                   </Flex>
 
-                  <Flex align="center" gap={4}>
+                  <Flex align="center" gap={6}>
                     <DynamicReactIcon
                       iconName="IoTime"
                       iconSet="io5"
-                      size={12}
+                      size={14}
                       color={COLORS.textColorLight}
                     />
                     <Typography.Text
                       style={{
                         fontSize: FONT_SIZE.SUB_TEXT,
                         color: COLORS.textColorLight,
+                        fontWeight: 500,
                       }}
                     >
                       {station.travelTime} mins
@@ -212,6 +217,6 @@ export const NearestTransitStationsDisplay: React.FC<
             </Flex>
           ))}
       </Flex>
-    </Flex>
+    </Card>
   );
 };

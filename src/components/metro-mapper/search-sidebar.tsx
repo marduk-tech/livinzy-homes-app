@@ -1,4 +1,4 @@
-import { Empty, Flex, Input, Spin, Typography } from "antd";
+import { AutoComplete, Empty, Flex, Input, Spin, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { SearchResult, usePlaceSearch } from "../../hooks/use-place-search";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
@@ -6,7 +6,6 @@ import { IDriverPlace } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 
 import { NearestTransitStationsDisplay } from "./nearest-transit-stations-display";
-import { SearchResultItem } from "./search-result-item";
 
 interface SearchSidebarProps {
   onResultSelect: (result: SearchResult) => void;
@@ -50,105 +49,155 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
     }
   };
 
-  const renderSearchContent = () => {
-    if (selectedResult) {
-      return null;
-    }
-
-    // if (debouncedSearchQuery.length < 2) {
-    //   return (
-    //     <Flex
-    //       vertical
-    //       align="center"
-    //       justify="center"
-    //       style={{
-    //         padding: "40px 20px",
-    //         textAlign: "center",
-    //         color: COLORS.textColorLight,
-    //       }}
-    //     >
-    //       <DynamicReactIcon
-    //         iconName="IoSearch"
-    //         iconSet="io5"
-    //         size={48}
-    //         color={COLORS.textColorLight}
-    //       />
-    //       <Typography.Text
-    //         style={{
-    //           fontSize: FONT_SIZE.SUB_TEXT,
-    //           color: COLORS.textColorLight,
-    //           marginTop: 8,
-    //         }}
-    //       >
-    //         Search a place to see if a metro is coming near you !
-    //       </Typography.Text>
-    //     </Flex>
-    //   );
-    // }
-
+  // Transform search results to AutoComplete options
+  const getAutoCompleteOptions = () => {
     if (isLoading) {
-      return (
-        <Flex align="center" justify="center" style={{ padding: "40px 20px" }}>
-          <Spin size="large" />
-        </Flex>
-      );
+      return [
+        {
+          value: "loading",
+          label: (
+            <Flex align="center" justify="center" style={{ padding: "8px" }}>
+              <Spin size="small" style={{ marginRight: 8 }} />
+              <Typography.Text style={{ color: COLORS.textColorLight }}>
+                Searching...
+              </Typography.Text>
+            </Flex>
+          ),
+          disabled: true,
+        },
+      ];
     }
 
-    if (isEmpty) {
-      return (
-        <Flex align="center" justify="center" style={{ padding: "40px 20px" }}>
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={
+    if (isEmpty && debouncedSearchQuery.length >= 2) {
+      return [
+        {
+          value: "no-results",
+          label: (
+            <Flex align="center" justify="center" style={{ padding: "16px" }}>
               <Typography.Text style={{ color: COLORS.textColorLight }}>
                 No results found for "{debouncedSearchQuery}"
               </Typography.Text>
-            }
-          />
-        </Flex>
-      );
+            </Flex>
+          ),
+          disabled: true,
+        },
+      ];
     }
 
-    return (
-      <Flex vertical>
-        {/* Results Header */}
-        {/* <Flex
-          style={{
-            padding: "12px 16px",
-            backgroundColor: COLORS.bgColorMedium,
-            borderBottom: `1px solid ${COLORS.borderColor}`,
-          }}
-        >
-          <Typography.Text
+    return results.map((result) => ({
+      value: result.name,
+      label: (
+        <Flex gap={12} align="center" style={{ padding: "8px 4px" }}>
+          {/* Icon */}
+          <Flex
             style={{
-              fontSize: FONT_SIZE.SUB_TEXT,
-              color: COLORS.textColorDark,
-              fontWeight: 500,
+              width: 32,
+              height: 32,
+              borderRadius: 6,
+              backgroundColor: COLORS.bgColorMedium,
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
             }}
           >
-            {results.length} result{results.length !== 1 ? "s" : ""} found
-          </Typography.Text>
-        </Flex> */}
-
-        {/* Results List */}
-        <Flex
-          vertical
-          style={{
-            maxHeight: "calc(100vh - 300px)",
-            overflowY: "auto",
-            scrollbarWidth: "thin",
-          }}
-        >
-          {results.map((result) => (
-            <SearchResultItem
-              key={result.id}
-              result={result}
-              onClick={handleResultClick}
+            <DynamicReactIcon
+              iconName={result.icon || "IoLocationOutline"}
+              iconSet={getIconSet(result.icon || "IoLocationOutline")}
+              size={16}
+              color={getTypeColor(result.type)}
             />
-          ))}
+          </Flex>
+
+          {/* Content */}
+          <Flex vertical style={{ flex: 1, minWidth: 0 }}>
+            <Flex align="center" justify="space-between">
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.HEADING_4,
+                  fontWeight: 500,
+                  color: COLORS.textColorDark,
+                }}
+                ellipsis={{ tooltip: result.name }}
+              >
+                {result.name}
+              </Typography.Text>
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.SUB_TEXT,
+                  color: getTypeColor(result.type),
+                  fontWeight: 500,
+                  marginLeft: 8,
+                }}
+              >
+                {getTypeLabel(result.type)}
+              </Typography.Text>
+            </Flex>
+            {(result.description || result.address) && (
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.SUB_TEXT,
+                  color: COLORS.textColorLight,
+                  marginTop: 2,
+                }}
+                ellipsis={{ tooltip: result.address || result.description }}
+              >
+                {result.address || result.description}
+              </Typography.Text>
+            )}
+          </Flex>
         </Flex>
-      </Flex>
-    );
+      ),
+      result,
+    }));
+  };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case "transit":
+        return COLORS.primaryColor;
+      case "project":
+        return COLORS.greenIdentifier;
+      case "locality":
+        return COLORS.orangeIdentifier;
+      case "place":
+        return COLORS.yellowIdentifier;
+      case "osm":
+        return COLORS.textColorDark;
+      default:
+        return COLORS.textColorDark;
+    }
+  };
+
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case "transit":
+        return "Metro";
+      case "project":
+        return "Project";
+      case "locality":
+        return "Area";
+      case "place":
+        return "Place";
+      case "osm":
+        return "Location";
+      default:
+        return "Place";
+    }
+  };
+
+  const getIconSet = (iconName: string) => {
+    if (iconName.startsWith("Io")) return "io5";
+    if (iconName.startsWith("Fa")) return "fa";
+    if (iconName.startsWith("Md")) return "md";
+    if (iconName.startsWith("Gi")) return "gi";
+    if (iconName.startsWith("Bi")) return "bi";
+    return "io5";
+  };
+
+  const handleAutoCompleteSelect = (value: string, option: any) => {
+    if (option.result) {
+      handleResultClick(option.result);
+    }
   };
 
   return (
@@ -166,34 +215,44 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
           padding: "0 16px",
         }}
       >
-        <Input
+        <AutoComplete
           size="large"
-          placeholder="Search your place"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          prefix={
-            <DynamicReactIcon
-              iconName="IoSearch"
-              iconSet="io5"
-              size={FONT_SIZE.HEADING_3}
-              color={COLORS.textColorLight}
-            />
+          onSelect={handleAutoCompleteSelect}
+          options={
+            debouncedSearchQuery.length >= 2 ? getAutoCompleteOptions() : []
           }
-          allowClear
           style={{
-            borderRadius: 8,
+            width: "100%",
           }}
-        />
+          dropdownStyle={{
+            maxHeight: 400,
+            overflowY: "auto",
+          }}
+          notFoundContent={null}
+          allowClear
+        >
+          <Input
+            placeholder="Search your place"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            prefix={
+              <DynamicReactIcon
+                iconName="IoSearch"
+                iconSet="io5"
+                size={16}
+                color={COLORS.textColorLight}
+              />
+            }
+            style={{
+              borderRadius: 8,
+            }}
+          />
+        </AutoComplete>
       </Flex>
 
       {/* Nearest Transit Stations - Show below search input when result is selected */}
-      {selectedResult ? (
+      {selectedResult && (
         <NearestTransitStationsDisplay selectedResult={selectedResult} />
-      ) : (
-        /* Search Content */
-        <Flex vertical style={{ flex: 1, minHeight: 0 }}>
-          {renderSearchContent()}
-        </Flex>
       )}
 
       {/* Footer */}
