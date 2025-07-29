@@ -117,7 +117,7 @@ export const ProjectImagesGalleryV2 = ({
       </Flex>
 
       {filteredImages.length > 0 ? (
-        <Flex vertical gap={32}>
+        <Flex vertical gap={32} style={{ paddingBottom: 80 }}>
           {filteredImages
             .sort(([aTag, aImages], [bTag, bImages]) => {
               if (selectedImageId) {

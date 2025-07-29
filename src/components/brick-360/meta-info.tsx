@@ -47,7 +47,7 @@ const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
         <Flex align="center" gap={8}>
           <Typography.Text
             style={{
-              fontSize: FONT_SIZE.HEADING_2,
+              fontSize: FONT_SIZE.HEADING_3,
               margin: 0,
               color: COLORS.textColorDark,
             }}

@@ -43,7 +43,11 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
   return (
     <ScrollableContainer>
       <Flex
-        style={{ position: "relative", height: window.innerHeight - 300 }}
+        style={{
+          position: "relative",
+          height: window.innerHeight - 300,
+          paddingBottom: 40,
+        }}
         vertical
         gap={8}
       >

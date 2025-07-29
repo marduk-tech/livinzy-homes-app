@@ -74,7 +74,7 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
           marginBottom: 8,
         }}
       >
-        <Flex vertical style={{ marginBottom: 8 }}>
+        <Flex vertical style={{ marginBottom: 8, paddingBottom: 80 }}>
           {/* Sqft & Configs */}
 
           <Flex align="center" gap={8}>
