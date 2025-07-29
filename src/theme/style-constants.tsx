@@ -11,7 +11,7 @@ export const COLORS = {
   borderColorMedium: "#ddd",
   borderColorDark: "#666",
   textColorDark: "#2D3F4E",
-  textColorMedium: "#888",
+  textColorMedium: "#999",
   textColorLight: "#bbb",
   textColorVeryLight: "#e1e1e1",
   bgColorBlue: "#e7f6ff",

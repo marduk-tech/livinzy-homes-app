@@ -91,6 +91,7 @@ export function UserProjects({
                 padding: "4px",
                 paddingBottom: 0,
                 marginBottom: 0,
+                fontWeight: 500,
               }}
               ellipsis={{
                 rows: 1,

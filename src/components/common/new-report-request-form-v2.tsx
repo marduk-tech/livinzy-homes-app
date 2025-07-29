@@ -344,6 +344,19 @@ export const NewReportRequestFormV2 = () => {
                 >
                   <Input.Search loading={reraProjectNamesLoading} />
                 </AutoComplete>
+                <a
+                  style={{
+                    textDecoration: "none",
+                    marginTop: -8,
+                    color: COLORS.primaryColor,
+
+                    fontSize: FONT_SIZE.PARA,
+                  }}
+                  target="_blank"
+                  href="/app/brick360/67e6534e1336dda74a5f0502"
+                >
+                  Looking for a sample report ? Click here.
+                </a>
 
                 <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
                   {selectedProjects.map((p) => (

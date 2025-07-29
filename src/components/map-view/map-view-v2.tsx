@@ -411,6 +411,7 @@ const MapViewV2 = ({
     tags?: { label: string; color: string }[];
     content: string;
     subHeading?: ReactNode;
+    footerContent?: ReactNode;
   }>();
 
   // Get primary project from projects array instead of fetching
@@ -992,6 +993,42 @@ const MapViewV2 = ({
   const TransitDriversComponent = ({ bounds }: { bounds: L.LatLngBounds }) => {
     const map = useMap();
 
+    function getTransitContent(info: any) {
+      return `${info.intro}\n#### Timeline\n${info.timeline} \n #### Updates\n${info.updates}`;
+    }
+
+    function getFooterContent(info: any) {
+      return (
+        <Flex vertical style={{ marginBottom: 16 }}>
+          <Flex>
+            {info.citations
+              .filter((c: any) => c.url.indexOf("wikipedia") == -1)
+              .map((citation: any) => {
+                const domain = citation.url.match(
+                  /^(?:https?:\/\/)?(?:www\.)?([^/]+)/
+                )[1];
+                return (
+                  <a
+                    href={citation.url}
+                    target="_blank"
+                    style={{
+                      textDecoration: "none",
+                      fontSize: FONT_SIZE.SUB_TEXT,
+                      padding: "2px 4px",
+                      backgroundColor: COLORS.bgColor,
+                      borderRadius: 8,
+                      color: COLORS.textColorMedium,
+                      border: `1px solid ${COLORS.borderColor}`,
+                    }}
+                  >
+                    {domain}
+                  </a>
+                );
+              })}
+          </Flex>
+        </Flex>
+      );
+    }
     if (
       !drivers ||
       !drivers.length ||
@@ -1088,9 +1125,11 @@ const MapViewV2 = ({
                           : "",
                       content: driver.details
                         ? driver.details.info
-                          ? driver.details.info.summary || ""
+                          ? getTransitContent(driver.details.info)
                           : driver.details?.description
                         : "",
+
+                      footerContent: getFooterContent(driver.details?.info),
                       tags: [
                         {
                           label:
@@ -1750,6 +1789,7 @@ const MapViewV2 = ({
           </Paragraph>
           {modalContent?.subHeading && modalContent.subHeading}
 
+          {modalContent?.footerContent && modalContent.footerContent}
           {modalContent && modalContent.content ? (
             <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
               {modalContent?.content}
