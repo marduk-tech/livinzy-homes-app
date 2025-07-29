@@ -365,6 +365,7 @@ export const LandingConstants = {
   genReportLink: "/",
   genReportFormLink: "/requestreport",
   appLink: "/app",
+  sampleReport: "/app/brick360/67e6534e1336dda74a5f0502",
 };
 
 export const DRIVER_CATEGORIES = {

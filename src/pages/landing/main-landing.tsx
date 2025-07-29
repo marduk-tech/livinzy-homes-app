@@ -25,14 +25,14 @@ export function MainLanding() {
   const whoAreWeText = (
     <Flex vertical>
       <a
-        href="#demo-brkfi"
+        href={LandingConstants.sampleReport}
         style={{
           fontSize: FONT_SIZE.HEADING_3,
           display: "block",
           color: COLORS.primaryColor,
         }}
       >
-        SEE DEMO BRICK360 REPORT
+        SEE SAMPLE BRICK360 REPORT
       </a>
       <Typography.Text
         style={{ fontSize: FONT_SIZE.HEADING_2, display: "block" }}

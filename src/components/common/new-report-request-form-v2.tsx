@@ -25,7 +25,7 @@ import {
   useCreateUserMutation,
   useSendUserMailMutation,
 } from "../../hooks/user-hooks";
-import { queryKeys } from "../../libs/constants";
+import { LandingConstants, queryKeys } from "../../libs/constants";
 import { capitalize } from "../../libs/lvnzy-helper";
 import { queryClient } from "../../libs/query-client";
 import { LandingFooter } from "../../pages/landing/footer";
@@ -360,7 +360,7 @@ export const NewReportRequestFormV2 = () => {
                     fontSize: FONT_SIZE.PARA,
                   }}
                   target="_blank"
-                  href="/app/brick360/67e6534e1336dda74a5f0502"
+                  href={LandingConstants.sampleReport}
                 >
                   Looking for a sample report ? Click here.
                 </a>
