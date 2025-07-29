@@ -369,6 +369,7 @@ const MapViewV2 = ({
   showLocalities,
   isFromTab = false,
   onMapReady,
+  showCorridors = true,
 }: {
   drivers?: any[];
   projectId?: string;
@@ -384,6 +385,7 @@ const MapViewV2 = ({
   showLocalities?: boolean;
   isFromTab?: boolean;
   onMapReady?: (map: any) => void;
+  showCorridors?: boolean;
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
@@ -1699,7 +1701,7 @@ const MapViewV2 = ({
                 <MapPolygons polygons={projectPolygons} />
 
                 {renderProjectMarkers()}
-                {renderCorridors()}
+                {showCorridors && renderCorridors()}
                 {showLocalities && localities ? renderLocalities() : null}
                 {renderSurroundings()}
                 {projectsNearby?.length && projectsNearbyIcons?.length

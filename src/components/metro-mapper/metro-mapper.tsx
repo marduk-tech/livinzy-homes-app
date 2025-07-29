@@ -181,6 +181,7 @@ export function MetroMapper() {
             isFromTab={false}
             showLocalities={false}
             onMapReady={setMapInstance}
+            showCorridors={false}
           />
         </Flex>
 

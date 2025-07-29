@@ -45,7 +45,7 @@ export const NewReportRequestFormV2 = () => {
   const navigate = useNavigate();
   const { user } = useUser();
   const { isMobile } = useDevice();
-  const [reportsLeft, setReportsLeft] = useState();
+  const [reportsLeft, setReportsLeft] = useState<number>(3);
   const [maxReportsRequested, setMaxReportsRequested] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [projectOptions, setProjectOptions] = useState<any[]>([]);
