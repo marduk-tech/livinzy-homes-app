@@ -9,6 +9,7 @@ import { IDriverPlace } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import { Loader } from "../common/loader";
 import MapViewV2 from "../map-view/map-view-v2";
+import { LineFilters } from "./line-filters";
 import { SearchSidebar } from "./search-sidebar";
 
 export function MetroMapper() {
@@ -16,6 +17,10 @@ export function MetroMapper() {
     useFetchAllLivindexPlaces(undefined, ["transit"]);
 
   const [transitDrivers, setTransitDrivers] = useState<IDriverPlace[]>([]);
+  const [filteredTransitDrivers, setFilteredTransitDrivers] = useState<
+    IDriverPlace[]
+  >([]);
+  const [selectedLines, setSelectedLines] = useState<string[]>([]);
   const [mapInstance, setMapInstance] = useState<any>(null);
   const temporaryMarkerRef = useRef<L.Marker | null>(null);
   const [isMapFullScreen, setIsMapFullScreen] = useState(false);
@@ -29,8 +34,35 @@ export function MetroMapper() {
         (place) => place.driver === "transit"
       );
       setTransitDrivers(transitOnly);
+      setFilteredTransitDrivers(transitOnly);
     }
   }, [livindexPlaces]);
+
+  // Update filtered drivers based on selected lines
+  useEffect(() => {
+    if (selectedLines.length === 0) {
+      setFilteredTransitDrivers(transitDrivers);
+    } else {
+      const filtered = transitDrivers.filter((driver) =>
+        selectedLines.includes(driver.name)
+      );
+      setFilteredTransitDrivers(filtered);
+    }
+  }, [selectedLines, transitDrivers]);
+
+  const handleLineToggle = (lineName: string) => {
+    setSelectedLines((prev) => {
+      if (prev.includes(lineName)) {
+        return prev.filter((name) => name !== lineName);
+      } else {
+        return [...prev, lineName];
+      }
+    });
+  };
+
+  const handleClearFilters = () => {
+    setSelectedLines([]);
+  };
 
   if (livindexPlacesLoading) {
     return <Loader />;
@@ -106,6 +138,16 @@ export function MetroMapper() {
   const handleSearchResultSelect = (result: SearchResult) => {
     if (!mapInstance) return;
 
+    // IMP
+    // conditionally reset line filters when a location is selected
+    // clear filters if they are currently active (selectedLines.length > 0)
+    // This ensures:
+    // User sees all nearby transit stations for the new location when filters were active
+    // Allows "Nearest Transit Stations" sidebar to display properly by not interfering with unfiltered data
+    if (selectedLines.length > 0) {
+      setSelectedLines([]);
+    }
+
     const zoomLevels = {
       transit: 19,
       locality: 16,
@@ -166,10 +208,35 @@ export function MetroMapper() {
           suburban railway stations.
         </Typography.Text>
       </Flex>
+
+      {!isMobile && (
+        <Flex style={{ marginBottom: 16 }}>
+          <LineFilters
+            transitDrivers={transitDrivers}
+            selectedLines={selectedLines}
+            onLineToggle={handleLineToggle}
+            onClearFilters={handleClearFilters}
+          />
+        </Flex>
+      )}
+
       {/* Main Content Area */}
       <Flex style={{ flex: 1 }} vertical={isMobile} gap={isMobile ? 16 : 0}>
         {/* Mobile: Search at top */}
-        {isMobile && <SearchContainer />}
+        {isMobile && (
+          <>
+            <SearchContainer />
+            {/* Mobile: Line Filters below search */}
+            <Flex style={{ padding: "0 16px", marginBottom: 16 }}>
+              <LineFilters
+                transitDrivers={transitDrivers}
+                selectedLines={selectedLines}
+                onLineToggle={handleLineToggle}
+                onClearFilters={handleClearFilters}
+              />
+            </Flex>
+          </>
+        )}
 
         {/* Map Container */}
         <Flex
@@ -220,7 +287,7 @@ export function MetroMapper() {
 
           <MapViewV2
             key="metro-mapper-view"
-            drivers={transitDrivers.map((driver) => ({
+            drivers={filteredTransitDrivers.map((driver) => ({
               ...driver,
               // Add duration calculation for consistency with other map usages
               duration: driver.distance ? Math.round(driver.distance / 60) : 0,
@@ -265,7 +332,7 @@ export function MetroMapper() {
         >
           <MapViewV2
             key="metro-mapper-fullscreen"
-            drivers={transitDrivers.map((driver) => ({
+            drivers={filteredTransitDrivers.map((driver) => ({
               ...driver,
             }))}
             fullSize={true}
