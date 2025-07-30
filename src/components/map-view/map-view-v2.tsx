@@ -1612,6 +1612,7 @@ const MapViewV2 = ({
       {/* Drivers filters */}
       {drivers &&
       drivers.length &&
+      uniqueDriverTypes.length > 1 &&
       (!surroundingElements?.length ||
         selectedCategories.some((cat) => cat !== "surroundings")) ? (
         <Flex
