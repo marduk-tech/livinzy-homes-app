@@ -372,7 +372,6 @@ const MapViewV2 = ({
   isFromTab = false,
   onMapReady,
   showCorridors = true,
-  highlightDrivers,
 }: {
   drivers?: any[];
   projectId?: string;
@@ -389,7 +388,6 @@ const MapViewV2 = ({
   isFromTab?: boolean;
   onMapReady?: (map: any) => void;
   showCorridors?: boolean;
-  highlightDrivers?: string[];
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);

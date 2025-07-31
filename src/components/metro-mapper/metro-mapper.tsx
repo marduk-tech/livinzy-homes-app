@@ -26,8 +26,6 @@ export function MetroMapper() {
   const temporaryMarkerRef = useRef<L.Marker | null>(null);
   const [isMapFullScreen, setIsMapFullScreen] = useState(false);
 
-  const [highlightDrivers, setHighlightDrivers] = useState<string[]>([]); // mutable flag, does not cause re-render
-
   const { isMobile } = useDevice();
   const setValue = useStore((state) => state.setValue);
 
@@ -152,15 +150,7 @@ export function MetroMapper() {
       setSelectedLines([]);
     }
 
-    const zoomLevels = {
-      transit: 19,
-      locality: 16,
-      project: 18,
-      place: 18,
-      osm: 17,
-    };
-
-    const targetZoom = zoomLevels[result.type] || 15;
+    const targetZoom = 14;
 
     mapInstance.flyTo(result.coordinates, targetZoom, {
       duration: 1.5,
@@ -201,11 +191,6 @@ export function MetroMapper() {
                 ? nearestUniqueStations.map((s) => s.driverId)
                 : []
             );
-            // setHighlightDrivers(
-            //   nearestUniqueStations && nearestUniqueStations.length
-            //     ? nearestUniqueStations.map((s) => s.driverId)
-            //     : []
-            // );
           }}
         />
       </Flex>
@@ -322,7 +307,6 @@ export function MetroMapper() {
             showLocalities={false}
             onMapReady={setMapInstance}
             showCorridors={false}
-            highlightDrivers={highlightDrivers}
           />
         </Flex>
 
