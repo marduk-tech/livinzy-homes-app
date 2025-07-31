@@ -11,6 +11,7 @@ import { Loader } from "../common/loader";
 import MapViewV2 from "../map-view/map-view-v2";
 import { LineFilters } from "./line-filters";
 import { SearchSidebar } from "./search-sidebar";
+import useStore from "./store";
 
 export function MetroMapper() {
   const { data: livindexPlaces, isLoading: livindexPlacesLoading } =
@@ -25,7 +26,10 @@ export function MetroMapper() {
   const temporaryMarkerRef = useRef<L.Marker | null>(null);
   const [isMapFullScreen, setIsMapFullScreen] = useState(false);
 
+  const [highlightDrivers, setHighlightDrivers] = useState<string[]>([]); // mutable flag, does not cause re-render
+
   const { isMobile } = useDevice();
+  const setValue = useStore((state) => state.setValue);
 
   // Filter only transit drivers from all places
   useEffect(() => {
@@ -169,6 +173,13 @@ export function MetroMapper() {
     }, 800);
   };
 
+  const handleSearchClear = () => {
+    mapInstance.removeLayer(temporaryMarkerRef.current);
+    mapInstance.setZoom(14, {
+      duration: 1,
+    });
+  };
+
   const SearchContainer = () => {
     return (
       <Flex
@@ -182,6 +193,20 @@ export function MetroMapper() {
         <SearchSidebar
           onResultSelect={handleSearchResultSelect}
           transitDrivers={transitDrivers}
+          onSearchClear={handleSearchClear}
+          onFetchedTransitDrivers={(nearestUniqueStations) => {
+            setValue(
+              "highlightDrivers",
+              nearestUniqueStations && nearestUniqueStations.length
+                ? nearestUniqueStations.map((s) => s.driverId)
+                : []
+            );
+            // setHighlightDrivers(
+            //   nearestUniqueStations && nearestUniqueStations.length
+            //     ? nearestUniqueStations.map((s) => s.driverId)
+            //     : []
+            // );
+          }}
         />
       </Flex>
     );
@@ -199,13 +224,13 @@ export function MetroMapper() {
         <Typography.Text
           style={{ fontSize: FONT_SIZE.HEADING_1, lineHeight: "120%" }}
         >
-          Find if a metro is coming near you!
+          Where's my Metro ?
         </Typography.Text>
         <Typography.Text
           style={{ fontSize: FONT_SIZE.HEADING_3, marginBottom: 24 }}
         >
-          This tool helps you find any nearest operational or upcoming metro or
-          suburban railway stations.
+          Find any nearest metro (operational or upcoming) for any location in
+          Bangalore.
         </Typography.Text>
       </Flex>
 
@@ -243,7 +268,7 @@ export function MetroMapper() {
           style={{
             width: isMobile ? "100%" : "70%",
             position: "relative",
-            height: isMobile ? 300 : "100%",
+            height: isMobile ? 600 : "100%",
             flex: isMobile ? "none" : 1,
           }}
         >
@@ -297,6 +322,7 @@ export function MetroMapper() {
             showLocalities={false}
             onMapReady={setMapInstance}
             showCorridors={false}
+            highlightDrivers={highlightDrivers}
           />
         </Flex>
 

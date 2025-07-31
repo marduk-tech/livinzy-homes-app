@@ -1,19 +1,25 @@
-import { AutoComplete, Empty, Flex, Input, Spin, Typography } from "antd";
-import { useEffect, useState } from "react";
+import { AutoComplete, Drawer, Flex, Input, Spin, Typography } from "antd";
+import { memo, useEffect, useState } from "react";
 import { SearchResult, usePlaceSearch } from "../../hooks/use-place-search";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 
 import { NearestTransitStationsDisplay } from "./nearest-transit-stations-display";
+import { useDevice } from "../../hooks/use-device";
+import { NearestTransitStation } from "../../hooks/use-nearest-transit-stations";
 
 interface SearchSidebarProps {
   onResultSelect: (result: SearchResult) => void;
+  onSearchClear: () => void;
+  onFetchedTransitDrivers: (transitDrivers: NearestTransitStation[]) => void;
   transitDrivers: IDriverPlace[];
 }
 
-export const SearchSidebar: React.FC<SearchSidebarProps> = ({
+export const SearchSidebarComponent: React.FC<SearchSidebarProps> = ({
   onResultSelect,
+  onSearchClear,
+  onFetchedTransitDrivers,
   transitDrivers,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,6 +27,7 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(
     null
   );
+  const { isMobile } = useDevice();
 
   // Debounce search query to reduce API wait times
   useEffect(() => {
@@ -87,26 +94,8 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
     return results.map((result) => ({
       value: result.name,
       label: (
-        <Flex gap={12} align="center" style={{ padding: "8px 4px" }}>
+        <Flex gap={4} align="center" style={{ padding: "0 4px" }}>
           {/* Icon */}
-          <Flex
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 6,
-              backgroundColor: COLORS.bgColorMedium,
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            <DynamicReactIcon
-              iconName={result.icon || "IoLocationOutline"}
-              iconSet={getIconSet(result.icon || "IoLocationOutline")}
-              size={16}
-              color={getTypeColor(result.type)}
-            />
-          </Flex>
 
           {/* Content */}
           <Flex vertical style={{ flex: 1, minWidth: 0 }}>
@@ -120,16 +109,6 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
                 ellipsis={{ tooltip: result.name }}
               >
                 {result.name}
-              </Typography.Text>
-              <Typography.Text
-                style={{
-                  fontSize: FONT_SIZE.SUB_TEXT,
-                  color: getTypeColor(result.type),
-                  fontWeight: 500,
-                  marginLeft: 8,
-                }}
-              >
-                {getTypeLabel(result.type)}
               </Typography.Text>
             </Flex>
             {(result.description || result.address) && (
@@ -149,49 +128,6 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
       ),
       result,
     }));
-  };
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case "transit":
-        return COLORS.primaryColor;
-      case "project":
-        return COLORS.greenIdentifier;
-      case "locality":
-        return COLORS.orangeIdentifier;
-      case "place":
-        return COLORS.yellowIdentifier;
-      case "osm":
-        return COLORS.textColorDark;
-      default:
-        return COLORS.textColorDark;
-    }
-  };
-
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case "transit":
-        return "Metro";
-      case "project":
-        return "Project";
-      case "locality":
-        return "Area";
-      case "place":
-        return "Place";
-      case "osm":
-        return "Location";
-      default:
-        return "Place";
-    }
-  };
-
-  const getIconSet = (iconName: string) => {
-    if (iconName.startsWith("Io")) return "io5";
-    if (iconName.startsWith("Fa")) return "fa";
-    if (iconName.startsWith("Md")) return "md";
-    if (iconName.startsWith("Gi")) return "gi";
-    if (iconName.startsWith("Bi")) return "bi";
-    return "io5";
   };
 
   const handleAutoCompleteSelect = (value: string, option: any) => {
@@ -230,6 +166,10 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
           }}
           notFoundContent={null}
           allowClear
+          onClear={() => {
+            setSelectedResult(null);
+            onSearchClear();
+          }}
         >
           <Input
             placeholder="Search your place"
@@ -251,9 +191,33 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
       </Flex>
 
       {/* Nearest Transit Stations - Show below search input when result is selected */}
-      {selectedResult && (
-        <NearestTransitStationsDisplay selectedResult={selectedResult} />
-      )}
+      {selectedResult ? (
+        isMobile ? (
+          <Drawer
+            title={null}
+            placement="bottom"
+            styles={{ header: { height: 0 } }}
+            onClose={() => {
+              setSelectedResult(null);
+              onSearchClear();
+            }}
+            mask={false}
+            open={!!selectedResult}
+          >
+            <NearestTransitStationsDisplay
+              selectedResult={selectedResult}
+              transitDrivers={transitDrivers}
+              onFetchedTransitDrivers={onFetchedTransitDrivers}
+            />
+          </Drawer>
+        ) : (
+          <NearestTransitStationsDisplay
+            selectedResult={selectedResult}
+            transitDrivers={transitDrivers}
+            onFetchedTransitDrivers={onFetchedTransitDrivers}
+          />
+        )
+      ) : null}
 
       {/* Footer */}
       {/* <Flex
@@ -277,3 +241,5 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
     </Flex>
   );
 };
+
+export const SearchSidebar = memo(SearchSidebarComponent);

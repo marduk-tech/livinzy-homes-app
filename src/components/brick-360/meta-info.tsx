@@ -7,7 +7,7 @@ import {
   rupeeAmountFormat,
 } from "../../libs/lvnzy-helper";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import DynamicReactIcon from "../common/dynamic-react-icon";
@@ -16,7 +16,7 @@ type MetaInfoProps = {
   lvnzyProject: LvnzyProject;
 };
 
-const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
+const MetaInfo = forwardRef<any, MetaInfoProps>(({ lvnzyProject }, ref) => {
   const [isPmtPlanModalOpen, setIsPmtPlanModalOpen] = useState(false);
   const [pmtPlan, setPmtPlan] = useState();
   useEffect(() => {
@@ -64,6 +64,7 @@ const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
           {pmtPlan ? (
             <Flex
               align="center"
+              ref={ref}
               style={{
                 padding: "2px 8px",
                 borderRadius: 8,
@@ -131,6 +132,6 @@ const MetaInfo: React.FC<MetaInfoProps> = ({ lvnzyProject }) => {
       </Modal>
     </>
   );
-};
+});
 
 export default MetaInfo;

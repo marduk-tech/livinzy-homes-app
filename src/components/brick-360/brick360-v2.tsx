@@ -1,4 +1,4 @@
-import { Flex, Tabs, Typography } from "antd";
+import { Flex, Tabs, Tour, TourProps, Typography } from "antd";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import DynamicReactIcon from "../common/dynamic-react-icon";
@@ -16,6 +16,7 @@ import {
   BRICK360_CATEGORY,
   Brick360CategoryInfo,
   Brick360DataPoints,
+  LocalStorageKeys,
 } from "../../libs/constants";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import Brick360Chat from "../liv/brick360-chat";
@@ -28,6 +29,87 @@ export function Brick360v2() {
   const brick360ChatRef = useRef<{
     expandChat: () => void;
   } | null>(null);
+
+  const scoreParamTourRef = useRef(null);
+  const pmtPlanTourRef = useRef(null);
+
+  const [tourSteps, setTourSteps] = useState<TourProps["steps"]>([]);
+
+  useEffect(() => {
+    const tempTourSteps: TourProps["steps"] = [];
+    tempTourSteps?.push({
+      title: (
+        <Typography.Text
+          style={{ fontSize: FONT_SIZE.HEADING_3, color: "white" }}
+        >
+          Click card to know more details
+        </Typography.Text>
+      ),
+      description: (
+        <Flex vertical align="center" gap={8}>
+          <img
+            src="/images/tour-1.png"
+            alt="see rating details"
+            width={300}
+            style={{
+              border: `3px solid ${COLORS.borderColorDark}`,
+              borderRadius: 8,
+            }}
+          ></img>
+          <Typography.Text
+            style={{ width: 300, fontSize: FONT_SIZE.HEADING_2 }}
+          >
+            Click here to see more details of this rating including map view.
+          </Typography.Text>
+        </Flex>
+      ),
+      placement: "bottom",
+      type: "default",
+      target: () => scoreParamTourRef.current,
+    });
+    if (!!pmtPlanTourRef) {
+      tempTourSteps?.push({
+        title: (
+          <Typography.Text
+            style={{ fontSize: FONT_SIZE.HEADING_3, color: "white" }}
+          >
+            Click card to know more details
+          </Typography.Text>
+        ),
+        description: (
+          <Flex vertical align="center" gap={8}>
+            <img
+              src="/images/tour-2.png"
+              alt="see rating details"
+              width={300}
+              style={{
+                border: `3px solid ${COLORS.borderColorDark}`,
+                borderRadius: 8,
+              }}
+            ></img>
+            <Typography.Text
+              style={{ width: 300, fontSize: FONT_SIZE.HEADING_2 }}
+            >
+              Click to see payment plan details.
+            </Typography.Text>
+          </Flex>
+        ),
+        placement: "bottom",
+        type: "default",
+        target: () => pmtPlanTourRef.current,
+      });
+    }
+    setTourSteps(tempTourSteps);
+  }, []);
+  const [tourOpen, setTourOpen] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem(LocalStorageKeys.tour) !== "tour-done") {
+      setTimeout(() => {
+        setTourOpen(true);
+      }, 1000);
+    }
+  });
 
   const { data: lvnzyProject, isLoading: lvnzyProjectIsLoading } =
     useFetchLvnzyProjectById(lvnzyProjectId!);
@@ -134,7 +216,7 @@ export function Brick360v2() {
         overflowX: "hidden",
       }}
     >
-      <ProjectHeader lvnzyProject={lvnzyProject} />
+      <ProjectHeader ref={pmtPlanTourRef} lvnzyProject={lvnzyProject} />
 
       <Tabs
         tabBarGutter={24}
@@ -166,6 +248,7 @@ export function Brick360v2() {
               <Brick360Tab
                 lvnzyProject={lvnzyProject}
                 scoreParams={scoreParams}
+                ref={scoreParamTourRef}
                 onDataPointClick={(sc, item) => {
                   brick360ChatRef.current?.expandChat();
                   setSelectedDataPointCategory(sc.key);
@@ -265,6 +348,14 @@ export function Brick360v2() {
           selectedDataPoint,
           selectedDataPointSubCategory,
         }}
+      />
+      <Tour
+        open={tourOpen}
+        onClose={() => {
+          setTourOpen(false);
+          localStorage.setItem(LocalStorageKeys.tour, "tour-done");
+        }}
+        steps={tourSteps}
       />
 
       <ConfigurationsModal

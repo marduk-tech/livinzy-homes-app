@@ -44,6 +44,8 @@ import DynamicReactIcon, {
 import { CorridorMarkerIcon } from "./corridor-marker-icon";
 import { LocalityMarkerIcon } from "./locality-marker-icon";
 import { MapPolygons } from "./map-polygons";
+import { FlickerPolyline } from "./shapes/flicker-polyline";
+import useStore from "../metro-mapper/store";
 
 type GeoJSONCoordinate = [number, number];
 type GeoJSONLineString = GeoJSONCoordinate[];
@@ -370,6 +372,7 @@ const MapViewV2 = ({
   isFromTab = false,
   onMapReady,
   showCorridors = true,
+  highlightDrivers,
 }: {
   drivers?: any[];
   projectId?: string;
@@ -386,6 +389,7 @@ const MapViewV2 = ({
   isFromTab?: boolean;
   onMapReady?: (map: any) => void;
   showCorridors?: boolean;
+  highlightDrivers?: string[];
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
@@ -464,9 +468,11 @@ const MapViewV2 = ({
     }
   }, [selectedCategories, selectedDriverType, isFromTab]);
 
-  useEffect(() => {}, [drivers]);
-
   const [roadIcon, setRoadIcon] = useState<L.DivIcon | null>(null);
+
+  const highlightedDrivers = useStore(
+    (state) => state.values["highlightDrivers"]
+  );
 
   // Setting icons for simple drivermarkers
   useEffect(() => {
@@ -1085,7 +1091,12 @@ const MapViewV2 = ({
           }
 
           return (
-            <Polyline
+            <FlickerPolyline
+              toFlicker={
+                !!highlightedDrivers &&
+                !!highlightedDrivers.length &&
+                highlightedDrivers.includes(driver._id)
+              }
               key={`${driver._id}-line-${lineIndex}`}
               positions={positions}
               pathOptions={{
@@ -1097,6 +1108,7 @@ const MapViewV2 = ({
             />
           );
         });
+
         let stations = null;
         if (map.getZoom() > 12.5) {
           stations = pointFeatures
@@ -1572,7 +1584,7 @@ const MapViewV2 = ({
         width: "100%",
         height: "100%",
         overflowY: "hidden",
-        borderRadius: 14,
+        borderRadius: 8,
         position: "relative",
       }}
     >

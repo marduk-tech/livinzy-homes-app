@@ -2,16 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 
 export interface NearestTransitStation {
-  stationId: string;
-  driverName: string;
+  driverId: string;
   stationName: string;
-  metroLineName: string;
   distance: string;
   travelTime: number;
-  coordinates: {
-    lat: number;
-    lng: number;
-  };
 }
 
 export interface NearestTransitStationsResponse {
