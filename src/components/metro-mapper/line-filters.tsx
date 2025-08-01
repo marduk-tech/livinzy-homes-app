@@ -30,8 +30,8 @@ export const LineFilters: React.FC<LineFiltersProps> = ({
     transitDrivers.forEach((driver) => {
       if (driver.name && driver.name.trim() !== "") {
         // Find the first LineString feature to get stroke color
-        const lineStringFeature = driver.features?.find(
-          (feature: any) => feature.type === "LineString"
+        const lineStringFeature = (driver.features as any)?.find?.(
+          (feature: any) => feature.geometry?.type === "LineString"
         );
 
         const strokeColor = lineStringFeature?.properties?.strokeColor;
