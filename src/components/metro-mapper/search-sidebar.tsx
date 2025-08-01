@@ -206,7 +206,7 @@ export const SearchSidebarComponent: React.FC<SearchSidebarProps> = ({
               setSelectedResult(null);
               onSearchClear();
             }}
-            height={350}
+            height={200}
             mask={false}
             open={!!selectedResult}
           >

@@ -1,5 +1,5 @@
-import { Flex, Spin, Typography } from "antd";
-import { useEffect, useState } from "react";
+import { Flex, Modal, Spin, Typography } from "antd";
+import { ReactNode, useEffect, useState } from "react";
 import { useDevice } from "../../hooks/use-device";
 import {
   NearestTransitStation,
@@ -23,6 +23,8 @@ export const NearestTransitStationsDisplay: React.FC<
   NearestTransitStationsDisplayProps
 > = ({ selectedResult, transitDrivers, onFetchedTransitDrivers }) => {
   const { isMobile } = useDevice();
+  const [mobileDetailsDialogContent, setMobileDetailsDialogContent] =
+    useState<ReactNode>();
 
   const {
     data: transitStationsData,
@@ -177,6 +179,7 @@ export const NearestTransitStationsDisplay: React.FC<
               style={{
                 width: isMobile ? window.innerWidth - 100 : "100%",
                 padding: "8px",
+                paddingBottom: 16,
                 margin: "0 0 8px 0",
                 borderBottom: isMobile
                   ? "none"
@@ -184,7 +187,7 @@ export const NearestTransitStationsDisplay: React.FC<
                 border: !isMobile ? "none" : `1px solid ${COLORS.borderColor}`,
                 borderRadius: isMobile ? 8 : 0,
                 paddingLeft: 8,
-                height: isMobile ? 275 : "auto",
+                height: "auto",
                 flexShrink: 0,
                 marginRight: isMobile
                   ? index == nearestUniqueStations.length - 1
@@ -276,55 +279,110 @@ export const NearestTransitStationsDisplay: React.FC<
                   </Typography.Text>
                 </Flex>
               </Flex>
-              <Flex vertical style={{ marginTop: 8, width: "100%" }}>
+
+              {isMobile ? (
                 <Typography.Text
-                  style={{
-                    fontWeight: 500,
-                    fontSize: FONT_SIZE.PARA,
-                    color: COLORS.textColorMedium,
-                    margin: 0,
+                  onClick={() => {
+                    setMobileDetailsDialogContent(
+                      <Flex vertical>
+                        <Typography.Text
+                          style={{
+                            fontSize: FONT_SIZE.HEADING_2,
+                            fontWeight: 500,
+                            marginBottom: 16,
+                          }}
+                        >
+                          {transitDriver.name}
+                        </Typography.Text>
+                        {transitDriver.details?.info.intro}
+                        <br></br>
+                        {transitDriver.details?.info.timeline}
+                        <br></br>
+                        <br></br>
+                        <Flex
+                          style={{
+                            width: "100%",
+                            overflowX: "scroll",
+                            scrollbarWidth: "none",
+                          }}
+                        >
+                          <Flex
+                            style={{
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {renderCitations(
+                              transitDriver.details?.info.citations
+                            )}
+                          </Flex>
+                        </Flex>
+                      </Flex>
+                    );
                   }}
+                  style={{ color: COLORS.primaryColor, marginTop: 8 }}
                 >
-                  Details & Timeline
+                  See Details/Timeline
                 </Typography.Text>
-                <Paragraph
-                  style={{ fontSize: FONT_SIZE.SUB_TEXT, margin: 0 }}
-                  ellipsis={
-                    isMobile
-                      ? undefined
-                      : {
-                          rows: isMobile ? 4 : 2,
-                          expandable: true,
-                          symbol: "more",
-                        }
-                  }
-                >
-                  {transitDriver.details?.info.intro}
-                  <br></br>
-                  {transitDriver.details?.info.timeline}
-                  <br></br>
-                  <br></br>
-                  <Flex
+              ) : (
+                <Flex vertical style={{ width: "100%" }}>
+                  <Typography.Text
                     style={{
-                      width: "100%",
-                      overflowX: "scroll",
-                      scrollbarWidth: "none",
+                      fontWeight: 500,
+                      fontSize: FONT_SIZE.PARA,
+                      color: COLORS.textColorMedium,
+                      margin: 0,
                     }}
                   >
+                    Details & Timeline
+                  </Typography.Text>
+                  <Paragraph
+                    style={{ fontSize: FONT_SIZE.SUB_TEXT, margin: 0 }}
+                    ellipsis={{
+                      rows: 2,
+                      expandable: true,
+                      symbol: "more",
+                    }}
+                  >
+                    {transitDriver.details?.info.intro}
+                    <br></br>
+                    {transitDriver.details?.info.timeline}
+                    <br></br>
+                    <br></br>
                     <Flex
                       style={{
-                        whiteSpace: "nowrap",
+                        width: "100%",
+                        overflowX: "scroll",
+                        scrollbarWidth: "none",
                       }}
                     >
-                      {renderCitations(transitDriver.details?.info.citations)}
+                      <Flex
+                        style={{
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {renderCitations(transitDriver.details?.info.citations)}
+                      </Flex>
                     </Flex>
-                  </Flex>
-                </Paragraph>
-              </Flex>
+                  </Paragraph>
+                </Flex>
+              )}
             </Flex>
           );
         })}
       </Flex>
+      <Modal
+        open={!!mobileDetailsDialogContent}
+        closable={true}
+        footer={null}
+        onCancel={() => {
+          setMobileDetailsDialogContent(undefined);
+        }}
+        onClose={() => {
+          setMobileDetailsDialogContent(undefined);
+        }}
+      >
+        <Flex vertical>{mobileDetailsDialogContent}</Flex>
+      </Modal>
     </Flex>
   );
 };

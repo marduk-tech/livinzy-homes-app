@@ -288,7 +288,7 @@ export function MetroMapper() {
                 position: "absolute",
                 top: 16,
                 right: 16,
-                zIndex: 9999,
+                zIndex: 8998,
               }}
             >
               <Button
@@ -314,9 +314,7 @@ export function MetroMapper() {
                 onClick={() => {
                   setIsMapFullScreen(true);
                 }}
-              >
-                Expand
-              </Button>
+              ></Button>
             </Flex>
           )}
 
