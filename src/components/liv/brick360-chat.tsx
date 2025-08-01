@@ -661,6 +661,33 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                   </Flex>
                 ) : null}
 
+                {dataPointSelected.selectedDataPointCategory ==
+                "areaConnectivity" ? (
+                  <Flex
+                    style={{
+                      width: "100",
+                      display: "inline",
+                      margin: "16px 0",
+                    }}
+                  >
+                    <Tag
+                      style={{
+                        lineHeight: "120%",
+                        padding: "4px 8px",
+                        borderRadius: 8,
+                        color: COLORS.textColorDark,
+                        fontSize: FONT_SIZE.PARA,
+                        width: "100",
+                        textWrap: "initial",
+                      }}
+                      color="warning"
+                    >
+                      The data here explains the location profile in its current
+                      form. For upcoming infra/profile, refer to growth
+                      potential under financials.
+                    </Tag>
+                  </Flex>
+                ) : null}
                 {/* Data point selected content */}
                 {dataPointSelected && (
                   <Flex vertical style={{ paddingTop: 8 }}>
