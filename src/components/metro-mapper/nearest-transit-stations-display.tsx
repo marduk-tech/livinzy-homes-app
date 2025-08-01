@@ -1,15 +1,15 @@
 import { Card, Flex, Spin, Typography } from "antd";
+import { useEffect, useState } from "react";
+import { useDevice } from "../../hooks/use-device";
 import {
   NearestTransitStation,
   useNearestTransitStations,
 } from "../../hooks/use-nearest-transit-stations";
 import { SearchResult } from "../../hooks/use-place-search";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import DynamicReactIcon from "../common/dynamic-react-icon";
-import { IDriverPlace } from "../../types/Project";
 import { PLACE_TIMELINE } from "../../libs/constants";
-import { useEffect, useState } from "react";
-import { useDevice } from "../../hooks/use-device";
+import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { IDriverPlace } from "../../types/Project";
+import DynamicReactIcon from "../common/dynamic-react-icon";
 
 interface NearestTransitStationsDisplayProps {
   selectedResult?: SearchResult | null;
@@ -20,6 +20,8 @@ interface NearestTransitStationsDisplayProps {
 export const NearestTransitStationsDisplay: React.FC<
   NearestTransitStationsDisplayProps
 > = ({ selectedResult, transitDrivers, onFetchedTransitDrivers }) => {
+  const { isMobile } = useDevice();
+
   const {
     data: transitStationsData,
     isLoading,
@@ -29,9 +31,6 @@ export const NearestTransitStationsDisplay: React.FC<
     selectedResult?.coordinates[1]
   );
 
-  if (!selectedResult) return null;
-  const { isMobile } = useDevice();
-
   const [nearestUniqueStations, setNearestUniqueStations] = useState<
     NearestTransitStation[]
   >([]);
@@ -40,24 +39,57 @@ export const NearestTransitStationsDisplay: React.FC<
     if (
       transitStationsData &&
       transitStationsData.nearestStations &&
-      transitStationsData.nearestStations.length
+      Array.isArray(transitStationsData.nearestStations) &&
+      transitStationsData.nearestStations.length > 0
     ) {
-      const nearestStationsSortedByDuration =
-        transitStationsData.nearestStations.sort(
-          (a, b) => a.travelTime - b.travelTime
-        );
-      const driverForWhichStationsAdded: string[] = [];
-      let uniqueStations: NearestTransitStation[] = [];
-      nearestStationsSortedByDuration.forEach((station) => {
-        if (!driverForWhichStationsAdded.includes(station.driverId)) {
-          driverForWhichStationsAdded.push(station.driverId);
-          uniqueStations.push(station);
-        }
-      });
-      setNearestUniqueStations(uniqueStations);
-      onFetchedTransitDrivers(uniqueStations);
+      try {
+        const nearestStationsSortedByDuration =
+          transitStationsData.nearestStations
+            .filter((station) => {
+              return (
+                station &&
+                (station as any).stationId &&
+                station.travelTime != null
+              );
+            })
+            .sort((a, b) => a.travelTime - b.travelTime);
+
+        const driverForWhichStationsAdded: string[] = [];
+        const uniqueStations: NearestTransitStation[] = [];
+
+        nearestStationsSortedByDuration.forEach((station) => {
+          // Extract driverId from stationId (format: driverId_stationNumber)
+          const stationId = (station as any).stationId;
+          const stationDriverId = stationId ? stationId.split("_")[0] : null;
+
+          if (
+            stationDriverId &&
+            !driverForWhichStationsAdded.includes(stationDriverId)
+          ) {
+            driverForWhichStationsAdded.push(stationDriverId);
+            uniqueStations.push({
+              driverId: stationDriverId, // Use extracted driverId
+              stationName: (station as any).stationName,
+              distance: (station as any).distance,
+              travelTime: station.travelTime,
+            });
+          }
+        });
+
+        setNearestUniqueStations(uniqueStations);
+        onFetchedTransitDrivers(uniqueStations);
+      } catch (error) {
+        console.error("Error processing nearest transit stations:", error);
+        setNearestUniqueStations([]);
+        onFetchedTransitDrivers([]);
+      }
+    } else {
+      setNearestUniqueStations([]);
+      onFetchedTransitDrivers([]);
     }
-  }, [transitStationsData]);
+  }, [transitStationsData, onFetchedTransitDrivers, transitDrivers]);
+
+  if (!selectedResult) return null;
 
   if (isLoading) {
     return (
@@ -86,6 +118,7 @@ export const NearestTransitStationsDisplay: React.FC<
   if (
     error ||
     !transitStationsData ||
+    !transitStationsData.nearestStations ||
     transitStationsData.nearestStations.length === 0
   ) {
     return (
@@ -119,14 +152,14 @@ export const NearestTransitStationsDisplay: React.FC<
     >
       {nearestUniqueStations.map((station, index) => {
         const transitDriver = transitDrivers.find(
-          (t) => t._id == station.driverId
+          (t) => t._id === station.driverId
         );
         if (!transitDriver) {
           return null;
         }
         return (
           <Flex
-            key={index}
+            key={`${station.driverId}-${index}`}
             vertical
             style={{
               padding: "12px 16px",
@@ -243,10 +276,12 @@ export const NearestTransitStationsDisplay: React.FC<
             </Flex>
             <Flex vertical gap={8} style={{ marginTop: 8 }}>
               <Typography.Text style={{ fontSize: FONT_SIZE.SUB_TEXT }}>
-                {transitDriver.details?.info.intro}
+                {transitDriver.details?.info?.intro ||
+                  "No description available"}
               </Typography.Text>
               <Typography.Text style={{ fontSize: FONT_SIZE.SUB_TEXT }}>
-                {transitDriver.details?.info.timeline}
+                {transitDriver.details?.info?.timeline ||
+                  "Timeline information not available"}
               </Typography.Text>
             </Flex>
           </Flex>

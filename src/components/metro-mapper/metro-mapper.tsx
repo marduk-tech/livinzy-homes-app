@@ -182,7 +182,7 @@ export function MetroMapper() {
       >
         <SearchSidebar
           onResultSelect={handleSearchResultSelect}
-          transitDrivers={transitDrivers}
+          transitDrivers={filteredTransitDrivers}
           onSearchClear={handleSearchClear}
           onFetchedTransitDrivers={(nearestUniqueStations) => {
             setValue(
