@@ -41,11 +41,11 @@ import { IDriverPlace, ISurroundingElement } from "../../types/Project";
 import DynamicReactIcon, {
   dynamicImportMap,
 } from "../common/dynamic-react-icon";
+import useStore from "../metro-mapper/store";
 import { CorridorMarkerIcon } from "./corridor-marker-icon";
 import { LocalityMarkerIcon } from "./locality-marker-icon";
 import { MapPolygons } from "./map-polygons";
 import { FlickerPolyline } from "./shapes/flicker-polyline";
-import useStore from "../metro-mapper/store";
 
 type GeoJSONCoordinate = [number, number];
 type GeoJSONLineString = GeoJSONCoordinate[];
@@ -135,7 +135,8 @@ async function getIcon(
         borderColor: isUnderConstruction
           ? COLORS.yellowIdentifier
           : COLORS.borderColorDark,
-        borderStyle: isUnderConstruction ? "dotted" : "solid",
+        borderStyle: isUnderConstruction ? "dashed" : "solid",
+
         justifyContent: "center",
         animation: toBounce ? "bounceAnimation 1s infinite" : "none",
         boxShadow: "0 0 6px rgba(0,0,0,0.3)",
