@@ -85,40 +85,10 @@ export const LineFilters: React.FC<LineFiltersProps> = ({
       vertical
       style={{
         padding: "16px 0",
-        borderBottom: `1px solid ${COLORS.borderColor}`,
-        marginBottom: 16,
         width: "100%",
         minWidth: 0,
       }}
     >
-      <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
-        <Typography.Text
-          style={{
-            fontSize: FONT_SIZE.HEADING_4,
-            fontWeight: 600,
-            color: COLORS.textColorDark,
-          }}
-        >
-          Filter by Metro Lines
-        </Typography.Text>
-
-        {selectedLines.length > 0 && (
-          <Button
-            type="text"
-            size="small"
-            onClick={onClearFilters}
-            style={{
-              color: COLORS.primaryColor,
-              fontSize: FONT_SIZE.SUB_TEXT,
-              padding: "4px 8px",
-              height: "auto",
-            }}
-          >
-            Clear All
-          </Button>
-        )}
-      </Flex>
-
       <div className={isMobile ? "" : "scrollbar-wrapper"}>
         <div
           className="custom-scrollbar"
@@ -126,7 +96,7 @@ export const LineFilters: React.FC<LineFiltersProps> = ({
             display: "flex",
             gap: "8px",
             overflowX: "auto",
-            scrollbarWidth: isMobile ? "none" : "thin", // scrollbar on desktop, hide on mobile
+            scrollbarWidth: "none", // scrollbar on desktop, hide on mobile
             WebkitOverflowScrolling: "touch",
             width: "100%",
             minWidth: 0,
@@ -143,11 +113,9 @@ export const LineFilters: React.FC<LineFiltersProps> = ({
                 style={{
                   borderRadius: 20,
                   height: 32,
-                  paddingLeft: 12,
-                  paddingRight: 12,
-                  backgroundColor: isSelected
-                    ? COLORS.primaryColor
-                    : COLORS.bgColorMedium,
+                  paddingLeft: 8,
+                  paddingRight: 8,
+                  backgroundColor: isSelected ? COLORS.primaryColor : "white",
                   borderColor: isSelected
                     ? COLORS.primaryColor
                     : lineInfo.strokeColor || COLORS.borderColor,
@@ -156,6 +124,7 @@ export const LineFilters: React.FC<LineFiltersProps> = ({
                   fontWeight: 500,
                   display: "flex",
                   alignItems: "center",
+                  borderWidth: 2,
                   gap: 6,
                   flexShrink: 0,
                   whiteSpace: "nowrap",
@@ -168,19 +137,36 @@ export const LineFilters: React.FC<LineFiltersProps> = ({
           })}
         </div>
       </div>
-
-      {selectedLines.length > 0 && (
+      <Flex align="center" style={{ marginTop: 8 }} gap={16}>
         <Typography.Text
           style={{
-            fontSize: FONT_SIZE.SUB_TEXT,
-            color: COLORS.textColorLight,
-            marginTop: 8,
+            fontSize: FONT_SIZE.PARA,
+            color: COLORS.textColorMedium,
           }}
         >
-          Showing {selectedLines.length} selected line
-          {selectedLines.length !== 1 ? "s" : ""}
+          {selectedLines.length > 0
+            ? `Showing ${selectedLines.length} selected line${
+                selectedLines.length !== 1 ? "s" : ""
+              }`
+            : ""}
         </Typography.Text>
-      )}
+
+        {selectedLines.length > 0 && (
+          <Button
+            size="small"
+            onClick={onClearFilters}
+            style={{
+              color: COLORS.primaryColor,
+              fontSize: FONT_SIZE.SUB_TEXT * 0.8,
+              padding: "2px 4px",
+              height: "auto",
+              borderRadius: 16,
+            }}
+          >
+            Clear All
+          </Button>
+        )}
+      </Flex>
     </Flex>
   );
 };

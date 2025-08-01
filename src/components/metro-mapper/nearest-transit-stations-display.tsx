@@ -1,4 +1,4 @@
-import { Card, Flex, Spin, Typography } from "antd";
+import { Flex, Spin, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useDevice } from "../../hooks/use-device";
 import {
@@ -10,6 +10,8 @@ import { PLACE_TIMELINE } from "../../libs/constants";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
+import { renderCitations } from "../../libs/lvnzy-helper";
+const { Paragraph } = Typography;
 
 interface NearestTransitStationsDisplayProps {
   selectedResult?: SearchResult | null;
@@ -48,7 +50,8 @@ export const NearestTransitStationsDisplay: React.FC<
             .filter((station) => {
               return (
                 station &&
-                (station as any).stationId &&
+                (station as any).stationName &&
+                (station as any).driverId &&
                 station.travelTime != null
               );
             })
@@ -59,9 +62,7 @@ export const NearestTransitStationsDisplay: React.FC<
 
         nearestStationsSortedByDuration.forEach((station) => {
           // Extract driverId from stationId (format: driverId_stationNumber)
-          const stationId = (station as any).stationId;
-          const stationDriverId = stationId ? stationId.split("_")[0] : null;
-
+          const stationDriverId = station.driverId;
           if (
             stationDriverId &&
             !driverForWhichStationsAdded.includes(stationDriverId)
@@ -93,25 +94,19 @@ export const NearestTransitStationsDisplay: React.FC<
 
   if (isLoading) {
     return (
-      <Card
+      <Flex
+        align="center"
+        justify="center"
+        gap={8}
         style={{
-          marginTop: 16,
-          borderRadius: 8,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+          padding: "24px",
         }}
       >
-        <Flex
-          align="center"
-          justify="center"
-          gap={8}
-          style={{ padding: "24px" }}
-        >
-          <Spin size="small" />
-          <Typography.Text style={{ color: COLORS.textColorLight }}>
-            Finding nearest transit stations...
-          </Typography.Text>
-        </Flex>
-      </Card>
+        <Spin size="small" />
+        <Typography.Text style={{ color: COLORS.textColorLight }}>
+          Finding nearest transit stations...
+        </Typography.Text>
+      </Flex>
     );
   }
 
@@ -122,7 +117,7 @@ export const NearestTransitStationsDisplay: React.FC<
     transitStationsData.nearestStations.length === 0
   ) {
     return (
-      <Card
+      <Flex
         style={{
           marginTop: 16,
           borderRadius: 8,
@@ -134,159 +129,202 @@ export const NearestTransitStationsDisplay: React.FC<
             No nearby transit stations found
           </Typography.Text>
         </Flex>
-      </Card>
+      </Flex>
     );
   }
 
   return (
-    <Flex
-      vertical={!isMobile}
-      style={{
-        overflowY: "auto",
-        margin: "0 16px",
-        maxHeight: 500,
-        msOverflowY: "scroll",
-        scrollbarWidth: "none",
-      }}
-      gap={8}
-    >
-      {nearestUniqueStations.map((station, index) => {
-        const transitDriver = transitDrivers.find(
-          (t) => t._id === station.driverId
-        );
-        if (!transitDriver) {
-          return null;
-        }
-        return (
-          <Flex
-            key={`${station.driverId}-${index}`}
-            vertical
-            style={{
-              padding: "12px 16px",
-              border: `1px solid ${COLORS.borderColor}`,
-              borderRadius: 8,
-              width: "100%",
-            }}
-            gap={16}
-            align="start"
-            className="station-item"
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = COLORS.bgColorMedium;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-            }}
-          >
-            {/* Metro Icon */}
-            {/* <Flex
+    <Flex vertical style={{ overflow: "hidden" }}>
+      <Typography.Text
+        style={{
+          padding: isMobile ? "8px 16px" : "8px 24px",
+          fontSize: FONT_SIZE.HEADING_2,
+          color: COLORS.textColorMedium,
+        }}
+      >
+        {nearestUniqueStations.length} stations found
+      </Typography.Text>
+
+      <Flex
+        vertical={!isMobile}
+        style={{
+          margin: "0 16px",
+          maxHeight: 500,
+          overflowY: isMobile ? "hidden" : "scroll",
+          overflowX: isMobile ? "scroll" : "hidden",
+          scrollbarWidth: "none",
+          width: "100%",
+        }}
+        gap={8}
+      >
+        {nearestUniqueStations.map((station, index) => {
+          const transitDriver = transitDrivers.find(
+            (t) => t._id === station.driverId
+          );
+          if (!transitDriver) {
+            return null;
+          }
+          let driverColor;
+          try {
+            driverColor = transitDriver.features.find(
+              (f: any) => f.geometry.type == "LineString"
+            ).properties.strokeColor;
+          } catch (err) {}
+          return (
+            <Flex
+              key={`${station.driverId}-${index}`}
+              vertical
+              style={{
+                width: isMobile ? window.innerWidth - 100 : "100%",
+                padding: "8px",
+                margin: "0 0 8px 0",
+                borderBottom: isMobile
+                  ? "none"
+                  : `1px solid ${COLORS.borderColor}`,
+                border: !isMobile ? "none" : `1px solid ${COLORS.borderColor}`,
+                borderRadius: isMobile ? 8 : 0,
+                paddingLeft: 8,
+                height: isMobile ? 275 : "auto",
+                flexShrink: 0,
+                marginRight: isMobile
+                  ? index == nearestUniqueStations.length - 1
+                    ? 32
+                    : 4
+                  : 0,
+                marginBottom: !isMobile
+                  ? index == nearestUniqueStations.length - 1
+                    ? 200
+                    : 4
+                  : 0,
+              }}
+              align="start"
+            >
+              <Typography.Text
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 8,
-                  backgroundColor: COLORS.primaryColor,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  boxShadow: "0 2px 4px rgba(24, 144, 255, 0.2)",
+                  fontSize: FONT_SIZE.SUB_TEXT,
+                  color: driverColor || COLORS.borderColor,
+                  textTransform: "uppercase",
                 }}
+                ellipsis={{ tooltip: station.stationName }}
               >
-                <DynamicReactIcon
-                  iconName="MdOutlineDirectionsTransit"
-                  iconSet="md"
-                  size={20}
-                  color="white"
-                />
-              </Flex> */}
+                STATION: {station.stationName}
+              </Typography.Text>
 
-            {/* Station Details */}
-            {/* Metro Line Name */}
-            <Typography.Text
-              style={{
-                fontSize: FONT_SIZE.SUB_TEXT,
-                color: COLORS.primaryColor,
-                textTransform: "uppercase",
-              }}
-              ellipsis={{ tooltip: station.stationName }}
-            >
-              {station.stationName}
-            </Typography.Text>
+              {/* Station Name */}
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.HEADING_3,
+                  color: COLORS.textColorDark,
+                  fontWeight: 500,
+                }}
+                ellipsis={{ tooltip: transitDriver.name }}
+              >
+                {transitDriver.name}
+              </Typography.Text>
 
-            {/* Station Name */}
-            <Typography.Text
-              style={{
-                fontSize: FONT_SIZE.HEADING_3,
-                color: COLORS.textColorDark,
-                fontWeight: 500,
-              }}
-              ellipsis={{ tooltip: transitDriver.name }}
-            >
-              {transitDriver.name}
-            </Typography.Text>
-
-            <Flex gap={16}>
-              <Flex align="center" gap={2}>
-                <DynamicReactIcon
-                  iconName={
-                    transitDriver.status == PLACE_TIMELINE.POST_LAUNCH
-                      ? "BiSolidBoltCircle"
-                      : "TbProgressBolt"
-                  }
-                  iconSet={
-                    transitDriver.status == PLACE_TIMELINE.POST_LAUNCH
-                      ? "bi"
-                      : "tb"
-                  }
-                  size={18}
-                  color={
-                    transitDriver.status == PLACE_TIMELINE.POST_LAUNCH
-                      ? COLORS.greenIdentifier
-                      : COLORS.yellowIdentifier
-                  }
-                />
+              <Flex
+                gap={16}
+                style={{ marginTop: 4, marginBottom: 8 }}
+                align="center"
+              >
+                <Flex align="center" gap={2}>
+                  <DynamicReactIcon
+                    iconName="IoTime"
+                    iconSet="io5"
+                    size={14}
+                    color={COLORS.textColorDark}
+                  />
+                  <Typography.Text
+                    style={{
+                      fontSize: FONT_SIZE.PARA,
+                      color: COLORS.textColorDark,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {station.travelTime} mins ({station.distance} km)
+                  </Typography.Text>
+                </Flex>
+                <Flex align="center" gap={2}>
+                  <DynamicReactIcon
+                    iconName={
+                      transitDriver.status == PLACE_TIMELINE.POST_LAUNCH
+                        ? "BiSolidBoltCircle"
+                        : "TbProgressBolt"
+                    }
+                    iconSet={
+                      transitDriver.status == PLACE_TIMELINE.POST_LAUNCH
+                        ? "bi"
+                        : "tb"
+                    }
+                    size={18}
+                    color={
+                      transitDriver.status == PLACE_TIMELINE.POST_LAUNCH
+                        ? COLORS.greenIdentifier
+                        : COLORS.yellowIdentifier
+                    }
+                  />
+                  <Typography.Text
+                    style={{
+                      fontSize: FONT_SIZE.PARA,
+                      color: COLORS.textColorDark,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {transitDriver.status == PLACE_TIMELINE.POST_LAUNCH
+                      ? "Operational"
+                      : "Under Construction"}
+                  </Typography.Text>
+                </Flex>
+              </Flex>
+              <Flex vertical style={{ marginTop: 8, width: "100%" }}>
                 <Typography.Text
                   style={{
-                    fontSize: FONT_SIZE.PARA,
-                    color: COLORS.textColorDark,
                     fontWeight: 500,
+                    fontSize: FONT_SIZE.PARA,
+                    color: COLORS.textColorMedium,
+                    margin: 0,
                   }}
                 >
-                  {transitDriver.status == PLACE_TIMELINE.POST_LAUNCH
-                    ? "Operational"
-                    : "Under Construction"}
+                  Details & Timeline
                 </Typography.Text>
-              </Flex>
-
-              <Flex align="center" gap={2}>
-                <DynamicReactIcon
-                  iconName="IoTime"
-                  iconSet="io5"
-                  size={14}
-                  color={COLORS.textColorDark}
-                />
-                <Typography.Text
-                  style={{
-                    fontSize: FONT_SIZE.PARA,
-                    color: COLORS.textColorDark,
-                    fontWeight: 500,
-                  }}
+                <Paragraph
+                  style={{ fontSize: FONT_SIZE.SUB_TEXT, margin: 0 }}
+                  ellipsis={
+                    isMobile
+                      ? undefined
+                      : {
+                          rows: isMobile ? 4 : 2,
+                          expandable: true,
+                          symbol: "more",
+                        }
+                  }
                 >
-                  {station.travelTime} mins ({station.distance} km)
-                </Typography.Text>
+                  {transitDriver.details?.info.intro}
+                  <br></br>
+                  {transitDriver.details?.info.timeline}
+                  <br></br>
+                  <br></br>
+                  <Flex
+                    style={{
+                      width: "100%",
+                      overflowX: "scroll",
+                      scrollbarWidth: "none",
+                    }}
+                  >
+                    <Flex
+                      style={{
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {renderCitations(transitDriver.details?.info.citations)}
+                    </Flex>
+                  </Flex>
+                </Paragraph>
               </Flex>
             </Flex>
-            <Flex vertical gap={8} style={{ marginTop: 8 }}>
-              <Typography.Text style={{ fontSize: FONT_SIZE.SUB_TEXT }}>
-                {transitDriver.details?.info?.intro ||
-                  "No description available"}
-              </Typography.Text>
-              <Typography.Text style={{ fontSize: FONT_SIZE.SUB_TEXT }}>
-                {transitDriver.details?.info?.timeline ||
-                  "Timeline information not available"}
-              </Typography.Text>
-            </Flex>
-          </Flex>
-        );
-      })}
+          );
+        })}
+      </Flex>
     </Flex>
   );
 };

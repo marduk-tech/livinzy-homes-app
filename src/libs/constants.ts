@@ -78,6 +78,10 @@ export const LivIndexDriversConfig = {
     label: "Dining",
     icon: { name: "IoFastFood", set: "io5" },
   },
+  "micro-market": {
+    label: "Micro Market",
+    icon: { name: "RiFundsFill", set: "ri" },
+  },
 };
 
 export const LivestIndexConfig = [
@@ -376,13 +380,19 @@ export const DRIVER_CATEGORIES = {
     drivers: ["industrial-hitech", "industrial-general"],
   },
   conveniences: {
-    drivers: ["food", "hospital", "commercial"],
+    drivers: ["food", "hospital", "commercial", "micro-market"],
   },
   connectivity: {
     drivers: ["highway", "transit"],
   },
   "growth potential": {
-    drivers: ["industrial-hitech", "industrial-general", "highway", "transit"],
+    drivers: [
+      "industrial-hitech",
+      "industrial-general",
+      "highway",
+      "transit",
+      "micro-market",
+    ],
   },
   surroundings: {
     drivers: [],

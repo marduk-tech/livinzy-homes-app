@@ -190,10 +190,7 @@ export interface IDriverPlace {
   distance?: number;
   duration: number;
   tags?: string[];
-  features: {
-    type: string;
-    coordinates: number[][][];
-  };
+  features: any;
 }
 
 export interface ISubLivestment {

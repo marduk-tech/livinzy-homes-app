@@ -1,6 +1,7 @@
 import posthog from "posthog-js";
 import { env, PLACE_TIMELINE } from "./constants";
 import { useLocation } from "react-router-dom";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
 
 export const nestedPropertyAccessor = (
   record: any,
@@ -88,4 +89,32 @@ export const fetchPmtPlan = (txt: any) => {
     console.log("could not find pmt plan");
   }
   return pmtPlan;
+};
+
+export const renderCitations = (citations: any) => {
+  return citations
+    .filter((c: any) => c.url.indexOf("wikipedia") == -1)
+    .map((citation: any) => {
+      const domain = citation.url.match(
+        /^(?:https?:\/\/)?(?:www\.)?([^/]+)/
+      )[1];
+      return (
+        <a
+          href={citation.url}
+          target="_blank"
+          style={{
+            textDecoration: "none",
+            fontSize: FONT_SIZE.SUB_TEXT,
+            padding: "2px 4px",
+            backgroundColor: COLORS.bgColor,
+            borderRadius: 8,
+            color: COLORS.textColorMedium,
+            border: `1px solid ${COLORS.borderColor}`,
+            marginRight: 4,
+          }}
+        >
+          {domain}
+        </a>
+      );
+    });
 };

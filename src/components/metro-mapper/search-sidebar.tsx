@@ -195,12 +195,18 @@ export const SearchSidebarComponent: React.FC<SearchSidebarProps> = ({
         isMobile ? (
           <Drawer
             title={null}
+            closable={false}
             placement="bottom"
-            styles={{ header: { height: 0 } }}
+            styles={{
+              header: { height: 0 },
+              content: { padding: 0 },
+              body: { padding: 0 },
+            }}
             onClose={() => {
               setSelectedResult(null);
               onSearchClear();
             }}
+            height={350}
             mask={false}
             open={!!selectedResult}
           >

@@ -23,6 +23,8 @@ export function MetroMapper() {
   >([]);
   const [selectedLines, setSelectedLines] = useState<string[]>([]);
   const [mapInstance, setMapInstance] = useState<any>(null);
+  const mapRef = useRef(mapInstance);
+
   const temporaryMarkerRef = useRef<L.Marker | null>(null);
   const [isMapFullScreen, setIsMapFullScreen] = useState(false);
 
@@ -39,6 +41,10 @@ export function MetroMapper() {
       setFilteredTransitDrivers(transitOnly);
     }
   }, [livindexPlaces]);
+
+  useEffect(() => {
+    mapRef.current = mapInstance;
+  }, mapInstance);
 
   // Update filtered drivers based on selected lines
   useEffect(() => {
@@ -71,11 +77,11 @@ export function MetroMapper() {
   }
 
   const addPersistentMarker = (result: SearchResult) => {
-    if (!mapInstance) return;
+    if (!mapRef.current) return;
 
     // Remove existing marker (replace previous marker)
     if (temporaryMarkerRef.current) {
-      mapInstance.removeLayer(temporaryMarkerRef.current);
+      mapRef.current.removeLayer(temporaryMarkerRef.current);
     }
 
     const markerIcon = L.divIcon({
@@ -130,7 +136,7 @@ export function MetroMapper() {
           className: "persistent-popup",
         }
       )
-      .addTo(mapInstance);
+      .addTo(mapRef.current);
 
     marker.openPopup();
 
@@ -150,17 +156,14 @@ export function MetroMapper() {
       setSelectedLines([]);
     }
 
-    const targetZoom = 14;
-
-    mapInstance.flyTo(result.coordinates, targetZoom, {
-      duration: 1.5,
-      easeLinearity: 0.25,
-    });
-
     // Add persistent highlight marker
     setTimeout(() => {
+      // mapRef.current.flyTo(result.coordinates, 17, { animate: true });
+      mapRef.current.setView(result.coordinates, 15, {
+        animate: true, // optional
+      });
       addPersistentMarker(result);
-    }, 800);
+    }, 1000);
   };
 
   const handleSearchClear = () => {
@@ -177,7 +180,6 @@ export function MetroMapper() {
         style={{
           width: isMobile ? "100%" : "30%",
           height: isMobile ? "auto" : "100%",
-          marginBottom: isMobile ? 16 : 0,
         }}
       >
         <SearchSidebar
@@ -202,7 +204,7 @@ export function MetroMapper() {
       vertical
       style={{
         height: "calc(100vh - 104px)",
-        marginTop: 24,
+        marginTop: 8,
         marginBottom: 16,
         width: "100%",
         minWidth: 0,
@@ -215,12 +217,21 @@ export function MetroMapper() {
         style={{ marginBottom: 0, padding: isMobile ? "0 16px" : 0 }}
       >
         <Typography.Text
-          style={{ fontSize: FONT_SIZE.HEADING_1, lineHeight: "120%" }}
+          style={{
+            fontSize: FONT_SIZE.HEADING_1 * 1.3,
+            lineHeight: "120%",
+            fontWeight: 500,
+          }}
         >
           Where's my Metro ?
         </Typography.Text>
         <Typography.Text
-          style={{ fontSize: FONT_SIZE.HEADING_3, marginBottom: 24 }}
+          style={{
+            fontSize: FONT_SIZE.HEADING_3,
+            marginBottom: isMobile ? 16 : 0,
+            color: COLORS.textColorMedium,
+            lineHeight: "120%",
+          }}
         >
           Find any nearest metro (operational or upcoming) for any location in
           Bangalore.
@@ -239,7 +250,7 @@ export function MetroMapper() {
       )}
 
       {/* Main Content Area */}
-      <Flex style={{ flex: 1 }} vertical={isMobile} gap={isMobile ? 16 : 0}>
+      <Flex style={{ flex: 1 }} vertical={isMobile} gap={0}>
         {/* Mobile: Search at top */}
         {isMobile && (
           <>
@@ -248,7 +259,6 @@ export function MetroMapper() {
             <Flex
               style={{
                 padding: "0 16px",
-                marginBottom: 16,
                 width: "100%",
                 minWidth: 0,
               }}
@@ -322,6 +332,7 @@ export function MetroMapper() {
             showLocalities={false}
             onMapReady={setMapInstance}
             showCorridors={false}
+            minMapZoom={10}
           />
         </Flex>
 

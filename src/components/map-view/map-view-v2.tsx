@@ -15,6 +15,7 @@ const { Paragraph } = Typography;
 import {
   MapContainer,
   Marker,
+  Polygon,
   Polyline,
   TileLayer,
   useMap,
@@ -34,6 +35,7 @@ import {
 import {
   capitalize,
   driverStatusLabel,
+  renderCitations,
   rupeeAmountFormat,
 } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
@@ -128,8 +130,8 @@ async function getIcon(
         backgroundColor: style?.iconBgColor || "white",
         borderRadius: text ? "24px" : "50%",
         padding: text ? 2 : 0,
-        height: text ? "auto" : (style?.iconSize || 20) * 1.6,
-        width: text ? 85 : (style?.iconSize || 20) * 1.6,
+        height: text ? "auto" : (style?.iconSize || 20) * 1.4,
+        width: text ? 80 : (style?.iconSize || 20) * 1.4,
         display: "flex",
         alignItems: "center",
         borderColor: isUnderConstruction
@@ -144,7 +146,7 @@ async function getIcon(
       }}
     >
       <IconComp
-        size={style?.iconSize || 16}
+        size={style?.iconSize || 14}
         color={
           style?.iconColor
             ? style.iconColor
@@ -373,6 +375,7 @@ const MapViewV2 = ({
   isFromTab = false,
   onMapReady,
   showCorridors = true,
+  minMapZoom = 12,
 }: {
   drivers?: any[];
   projectId?: string;
@@ -389,6 +392,7 @@ const MapViewV2 = ({
   isFromTab?: boolean;
   onMapReady?: (map: any) => void;
   showCorridors?: boolean;
+  minMapZoom?: number;
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
@@ -601,7 +605,7 @@ const MapViewV2 = ({
         {
           iconBgColor: COLORS.textColorDark,
           iconColor: "white",
-          iconSize: 14,
+          iconSize: 12,
         }
       );
       setTransitStationIcon(transitStationIcon);
@@ -1007,32 +1011,7 @@ const MapViewV2 = ({
     function getFooterContent(info: any) {
       return (
         <Flex vertical style={{ marginBottom: 16 }}>
-          <Flex>
-            {info.citations
-              .filter((c: any) => c.url.indexOf("wikipedia") == -1)
-              .map((citation: any) => {
-                const domain = citation.url.match(
-                  /^(?:https?:\/\/)?(?:www\.)?([^/]+)/
-                )[1];
-                return (
-                  <a
-                    href={citation.url}
-                    target="_blank"
-                    style={{
-                      textDecoration: "none",
-                      fontSize: FONT_SIZE.SUB_TEXT,
-                      padding: "2px 4px",
-                      backgroundColor: COLORS.bgColor,
-                      borderRadius: 8,
-                      color: COLORS.textColorMedium,
-                      border: `1px solid ${COLORS.borderColor}`,
-                    }}
-                  >
-                    {domain}
-                  </a>
-                );
-              })}
-          </Flex>
+          <Flex>{renderCitations(info.citations)}</Flex>
         </Flex>
       );
     }
@@ -1059,13 +1038,13 @@ const MapViewV2 = ({
       .flatMap((driver) => {
         //  points from lines
         const pointFeatures = driver.features.filter(
-          (f): f is GeoJSONPointFeature =>
+          (f: any): f is GeoJSONPointFeature =>
             f.type === "Feature" && f.geometry.type === "Point"
         );
 
         const lineFeatures = processRoadFeatures(
           driver.features.filter(
-            (f) => f.type === "Feature" && f.geometry?.type !== "Point"
+            (f: any) => f.type === "Feature" && f.geometry?.type !== "Point"
           )
         );
 
@@ -1111,12 +1090,12 @@ const MapViewV2 = ({
         let stations = null;
         if (map.getZoom() > 12.5) {
           stations = pointFeatures
-            .filter((feature) => {
+            .filter((feature: any) => {
               // render stations within bounds
               const [lng, lat] = feature.geometry.coordinates;
               return bounds.contains([lat, lng]);
             })
-            .map((feature, pointIndex) => (
+            .map((feature: any, pointIndex: number) => (
               <Marker
                 key={`${driver._id}-point-${pointIndex}`}
                 position={[
@@ -1174,6 +1153,64 @@ const MapViewV2 = ({
             {transitLines}
             {stations}
           </React.Fragment>
+        );
+      });
+  };
+
+  const MicroMarketDriversComponent = () => {
+    if (
+      !drivers ||
+      !drivers.length ||
+      (!!surroundingElements?.length &&
+        selectedCategories.length === 1 &&
+        selectedCategories.includes("surroundings")) ||
+      !roadIcon
+    ) {
+      return null;
+    }
+
+    return drivers
+      .filter(
+        (driver) =>
+          driver.driver == "micro-market" &&
+          (!isFromTab || allowedDriverTypes.includes(driver.driver)) &&
+          (!selectedDriverType || selectedDriverType == driver.driver)
+      )
+      .map((d) => {
+        return (
+          <Polygon
+            key={`polygon-${d._id}`}
+            positions={d.features[0].geometry.coordinates[0].map(
+              ([lng, lat]: [number, number]) => [lat, lng] as [number, number]
+            )}
+            eventHandlers={{
+              click: () => {
+                setModalContent({
+                  title: d.name,
+                  subHeading: fetchTravelDurationElement(
+                    d.distance,
+                    d.duration
+                  ),
+                  content: d.details?.info
+                    ? d.details.info.summary
+                    : d.details?.description || "",
+                  tags: [
+                    {
+                      label: "Micro Market",
+                      color: COLORS.primaryColor,
+                    },
+                  ],
+                });
+                setInfoModalOpen(true);
+              },
+            }}
+            pathOptions={{
+              color: COLORS.redIdentifier,
+              weight: 1,
+              fillOpacity: 0.2,
+              fillColor: COLORS.yellowIdentifier,
+            }}
+          />
         );
       });
   };
@@ -1684,9 +1721,9 @@ const MapViewV2 = ({
       >
         <MapContainer
           key={`map-v2`}
-          center={[13.110274, 77.6009443]}
-          zoom={14}
-          minZoom={12}
+          center={[12.969999, 77.587841]}
+          zoom={12}
+          minZoom={minMapZoom || 12}
           maxZoom={19}
           style={{ height: "100%", width: "100%" }}
           zoomControl={false}
@@ -1713,9 +1750,10 @@ const MapViewV2 = ({
                 <MapPolygons polygons={projectPolygons} />
 
                 {renderProjectMarkers()}
-                {showCorridors && renderCorridors()}
+                {/* {showCorridors && renderCorridors()} */}
                 {showLocalities && localities ? renderLocalities() : null}
                 {renderSurroundings()}
+                <MicroMarketDriversComponent></MicroMarketDriversComponent>
                 {projectsNearby?.length && projectsNearbyIcons?.length
                   ? renderProjectsNearby()
                   : null}
