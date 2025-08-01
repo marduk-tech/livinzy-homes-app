@@ -1,7 +1,8 @@
-import { Flex, Image, Typography } from "antd";
+import { Flex, Image, Tag, Typography } from "antd";
 import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { ScrollableContainer } from "../scrollable-container";
+import { useDevice } from "../../hooks/use-device";
 
 interface UnitsTabProps {
   lvnzyProject: any;
@@ -65,6 +66,7 @@ const getMinMaxSize = (configs: any[]) => {
 };
 
 export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
+  const { isMobile } = useDevice();
   return (
     <ScrollableContainer>
       <Flex
@@ -113,7 +115,43 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
             lvnzyProject!.meta.projectConfigurations.unitsBreakup
               ? getTotalFloors(lvnzyProject)
               : null}
+            {lvnzyProject?.property.layout.totalPhases ? (
+              <Typography.Text
+                style={{
+                  fontSize: FONT_SIZE.HEADING_4,
+                  color: COLORS.textColorMedium,
+                  marginLeft: 4,
+                }}
+              >
+                · {lvnzyProject?.property.layout.totalPhases} Phases
+              </Typography.Text>
+            ) : null}
           </Flex>
+          {lvnzyProject?.property.layout.totalPhases ? (
+            <Flex
+              style={{
+                width: "100",
+                display: "inline",
+                marginTop: 16,
+              }}
+            >
+              <Tag
+                style={{
+                  lineHeight: "120%",
+                  padding: "4px 8px",
+                  borderRadius: 8,
+                  color: COLORS.textColorDark,
+                  fontSize: FONT_SIZE.PARA,
+                  width: "100",
+                  textWrap: "initial",
+                }}
+                color="processing"
+              >
+                The project has three different phases. Unit availability as
+                well as pricing might vary with each phase.
+              </Tag>
+            </Flex>
+          ) : null}
 
           <Flex vertical gap={8}>
             {lvnzyProject!.meta.costingDetails.configurations.map(
@@ -124,14 +162,17 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                     vertical
                     style={{
                       marginTop: 16,
-                      backgroundColor: COLORS.bgColor,
                       padding: 8,
-                      borderRadius: 8,
-                      border: "1px solid",
-                      borderColor: COLORS.borderColor,
+                      paddingBottom: 16,
                     }}
                   >
-                    <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_3 }}>
+                    <Typography.Text
+                      style={{
+                        fontSize: FONT_SIZE.HEADING_4,
+                        textTransform: "uppercase",
+                        color: COLORS.primaryColor,
+                      }}
+                    >
                       {c.config}
                     </Typography.Text>
                     <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
@@ -154,7 +195,7 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                               key={`fp-${i}`}
                               src={fp}
                               style={{
-                                height: 100,
+                                height: 125,
                                 width: "auto",
                               }}
                             />
