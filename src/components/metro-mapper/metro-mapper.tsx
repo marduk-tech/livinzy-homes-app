@@ -200,7 +200,15 @@ export function MetroMapper() {
   return (
     <Flex
       vertical
-      style={{ height: "calc(100vh - 104px)", marginTop: 24, marginBottom: 16 }}
+      style={{
+        height: "calc(100vh - 104px)",
+        marginTop: 24,
+        marginBottom: 16,
+        width: "100%",
+        minWidth: 0,
+        maxWidth: "100%",
+        overflow: "hidden",
+      }}
     >
       <Flex
         vertical
@@ -220,7 +228,7 @@ export function MetroMapper() {
       </Flex>
 
       {!isMobile && (
-        <Flex style={{ marginBottom: 16 }}>
+        <Flex style={{ marginBottom: 16, width: "100%", minWidth: 0 }}>
           <LineFilters
             transitDrivers={transitDrivers}
             selectedLines={selectedLines}
@@ -237,7 +245,14 @@ export function MetroMapper() {
           <>
             <SearchContainer />
             {/* Mobile: Line Filters below search */}
-            <Flex style={{ padding: "0 16px", marginBottom: 16 }}>
+            <Flex
+              style={{
+                padding: "0 16px",
+                marginBottom: 16,
+                width: "100%",
+                minWidth: 0,
+              }}
+            >
               <LineFilters
                 transitDrivers={transitDrivers}
                 selectedLines={selectedLines}

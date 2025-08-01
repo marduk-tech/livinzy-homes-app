@@ -1,7 +1,13 @@
 import { Button, Flex, Typography } from "antd";
+import { useDevice } from "../../hooks/use-device";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
+
+interface LineInfo {
+  name: string;
+  strokeColor?: string;
+}
 
 interface LineFiltersProps {
   transitDrivers: IDriverPlace[];
@@ -16,14 +22,27 @@ export const LineFilters: React.FC<LineFiltersProps> = ({
   onLineToggle,
   onClearFilters,
 }) => {
-  // unique line names from transit drivers
-  const getUniqueLines = () => {
-    const lineNames = transitDrivers
-      .map((driver) => driver.name)
-      .filter((name) => name && name.trim() !== "");
+  const { isMobile } = useDevice();
+  // unique line names with stroke colors from transit drivers
+  const getUniqueLines = (): LineInfo[] => {
+    const lineMap = new Map<string, string>();
 
-    // remove duplicates using Set
-    return Array.from(new Set(lineNames));
+    transitDrivers.forEach((driver) => {
+      if (driver.name && driver.name.trim() !== "") {
+        // Find the first LineString feature to get stroke color
+        const lineStringFeature = driver.features?.find(
+          (feature: any) => feature.type === "LineString"
+        );
+
+        const strokeColor = lineStringFeature?.properties?.strokeColor;
+        lineMap.set(driver.name, strokeColor);
+      }
+    });
+
+    return Array.from(lineMap.entries()).map(([name, strokeColor]) => ({
+      name,
+      strokeColor,
+    }));
   };
 
   const uniqueLines = getUniqueLines();
@@ -32,6 +51,35 @@ export const LineFilters: React.FC<LineFiltersProps> = ({
     return null;
   }
 
+  const getLineIcon = (lineName: string) => {
+    const lowerName = lineName.toLowerCase();
+    if (lowerName.includes("namma metro")) {
+      return (
+        <img
+          src="/images/metro-mapper/namma-metro-logo.png"
+          alt="Namma Metro"
+          style={{ width: 14, height: 14 }}
+        />
+      );
+    } else if (lowerName.includes("suburban rail")) {
+      return (
+        <img
+          src="/images/metro-mapper/kride-logo.png"
+          alt="Suburban Rail"
+          style={{ width: 14, height: 14 }}
+        />
+      );
+    }
+    return (
+      <DynamicReactIcon
+        iconName="MdOutlineDirectionsTransit"
+        iconSet="md"
+        size={14}
+        color={selectedLines.includes(lineName) ? "white" : COLORS.primaryColor}
+      />
+    );
+  };
+
   return (
     <Flex
       vertical
@@ -39,6 +87,8 @@ export const LineFilters: React.FC<LineFiltersProps> = ({
         padding: "16px 0",
         borderBottom: `1px solid ${COLORS.borderColor}`,
         marginBottom: 16,
+        width: "100%",
+        minWidth: 0,
       }}
     >
       <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
@@ -69,47 +119,55 @@ export const LineFilters: React.FC<LineFiltersProps> = ({
         )}
       </Flex>
 
-      <Flex wrap="wrap" gap={8}>
-        {uniqueLines.map((lineName) => {
-          const isSelected = selectedLines.includes(lineName);
+      <div className={isMobile ? "" : "scrollbar-wrapper"}>
+        <div
+          className="custom-scrollbar"
+          style={{
+            display: "flex",
+            gap: "8px",
+            overflowX: "auto",
+            scrollbarWidth: isMobile ? "none" : "thin", // scrollbar on desktop, hide on mobile
+            WebkitOverflowScrolling: "touch",
+            width: "100%",
+            minWidth: 0,
+          }}
+        >
+          {uniqueLines.map((lineInfo) => {
+            const isSelected = selectedLines.includes(lineInfo.name);
 
-          return (
-            <Button
-              key={lineName}
-              size="small"
-              onClick={() => onLineToggle(lineName)}
-              style={{
-                borderRadius: 20,
-                height: 32,
-                paddingLeft: 12,
-                paddingRight: 12,
-                backgroundColor: isSelected
-                  ? COLORS.primaryColor
-                  : COLORS.bgColorMedium,
-                borderColor: isSelected
-                  ? COLORS.primaryColor
-                  : COLORS.borderColor,
-                color: isSelected ? "white" : COLORS.textColorDark,
-                fontSize: FONT_SIZE.SUB_TEXT,
-                fontWeight: 500,
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-              icon={
-                <DynamicReactIcon
-                  iconName="MdOutlineDirectionsTransit"
-                  iconSet="md"
-                  size={14}
-                  color={isSelected ? "white" : COLORS.primaryColor}
-                />
-              }
-            >
-              {lineName}
-            </Button>
-          );
-        })}
-      </Flex>
+            return (
+              <Button
+                key={lineInfo.name}
+                size="small"
+                onClick={() => onLineToggle(lineInfo.name)}
+                style={{
+                  borderRadius: 20,
+                  height: 32,
+                  paddingLeft: 12,
+                  paddingRight: 12,
+                  backgroundColor: isSelected
+                    ? COLORS.primaryColor
+                    : COLORS.bgColorMedium,
+                  borderColor: isSelected
+                    ? COLORS.primaryColor
+                    : lineInfo.strokeColor || COLORS.borderColor,
+                  color: isSelected ? "white" : COLORS.textColorDark,
+                  fontSize: FONT_SIZE.SUB_TEXT,
+                  fontWeight: 500,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  flexShrink: 0,
+                  whiteSpace: "nowrap",
+                }}
+                icon={getLineIcon(lineInfo.name)}
+              >
+                {lineInfo.name}
+              </Button>
+            );
+          })}
+        </div>
+      </div>
 
       {selectedLines.length > 0 && (
         <Typography.Text
