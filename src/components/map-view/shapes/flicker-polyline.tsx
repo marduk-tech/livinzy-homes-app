@@ -25,13 +25,31 @@ export const FlickerPolyline: React.FC<FlickerPolylineProps> = ({
   }, []);
 
   return (
-    <Polyline
-      key={key}
-      positions={positions}
-      pathOptions={{
-        ...pathOptions,
-        opacity: toFlicker ? (isVisible ? 1 : 0.3) : 1,
-      }}
-    />
+    <>
+      {/* highlight polyline  */}
+      {toFlicker && (
+        <Polyline
+          key={`${key}-highlight`}
+          positions={positions}
+          pathOptions={{
+            ...pathOptions,
+            color: "#FFD700",
+            // double width
+            weight: (pathOptions.weight || 6) * 2,
+            opacity: 0.3,
+          }}
+        />
+      )}
+
+      {/* flickering polyline */}
+      <Polyline
+        key={key}
+        positions={positions}
+        pathOptions={{
+          ...pathOptions,
+          opacity: toFlicker ? (isVisible ? 1 : 0.3) : 1,
+        }}
+      />
+    </>
   );
 };
