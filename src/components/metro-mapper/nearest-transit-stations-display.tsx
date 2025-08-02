@@ -7,10 +7,10 @@ import {
 } from "../../hooks/use-nearest-transit-stations";
 import { SearchResult } from "../../hooks/use-place-search";
 import { PLACE_TIMELINE } from "../../libs/constants";
+import { renderCitations } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { IDriverPlace } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
-import { renderCitations } from "../../libs/lvnzy-helper";
 const { Paragraph } = Typography;
 
 interface NearestTransitStationsDisplayProps {
@@ -171,7 +171,9 @@ export const NearestTransitStationsDisplay: React.FC<
             driverColor = transitDriver.features.find(
               (f: any) => f.geometry.type == "LineString"
             ).properties.strokeColor;
-          } catch (err) {}
+          } catch (err) {
+            console.log(err);
+          }
           return (
             <Flex
               key={`${station.driverId}-${index}`}
@@ -294,9 +296,9 @@ export const NearestTransitStationsDisplay: React.FC<
                         >
                           {transitDriver.name}
                         </Typography.Text>
-                        {transitDriver.details?.info.intro}
+                        {transitDriver.details?.info?.intro}
                         <br></br>
-                        {transitDriver.details?.info.timeline}
+                        {transitDriver.details?.info?.timeline}
                         <br></br>
                         <br></br>
                         <Flex
@@ -312,7 +314,7 @@ export const NearestTransitStationsDisplay: React.FC<
                             }}
                           >
                             {renderCitations(
-                              transitDriver.details?.info.citations
+                              transitDriver.details?.info?.citations
                             )}
                           </Flex>
                         </Flex>
@@ -343,9 +345,9 @@ export const NearestTransitStationsDisplay: React.FC<
                       symbol: "more",
                     }}
                   >
-                    {transitDriver.details?.info.intro}
+                    {transitDriver.details?.info?.intro}
                     <br></br>
-                    {transitDriver.details?.info.timeline}
+                    {transitDriver.details?.info?.timeline}
                     <br></br>
                     <br></br>
                     <Flex
@@ -360,7 +362,9 @@ export const NearestTransitStationsDisplay: React.FC<
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {renderCitations(transitDriver.details?.info.citations)}
+                        {renderCitations(
+                          transitDriver.details?.info?.citations
+                        )}
                       </Flex>
                     </Flex>
                   </Paragraph>

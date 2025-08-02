@@ -92,6 +92,10 @@ export const fetchPmtPlan = (txt: any) => {
 };
 
 export const renderCitations = (citations: any) => {
+  if (!citations || !Array.isArray(citations)) {
+    return [];
+  }
+  
   return citations
     .filter((c: any) => c.url.indexOf("wikipedia") == -1)
     .map((citation: any) => {
