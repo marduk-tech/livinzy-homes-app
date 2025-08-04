@@ -147,8 +147,9 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                 }}
                 color="processing"
               >
-                The project has three different phases. Unit availability as
-                well as pricing might vary with each phase.
+                The project has {lvnzyProject?.property.layout.totalPhases}{" "}
+                different phases. Unit availability as well as pricing might
+                vary with each phase.
               </Tag>
             </Flex>
           ) : null}
