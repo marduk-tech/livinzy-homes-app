@@ -642,8 +642,10 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                         projectId={lvnzyProject?.originalProjectId?._id}
                         surroundingElements={surroundingElements}
                         projectSqftPricing={Math.round(
-                          (lvnzyProject?.meta?.costingDetails?.minimumUnitCost || 0) /
-                            (lvnzyProject?.meta?.costingDetails?.minimumUnitSize || 1)
+                          (lvnzyProject?.meta?.costingDetails
+                            ?.minimumUnitCost || 0) /
+                            (lvnzyProject?.meta?.costingDetails
+                              ?.minimumUnitSize || 1)
                         )}
                         projectsNearby={projectsNearby}
                         drivers={mapDrivers.map((d) => {
@@ -661,8 +663,9 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                   </Flex>
                 ) : null}
 
-                {dataPointSelected.selectedDataPointCategory ==
-                "areaConnectivity" ? (
+                {dataPointSelected &&
+                dataPointSelected.selectedDataPointCategory ==
+                  "areaConnectivity" ? (
                   <Flex
                     style={{
                       width: "100",

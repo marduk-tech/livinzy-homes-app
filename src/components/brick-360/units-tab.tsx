@@ -127,7 +127,8 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
               </Typography.Text>
             ) : null}
           </Flex>
-          {lvnzyProject?.property.layout.totalPhases ? (
+          {lvnzyProject?.property.layout.totalPhases &&
+          lvnzyProject?.property.layout.totalPhases > 1 ? (
             <Flex
               style={{
                 width: "100",
