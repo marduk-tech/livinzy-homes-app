@@ -208,9 +208,9 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             ) {
               setMapVisible(true);
               setProjectsNearby(
-                lvnzyProject?.investment.corridorPricing.filter(
+                lvnzyProject?.investment?.corridorPricing?.filter(
                   (p: any) => !!p.sqftCost
-                )
+                ) || []
               );
             }
           } else if (
@@ -639,11 +639,11 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                       }}
                     >
                       <MapViewV2
-                        projectId={lvnzyProject?.originalProjectId._id}
+                        projectId={lvnzyProject?.originalProjectId?._id}
                         surroundingElements={surroundingElements}
                         projectSqftPricing={Math.round(
-                          lvnzyProject?.meta.costingDetails.minimumUnitCost /
-                            lvnzyProject?.meta.costingDetails.minimumUnitSize
+                          (lvnzyProject?.meta?.costingDetails?.minimumUnitCost || 0) /
+                            (lvnzyProject?.meta?.costingDetails?.minimumUnitSize || 1)
                         )}
                         projectsNearby={projectsNearby}
                         drivers={mapDrivers.map((d) => {
@@ -863,11 +863,11 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             gap={8}
           >
             <MapViewV2
-              projectId={lvnzyProject?.originalProjectId._id}
+              projectId={lvnzyProject?.originalProjectId?._id}
               surroundingElements={surroundingElements}
               projectSqftPricing={Math.round(
-                lvnzyProject?.meta.costingDetails.minimumUnitCost /
-                  lvnzyProject?.meta.costingDetails.minimumUnitSize
+                (lvnzyProject?.meta?.costingDetails?.minimumUnitCost || 0) /
+                  (lvnzyProject?.meta?.costingDetails?.minimumUnitSize || 1)
               )}
               projectsNearby={projectsNearby}
               drivers={mapDrivers.map((d) => {
