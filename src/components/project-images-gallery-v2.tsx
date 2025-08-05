@@ -1,23 +1,24 @@
 import { Flex, Image, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
-import { useDevice } from "../hooks/use-device";
 import "../theme/gallery.css";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { IMedia } from "../types/Project";
 
-export const ProjectImagesGalleryV2 = ({
+export const ProjectGalleryV2 = ({
   media,
   selectedImageId,
 }: {
   media: IMedia[];
   selectedImageId: string | null;
 }) => {
-  const { isMobile } = useDevice();
   const [selectedTag, setSelectedTag] = useState<string>("all");
 
   const allTags = useMemo(() => {
     const tags = new Set<string>();
+    const hasVideos = media.some((item) => item.type === "video" && item.video);
+
     media.forEach((item) => {
+      // Extract tags from images
       if (item.type === "image" && item.image?.tags) {
         item.image.tags.forEach((tag) => {
           if (tag !== "na") {
@@ -25,20 +26,44 @@ export const ProjectImagesGalleryV2 = ({
           }
         });
       }
+      // Extract tags from videos
+      if (item.type === "video" && item.video?.tags) {
+        item.video.tags.forEach((tag) => {
+          if (tag !== "na") {
+            tags.add(tag);
+          }
+        });
+      }
     });
-    return ["all", ...Array.from(tags)];
+
+    const tagArray = ["all"];
+    if (hasVideos) {
+      tagArray.push("Videos");
+    }
+    tagArray.push(...Array.from(tags));
+
+    return tagArray;
   }, [media]);
 
   const groupedImages = useMemo(() => {
+    // Filter videos first
+    const videoMedia = media.filter(
+      (item) =>
+        item.type === "video" &&
+        item.video &&
+        (!item.video.tags || !item.video.tags.includes("na"))
+    );
     const imageMedia = media.filter(
       (item) =>
         item.type === "image" && item.image && !item.image.tags.includes("na")
     );
+    const allMedia = [...videoMedia, ...imageMedia];
     const result: Record<string, IMedia[]> = {};
 
-    imageMedia.forEach((item) => {
-      if (item.image?.tags && item.image.tags.length > 0) {
-        item.image.tags.forEach((tag) => {
+    allMedia.forEach((item) => {
+      const tags = item.type === "image" ? item.image?.tags : item.video?.tags;
+      if (tags && tags.length > 0) {
+        tags.forEach((tag) => {
           if (!result[tag]) {
             result[tag] = [];
           }
@@ -50,6 +75,15 @@ export const ProjectImagesGalleryV2 = ({
         }
         result["Other"].push(item);
       }
+    });
+
+    // Sort videos first, then images
+    Object.keys(result).forEach((tag) => {
+      result[tag].sort((a, b) => {
+        if (a.type === "video" && b.type === "image") return -1;
+        if (a.type === "image" && b.type === "video") return 1;
+        return 0;
+      });
     });
 
     // move selected image to front in its sections
@@ -72,11 +106,20 @@ export const ProjectImagesGalleryV2 = ({
     if (selectedTag === "all") {
       return Object.entries(groupedImages);
     }
+    if (selectedTag === "Videos") {
+      const videoMedia = media.filter(
+        (item) =>
+          item.type === "video" &&
+          item.video &&
+          (!item.video.tags || !item.video.tags.includes("na"))
+      );
+      return [["Videos", videoMedia]];
+    }
     if (groupedImages[selectedTag]) {
       return [[selectedTag, groupedImages[selectedTag]]];
     }
     return [];
-  }, [selectedTag, groupedImages]);
+  }, [selectedTag, groupedImages, media]);
 
   return (
     <Flex vertical gap={16}>
@@ -130,6 +173,13 @@ export const ProjectImagesGalleryV2 = ({
                 if (aHasSelected && !bHasSelected) return -1;
                 if (!aHasSelected && bHasSelected) return 1;
               }
+
+              // Prioritize videos sections
+              const aHasVideos = aImages.some((item) => item.type === "video");
+              const bHasVideos = bImages.some((item) => item.type === "video");
+              if (aHasVideos && !bHasVideos) return -1;
+              if (!aHasVideos && bHasVideos) return 1;
+
               return aTag.localeCompare(bTag);
             })
             .map(([tag, images]) => (
@@ -154,22 +204,55 @@ export const ProjectImagesGalleryV2 = ({
                           isFirstInSection ? "gallery-item-large" : ""
                         }`}
                       >
-                        <Image
-                          src={item.image!.url}
-                          alt={
-                            item.image!.caption || `${tag} image ${index + 1}`
-                          }
-                          preview={{
-                            mask: null,
-                          }}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            border: "1px solid",
-                            borderColor: COLORS.borderColorMedium,
-                          }}
-                        />
+                        {item.type === "video" ? (
+                          item.video?.isYoutube ? (
+                            <iframe
+                              src={item.video.youtubeUrl?.replace(
+                                "watch?v=",
+                                "embed/"
+                              )}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                border: "1px solid",
+                                borderColor: COLORS.borderColorMedium,
+                                borderRadius: "8px",
+                              }}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          ) : (
+                            <iframe
+                              src={`https://iframe.mediadelivery.net/embed/${item.video?.bunnyLibraryId}/${item.video?.bunnyVideoId}?autoplay=false&loop=false&muted=false&preload=true&responsive=true`}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                border: "1px solid",
+                                borderColor: COLORS.borderColorMedium,
+                                borderRadius: "8px",
+                              }}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          )
+                        ) : (
+                          <Image
+                            src={item.image!.url}
+                            alt={
+                              item.image!.caption || `${tag} image ${index + 1}`
+                            }
+                            preview={{
+                              mask: null,
+                            }}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              border: "1px solid",
+                              borderColor: COLORS.borderColorMedium,
+                            }}
+                          />
+                        )}
                       </div>
                     );
                   })}
@@ -179,7 +262,7 @@ export const ProjectImagesGalleryV2 = ({
         </Flex>
       ) : (
         <Typography.Text>
-          No images available for the selected tag.
+          No media available for the selected tag.
         </Typography.Text>
       )}
     </Flex>

@@ -21,6 +21,9 @@ export interface IMedia {
     hlsUrl?: string;
     thumbnailUrl?: string;
     previewUrl?: string;
+    isYoutube?: boolean;
+    youtubeUrl?: string;
+    bunnyLibraryId?: number;
   };
 }
 

@@ -1,4 +1,4 @@
-import { ProjectImagesGalleryV2 } from "../project-images-gallery-v2";
+import { ProjectGalleryV2 } from "../project-images-gallery-v2";
 import { ScrollableContainer } from "../scrollable-container";
 
 interface MediaTabProps {
@@ -8,7 +8,7 @@ interface MediaTabProps {
 export const MediaTab = ({ lvnzyProject }: MediaTabProps) => {
   return (
     <ScrollableContainer>
-      <ProjectImagesGalleryV2
+      <ProjectGalleryV2
         media={lvnzyProject?.originalProjectId.media}
         selectedImageId={null}
       />
