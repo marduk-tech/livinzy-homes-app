@@ -5,12 +5,12 @@ import { Brick360v2 } from "../components/brick-360/brick360-v2";
 import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { Loader } from "../components/common/loader";
 import { RequestedProjectsList } from "../components/requested-projects-list";
+import { UserProjects } from "../components/user-projects";
 import { useFetchAllLvnzyProjects } from "../hooks/use-lvnzy-project";
 import { useUser } from "../hooks/use-user";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { LandingConstants } from "../libs/constants";
 import { COLORS, FONT_SIZE } from "../theme/style-constants";
-import { UserProjects } from "./user-projects";
 
 interface SavedLvnzyProject {
   _id: string;

@@ -1,9 +1,6 @@
 import { Flex, Tooltip, Typography } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
-import GradientBar from "../components/common/grading-bar";
-import { Loader } from "../components/common/loader";
 import { useDevice } from "../hooks/use-device";
 import { useUser } from "../hooks/use-user";
 import { BRICK360_CATEGORY, Brick360CategoryInfo } from "../libs/constants";
@@ -15,6 +12,9 @@ import {
 } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { LvnzyProject } from "../types/LvnzyProject";
+import DynamicReactIcon from "./common/dynamic-react-icon";
+import GradientBar from "./common/grading-bar";
+import { Loader } from "./common/loader";
 const { Paragraph } = Typography;
 
 export function UserProjects({
