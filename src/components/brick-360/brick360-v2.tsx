@@ -180,7 +180,7 @@ export function Brick360v2() {
             title: catInfo.title,
             key: key,
             icon: getDataCategoryIcon(catInfo.iconName, catInfo.iconSet),
-            dataPoints: lvnzyProject.score[cat]
+            dataPoints: lvnzyProject.score?.[cat]
               ? Object.entries(lvnzyProject.score[cat]).filter(
                   (e) => e && e.length && (e as any)[1].rating
                 )

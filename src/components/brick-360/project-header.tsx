@@ -29,7 +29,7 @@ export const ProjectHeader = forwardRef<any, ProjectHeaderProps>(
                 color: COLORS.textColorMedium,
               }}
             >
-              {lvnzyProject?.originalProjectId.info.developerId.name}
+              {lvnzyProject?.originalProjectId?.info?.developerId?.name || "Developer"}
             </Typography.Text>
             <Typography.Text
               style={{

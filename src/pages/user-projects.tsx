@@ -1,6 +1,7 @@
 import { Flex, Tooltip, Typography } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import GradientBar from "../components/common/grading-bar";
 import { Loader } from "../components/common/loader";
 import { useDevice } from "../hooks/use-device";
@@ -14,7 +15,6 @@ import {
 } from "../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
 import { LvnzyProject } from "../types/LvnzyProject";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
 const { Paragraph } = Typography;
 
 export function UserProjects({
@@ -52,7 +52,9 @@ export function UserProjects({
     const primaryCorridor = itemInfo.meta.projectCorridors.sort(
       (a: any, b: any) => a.approxDistanceInKms - b.approxDistanceInKms
     )[0].corridorName;
-    let pmtPlan = fetchPmtPlan(itemInfo.originalProjectId?.info?.financialPlan);
+    const pmtPlan = fetchPmtPlan(
+      itemInfo.originalProjectId?.info?.financialPlan
+    );
     return (
       <Flex
         style={{
@@ -175,7 +177,7 @@ export function UserProjects({
                     </Typography.Text>
                     <Flex>
                       <GradientBar
-                        value={getCategoryScore(itemInfo.score[item])}
+                        value={getCategoryScore(itemInfo.score?.[item])}
                         showBadgeOnly={true}
                       ></GradientBar>
                     </Flex>

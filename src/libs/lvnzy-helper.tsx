@@ -70,7 +70,7 @@ export const getCategoryScore = (dataPt: any) => {
   let totRating = 0,
     ct = 0;
   Object.keys(dataPt).forEach((subPt) => {
-    if (dataPt[subPt].rating) {
+    if (dataPt[subPt]?.rating) {
       totRating += dataPt[subPt].rating;
       ct++;
     }

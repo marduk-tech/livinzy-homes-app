@@ -20,7 +20,7 @@ const MetaInfo = forwardRef<any, MetaInfoProps>(({ lvnzyProject }, ref) => {
   const [isPmtPlanModalOpen, setIsPmtPlanModalOpen] = useState(false);
   const [pmtPlan, setPmtPlan] = useState();
   useEffect(() => {
-    if (lvnzyProject && lvnzyProject.originalProjectId.info.financialPlan) {
+    if (lvnzyProject && lvnzyProject.originalProjectId?.info?.financialPlan) {
       setPmtPlan(
         fetchPmtPlan(lvnzyProject.originalProjectId.info.financialPlan)
       );
@@ -126,7 +126,7 @@ const MetaInfo = forwardRef<any, MetaInfoProps>(({ lvnzyProject }, ref) => {
           }}
         >
           <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
-            {lvnzyProject.originalProjectId.info.financialPlan}
+            {lvnzyProject.originalProjectId?.info?.financialPlan || 'No financial plan available'}
           </Markdown>
         </Flex>
       </Modal>

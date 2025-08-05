@@ -143,7 +143,7 @@ export const Brick360Tab = forwardRef<any, Brick360TabProps>(
                       >
                         {sc.title}
                       </Typography.Text>
-                      {lvnzyProject!.score[sc.key] ? (
+                      {lvnzyProject!.score?.[sc.key] ? (
                         <GradientBar
                           value={getCategoryScore(lvnzyProject!.score[sc.key])}
                           showBadgeOnly={true}

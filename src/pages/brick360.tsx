@@ -261,7 +261,7 @@ export function Brick360() {
             title: catInfo.title,
             key: key,
             icon: getDataCategoryIcon(catInfo.iconName, catInfo.iconSet),
-            dataPoints: lvnzyProject.score[cat]
+            dataPoints: lvnzyProject.score?.[cat]
               ? Object.entries(lvnzyProject.score[cat])
               : [],
           });
@@ -354,7 +354,7 @@ export function Brick360() {
                 fontWeight: 500,
               }}
             >
-              {lvnzyProject?.originalProjectId.info.developerId.name}
+              {lvnzyProject?.originalProjectId?.info?.developerId?.name || "Developer"}
             </Tag>
             <Tag
               style={{
@@ -499,7 +499,7 @@ export function Brick360() {
           </Flex>
           {/* Payment plan and price point */}
           <Flex style={{ marginTop: 8, marginBottom: 8 }}>
-            {lvnzyProject?.originalProjectId.info.financialPlan ? (
+            {lvnzyProject?.originalProjectId?.info?.financialPlan ? (
               <Flex
                 style={{ marginTop: 8 }}
                 onClick={() => {
@@ -526,7 +526,7 @@ export function Brick360() {
                         remarkPlugins={[remarkGfm]}
                         className="liviq-content"
                       >
-                        {lvnzyProject?.originalProjectId.info.financialPlan}
+                        {lvnzyProject?.originalProjectId?.info?.financialPlan || 'No financial plan available'}
                       </Markdown>
                     </Flex>
                   );
@@ -724,7 +724,7 @@ export function Brick360() {
                   >
                     {sc.title}
                   </Typography.Title>
-                  {lvnzyProject!.score[sc.key] ? (
+                  {lvnzyProject!.score?.[sc.key] ? (
                     <GradientBar
                       value={getCategoryScore(lvnzyProject!.score[sc.key])}
                       showBadgeOnly={true}
@@ -1094,7 +1094,7 @@ export function Brick360() {
             </Typography.Title>
             {selectedDataPointCategory == "developer" && (
               <Typography.Title level={5} style={{ margin: "8px 0" }}>
-                {lvnzyProject?.originalProjectId.info.developerId.name}
+                {lvnzyProject?.originalProjectId?.info?.developerId?.name || "Developer"}
               </Typography.Title>
             )}
             <Flex vertical gap={16}>
