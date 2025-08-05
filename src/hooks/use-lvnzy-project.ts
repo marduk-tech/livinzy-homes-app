@@ -37,3 +37,21 @@ export const useFetchLvnzyProjectsByIds = (ids: string) => {
     refetchOnWindowFocus: false,
   });
 };
+
+/**
+ * Custom hook to fetch all lvnzy projects for admin users
+ * @param {boolean} enabled - Whether to enable the query (should be true only for admin users)
+ * @returns {UseQueryResult<LvnzyProject[], Error>} The result of the useQuery hook containing all lvnzy projects
+ */
+export const useFetchAllLvnzyProjects = (enabled: boolean = false) => {
+  return useQuery<LvnzyProject[], Error>({
+    queryKey: [queryKeys.getAllLvnzyProjects],
+    queryFn: async () => {
+      const { data } = await axiosApiInstance.get(`/lvnzy-projects`);
+      return data as LvnzyProject[];
+    },
+    enabled,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+};

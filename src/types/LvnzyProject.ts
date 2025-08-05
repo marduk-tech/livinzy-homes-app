@@ -5,7 +5,10 @@ export interface LvnzyProject {
   meta: any;
   neighborhood: any;
   connectivity: any;
-  originalProjectId: any;
+  originalProjectId: {
+    info: any | null;
+    [key: string]: any;
+  };
   score: any;
   _id: string;
 }

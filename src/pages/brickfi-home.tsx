@@ -1,15 +1,16 @@
 import { Button, Flex, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Brick360v2 } from "../components/brick-360/brick360-v2";
+import DynamicReactIcon from "../components/common/dynamic-react-icon";
 import { Loader } from "../components/common/loader";
 import { RequestedProjectsList } from "../components/requested-projects-list";
+import { useFetchAllLvnzyProjects } from "../hooks/use-lvnzy-project";
 import { useUser } from "../hooks/use-user";
-import { Brick360v2 } from "../components/brick-360/brick360-v2";
-import { UserProjects } from "./user-projects";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
-import DynamicReactIcon from "../components/common/dynamic-react-icon";
-import { COLORS, FONT_SIZE } from "../theme/style-constants";
 import { LandingConstants } from "../libs/constants";
+import { COLORS, FONT_SIZE } from "../theme/style-constants";
+import { UserProjects } from "./user-projects";
 
 interface SavedLvnzyProject {
   _id: string;
@@ -23,6 +24,10 @@ const BrickfiHome: React.FC = () => {
 
   const [lvnzyProjects, setLvnzyProjects] = useState<any[]>([]);
   const [projectsLoading, setProjectsLoadng] = useState(true);
+
+  const isAdmin = user?.role === "admin";
+  const { data: allLvnzyProjects, isLoading: adminProjectsLoading } =
+    useFetchAllLvnzyProjects(isAdmin);
 
   const fetchLvnzyProjectsByIds = async (ids: string) => {
     const { data } = await axiosApiInstance.post(`/lvnzy-projects/${ids}`, {
@@ -41,14 +46,14 @@ const BrickfiHome: React.FC = () => {
         "property='og:description'",
         "property='twitter:description'",
       ].forEach((mQ) => {
-        let meta = document.querySelector(`meta[${mQ}]`);
+        const meta = document.querySelector(`meta[${mQ}]`);
         meta?.setAttribute("content", description);
       });
     }
   }, [collectionId]);
 
   useEffect(() => {
-    if (!!lvnzyProjectId) {
+    if (lvnzyProjectId) {
       setProjectsLoadng(false);
       return;
     }
@@ -65,26 +70,38 @@ const BrickfiHome: React.FC = () => {
         "67f0f60f3ef53b74b67d12f5,67e83fe1a06e471b3d14b6b5,687b4d291541e1a0ecb321ca,687b401e8a68a0900797180b,67f0046ca58ac2b37e530f2b,6870af1904ec49de98b9b1fa,680736af3ff1a71676450fbb,68073ba59f670b1afc3f03f4"
       );
     } else {
-      if (collectionId) {
-        const collection =
-          user.savedLvnzyProjects.find(
-            (c: SavedLvnzyProject) => c._id === collectionId
-          ) || null;
-        if (collection && collection.projects) {
-          setLvnzyProjects(collection.projects);
+      // Check if user is admin and show all projects
+      if (user.role === "admin") {
+        if (allLvnzyProjects) {
+          setLvnzyProjects(allLvnzyProjects);
         }
+        setProjectsLoadng(false);
       } else {
-        if (!user.savedLvnzyProjects || user.savedLvnzyProjects.length === 0) {
-          setLvnzyProjects([]);
+        // Existing logic for regular users
+        if (collectionId) {
+          const collection =
+            user.savedLvnzyProjects.find(
+              (c: SavedLvnzyProject) => c._id === collectionId
+            ) || null;
+          if (collection && collection.projects) {
+            setLvnzyProjects(collection.projects);
+          }
         } else {
-          setLvnzyProjects(user.savedLvnzyProjects[0].projects);
+          if (
+            !user.savedLvnzyProjects ||
+            user.savedLvnzyProjects.length === 0
+          ) {
+            setLvnzyProjects([]);
+          } else {
+            setLvnzyProjects(user.savedLvnzyProjects[0].projects);
+          }
         }
+        setProjectsLoadng(false);
       }
-      setProjectsLoadng(false);
     }
-  }, [collectionId, user]);
+  }, [collectionId, user, allLvnzyProjects]);
 
-  if (userLoading || projectsLoading) {
+  if (userLoading || projectsLoading || (isAdmin && adminProjectsLoading)) {
     return <Loader></Loader>;
   }
 

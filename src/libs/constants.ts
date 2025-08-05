@@ -7,6 +7,7 @@ export const queryKeys = {
   getProjectById: "getProjectById",
   getLvnzyProjectById: "getLvnzyProjectById",
   getLvnzyProjectsByIds: "getLvnzyProjectsByIds",
+  getAllLvnzyProjects: "getAllLvnzyProjects",
   projectsMapView: "projectsMapView",
   getAllPlaces: "getAllPlaces",
   getAllCorridors: "getAllCorridors",

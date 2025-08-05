@@ -52,7 +52,7 @@ export function UserProjects({
     const primaryCorridor = itemInfo.meta.projectCorridors.sort(
       (a: any, b: any) => a.approxDistanceInKms - b.approxDistanceInKms
     )[0].corridorName;
-    let pmtPlan = fetchPmtPlan(itemInfo.originalProjectId.info.financialPlan);
+    let pmtPlan = fetchPmtPlan(itemInfo.originalProjectId?.info?.financialPlan);
     return (
       <Flex
         style={{
