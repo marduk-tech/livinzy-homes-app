@@ -15,7 +15,12 @@ export const ProjectGalleryV2 = ({
 
   const allTags = useMemo(() => {
     const tags = new Set<string>();
-    const hasVideos = media.some((item) => item.type === "video" && item.video);
+    const hasVideos = media.some(
+      (item) =>
+        item.type === "video" &&
+        item.video &&
+        (item.video.youtubeUrl || item.video.bunnyLibraryId)
+    );
 
     media.forEach((item) => {
       // Extract tags from images
@@ -51,6 +56,7 @@ export const ProjectGalleryV2 = ({
       (item) =>
         item.type === "video" &&
         item.video &&
+        (item.video.youtubeUrl || item.video.bunnyLibraryId) &&
         (!item.video.tags || !item.video.tags.includes("na"))
     );
     const imageMedia = media.filter(
