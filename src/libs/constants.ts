@@ -320,7 +320,7 @@ export const Brick360DataPoints = {
     },
     timeCommitment: {
       label: "Time Committment",
-      prompts: ["Most delayed project", "Projects with no extension"],
+      prompts: ["Delayed projects", ""],
     },
     customerSatisfaction: {
       label: "Customer Satisfaction",
@@ -334,7 +334,7 @@ export const Brick360DataPoints = {
     },
     rentalIncome: {
       label: "Rental Income",
-      prompts: ["Highest rental nearby", "List 1BHK rentals"],
+      prompts: ["Highest rental nearby", "Rental price distribution"],
     },
     growthPotential: { label: "Growth Potential" },
   },
