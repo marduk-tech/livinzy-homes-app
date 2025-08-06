@@ -322,7 +322,8 @@ export const NewReportRequestFormV2 = () => {
                   <Typography.Text
                     style={{ fontSize: FONT_SIZE.HEADING_4, marginBottom: 24 }}
                   >
-                    You can request report for upto {reportsLeft} projects.
+                    You can request report for upto {reportsLeft} projects. It
+                    will be shared within 24-48 hrs.
                   </Typography.Text>
                 )}
 
@@ -481,8 +482,8 @@ export const NewReportRequestFormV2 = () => {
                 </Typography.Text>
                 <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_4 }}>
                   Our team including our swarm of AI agents are already
-                  processesing your request. <br></br>Please give us max 24
-                  hours to get back to you with a detailed report.
+                  processesing your request. <br></br>Please give us max 24-48
+                  hrs hours to get back to you with a detailed report.
                 </Typography.Text>
                 <Typography.Text
                   style={{
