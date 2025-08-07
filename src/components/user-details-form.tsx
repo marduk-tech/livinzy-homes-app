@@ -126,7 +126,7 @@ export function UserDetailsForm({
 
         {!ignoreSource && (
           <Form.Item
-            label="How did you get to know about Livinzy?"
+            label="How did you get to know about Brickfi?"
             name="source"
             style={{ marginBottom: 0, marginTop: 20 }}
           >

@@ -30,12 +30,18 @@ export function Brick360v2() {
     expandChat: () => void;
   } | null>(null);
 
+  const { data: lvnzyProject, isLoading: lvnzyProjectIsLoading } =
+    useFetchLvnzyProjectById(lvnzyProjectId!);
+
   const scoreParamTourRef = useRef(null);
   const pmtPlanTourRef = useRef(null);
 
   const [tourSteps, setTourSteps] = useState<TourProps["steps"]>([]);
 
   useEffect(() => {
+    if (!lvnzyProject) {
+      return;
+    }
     const tempTourSteps: TourProps["steps"] = [];
     tempTourSteps?.push({
       title: (
@@ -67,7 +73,10 @@ export function Brick360v2() {
       type: "default",
       target: () => scoreParamTourRef.current,
     });
-    if (!!pmtPlanTourRef) {
+    if (
+      !!pmtPlanTourRef &&
+      !!lvnzyProject.originalProjectId?.info?.financialPlan
+    ) {
       tempTourSteps?.push({
         title: (
           <Typography.Text
@@ -100,19 +109,16 @@ export function Brick360v2() {
       });
     }
     setTourSteps(tempTourSteps);
-  }, []);
+  }, [lvnzyProject]);
   const [tourOpen, setTourOpen] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem(LocalStorageKeys.tour) !== "tour-done") {
       setTimeout(() => {
         setTourOpen(true);
-      }, 1000);
+      }, 2000);
     }
   });
-
-  const { data: lvnzyProject, isLoading: lvnzyProjectIsLoading } =
-    useFetchLvnzyProjectById(lvnzyProjectId!);
 
   const [scoreParams, setScoreParams] = useState<any[]>([]);
 

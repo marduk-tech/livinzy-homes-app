@@ -236,21 +236,23 @@ export const DashboardLayout: React.FC = () => {
               </Flex>
             </Flex>
           </Drawer>
-          <Content
-            style={{
-              margin: "auto",
-              backgroundColor: "#FFF",
-              maxWidth: MAX_WIDTH,
-              width: "100%",
-              height: "calc(100vh - 100px)",
-              overflowY: "scroll",
-              scrollbarWidth: "none",
-            }}
-          >
-            <CustomErrorBoundary>
-              <Outlet></Outlet>
-            </CustomErrorBoundary>
-          </Content>
+          {loginModalOpen || showUserDetailsForm ? null : (
+            <Content
+              style={{
+                margin: "auto",
+                backgroundColor: "#FFF",
+                maxWidth: MAX_WIDTH,
+                width: "100%",
+                height: "calc(100vh - 100px)",
+                overflowY: "scroll",
+                scrollbarWidth: "none",
+              }}
+            >
+              <CustomErrorBoundary>
+                <Outlet></Outlet>
+              </CustomErrorBoundary>
+            </Content>
+          )}
         </Layout>
       </Layout>
     </>

@@ -48,6 +48,7 @@ import { CorridorMarkerIcon } from "./corridor-marker-icon";
 import { LocalityMarkerIcon } from "./locality-marker-icon";
 import { MapPolygons } from "./map-polygons";
 import { FlickerPolyline } from "./shapes/flicker-polyline";
+import { useDevice } from "../../hooks/use-device";
 
 type GeoJSONCoordinate = [number, number];
 type GeoJSONLineString = GeoJSONCoordinate[];
@@ -409,6 +410,7 @@ const MapViewV2 = ({
     DRIVER_CATEGORIES.workplace.drivers
   );
 
+  const { isMobile } = useDevice();
   const [uniqueSurroundingElements, setUniqueSurroundingElements] = useState<
     string[]
   >([]);
@@ -1624,71 +1626,76 @@ const MapViewV2 = ({
         position: "relative",
       }}
     >
-      {/* Category selection dropdown - only show when from tab */}
-      {isFromTab && !infoModalOpen && (
-        <Flex
-          style={{
-            position: "absolute",
-            top: 16,
-            left: 16,
-            zIndex: 1000,
-            backgroundColor: "white",
-            borderRadius: 8,
-            padding: 8,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-          }}
-        >
-          <Select
-            mode="multiple"
-            value={selectedCategories}
-            onChange={(values: DriverCategoryKey[]) => {
-              // 2 selections max
-              if (values.length <= 2) {
-                setSelectedCategories(values);
-              }
+      <Flex
+        style={{
+          position: "absolute",
+          zIndex: 9999,
+          bottom:
+            surroundingElements &&
+            surroundingElements.length &&
+            selectedCategories.includes("surroundings")
+              ? 72
+              : 32,
+          paddingLeft: 8,
+          width: "100%",
+        }}
+        align={isMobile ? "flex-start" : "center"}
+        gap={8}
+        vertical={isMobile}
+      >
+        {/* Category selection dropdown - only show when from tab */}
+        {isFromTab && !infoModalOpen && (
+          <Flex
+            style={{
+              zIndex: 1000,
+              backgroundColor: "white",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
             }}
-            style={{ width: 250 }}
-            placeholder="Choose a parameter"
-            maxTagCount={2}
-            options={Object.keys(DRIVER_CATEGORIES).map((key) => ({
-              label: capitalize(key),
-              value: key as DriverCategoryKey,
-            }))}
-          />
-        </Flex>
-      )}
-      {/* Drivers filters */}
-      {drivers &&
-      drivers.length &&
-      uniqueDriverTypes.length > 1 &&
-      (!surroundingElements?.length ||
-        selectedCategories.some((cat) => cat !== "surroundings")) ? (
-        <Flex
-          style={{
-            width: "100%",
-            overflowX: "scroll",
-            scrollbarWidth: "none",
-            height: 32,
-            position: "absolute",
-            zIndex: 9999,
-            bottom:
-              surroundingElements &&
-              surroundingElements.length &&
-              selectedCategories.includes("surroundings")
-                ? 72
-                : 32,
-            paddingLeft: 8,
-          }}
-        >
-          {(uniqueDriverTypes || [])
-            .filter(
-              (d) => !!d && (!isFromTab || allowedDriverTypes.includes(d))
-            )
-            .map((k: string) => {
-              return renderDriverTypesTag(k);
-            })}
-        </Flex>
-      ) : null}
+          >
+            <Select
+              mode="multiple"
+              value={selectedCategories}
+              onChange={(values: DriverCategoryKey[]) => {
+                // 2 selections max
+                if (values.length <= 2) {
+                  setSelectedCategories(values);
+                }
+              }}
+              style={{ width: 275, borderRadius: 16 }}
+              placeholder="Choose a parameter"
+              maxTagCount={2}
+              options={Object.keys(DRIVER_CATEGORIES).map((key) => ({
+                label: capitalize(key),
+                value: key as DriverCategoryKey,
+              }))}
+            />
+          </Flex>
+        )}
+        {/* Drivers filters */}
+        {drivers &&
+        drivers.length &&
+        uniqueDriverTypes.length > 1 &&
+        (!surroundingElements?.length ||
+          selectedCategories.some((cat) => cat !== "surroundings")) ? (
+          <Flex
+            style={{
+              width: "100%",
+              overflowX: "scroll",
+              scrollbarWidth: "none",
+              height: 32,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {(uniqueDriverTypes || [])
+              .filter(
+                (d) => !!d && (!isFromTab || allowedDriverTypes.includes(d))
+              )
+              .map((k: string) => {
+                return renderDriverTypesTag(k);
+              })}
+          </Flex>
+        ) : null}
+      </Flex>
 
       {/* Surrounding Elements Filters */}
       {surroundingElements &&
@@ -1722,11 +1729,11 @@ const MapViewV2 = ({
         <MapContainer
           key={`map-v2`}
           center={[12.969999, 77.587841]}
-          zoom={12}
+          zoom={16}
           minZoom={minMapZoom || 12}
           maxZoom={19}
           style={{ height: "100%", width: "100%" }}
-          zoomControl={false}
+          zoomControl={true}
         >
           <MapResizeHandler />
           <MapCenterHandler projectData={primaryProject} projects={projects} />

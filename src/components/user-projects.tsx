@@ -137,18 +137,20 @@ export function UserProjects({
                   iconName="RiDiscountPercentFill"
                   iconSet="ri"
                   size={18}
-                  color={COLORS.textColorDark}
+                  color={COLORS.primaryColor}
                 ></DynamicReactIcon>
                 <Typography.Text
                   style={{
-                    fontSize: FONT_SIZE.PARA,
-                    color: COLORS.textColorDark,
+                    fontSize: FONT_SIZE.HEADING_4,
+                    color: COLORS.primaryColor,
                   }}
                 >
                   {pmtPlan}
                 </Typography.Text>{" "}
               </Flex>
-            ) : null}
+            ) : (
+              <Typography.Text>&nbsp;</Typography.Text>
+            )}
             <Flex
               style={{
                 paddingTop: 8,
