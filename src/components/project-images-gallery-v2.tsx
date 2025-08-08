@@ -41,11 +41,26 @@ export const ProjectGalleryV2 = ({
       }
     });
 
+    // fixed order for tags
+    const fixedOrder = [
+      "exterior",
+      "layout",
+      "amenities",
+      "floorplan",
+      "house",
+      "construction",
+    ];
+
     const tagArray = ["all"];
     if (hasVideos) {
       tagArray.push("Videos");
     }
-    tagArray.push(...Array.from(tags));
+
+    fixedOrder.forEach((tag) => {
+      if (tags.has(tag)) {
+        tagArray.push(tag);
+      }
+    });
 
     return tagArray;
   }, [media]);
@@ -108,16 +123,22 @@ export const ProjectGalleryV2 = ({
   const filteredImages = useMemo((): [string, IMedia[]][] => {
     if (selectedTag === "all") {
       const result = Object.entries(groupedImages);
-      
+
       // Add media without tags to the result when "all" is selected
       const mediaWithoutTags = media.filter((item) => {
-        const tags = item.type === "image" ? item.image?.tags : item.video?.tags;
-        return (!tags || tags.length === 0 || (tags.length === 1 && tags[0] === "na")) &&
-               ((item.type === "image" && item.image) || 
-                (item.type === "video" && item.video && 
-                 (item.video.youtubeUrl || item.video.bunnyLibraryId)));
+        const tags =
+          item.type === "image" ? item.image?.tags : item.video?.tags;
+        return (
+          (!tags ||
+            tags.length === 0 ||
+            (tags.length === 1 && tags[0] === "na")) &&
+          ((item.type === "image" && item.image) ||
+            (item.type === "video" &&
+              item.video &&
+              (item.video.youtubeUrl || item.video.bunnyLibraryId)))
+        );
       });
-      
+
       if (mediaWithoutTags.length > 0 && result.length > 0) {
         // Add untagged media to the first existing category
         result[0][1] = [...result[0][1], ...mediaWithoutTags];
@@ -125,7 +146,7 @@ export const ProjectGalleryV2 = ({
         // If no other categories exist, create a general category
         result.push(["Media", mediaWithoutTags]);
       }
-      
+
       return result;
     }
     if (selectedTag === "Videos") {
