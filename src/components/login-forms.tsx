@@ -1,4 +1,4 @@
-import { Button, Flex, Form, Input, message, Typography } from "antd";
+import { Button, Flex, Form, Input, Typography } from "antd";
 import PhoneInput from "antd-phone-input";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
@@ -14,6 +14,10 @@ export function LoginForm() {
     setLoginStatus,
   } = useAuth();
   const [resendTimer, setResendTimer] = useState(45);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackType, setFeedbackType] = useState<
+    "error" | "success" | "info"
+  >("info");
 
   const [form] = Form.useForm();
 
@@ -50,7 +54,8 @@ export function LoginForm() {
         countryCode: countryCode,
       });
 
-      message.success("OTP sent");
+      setFeedbackText("OTP sent. Please verify.");
+      setFeedbackType("success");
       setLoginStatus("OTP_SENT");
       setResendTimer(45);
     } catch (error: any) {
@@ -60,10 +65,11 @@ export function LoginForm() {
         error.response.data &&
         error.response.data.message
       ) {
-        message.error(error.response.data.message);
+        setFeedbackText(error.response.data.message);
       } else {
-        message.error("Failed to send OTP. Please try again.");
+        setFeedbackText("Failed to send OTP. Please try again.");
       }
+      setFeedbackType("error");
     }
   };
 
@@ -79,11 +85,16 @@ export function LoginForm() {
       countryCode = values.mobileNumber.countryCode;
     }
 
+    setFeedbackText("Sending OTP. Please wait..");
+    setFeedbackType("info");
     generateOtp({ mobile: phoneNumber, countryCode: `${countryCode}` });
   };
 
   const handleLogin = async () => {
     const values = await form.validateFields();
+
+    setFeedbackText("Verifying OTP. Please wait..");
+    setFeedbackType("info");
 
     try {
       await loginMutation
@@ -97,7 +108,8 @@ export function LoginForm() {
           }
         });
     } catch (error) {
-      message.error("Invalid OTP. Please try again.");
+      setFeedbackText("Incorrect OTP. Please try again");
+      setFeedbackType("error");
       form.resetFields(["otp"]);
     }
   };
@@ -203,6 +215,7 @@ By signing up, you agree to the terms & conditions.
                         onClick={() => {
                           setLoginStatus("EDIT_MOBILE");
                           form.resetFields(["otp"]);
+                          setFeedbackText("");
                         }}
                       >
                         Edit number
@@ -251,6 +264,8 @@ By signing up, you agree to the terms & conditions.
                               mobile.areaCode +
                               mobile.phoneNumber;
 
+                            setFeedbackText("Sending OTP. Please wait..");
+                            setFeedbackType("info");
                             generateOtp({
                               mobile: phoneNumber,
                               countryCode: `${mobile.countryCode}`,
@@ -284,6 +299,23 @@ By signing up, you agree to the terms & conditions.
               >
                 {loginStatus === "OTP_SENT" ? "Verify OTP" : "Send OTP"}
               </Button>
+              {feedbackText && (
+                <Typography.Text
+                  style={{
+                    display: "block",
+                    marginTop: 8,
+                    fontSize: FONT_SIZE.PARA,
+                    color:
+                      feedbackType === "error"
+                        ? COLORS.redIdentifier
+                        : feedbackType === "success"
+                        ? COLORS.greenIdentifier
+                        : COLORS.textColorMedium,
+                  }}
+                >
+                  {feedbackText}
+                </Typography.Text>
+              )}
             </Form.Item>
           </Form>
         </Flex>
