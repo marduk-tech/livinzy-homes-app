@@ -303,8 +303,8 @@ By signing up, you agree to the terms & conditions.
                 <Typography.Text
                   style={{
                     display: "block",
-                    marginTop: 8,
-                    fontSize: FONT_SIZE.PARA,
+                    marginTop: 16,
+                    fontSize: FONT_SIZE.HEADING_3,
                     color:
                       feedbackType === "error"
                         ? COLORS.redIdentifier

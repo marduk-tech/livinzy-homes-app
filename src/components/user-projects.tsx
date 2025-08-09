@@ -118,8 +118,10 @@ export function UserProjects({
               }}
             >
               {capitalize(itemInfo.meta.projectUnitTypes.split(",")[0])} · ₹
-              {rupeeAmountFormat(itemInfo.meta.costingDetails.minimumUnitCost)}-
-              {itemInfo.meta.costingDetails.minimumUnitSize}sq.ft ·{" "}
+              {rupeeAmountFormat(
+                itemInfo?.originalProjectId.info.rate.minimumUnitCost
+              )}
+              -{itemInfo?.originalProjectId.info.rate.minimumUnitSize}sq.ft ·{" "}
               {primaryCorridor}
             </Paragraph>
 

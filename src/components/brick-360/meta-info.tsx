@@ -53,11 +53,11 @@ const MetaInfo = forwardRef<any, MetaInfoProps>(({ lvnzyProject }, ref) => {
             }}
           >
             {rupeeAmountFormat(
-              lvnzyProject?.meta.costingDetails.minimumUnitCost
+              lvnzyProject?.originalProjectId.info.rate.minimumUnitCost
             )}{" "}
             ·{" "}
             {rupeeAmountFormat(
-              lvnzyProject?.meta.costingDetails.minimumUnitSize
+              lvnzyProject?.originalProjectId.info.rate.minimumUnitSize
             )}
             sqft
           </Typography.Text>
@@ -126,7 +126,8 @@ const MetaInfo = forwardRef<any, MetaInfoProps>(({ lvnzyProject }, ref) => {
           }}
         >
           <Markdown remarkPlugins={[remarkGfm]} className="liviq-content">
-            {lvnzyProject.originalProjectId?.info?.financialPlan || 'No financial plan available'}
+            {lvnzyProject.originalProjectId?.info?.financialPlan ||
+              "No financial plan available"}
           </Markdown>
         </Flex>
       </Modal>

@@ -142,6 +142,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
               case "schoolsOffices":
                 driverTypes = [
                   "school",
+                  "university",
                   "industrial-hitech",
                   "industrial-general",
                 ];

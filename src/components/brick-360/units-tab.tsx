@@ -85,14 +85,16 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                 ₹
                 {rupeeAmountFormat(
                   `${Math.round(
-                    lvnzyProject?.meta.costingDetails.minimumUnitCost /
-                      lvnzyProject?.meta.costingDetails.minimumUnitSize
+                    lvnzyProject?.originalProjectId.info.rate.minimumUnitCost /
+                      lvnzyProject?.originalProjectId.info.rate.minimumUnitSize
                   )}`
                 )}{" "}
                 per sq.ft ·
               </Typography.Text>
             )}{" "}
-            {getMinMaxSize(lvnzyProject?.meta.costingDetails.configurations)}
+            {getMinMaxSize(
+              lvnzyProject?.originalProjectId.info.unitConfigWithPricing
+            )}
           </Flex>
           <Flex>
             {lvnzyProject?.property.layout.totalUnits && (
@@ -111,7 +113,7 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
               </Typography.Text>
             )}{" "}
             ·
-            {lvnzyProject?.meta.projectConfigurations &&
+            {lvnzyProject?.originalProjectId.info.unitConfigWithPricing &&
             lvnzyProject!.meta.projectConfigurations.unitsBreakup
               ? getTotalFloors(lvnzyProject)
               : null}
@@ -156,7 +158,7 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
           ) : null}
 
           <Flex vertical gap={8}>
-            {lvnzyProject!.meta.costingDetails.configurations.map(
+            {lvnzyProject?.originalProjectId.info.unitConfigWithPricing.map(
               (c: any, index: number) => {
                 return (
                   <Flex
@@ -178,7 +180,7 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                       {c.config}
                     </Typography.Text>
                     <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
-                      ₹{rupeeAmountFormat(c.cost)}
+                      ₹{rupeeAmountFormat(c.price)}
                     </Typography.Text>
                     {c.floorplans && c.floorplans.length > 0 && (
                       <Flex
