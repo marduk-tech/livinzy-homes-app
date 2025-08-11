@@ -45,7 +45,6 @@ import DynamicReactIcon, {
   dynamicImportMap,
 } from "../common/dynamic-react-icon";
 import useStore from "../metro-mapper/store";
-import { CorridorMarkerIcon } from "./corridor-marker-icon";
 import { LocalityMarkerIcon } from "./locality-marker-icon";
 import { MapPolygons } from "./map-polygons";
 import { FlickerPolyline } from "./shapes/flicker-polyline";
@@ -101,7 +100,13 @@ async function getIcon(
   toBounce?: boolean,
   text?: string,
   driver?: IDriverPlace,
-  style?: { iconColor?: string; iconBgColor?: string; iconSize?: number }
+  style?: {
+    iconColor?: string;
+    iconBgColor?: string;
+    iconSize?: number;
+    borderColor?: string;
+    containerWidth?: number;
+  }
 ) {
   let IconComp = null;
   if (!dynamicImportMap[iconSet]) {
@@ -127,13 +132,23 @@ async function getIcon(
     <div
       style={{
         backgroundColor: style?.iconBgColor || "white",
-        borderRadius: text ? "24px" : "50%",
+        borderRadius: style?.containerWidth
+          ? style.containerWidth / 10
+          : text
+          ? "24px"
+          : "50%",
         padding: text ? 2 : 0,
         height: text ? "auto" : (style?.iconSize || 20) * 1.4,
-        width: text ? 80 : (style?.iconSize || 20) * 1.4,
+        width: style?.containerWidth
+          ? style.containerWidth
+          : text
+          ? 80
+          : (style?.iconSize || 20) * 1.4,
         display: "flex",
         alignItems: "center",
-        borderColor: isUnderConstruction
+        borderColor: style?.borderColor
+          ? style.borderColor
+          : isUnderConstruction
           ? COLORS.yellowIdentifier
           : COLORS.borderColorDark,
         borderStyle: isUnderConstruction ? "dashed" : "solid",
@@ -419,9 +434,9 @@ const MapViewV2 = ({
 
   const { isMobile } = useDevice();
   const [uniqueSurroundingElements, setUniqueSurroundingElements] = useState<
-    string[]
+    ISurroundingElement[]
   >([]);
-  const [selectedSurroundingElement, setSelectedSurroundingElement] =
+  const [selectedSurroundingElementType, setSelectedSurroundingElementType] =
     useState<string>();
 
   const [modalContent, setModalContent] = useState<{
@@ -548,12 +563,12 @@ const MapViewV2 = ({
 
   // Setting the unique surrounding elements for filters
   useEffect(() => {
-    const uniqueElements: string[] = [];
+    const uniqueElements: ISurroundingElement[] = [];
 
-    async function setElementIcons(elements: string[]) {
+    async function setElementIcons(elements: ISurroundingElement[]) {
       const elementIcons = [];
       for (const element of elements) {
-        const icon = (SurroundingElementLabels as any)[element].icon;
+        const icon = (SurroundingElementLabels as any)[element.type].icon;
         const elementIcon = await getIcon(
           icon.name,
           icon.set,
@@ -563,23 +578,26 @@ const MapViewV2 = ({
           {
             iconSize: 16,
             iconBgColor: "white",
-            iconColor: COLORS.primaryColor,
+            iconColor:
+              element.impact > 0
+                ? COLORS.greenIdentifier
+                : COLORS.redIdentifier,
           }
         );
-        elementIcons.push({ type: element, icon: elementIcon });
+        elementIcons.push({ type: element.type, icon: elementIcon });
       }
       setSurroundingElementIcons(elementIcons);
     }
 
     if (surroundingElements && surroundingElements.length) {
       surroundingElements.forEach((e: ISurroundingElement) => {
-        if (!uniqueElements.includes(e.type)) {
-          uniqueElements.push(e.type);
+        if (!uniqueElements.map((ue) => ue.type).includes(e.type)) {
+          uniqueElements.push(e);
         }
       });
       setUniqueSurroundingElements(uniqueElements);
       if (uniqueElements.length == 1) {
-        setSelectedSurroundingElement(uniqueElements[0]);
+        setSelectedSurroundingElementType(uniqueElements[0].type);
       }
       setElementIcons(uniqueElements);
     }
@@ -594,12 +612,14 @@ const MapViewV2 = ({
         true,
         projectsNearby && projectsNearby.length
           ? `₹${rupeeAmountFormat(`${projectSqftPricing}`)} /sqft`
-          : undefined,
+          : primaryProject?.info.name.substring(0, 30),
         undefined,
         {
-          iconBgColor: COLORS.textColorDark,
+          iconBgColor: COLORS.primaryColor,
           iconColor: "white",
-          iconSize: projectsNearby && projectsNearby.length ? 18 : 24,
+          borderColor: "white",
+          containerWidth: projectsNearby && projectsNearby.length ? 80 : 135,
+          iconSize: projectsNearby && projectsNearby.length ? 18 : 16,
         }
       );
       setCurrentProjectMarkerIcon(currentProjectIcon);
@@ -613,6 +633,7 @@ const MapViewV2 = ({
           iconBgColor: "white",
           iconColor: COLORS.textColorDark,
           iconSize: 24,
+          borderColor: COLORS.primaryColor,
         }
       );
       setProjectMarkerIcon(projectIcon);
@@ -646,7 +667,7 @@ const MapViewV2 = ({
       setRoadIcon(roadIcon);
     }
     updateProjectIcons();
-  }, []);
+  }, [primaryProject]);
 
   // Settings icons for nearby projects
   useEffect(() => {
@@ -732,46 +753,68 @@ const MapViewV2 = ({
       });
   };
 
-  const renderCorridors = () => {
+  const CorridorsComponent = () => {
     if (!corridors) {
       return null;
     }
-    const CorridorIcon = L.divIcon({
-      className: "", // prevent default icon styles
-      html: renderToString(<CorridorMarkerIcon />),
-      iconSize: [100, 100],
-      iconAnchor: [50, 50],
-    });
-    return corridors!.map((c) => {
-      return (
-        <React.Fragment key={`corridor-${c._id}`}>
-          <Marker
-            key={`rpple-${c._id}`}
-            icon={CorridorIcon}
-            position={[c.location.lat, c.location.lng]}
-            eventHandlers={{
-              click: () => {
-                setModalContent({
-                  title: c.name,
-                  content: c.description || "",
-                  tags: [
-                    { label: "Growth corridor", color: COLORS.textColorDark },
-                  ],
-                });
-                setInfoModalOpen(true);
-              },
-            }}
-          />
-        </React.Fragment>
-      );
-    });
+
+    const [corridorsElements, setCorridorElements] = useState();
+
+    useEffect(() => {
+      const loadIcons = async () => {
+        const elements = await Promise.all(
+          corridors.map(async (c) => {
+            const CorridorIcon = await getIcon(
+              "LuMilestone",
+              "lu",
+              false,
+              c.name,
+              undefined,
+              {
+                iconColor: "white",
+                iconBgColor: COLORS.textColorDark,
+                containerWidth: 125,
+              }
+            );
+
+            return (
+              <React.Fragment key={`corridor-${c._id}`}>
+                <Marker
+                  icon={CorridorIcon!}
+                  zIndexOffset={100}
+                  position={[c.location.lat, c.location.lng]}
+                  eventHandlers={{
+                    click: () => {
+                      setModalContent({
+                        title: c.name,
+                        content: c.description || "",
+                        tags: [
+                          {
+                            label: "Growth corridor",
+                            color: COLORS.textColorDark,
+                          },
+                        ],
+                      });
+                      setInfoModalOpen(true);
+                    },
+                  }}
+                />
+              </React.Fragment>
+            );
+          })
+        );
+
+        setCorridorElements(elements as any); // now it's JSX[], not Promise[]
+      };
+
+      loadIcons();
+    }, [corridors]);
+
+    return corridorsElements || null;
   };
 
-  /**
-   * Renders the surrounding elements
-   * @returns
-   */
-  const renderSurroundings = () => {
+  const SurroundingsComponent = () => {
+    const map = useMap();
     if (
       !surroundingElements ||
       !surroundingElements.length ||
@@ -779,12 +822,21 @@ const MapViewV2 = ({
       !surroundingElementIcons.length ||
       (isFromTab && currentSelectedCategory !== "surroundings")
     ) {
+      map.setZoom(12, {
+        animate: true,
+      });
       return null;
     }
+
+    map.setZoom(15, {
+      animate: true,
+    });
+
     return surroundingElements
       ?.filter(
         (e: ISurroundingElement) =>
-          !selectedSurroundingElement || e.type == selectedSurroundingElement
+          !selectedSurroundingElementType ||
+          e.type == selectedSurroundingElementType
       )
       .map((element: ISurroundingElement, index: number) => {
         let plygn;
@@ -850,7 +902,10 @@ const MapViewV2 = ({
               key={index}
               positions={positions}
               pathOptions={{
-                color: COLORS.primaryColor,
+                color:
+                  element.impact > 0
+                    ? COLORS.greenIdentifier
+                    : COLORS.redIdentifier,
                 weight: 8,
                 opacity: 0.8,
               }}
@@ -1293,7 +1348,7 @@ const MapViewV2 = ({
       };
 
       updateIcons();
-    }, [drivers, showDuration, simpleDriverMarkerIcons, drivers]);
+    }, [drivers, showDuration, simpleDriverMarkerIcons]);
 
     if (
       !drivers?.length ||
@@ -1574,14 +1629,14 @@ const MapViewV2 = ({
           borderRadius: 16,
           padding: "4px 8px",
           backgroundColor:
-            k == selectedSurroundingElement ? COLORS.primaryColor : "white",
-          color: k == selectedSurroundingElement ? "white" : "initial",
+            k == selectedSurroundingElementType ? COLORS.primaryColor : "white",
+          color: k == selectedSurroundingElementType ? "white" : "initial",
           marginLeft: 4,
           fontSize: FONT_SIZE.HEADING_3,
           cursor: "pointer",
         }}
         onClick={() => {
-          setSelectedSurroundingElement(k);
+          setSelectedSurroundingElementType(k);
         }}
       >
         <DynamicReactIcon
@@ -1589,13 +1644,15 @@ const MapViewV2 = ({
           iconSet={icon.set}
           size={20}
           color={
-            k == selectedSurroundingElement ? "white" : COLORS.textColorDark
+            k == selectedSurroundingElementType ? "white" : COLORS.textColorDark
           }
         ></DynamicReactIcon>
         <Typography.Text
           style={{
             color:
-              k == selectedSurroundingElement ? "white" : COLORS.textColorDark,
+              k == selectedSurroundingElementType
+                ? "white"
+                : COLORS.textColorDark,
             marginLeft: 4,
             fontSize: FONT_SIZE.SUB_TEXT,
           }}
@@ -1699,8 +1756,8 @@ const MapViewV2 = ({
             paddingLeft: 8,
           }}
         >
-          {uniqueSurroundingElements.map((k: string) => {
-            return renderSurroundingElementTypes(k);
+          {uniqueSurroundingElements.map((k: ISurroundingElement) => {
+            return renderSurroundingElementTypes(k.type);
           })}
         </Flex>
       ) : null}
@@ -1743,9 +1800,10 @@ const MapViewV2 = ({
                 <MapPolygons polygons={projectPolygons} />
 
                 {renderProjectMarkers()}
-                {/* {showCorridors && renderCorridors()} */}
                 {showLocalities && localities ? renderLocalities() : null}
-                {renderSurroundings()}
+                {/* {renderSurroundings()} */}
+                {showCorridors && <CorridorsComponent></CorridorsComponent>}
+                <SurroundingsComponent></SurroundingsComponent>
                 <MicroMarketDriversComponent></MicroMarketDriversComponent>
                 {projectsNearby?.length && projectsNearbyIcons?.length
                   ? renderProjectsNearby()

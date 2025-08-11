@@ -167,6 +167,7 @@ export interface ISurroundingElement {
   type: string;
   description: string;
   geometry: any;
+  impact: number;
 }
 
 export interface IDriverPlace {
