@@ -442,6 +442,7 @@ const MapViewV2 = ({
   const [modalContent, setModalContent] = useState<{
     title: string;
     tags?: { label: string; color: string }[];
+    titleIcon?: ReactNode;
     content: string;
     subHeading?: ReactNode;
     footerContent?: ReactNode;
@@ -771,8 +772,9 @@ const MapViewV2 = ({
               c.name,
               undefined,
               {
-                iconColor: "white",
-                iconBgColor: COLORS.textColorDark,
+                iconColor: COLORS.textColorDark,
+                borderColor: COLORS.textColorMedium,
+                iconBgColor: COLORS.bgColorMedium,
                 containerWidth: 125,
               }
             );
@@ -788,6 +790,14 @@ const MapViewV2 = ({
                       setModalContent({
                         title: c.name,
                         content: c.description || "",
+                        titleIcon: (
+                          <DynamicReactIcon
+                            iconName="LuMilestone"
+                            iconSet="lu"
+                            size={20}
+                            color={COLORS.textColorDark}
+                          ></DynamicReactIcon>
+                        ),
                         tags: [
                           {
                             label: "Growth corridor",
@@ -1460,6 +1470,7 @@ const MapViewV2 = ({
             primaryProject.info.location.lat,
             primaryProject.info.location.lng,
           ]}
+          zIndexOffset={501}
           icon={currentProjectMarkerIcon}
           eventHandlers={{
             click: () => {
@@ -1875,21 +1886,24 @@ const MapViewV2 = ({
               ))}
             </Flex>
           ) : null}
-          <Paragraph
-            style={{
-              fontSize: FONT_SIZE.HEADING_2,
-              fontWeight: 500,
-              marginBottom: 8,
-              marginTop: 8,
-              paddingBottom: 1,
-              minHeight: 32,
-            }}
-            ellipsis={{
-              rows: 2,
-            }}
-          >
-            {modalContent?.title}
-          </Paragraph>
+          <Flex align="center" gap={4}>
+            {modalContent?.titleIcon && modalContent.titleIcon}
+            <Paragraph
+              style={{
+                fontSize: FONT_SIZE.HEADING_2,
+                fontWeight: 500,
+                marginBottom: 8,
+                marginTop: 8,
+                paddingBottom: 1,
+                minHeight: 32,
+              }}
+              ellipsis={{
+                rows: 2,
+              }}
+            >
+              {modalContent?.title}
+            </Paragraph>
+          </Flex>
           {modalContent?.subHeading && modalContent.subHeading}
 
           {modalContent?.footerContent && modalContent.footerContent}
