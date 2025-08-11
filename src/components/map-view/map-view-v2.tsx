@@ -1470,7 +1470,7 @@ const MapViewV2 = ({
             primaryProject.info.location.lat,
             primaryProject.info.location.lng,
           ]}
-          zIndexOffset={501}
+          zIndexOffset={600}
           icon={currentProjectMarkerIcon}
           eventHandlers={{
             click: () => {
