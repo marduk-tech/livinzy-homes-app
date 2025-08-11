@@ -68,6 +68,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
 
     const [mapVisible, setMapVisible] = useState<boolean>(false);
     const [selectedDriverTypes, setSelectedDriverTypes] = useState<any>();
+  const [mapCategories, setMapCategories] = useState<string[]>([]);
 
     const [currentSessionId, setCurrentSessionId] = useState<string>(() =>
       uuidv4()
@@ -131,56 +132,50 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
         const updateMapState = () => {
           // reset states first
           setSelectedDriverTypes([]);
+          setMapCategories([]);
           setMapVisible(false);
 
           if (
             dataPointSelected.selectedDataPointCategory === "areaConnectivity"
           ) {
             setMapVisible(true);
-            let driverTypes: string[] = [];
+            let categories: string[] = [];
             switch (dataPointSelected.selectedDataPointSubCategory) {
               case "schoolsOffices":
-                driverTypes = [
-                  "school",
-                  "university",
-                  "industrial-hitech",
-                  "industrial-general",
-                ];
-                setMapDrivers(
-                  lvnzyProject.neighborhood.drivers.filter(
-                    (d: any) =>
-                      !!d &&
-                      !!d.driverId &&
-                      driverTypes.includes(d.driverId.driver)
-                  )
-                );
+                categories = ["workplace", "schools"];
+                setMapDrivers([
+                  ...lvnzyProject.neighborhood.drivers.filter(
+                    (d: any) => !!d && !!d.driverId
+                  ),
+                  ...lvnzyProject.connectivity.drivers.filter(
+                    (d: any) => !!d && !!d.driverId
+                  ),
+                ]);
                 break;
               case "conveniences":
-                driverTypes = [
-                  "food",
-                  "hospital",
-                  "commercial",
-                  "micro-market",
-                ];
-                setMapDrivers(
-                  lvnzyProject.neighborhood.drivers.filter(
-                    (d: any) =>
-                      !!d &&
-                      !!d.driverId &&
-                      driverTypes.includes(d.driverId.driver)
-                  )
-                );
+                categories = ["conveniences"];
+                setMapDrivers([
+                  ...lvnzyProject.neighborhood.drivers.filter(
+                    (d: any) => !!d && !!d.driverId
+                  ),
+                  ...lvnzyProject.connectivity.drivers.filter(
+                    (d: any) => !!d && !!d.driverId
+                  ),
+                ]);
                 break;
               case "transport":
-                driverTypes = ["transit", "highway"];
-                setMapDrivers(
-                  lvnzyProject.connectivity.drivers.filter(
+                categories = ["connectivity"];
+                setMapDrivers([
+                  ...lvnzyProject.neighborhood.drivers.filter(
                     (d: any) => !!d && !!d.driverId
-                  )
-                );
+                  ),
+                  ...lvnzyProject.connectivity.drivers.filter(
+                    (d: any) => !!d && !!d.driverId
+                  ),
+                ]);
                 break;
             }
-            setSelectedDriverTypes(driverTypes);
+            setMapCategories(categories);
           } else if (
             dataPointSelected.selectedDataPointCategory === "financials"
           ) {
@@ -189,19 +184,13 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
               "growthPotential"
             ) {
               setMapVisible(true);
-              let driverTypes = [
-                "industrial-hitech",
-                "industrial-general",
-                "highway",
-                "transit",
-                "micro-market",
-              ];
-              setSelectedDriverTypes(driverTypes);
+              setMapCategories(["growth potential"]);
               setMapDrivers([
-                ...lvnzyProject.connectivity.drivers,
+                ...lvnzyProject.connectivity.drivers.filter(
+                  (d: any) => !!d && !!d.driverId
+                ),
                 ...lvnzyProject.neighborhood.drivers.filter(
-                  (d: any) =>
-                    d && d.driverId && driverTypes.includes(d.driverId.driver)
+                  (d: any) => !!d && !!d.driverId
                 ),
               ]);
             } else if (
@@ -235,6 +224,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
         setFollowupPrompts([]);
         setSurroundingElements([]);
         setMapDrivers([]);
+        setMapCategories([]);
         setMapVisible(false);
       }
     }, [dataPointSelected]);
@@ -658,6 +648,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                               : Math.round(d.mapsDurationSeconds / 60),
                           };
                         })}
+                        categories={mapCategories}
                         fullSize={false}
                       />
                     </Flex>
@@ -883,6 +874,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                     : Math.round(d.mapsDurationSeconds / 60),
                 };
               })}
+              categories={mapCategories}
               fullSize={true}
             />
           </Flex>

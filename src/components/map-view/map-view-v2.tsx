@@ -376,6 +376,7 @@ const MapViewV2 = ({
   showCorridors = true,
   minMapZoom = 12,
   selectedCategory,
+  categories,
 }: {
   drivers?: any[];
   projectId?: string;
@@ -394,6 +395,7 @@ const MapViewV2 = ({
   showCorridors?: boolean;
   minMapZoom?: number;
   selectedCategory?: string;
+  categories?: string[];
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
@@ -456,9 +458,23 @@ const MapViewV2 = ({
   const [transitStationIcon, setTransitStationIcon] =
     useState<L.DivIcon | null>(null);
 
-  // update all allowed driver types when categories is changed (only when from tab)
+  // update all allowed driver types when categories is changed
   useEffect(() => {
-    if (isFromTab) {
+    if (categories && categories.length > 0) {
+      // categories are provided use them to determine allowed driver types
+      const allowedTypes = categories.flatMap(
+        (category) =>
+          DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]
+            ?.drivers || []
+      );
+      setAllowedDriverTypes(allowedTypes);
+
+      // reset selectedDriverType
+      if (!selectedDriverType || !allowedTypes.includes(selectedDriverType)) {
+        setSelectedDriverType(allowedTypes[0]);
+      }
+    } else if (isFromTab) {
+      // Original tab-based filtering logic
       const categoryData =
         DRIVER_CATEGORIES[
           currentSelectedCategory as keyof typeof DRIVER_CATEGORIES
@@ -471,10 +487,10 @@ const MapViewV2 = ({
         setSelectedDriverType(allowedTypes[0]);
       }
     } else {
-      // When not from tab, allow all driver types (empty array means no filtering)
+      // When not from tab and no categories, allow all driver types (empty array means no filtering)
       setAllowedDriverTypes([]);
     }
-  }, [currentSelectedCategory, selectedDriverType, isFromTab]);
+  }, [categories, currentSelectedCategory, selectedDriverType, isFromTab]);
 
   const [roadIcon, setRoadIcon] = useState<L.DivIcon | null>(null);
 
