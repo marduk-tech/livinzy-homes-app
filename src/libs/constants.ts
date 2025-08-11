@@ -1,3 +1,5 @@
+import { IDriverPlace } from "../types/Project";
+
 export const envMode = import.meta.env.VITE_ENV;
 
 export const baseApiUrl = import.meta.env.VITE_API_URL;
@@ -376,6 +378,22 @@ export const LandingConstants = {
 export const DRIVER_CATEGORIES = {
   schools: {
     drivers: ["school", "university"],
+    filters: [
+      { label: "Pre School", key: "pre-school" },
+      { label: "International", key: "international" },
+      { label: "CBSE", key: "cbse" },
+      { label: "ICSE", key: "icse" },
+    ],
+    onFilter: (filter: string, driver: IDriverPlace) => {
+      if (
+        filter == "international" &&
+        (driver.tags?.includes("ib") ||
+          driver.tags?.includes("cambridge-igcse"))
+      ) {
+        return true;
+      }
+      return false;
+    },
   },
   workplace: {
     drivers: ["industrial-hitech", "industrial-general"],
