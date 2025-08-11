@@ -383,6 +383,7 @@ export const DRIVER_CATEGORIES = {
       { label: "International", key: "international" },
       { label: "CBSE", key: "cbse" },
       { label: "ICSE", key: "icse" },
+      { label: "university", key: "university" },
     ],
     onFilter: (filter: string, driver: IDriverPlace) => {
       if (
