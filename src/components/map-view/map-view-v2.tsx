@@ -1794,7 +1794,7 @@ const MapViewV2 = ({
           {onMapReady && <MapInstanceCapture onMapReady={onMapReady} />}
           <TileLayer
             url="https://tile.jawg.io/9a737f1f-005e-423b-be7f-34aae5cf303f/{z}/{x}/{y}{r}.png?access-token=vXg5mvnWlqLoFPMM5htJQQcAKJeRjV691UPWRPir3UDzYb6o6q9aX7ymowUgB9s7"
-            attribution='https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution=""
           />
           {/* Process and render polygon data */}
           {(() => {
