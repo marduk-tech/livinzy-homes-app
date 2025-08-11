@@ -613,7 +613,9 @@ const MapViewV2 = ({
         true,
         projectsNearby && projectsNearby.length
           ? `₹${rupeeAmountFormat(`${projectSqftPricing}`)} /sqft`
-          : primaryProject?.info.name.substring(0, 30),
+          : primaryProject?.info.name.length > 20
+          ? `${primaryProject?.info.name.substring(0, 20)}..`
+          : primaryProject?.info.name,
         undefined,
         {
           iconBgColor: COLORS.primaryColor,
