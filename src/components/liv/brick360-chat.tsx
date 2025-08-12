@@ -11,6 +11,7 @@ import {
   Typography,
 } from "antd";
 import { makeStreamingJsonRequest } from "http-streaming-request";
+import { sha256 } from "js-sha256";
 import {
   forwardRef,
   useEffect,
@@ -19,19 +20,20 @@ import {
   useState,
 } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useDevice } from "../../hooks/use-device";
 import { useUser } from "../../hooks/use-user";
 import { axiosApiInstance } from "../../libs/axios-api-Instance";
-import { baseApiUrl, Brick360DataPoints, DRIVER_CATEGORIES } from "../../libs/constants";
+import {
+  baseApiUrl,
+  Brick360DataPoints,
+  DRIVER_CATEGORIES,
+} from "../../libs/constants";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
-import DynamicReactIcon from "../common/dynamic-react-icon";
-import { sha256 } from "js-sha256";
 import { LvnzyProject } from "../../types/LvnzyProject";
-import { useDevice } from "../../hooks/use-device";
-import MapViewV2 from "../map-view/map-view-v2";
 import { ISurroundingElement } from "../../types/Project";
-
-const { Paragraph } = Typography;
+import DynamicReactIcon from "../common/dynamic-react-icon";
+import MapViewV2 from "../map-view/map-view-v2";
 
 export interface AICuratedProject {
   projectId: string;
@@ -67,8 +69,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
     const [projectsNearby, setProjectsNearby] = useState<any[]>();
 
     const [mapVisible, setMapVisible] = useState<boolean>(false);
-    const [selectedDriverTypes, setSelectedDriverTypes] = useState<any>();
-  const [mapCategories, setMapCategories] = useState<string[]>([]);
+    const [mapCategories, setMapCategories] = useState<string[]>([]);
 
     const [currentSessionId, setCurrentSessionId] = useState<string>(() =>
       uuidv4()
@@ -84,9 +85,6 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
     const { user } = useUser();
 
     const [form] = Form.useForm();
-    const [previousChat, setPreviousChat] = useState<
-      Array<{ question: string; answer: any }>
-    >([]);
 
     const [currentChat, setCurrentChat] = useState<
       Array<{ question: string; answer: any }>
@@ -94,14 +92,9 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
 
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
-    const [messageApi, contextHolder] = message.useMessage();
+    const [messageApi] = message.useMessage();
 
     const { isMobile } = useDevice();
-
-    const [
-      selectedProjectPredefinedQuestion,
-      setSelectedProjectPredefinedQuestion,
-    ] = useState<string>();
 
     // Example method to expose to parent
     useImperativeHandle(ref, () => ({
@@ -131,7 +124,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
 
         const updateMapState = () => {
           // reset states first
-          setSelectedDriverTypes([]);
+          // setSelectedDriverTypes([]);
           setMapCategories([]);
           setMapVisible(false);
 
@@ -156,15 +149,22 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             // Filter mapDrivers based on categories using DRIVER_CATEGORIES
             const categoryDrivers = categories.flatMap(
               (category) =>
-                DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]?.drivers || []
+                DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]
+                  ?.drivers || []
             );
-            
+
             setMapDrivers([
               ...lvnzyProject.neighborhood.drivers.filter(
-                (d: any) => !!d && !!d.driverId && categoryDrivers.includes(d.driverId.driver)
+                (d: any) =>
+                  !!d &&
+                  !!d.driverId &&
+                  categoryDrivers.includes(d.driverId.driver)
               ),
               ...lvnzyProject.connectivity.drivers.filter(
-                (d: any) => !!d && !!d.driverId && categoryDrivers.includes(d.driverId.driver)
+                (d: any) =>
+                  !!d &&
+                  !!d.driverId &&
+                  categoryDrivers.includes(d.driverId.driver)
               ),
             ]);
           } else if (
@@ -177,19 +177,26 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
               setMapVisible(true);
               const categories = ["growth potential"];
               setMapCategories(categories);
-              
+
               // Filter mapDrivers based on categories using DRIVER_CATEGORIES
               const categoryDrivers = categories.flatMap(
                 (category) =>
-                  DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]?.drivers || []
+                  DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]
+                    ?.drivers || []
               );
-              
+
               setMapDrivers([
                 ...lvnzyProject.connectivity.drivers.filter(
-                  (d: any) => !!d && !!d.driverId && categoryDrivers.includes(d.driverId.driver)
+                  (d: any) =>
+                    !!d &&
+                    !!d.driverId &&
+                    categoryDrivers.includes(d.driverId.driver)
                 ),
                 ...lvnzyProject.neighborhood.drivers.filter(
-                  (d: any) => !!d && !!d.driverId && categoryDrivers.includes(d.driverId.driver)
+                  (d: any) =>
+                    !!d &&
+                    !!d.driverId &&
+                    categoryDrivers.includes(d.driverId.driver)
                 ),
               ]);
             } else if (
@@ -295,7 +302,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
           }
 
           // update livThread with historical messages
-          setPreviousChat(threads);
+          // setPreviousChat(threads);
         }
         setLoadingLivThread(false);
       } catch (error) {
@@ -365,7 +372,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
         });
       } finally {
         setQueryStreaming(false);
-        setSelectedProjectPredefinedQuestion(undefined);
+        // setSelectedProjectPredefinedQuestion(undefined);
       }
     };
 
@@ -440,12 +447,16 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             <>
               {" "}
               {/* Past Interactions */}
-              {currentChat.map((thread, index) =>
+              {currentChat.map((thread) =>
                 renderQABlock(thread.question, thread.answer.answer, false)
               )}
               {/* Current Question & Answer (Only show while processing) */}
               {currentQuestion &&
-                renderQABlock(currentQuestion, currentAnswer?.answer!, true)}
+                renderQABlock(
+                  currentQuestion,
+                  currentAnswer?.answer || "",
+                  true
+                )}
             </>
           ) : null}
         </Flex>
@@ -475,7 +486,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
     };
     function closeDrawer() {
       setIsDrawerExpanded(false);
-      setPreviousChat([]);
+      // setPreviousChat([]);
       setCurrentChat([]);
       setCurrentQuestion(undefined);
       setCurrentAnswer(undefined);

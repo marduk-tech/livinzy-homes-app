@@ -952,8 +952,8 @@ const MapViewV2 = ({
         const isDriverAllowed = !categories || categories.length === 0
           ? true
           : categories.some(category => {
-              const categoryDrivers = DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]?.drivers;
-              return categoryDrivers && categoryDrivers.includes(driver.driver);
+              const categoryDrivers = (DRIVER_CATEGORIES as any)[category]?.drivers || [];
+              return Array.isArray(categoryDrivers) && categoryDrivers.includes(driver.driver);
             });
         return (
           driver.driver === "highway" &&
@@ -1080,8 +1080,8 @@ const MapViewV2 = ({
         const isDriverAllowed = !categories || categories.length === 0
           ? true
           : categories.some(category => {
-              const categoryDrivers = DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]?.drivers;
-              return categoryDrivers && categoryDrivers.includes(driver.driver);
+              const categoryDrivers = (DRIVER_CATEGORIES as any)[category]?.drivers || [];
+              return Array.isArray(categoryDrivers) && categoryDrivers.includes(driver.driver);
             });
         return (
           driver.driver === "transit" &&
@@ -1222,8 +1222,8 @@ const MapViewV2 = ({
       const isDriverAllowed = !categories || categories.length === 0
         ? true
         : categories.some(category => {
-            const categoryDrivers = DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]?.drivers;
-            return categoryDrivers && categoryDrivers.includes(driver.driver);
+            const categoryDrivers = (DRIVER_CATEGORIES as any)[category]?.drivers || [];
+            return Array.isArray(categoryDrivers) && categoryDrivers.includes(driver.driver);
           });
       const isMicroMarket = driver.driver == "micro-market";
       const isTypeSelected =
@@ -1334,8 +1334,8 @@ const MapViewV2 = ({
       const isDriverAllowed = !categories || categories.length === 0
         ? true
         : categories.some(category => {
-            const categoryDrivers = DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]?.drivers;
-            return categoryDrivers && categoryDrivers.includes(driver.driver);
+            const categoryDrivers = (DRIVER_CATEGORIES as any)[category]?.drivers || [];
+            return Array.isArray(categoryDrivers) && categoryDrivers.includes(driver.driver);
           });
       return (
         isDriverAllowed &&
@@ -1714,8 +1714,8 @@ const MapViewV2 = ({
                 }
                 // If categories provided, only show drivers that match the category
                 return categories.some(category => {
-                  const categoryDrivers = DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]?.drivers;
-                  return categoryDrivers && categoryDrivers.includes(d);
+                  const categoryDrivers = (DRIVER_CATEGORIES as any)[category]?.drivers || [];
+                  return Array.isArray(categoryDrivers) && categoryDrivers.includes(d);
                 });
               })
               .map((k: string) => {
