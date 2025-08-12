@@ -21,7 +21,11 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { useUser } from "../../hooks/use-user";
 import { axiosApiInstance } from "../../libs/axios-api-Instance";
-import { baseApiUrl, Brick360DataPoints } from "../../libs/constants";
+import {
+  baseApiUrl,
+  Brick360CategoryInfo,
+  Brick360DataPoints,
+} from "../../libs/constants";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
@@ -60,6 +64,8 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
 
     const [dataPointSelected, setDataPointSelected] = useState<any>();
     const [followUpPrompts, setFollowupPrompts] = useState<string[]>();
+    const [note, setNote] = useState<string>();
+
     const [mapDrivers, setMapDrivers] = useState<any[]>([]);
     const [surroundingElements, setSurroundingElements] =
       useState<ISurroundingElement[]>();
@@ -125,6 +131,15 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
         const prompts = (Brick360DataPoints as any)[
           dataPointSelected.selectedDataPointCategory
         ][dataPointSelected.selectedDataPointSubCategory]["prompts"];
+
+        let noteForDataPt =
+          (Brick360CategoryInfo as any)[
+            dataPointSelected.selectedDataPointCategory
+          ].note ||
+          (Brick360DataPoints as any)[
+            dataPointSelected.selectedDataPointCategory
+          ][dataPointSelected.selectedDataPointSubCategory]["note"];
+        setNote(noteForDataPt);
 
         setFollowupPrompts(prompts);
         let surrElements;
@@ -655,9 +670,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                   </Flex>
                 ) : null}
 
-                {dataPointSelected &&
-                dataPointSelected.selectedDataPointCategory ==
-                  "areaConnectivity" ? (
+                {note ? (
                   <Flex
                     style={{
                       width: "100",
@@ -677,9 +690,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                       }}
                       color="warning"
                     >
-                      The data here explains the location profile in its current
-                      form. For upcoming infra/profile, refer to growth
-                      potential under financials.
+                      {note}
                     </Tag>
                   </Flex>
                 ) : null}

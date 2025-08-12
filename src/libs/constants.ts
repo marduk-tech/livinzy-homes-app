@@ -253,7 +253,13 @@ export enum BRICK360_CATEGORY {
 
 export const Brick360CategoryInfo: Record<
   BRICK360_CATEGORY,
-  { title: string; iconName: string; iconSet: string; disabled?: boolean }
+  {
+    title: string;
+    iconName: string;
+    iconSet: string;
+    disabled?: boolean;
+    note?: string;
+  }
 > = {
   property: {
     title: "Property",
@@ -264,11 +270,13 @@ export const Brick360CategoryInfo: Record<
     title: "Location",
     iconName: "BiMapPin",
     iconSet: "bi",
+    note: "Most of the data here explains the location profile in its current form. Refer growth potential for more details about upcoming infra.",
   },
   developer: {
     title: "Developer",
     iconName: "FaPeopleGroup",
     iconSet: "fa6",
+    note: "Only projects from the developer registered under RERA in the state of Karnataka are taken up for analysis.",
   },
   financials: {
     title: "Financials",
@@ -281,6 +289,7 @@ export const Brick360DataPoints = {
   property: {
     amenities: {
       label: "Amenities",
+      note: "The amenities list here are as marketed by the developer. Final list should be reviewed before final agreement.",
       prompts: [
         "Outdoor amenities",
         "Any kid specific amenities?",
@@ -333,6 +342,7 @@ export const Brick360DataPoints = {
     pricePoint: {
       label: "Price Point",
       prompts: ["Projects priced higher", "Is this price high or low?"],
+      note: "The final price may vary as per negotitation and other charges applied (usually 10-15% extra)",
     },
     rentalIncome: {
       label: "Rental Income",
