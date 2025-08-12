@@ -396,12 +396,24 @@ export const DRIVER_CATEGORIES = {
       { label: "university", key: "university" },
     ],
     onFilter: (filter: string, driver: IDriverPlace) => {
-      if (
-        filter == "international" &&
-        (driver.tags?.includes("ib") ||
-          driver.tags?.includes("cambridge-igcse"))
-      ) {
-        return true;
+      if (filter == "international") {
+        return (
+          driver.tags?.includes("ib") ||
+          driver.tags?.includes("cambridge-igcse") ||
+          false
+        );
+      }
+      if (filter == "pre-school") {
+        return driver.tags?.includes("pre-school") || false;
+      }
+      if (filter == "cbse") {
+        return driver.tags?.includes("cbse") || false;
+      }
+      if (filter == "icse") {
+        return driver.tags?.includes("icse") || false;
+      }
+      if (filter == "university") {
+        return driver.driver === "university";
       }
       return false;
     },

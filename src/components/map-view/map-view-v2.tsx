@@ -322,15 +322,15 @@ const MapResizeHandler = () => {
 const processDriversToPolygons = (
   data: any[],
   filterByDriverTypes = true,
-  selectedDriverTypes: string[] = []
+  selectedDriverFilters: string[] = []
 ) => {
   return data
     .filter((driver) => {
       const hasGeojson = driver.details?.osm?.geojson;
       const matchesType =
         !filterByDriverTypes ||
-        selectedDriverTypes.length === 0 ||
-        selectedDriverTypes.includes(driver.driver);
+        selectedDriverFilters.length === 0 ||
+        selectedDriverFilters.includes(driver.driver);
       return hasGeojson && matchesType;
     })
     .map((driver) => {
@@ -411,12 +411,12 @@ const MapViewV2 = ({
   categories?: string[];
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
-  const [uniqueDriverTypes, setUniqueDriverTypes] = useState<any[]>([]);
+  const [driverFilters, setDriverFilters] = useState<any[]>([]);
   const { data: corridors, isLoading: isCorridorsDataLoading } =
     useFetchCorridors();
   const { data: localities, isLoading: isLocalitiesDataLoading } =
     useFetchLocalities();
-  const [selectedDriverType, setSelectedDriverType] = useState<string>();
+  const [selectedDriverFilter, setSelectedDriverFilter] = useState<string>();
 
   // first available category from DRIVER_CATEGORIES
   const getDefaultCategory = () => {
@@ -468,12 +468,53 @@ const MapViewV2 = ({
   const [transitStationIcon, setTransitStationIcon] =
     useState<L.DivIcon | null>(null);
 
-
   const [roadIcon, setRoadIcon] = useState<L.DivIcon | null>(null);
 
   const highlightedDrivers = useStore(
     (state) => state.values["highlightDrivers"]
   );
+
+  const isDriverMatchingFilter = (driver: IDriverPlace): boolean => {
+    if (!selectedDriverFilter) return true;
+
+    console.log(
+      "🎯 Filtering driver:",
+      driver.name,
+      "with selectedDriverFilter:",
+      selectedDriverFilter
+    );
+
+    // Check for custom filter
+    if (categories && categories.length > 0) {
+      for (const category of categories) {
+        const categoryData =
+          DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES];
+        const customFilters = (categoryData as any)?.filters;
+        const onFilterFunc = (categoryData as any)?.onFilter;
+
+        if (customFilters && onFilterFunc) {
+          // Check if selectedDriverFilter is a custom filter key
+          const isCustomFilter = customFilters.some(
+            (filter: any) => filter.key === selectedDriverFilter
+          );
+          if (isCustomFilter) {
+            const result = onFilterFunc(selectedDriverFilter, driver);
+            console.log(
+              `🎯 Custom filter "${selectedDriverFilter}" for driver "${driver.name}": ${result}`
+            );
+            return result;
+          }
+        }
+      }
+    }
+
+    // Fallback to driver type matching
+    const result = selectedDriverFilter === driver.driver;
+    console.log(
+      `🎯 Driver type filter "${selectedDriverFilter}" for driver "${driver.name}" (type: ${driver.driver}): ${result}`
+    );
+    return result;
+  };
 
   // Setting icons for simple drivermarkers
   useEffect(() => {
@@ -514,17 +555,58 @@ const MapViewV2 = ({
     // Fetch icons, set unique driver types based on categories
     if (drivers && drivers?.length) {
       fetchDriverIcons();
-      
-      // Set unique driver types directly from categories or drivers
-      const uniqTypes = categories && categories.length > 0
-        ? categories.flatMap(category => 
-            DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]?.drivers || []
-          ).filter(driverType => 
-            drivers.some(d => d.driver === driverType)
-          )
-        : Array.from(new Set(drivers.map((d) => d.driver)));
-      
-      setUniqueDriverTypes(uniqTypes);
+
+      // Set driver filters - use custom filters if available, otherwise use driver types
+      console.log("🎯 Setting driver filters for categories:", categories);
+
+      if (categories && categories.length > 0) {
+        // Check if any category has custom filters
+        const customFilters = categories.flatMap((category) => {
+          const categoryData =
+            DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES];
+          const filters = (categoryData as any)?.filters || [];
+          console.log(
+            `🎯 Category "${category}" has ${filters.length} custom filters:`,
+            filters
+          );
+          return filters;
+        });
+
+        console.log(
+          "🎯 Total custom filters found:",
+          customFilters.length,
+          customFilters
+        );
+
+        if (customFilters.length > 0) {
+          // Use custom filters
+          console.log("🎯 Using custom filters:", customFilters);
+          setDriverFilters(customFilters);
+        } else {
+          // Fallback to driver types
+          const driverTypes = categories
+            .flatMap(
+              (category) =>
+                DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]
+                  ?.drivers || []
+            )
+            .filter((driverType) =>
+              drivers.some((d) => d.driver === driverType)
+            );
+          console.log("🎯 Using driver types (fallback):", driverTypes);
+          setDriverFilters(driverTypes);
+        }
+      } else {
+        // use unique driver types - no categories provided
+        const uniqueDriverTypes = Array.from(
+          new Set(drivers.map((d) => d.driver))
+        );
+        console.log(
+          "🎯 Using unique driver types (no categories):",
+          uniqueDriverTypes
+        );
+        setDriverFilters(uniqueDriverTypes);
+      }
     }
   }, [drivers, categories]);
 
@@ -949,18 +1031,23 @@ const MapViewV2 = ({
 
     return drivers
       ?.filter((driver): driver is RoadDriverPlace => {
-        const isDriverAllowed = !categories || categories.length === 0
-          ? true
-          : categories.some(category => {
-              const categoryDrivers = (DRIVER_CATEGORIES as any)[category]?.drivers || [];
-              return Array.isArray(categoryDrivers) && categoryDrivers.includes(driver.driver);
-            });
+        const isDriverAllowed =
+          !categories || categories.length === 0
+            ? true
+            : categories.some((category) => {
+                const categoryDrivers =
+                  (DRIVER_CATEGORIES as any)[category]?.drivers || [];
+                return (
+                  Array.isArray(categoryDrivers) &&
+                  categoryDrivers.includes(driver.driver)
+                );
+              });
         return (
           driver.driver === "highway" &&
           !!driver.features &&
           typeof driver.status === "string" &&
           isDriverAllowed &&
-          (!selectedDriverType || selectedDriverType == driver.driver)
+          isDriverMatchingFilter(driver)
         );
       })
       .flatMap((driver) => {
@@ -1077,18 +1164,23 @@ const MapViewV2 = ({
 
     return drivers
       ?.filter((driver): driver is TransitDriverPlace => {
-        const isDriverAllowed = !categories || categories.length === 0
-          ? true
-          : categories.some(category => {
-              const categoryDrivers = (DRIVER_CATEGORIES as any)[category]?.drivers || [];
-              return Array.isArray(categoryDrivers) && categoryDrivers.includes(driver.driver);
-            });
+        const isDriverAllowed =
+          !categories || categories.length === 0
+            ? true
+            : categories.some((category) => {
+                const categoryDrivers =
+                  (DRIVER_CATEGORIES as any)[category]?.drivers || [];
+                return (
+                  Array.isArray(categoryDrivers) &&
+                  categoryDrivers.includes(driver.driver)
+                );
+              });
         return (
           driver.driver === "transit" &&
           !!driver.features &&
           typeof driver.status === "string" &&
           isDriverAllowed &&
-          (!selectedDriverType || selectedDriverType == driver.driver)
+          isDriverMatchingFilter(driver)
         );
       })
       .flatMap((driver) => {
@@ -1219,17 +1311,19 @@ const MapViewV2 = ({
     }
 
     const microMarketFiltered = drivers.filter((driver) => {
-      const isDriverAllowed = !categories || categories.length === 0
-        ? true
-        : categories.some(category => {
-            const categoryDrivers = (DRIVER_CATEGORIES as any)[category]?.drivers || [];
-            return Array.isArray(categoryDrivers) && categoryDrivers.includes(driver.driver);
-          });
+      const isDriverAllowed =
+        !categories || categories.length === 0
+          ? true
+          : categories.some((category) => {
+              const categoryDrivers =
+                (DRIVER_CATEGORIES as any)[category]?.drivers || [];
+              return (
+                Array.isArray(categoryDrivers) &&
+                categoryDrivers.includes(driver.driver)
+              );
+            });
       const isMicroMarket = driver.driver == "micro-market";
-      const isTypeSelected =
-        !selectedDriverType || selectedDriverType == driver.driver;
-
-      return isMicroMarket && isDriverAllowed && isTypeSelected;
+      return isMicroMarket && isDriverAllowed && isDriverMatchingFilter(driver);
     });
 
     return microMarketFiltered.map((d) => {
@@ -1331,15 +1425,20 @@ const MapViewV2 = ({
 
     const filteredDrivers = drivers.filter((driver) => {
       if (!driver.location?.lat || !driver.location?.lng) return false;
-      const isDriverAllowed = !categories || categories.length === 0
-        ? true
-        : categories.some(category => {
-            const categoryDrivers = (DRIVER_CATEGORIES as any)[category]?.drivers || [];
-            return Array.isArray(categoryDrivers) && categoryDrivers.includes(driver.driver);
-          });
+      const isDriverAllowed =
+        !categories || categories.length === 0
+          ? true
+          : categories.some((category) => {
+              const categoryDrivers =
+                (DRIVER_CATEGORIES as any)[category]?.drivers || [];
+              return (
+                Array.isArray(categoryDrivers) &&
+                categoryDrivers.includes(driver.driver)
+              );
+            });
       return (
         isDriverAllowed &&
-        (!selectedDriverType || selectedDriverType == driver.driver) &&
+        isDriverMatchingFilter(driver) &&
         bounds.contains([driver.location.lat, driver.location.lng])
       );
     });
@@ -1542,31 +1641,72 @@ const MapViewV2 = ({
       });
   };
 
-  /** Filter for driver types */
-  const renderDriverTypesTag = (k: string) => {
+  /** Filter for driver types and custom filters */
+  const renderDriverFilters = (filterItem: any) => {
+    // custom filter objects with key and label
+    if (typeof filterItem === "object" && filterItem.key && filterItem.label) {
+      const isSelected = filterItem.key == selectedDriverFilter;
+      return (
+        <Tag
+          key={filterItem.key}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            borderRadius: 16,
+            padding: "4px 8px",
+            marginRight: 4,
+            backgroundColor: isSelected ? COLORS.primaryColor : "white",
+            color: isSelected ? "white" : "initial",
+            marginLeft: 0,
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            if (isSelected) {
+              setSelectedDriverFilter(undefined);
+            } else {
+              setSelectedDriverFilter(filterItem.key);
+            }
+          }}
+        >
+          <Typography.Text
+            style={{
+              color: isSelected ? "white" : COLORS.textColorDark,
+              fontSize: FONT_SIZE.SUB_TEXT,
+              fontWeight: 500,
+            }}
+          >
+            {filterItem.label}
+          </Typography.Text>
+        </Tag>
+      );
+    }
+
+    // Handle driver type strings (fallback behavior)
+    const k = filterItem;
     if (!(LivIndexDriversConfig as any)[k]) {
       return null;
     }
     const icon = (LivIndexDriversConfig as any)[k].icon;
+    const isSelected = k == selectedDriverFilter;
     return (
       <Tag
+        key={k}
         style={{
           display: "flex",
           alignItems: "center",
           borderRadius: 16,
           padding: "4px 8px",
           marginRight: 4,
-          backgroundColor:
-            k == selectedDriverType ? COLORS.primaryColor : "white",
-          color: k == selectedDriverType ? "white" : "initial",
+          backgroundColor: isSelected ? COLORS.primaryColor : "white",
+          color: isSelected ? "white" : "initial",
           marginLeft: 0,
           cursor: "pointer",
         }}
         onClick={() => {
-          if (k == selectedDriverType) {
-            setSelectedDriverType(undefined);
+          if (isSelected) {
+            setSelectedDriverFilter(undefined);
           } else {
-            setSelectedDriverType(k);
+            setSelectedDriverFilter(k);
           }
         }}
       >
@@ -1574,11 +1714,11 @@ const MapViewV2 = ({
           iconName={icon.name}
           iconSet={icon.set}
           size={20}
-          color={k == selectedDriverType ? "white" : COLORS.textColorDark}
+          color={isSelected ? "white" : COLORS.textColorDark}
         ></DynamicReactIcon>
         <Typography.Text
           style={{
-            color: k == selectedDriverType ? "white" : COLORS.textColorDark,
+            color: isSelected ? "white" : COLORS.textColorDark,
             marginLeft: 4,
             fontSize: FONT_SIZE.SUB_TEXT,
             fontWeight: 500,
@@ -1694,7 +1834,7 @@ const MapViewV2 = ({
         {/* Drivers filters */}
         {drivers &&
         drivers.length &&
-        uniqueDriverTypes.length > 1 &&
+        driverFilters.length > 1 &&
         currentSelectedCategory !== "surroundings" ? (
           <Flex
             style={{
@@ -1705,21 +1845,32 @@ const MapViewV2 = ({
               whiteSpace: "nowrap",
             }}
           >
-            {(uniqueDriverTypes || [])
+            {(driverFilters || [])
               .filter((d) => {
                 if (!d) return false;
+
+                // custom filter object always show it (it's already filtered by category)
+                if (typeof d === "object" && d.key && d.label) {
+                  return true;
+                }
+
                 // If no categories provided, show all driver types
                 if (!categories || categories.length === 0) {
                   return true;
                 }
-                // If categories provided, only show drivers that match the category
-                return categories.some(category => {
-                  const categoryDrivers = (DRIVER_CATEGORIES as any)[category]?.drivers || [];
-                  return Array.isArray(categoryDrivers) && categoryDrivers.includes(d);
+
+                // For driver type strings, filter by category
+                return categories.some((category) => {
+                  const categoryDrivers =
+                    (DRIVER_CATEGORIES as any)[category]?.drivers || [];
+                  return (
+                    Array.isArray(categoryDrivers) &&
+                    categoryDrivers.includes(d)
+                  );
                 });
               })
-              .map((k: string) => {
-                return renderDriverTypesTag(k);
+              .map((filterItem: any) => {
+                return renderDriverFilters(filterItem);
               })}
           </Flex>
         ) : null}
@@ -1778,7 +1929,7 @@ const MapViewV2 = ({
               "🎯 SurroundingElements:",
               surroundingElements?.length || 0
             );
-            console.log("🎯 UniqueDriverTypes:", uniqueDriverTypes);
+            console.log("🎯 DriverFilters:", driverFilters);
             console.log(
               "🎯 Should render drivers?",
               !!(drivers && drivers.length && !surroundingElements?.length)
@@ -1788,7 +1939,7 @@ const MapViewV2 = ({
             const projectPolygons = processDriversToPolygons(
               primaryProjectBounds,
               false,
-              uniqueDriverTypes
+              driverFilters
             );
             console.log("🎯 ProjectPolygons:", projectPolygons.length);
 
@@ -1851,7 +2002,7 @@ const MapViewV2 = ({
                       polygons={processDriversToPolygons(
                         drivers || [],
                         true,
-                        uniqueDriverTypes
+                        driverFilters
                       )}
                     />
                   </>
