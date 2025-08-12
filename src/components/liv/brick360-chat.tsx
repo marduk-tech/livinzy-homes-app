@@ -25,6 +25,7 @@ import { useUser } from "../../hooks/use-user";
 import { axiosApiInstance } from "../../libs/axios-api-Instance";
 import {
   baseApiUrl,
+  Brick360CategoryInfo,
   Brick360DataPoints,
   DRIVER_CATEGORIES,
 } from "../../libs/constants";
@@ -62,6 +63,8 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
 
     const [dataPointSelected, setDataPointSelected] = useState<any>();
     const [followUpPrompts, setFollowupPrompts] = useState<string[]>();
+    const [note, setNote] = useState<string>();
+
     const [mapDrivers, setMapDrivers] = useState<any[]>([]);
     const [surroundingElements, setSurroundingElements] =
       useState<ISurroundingElement[]>();
@@ -69,6 +72,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
     const [projectsNearby, setProjectsNearby] = useState<any[]>();
 
     const [mapVisible, setMapVisible] = useState<boolean>(false);
+    const [selectedDriverTypes, setSelectedDriverTypes] = useState<any>();
     const [mapCategories, setMapCategories] = useState<string[]>([]);
 
     const [currentSessionId, setCurrentSessionId] = useState<string>(() =>
@@ -118,6 +122,15 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
         const prompts = (Brick360DataPoints as any)[
           dataPointSelected.selectedDataPointCategory
         ][dataPointSelected.selectedDataPointSubCategory]["prompts"];
+
+        const noteForDataPt =
+          (Brick360CategoryInfo as any)[
+            dataPointSelected.selectedDataPointCategory
+          ].note ||
+          (Brick360DataPoints as any)[
+            dataPointSelected.selectedDataPointCategory
+          ][dataPointSelected.selectedDataPointSubCategory]["note"];
+        setNote(noteForDataPt);
 
         setFollowupPrompts(prompts);
         let surrElements;
@@ -643,10 +656,10 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                         projectId={lvnzyProject?.originalProjectId?._id}
                         surroundingElements={surroundingElements}
                         projectSqftPricing={Math.round(
-                          (lvnzyProject?.meta?.costingDetails
-                            ?.minimumUnitCost || 0) /
-                            (lvnzyProject?.meta?.costingDetails
-                              ?.minimumUnitSize || 1)
+                          lvnzyProject?.originalProjectId.info.rate
+                            .minimumUnitCost /
+                            lvnzyProject?.originalProjectId.info.rate
+                              .minimumUnitSize
                         )}
                         projectsNearby={projectsNearby}
                         drivers={mapDrivers.map((d) => {
@@ -665,9 +678,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                   </Flex>
                 ) : null}
 
-                {dataPointSelected &&
-                dataPointSelected.selectedDataPointCategory ==
-                  "areaConnectivity" ? (
+                {note ? (
                   <Flex
                     style={{
                       width: "100",
@@ -687,9 +698,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                       }}
                       color="warning"
                     >
-                      The data here explains the location profile in its current
-                      form. For upcoming infra/profile, refer to growth
-                      potential under financials.
+                      {note}
                     </Tag>
                   </Flex>
                 ) : null}
@@ -871,8 +880,8 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
               projectId={lvnzyProject?.originalProjectId?._id}
               surroundingElements={surroundingElements}
               projectSqftPricing={Math.round(
-                (lvnzyProject?.meta?.costingDetails?.minimumUnitCost || 0) /
-                  (lvnzyProject?.meta?.costingDetails?.minimumUnitSize || 1)
+                lvnzyProject?.originalProjectId.info.rate.minimumUnitCost /
+                  lvnzyProject?.originalProjectId.info.rate.minimumUnitSize
               )}
               projectsNearby={projectsNearby}
               drivers={mapDrivers.map((d) => {
