@@ -152,8 +152,8 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
             projectId={lvnzyProject?.originalProjectId._id}
             drivers={drivers}
             surroundingElements={surroundingElements}
-            isFromTab={true}
             selectedCategory={selectedCategory}
+            categories={selectedCategory ? [selectedCategory] : []}
           />
         )}
 
@@ -231,8 +231,8 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
               drivers={drivers}
               surroundingElements={surroundingElements}
               fullSize={true}
-              isFromTab={true}
               selectedCategory={selectedCategory}
+              categories={selectedCategory ? [selectedCategory] : []}
             />
           </Flex>
         </Modal>

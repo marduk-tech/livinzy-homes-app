@@ -21,7 +21,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { useUser } from "../../hooks/use-user";
 import { axiosApiInstance } from "../../libs/axios-api-Instance";
-import { baseApiUrl, Brick360DataPoints } from "../../libs/constants";
+import { baseApiUrl, Brick360DataPoints, DRIVER_CATEGORIES } from "../../libs/constants";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
@@ -143,39 +143,30 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
             switch (dataPointSelected.selectedDataPointSubCategory) {
               case "schoolsOffices":
                 categories = ["workplace", "schools"];
-                setMapDrivers([
-                  ...lvnzyProject.neighborhood.drivers.filter(
-                    (d: any) => !!d && !!d.driverId
-                  ),
-                  ...lvnzyProject.connectivity.drivers.filter(
-                    (d: any) => !!d && !!d.driverId
-                  ),
-                ]);
                 break;
               case "conveniences":
                 categories = ["conveniences"];
-                setMapDrivers([
-                  ...lvnzyProject.neighborhood.drivers.filter(
-                    (d: any) => !!d && !!d.driverId
-                  ),
-                  ...lvnzyProject.connectivity.drivers.filter(
-                    (d: any) => !!d && !!d.driverId
-                  ),
-                ]);
                 break;
               case "transport":
                 categories = ["connectivity"];
-                setMapDrivers([
-                  ...lvnzyProject.neighborhood.drivers.filter(
-                    (d: any) => !!d && !!d.driverId
-                  ),
-                  ...lvnzyProject.connectivity.drivers.filter(
-                    (d: any) => !!d && !!d.driverId
-                  ),
-                ]);
                 break;
             }
             setMapCategories(categories);
+
+            // Filter mapDrivers based on categories using DRIVER_CATEGORIES
+            const categoryDrivers = categories.flatMap(
+              (category) =>
+                DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]?.drivers || []
+            );
+            
+            setMapDrivers([
+              ...lvnzyProject.neighborhood.drivers.filter(
+                (d: any) => !!d && !!d.driverId && categoryDrivers.includes(d.driverId.driver)
+              ),
+              ...lvnzyProject.connectivity.drivers.filter(
+                (d: any) => !!d && !!d.driverId && categoryDrivers.includes(d.driverId.driver)
+              ),
+            ]);
           } else if (
             dataPointSelected.selectedDataPointCategory === "financials"
           ) {
@@ -184,13 +175,21 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
               "growthPotential"
             ) {
               setMapVisible(true);
-              setMapCategories(["growth potential"]);
+              const categories = ["growth potential"];
+              setMapCategories(categories);
+              
+              // Filter mapDrivers based on categories using DRIVER_CATEGORIES
+              const categoryDrivers = categories.flatMap(
+                (category) =>
+                  DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]?.drivers || []
+              );
+              
               setMapDrivers([
                 ...lvnzyProject.connectivity.drivers.filter(
-                  (d: any) => !!d && !!d.driverId
+                  (d: any) => !!d && !!d.driverId && categoryDrivers.includes(d.driverId.driver)
                 ),
                 ...lvnzyProject.neighborhood.drivers.filter(
-                  (d: any) => !!d && !!d.driverId
+                  (d: any) => !!d && !!d.driverId && categoryDrivers.includes(d.driverId.driver)
                 ),
               ]);
             } else if (

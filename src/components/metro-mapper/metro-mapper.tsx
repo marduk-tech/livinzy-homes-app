@@ -326,7 +326,6 @@ export function MetroMapper() {
               duration: driver.distance ? Math.round(driver.distance / 60) : 0,
             }))}
             fullSize={true}
-            isFromTab={false}
             showLocalities={false}
             onMapReady={setMapInstance}
             showCorridors={false}
@@ -370,7 +369,6 @@ export function MetroMapper() {
               ...driver,
             }))}
             fullSize={true}
-            isFromTab={false}
             showLocalities={false}
             showCorridors={false}
           />
