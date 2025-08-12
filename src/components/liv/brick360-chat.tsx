@@ -68,7 +68,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
 
     const [mapVisible, setMapVisible] = useState<boolean>(false);
     const [selectedDriverTypes, setSelectedDriverTypes] = useState<any>();
-  const [mapCategories, setMapCategories] = useState<string[]>([]);
+    const [mapCategories, setMapCategories] = useState<string[]>([]);
 
     const [currentSessionId, setCurrentSessionId] = useState<string>(() =>
       uuidv4()
@@ -633,10 +633,10 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                         projectId={lvnzyProject?.originalProjectId?._id}
                         surroundingElements={surroundingElements}
                         projectSqftPricing={Math.round(
-                          (lvnzyProject?.meta?.costingDetails
-                            ?.minimumUnitCost || 0) /
-                            (lvnzyProject?.meta?.costingDetails
-                              ?.minimumUnitSize || 1)
+                          lvnzyProject?.originalProjectId.info.rate
+                            .minimumUnitCost /
+                            lvnzyProject?.originalProjectId.info.rate
+                              .minimumUnitSize
                         )}
                         projectsNearby={projectsNearby}
                         drivers={mapDrivers.map((d) => {
@@ -861,8 +861,8 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
               projectId={lvnzyProject?.originalProjectId?._id}
               surroundingElements={surroundingElements}
               projectSqftPricing={Math.round(
-                (lvnzyProject?.meta?.costingDetails?.minimumUnitCost || 0) /
-                  (lvnzyProject?.meta?.costingDetails?.minimumUnitSize || 1)
+                lvnzyProject?.originalProjectId.info.rate.minimumUnitCost /
+                  lvnzyProject?.originalProjectId.info.rate.minimumUnitSize
               )}
               projectsNearby={projectsNearby}
               drivers={mapDrivers.map((d) => {
