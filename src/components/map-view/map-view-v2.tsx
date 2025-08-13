@@ -486,13 +486,6 @@ const MapViewV2 = ({
   const isDriverMatchingFilter = (driver: IDriverPlace): boolean => {
     if (!selectedDriverFilter) return true;
 
-    console.log(
-      "🎯 Filtering driver:",
-      driver.name,
-      "with selectedDriverFilter:",
-      selectedDriverFilter
-    );
-
     // Check for custom filter
     if (hasCategories) {
       for (const category of categories) {
@@ -508,9 +501,6 @@ const MapViewV2 = ({
           );
           if (isCustomFilter) {
             const result = onFilterFunc(selectedDriverFilter, driver);
-            console.log(
-              `🎯 Custom filter "${selectedDriverFilter}" for driver "${driver.name}": ${result}`
-            );
             return result;
           }
         }
@@ -519,9 +509,6 @@ const MapViewV2 = ({
 
     // Fallback to driver type matching
     const result = selectedDriverFilter === driver.driver;
-    console.log(
-      `🎯 Driver type filter "${selectedDriverFilter}" for driver "${driver.name}" (type: ${driver.driver}): ${result}`
-    );
     return result;
   };
 
@@ -566,30 +553,17 @@ const MapViewV2 = ({
       fetchDriverIcons();
 
       // Set driver filters - use custom filters if available, otherwise use driver types
-      console.log("🎯 Setting driver filters for categories:", categories);
-
       if (hasCategories) {
         // Check if any category has custom filters
         const customFilters = categories.flatMap((category) => {
           const categoryData =
             DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES];
           const filters = (categoryData as any)?.filters || [];
-          console.log(
-            `🎯 Category "${category}" has ${filters.length} custom filters:`,
-            filters
-          );
           return filters;
         });
 
-        console.log(
-          "🎯 Total custom filters found:",
-          customFilters.length,
-          customFilters
-        );
-
         if (customFilters.length > 0) {
           // Use custom filters
-          console.log("🎯 Using custom filters:", customFilters);
           setDriverFilters(customFilters);
         } else {
           // Fallback to driver types
@@ -602,17 +576,12 @@ const MapViewV2 = ({
             .filter((driverType) =>
               drivers.some((d) => d.driver === driverType)
             );
-          console.log("🎯 Using driver types (fallback):", driverTypes);
           setDriverFilters(driverTypes);
         }
       } else {
         // use unique driver types - no categories provided
         const uniqueDriverTypes = Array.from(
           new Set(drivers.map((d) => d.driver))
-        );
-        console.log(
-          "🎯 Using unique driver types (no categories):",
-          uniqueDriverTypes
         );
         setDriverFilters(uniqueDriverTypes);
       }
@@ -1982,25 +1951,12 @@ const MapViewV2 = ({
           />
           {/* Process and render polygon data */}
           {(() => {
-            console.log("🎯 === RENDER COMPONENTS LOGIC ===");
-            console.log("🎯 Drivers:", drivers?.length || 0);
-            console.log(
-              "🎯 SurroundingElements:",
-              surroundingElements?.length || 0
-            );
-            console.log("🎯 DriverFilters:", driverFilters);
-            console.log(
-              "🎯 Should render drivers?",
-              !!(drivers && drivers.length && !surroundingElements?.length)
-            );
-
             // Process primary project bounds
             const projectPolygons = processDriversToPolygons(
               primaryProjectBounds,
               false,
               driverFilters
             );
-            console.log("🎯 ProjectPolygons:", projectPolygons.length);
 
             // Render all components
             return (
@@ -2010,52 +1966,20 @@ const MapViewV2 = ({
                 {renderProjectMarkers()}
                 {showLocalities && localities ? renderLocalities() : null}
                 {/* {renderSurroundings()} */}
-                {showCorridors && (
-                  <>
-                    {console.log("🎯 Rendering CorridorsComponent")}
-                    <CorridorsComponent></CorridorsComponent>
-                  </>
-                )}
+                {showCorridors && <CorridorsComponent></CorridorsComponent>}
                 {currentSelectedCategory === "surroundings" && (
-                  <>
-                    {console.log(
-                      "🎯 Rendering SurroundingsComponent for surroundings category"
-                    )}
-                    <SurroundingsComponent></SurroundingsComponent>
-                  </>
+                  <SurroundingsComponent></SurroundingsComponent>
                 )}
-                <>
-                  {console.log("🎯 Rendering MicroMarketDriversComponent")}
-                  <MicroMarketDriversComponent></MicroMarketDriversComponent>
-                </>
+                <MicroMarketDriversComponent></MicroMarketDriversComponent>
                 {projectsNearby?.length && projectsNearbyIcons?.length
                   ? renderProjectsNearby()
                   : null}
                 {drivers && drivers.length ? (
                   <>
-                    {console.log("🎯 Rendering BoundsAwareDrivers")}
                     <BoundsAwareDrivers
-                      renderRoadDrivers={(bounds) => {
-                        console.log(
-                          "🎯 Rendering RoadDriversComponent with bounds:",
-                          bounds
-                        );
-                        return <RoadDriversComponent bounds={bounds} />;
-                      }}
-                      renderTransitDrivers={(bounds) => {
-                        console.log(
-                          "🎯 Rendering TransitDriversComponent with bounds:",
-                          bounds
-                        );
-                        return <TransitDriversComponent bounds={bounds} />;
-                      }}
-                      renderSimpleDrivers={(bounds) => {
-                        console.log(
-                          "🎯 Rendering SimpleDriversRenderer with bounds:",
-                          bounds
-                        );
-                        return <SimpleDriversRenderer bounds={bounds} />;
-                      }}
+                      renderRoadDrivers={(bounds) => <RoadDriversComponent bounds={bounds} />}
+                      renderTransitDrivers={(bounds) => <TransitDriversComponent bounds={bounds} />}
+                      renderSimpleDrivers={(bounds) => <SimpleDriversRenderer bounds={bounds} />}
                     />
                     <MapPolygons
                       polygons={processDriversToPolygons(
@@ -2065,18 +1989,7 @@ const MapViewV2 = ({
                       )}
                     />
                   </>
-                ) : (
-                  <>
-                    {console.log(
-                      "🎯 NOT rendering BoundsAwareDrivers because:",
-                      {
-                        hasDrivers: !!(drivers && drivers.length),
-                        hasSurroundingElements: !!surroundingElements?.length,
-                      }
-                    )}
-                    {null}
-                  </>
-                )}
+                ) : null}
               </>
             );
           })()}
