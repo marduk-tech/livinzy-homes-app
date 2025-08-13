@@ -72,7 +72,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
     const [projectsNearby, setProjectsNearby] = useState<any[]>();
 
     const [mapVisible, setMapVisible] = useState<boolean>(false);
-    const [selectedDriverTypes, setSelectedDriverTypes] = useState<any>();
+
     const [mapCategories, setMapCategories] = useState<string[]>([]);
 
     const [currentSessionId, setCurrentSessionId] = useState<string>(() =>
@@ -137,7 +137,6 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
 
         const updateMapState = () => {
           // reset states first
-          // setSelectedDriverTypes([]);
           setMapCategories([]);
           setMapVisible(false);
 

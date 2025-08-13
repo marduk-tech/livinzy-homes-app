@@ -389,7 +389,6 @@ const MapViewV2 = ({
   onMapReady,
   showCorridors = true,
   minMapZoom = 12,
-  selectedCategory,
   categories,
 }: {
   drivers?: any[];
@@ -407,11 +406,17 @@ const MapViewV2 = ({
   onMapReady?: (map: any) => void;
   showCorridors?: boolean;
   minMapZoom?: number;
-  selectedCategory?: string;
   categories?: string[];
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [driverFilters, setDriverFilters] = useState<any[]>([]);
+
+  //repetitive category checks
+  const showCategorySelection = categories && categories.length > 1;
+  const noCategoriesProvided = !categories || categories.length === 0;
+  const hasCategories = categories && categories.length > 0;
+  const showDriverFilters = driverFilters.length > 1;
+
   const { data: corridors, isLoading: isCorridorsDataLoading } =
     useFetchCorridors();
   const { data: localities, isLoading: isLocalitiesDataLoading } =
@@ -420,11 +425,15 @@ const MapViewV2 = ({
 
   // first available category from DRIVER_CATEGORIES
   const getDefaultCategory = () => {
-    const categories = Object.keys(DRIVER_CATEGORIES);
-    return categories[0];
+    if (hasCategories) return categories[0];
+    const allCategories = Object.keys(DRIVER_CATEGORIES);
+    return allCategories[0];
   };
 
-  const currentSelectedCategory = selectedCategory || getDefaultCategory();
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    getDefaultCategory()
+  );
+  const currentSelectedCategory = selectedCategory;
 
   const { isMobile } = useDevice();
   const [uniqueSurroundingElements, setUniqueSurroundingElements] = useState<
@@ -485,7 +494,7 @@ const MapViewV2 = ({
     );
 
     // Check for custom filter
-    if (categories && categories.length > 0) {
+    if (hasCategories) {
       for (const category of categories) {
         const categoryData =
           DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES];
@@ -559,7 +568,7 @@ const MapViewV2 = ({
       // Set driver filters - use custom filters if available, otherwise use driver types
       console.log("🎯 Setting driver filters for categories:", categories);
 
-      if (categories && categories.length > 0) {
+      if (hasCategories) {
         // Check if any category has custom filters
         const customFilters = categories.flatMap((category) => {
           const categoryData =
@@ -1031,17 +1040,17 @@ const MapViewV2 = ({
 
     return drivers
       ?.filter((driver): driver is RoadDriverPlace => {
-        const isDriverAllowed =
-          !categories || categories.length === 0
-            ? true
-            : categories.some((category) => {
-                const categoryDrivers =
-                  (DRIVER_CATEGORIES as any)[category]?.drivers || [];
-                return (
-                  Array.isArray(categoryDrivers) &&
-                  categoryDrivers.includes(driver.driver)
-                );
-              });
+        const isDriverAllowed = noCategoriesProvided
+          ? true
+          : (() => {
+              const categoryDrivers =
+                (DRIVER_CATEGORIES as any)[currentSelectedCategory]?.drivers ||
+                [];
+              return (
+                Array.isArray(categoryDrivers) &&
+                categoryDrivers.includes(driver.driver)
+              );
+            })();
         return (
           driver.driver === "highway" &&
           !!driver.features &&
@@ -1164,17 +1173,17 @@ const MapViewV2 = ({
 
     return drivers
       ?.filter((driver): driver is TransitDriverPlace => {
-        const isDriverAllowed =
-          !categories || categories.length === 0
-            ? true
-            : categories.some((category) => {
-                const categoryDrivers =
-                  (DRIVER_CATEGORIES as any)[category]?.drivers || [];
-                return (
-                  Array.isArray(categoryDrivers) &&
-                  categoryDrivers.includes(driver.driver)
-                );
-              });
+        const isDriverAllowed = noCategoriesProvided
+          ? true
+          : (() => {
+              const categoryDrivers =
+                (DRIVER_CATEGORIES as any)[currentSelectedCategory]?.drivers ||
+                [];
+              return (
+                Array.isArray(categoryDrivers) &&
+                categoryDrivers.includes(driver.driver)
+              );
+            })();
         return (
           driver.driver === "transit" &&
           !!driver.features &&
@@ -1311,17 +1320,17 @@ const MapViewV2 = ({
     }
 
     const microMarketFiltered = drivers.filter((driver) => {
-      const isDriverAllowed =
-        !categories || categories.length === 0
-          ? true
-          : categories.some((category) => {
-              const categoryDrivers =
-                (DRIVER_CATEGORIES as any)[category]?.drivers || [];
-              return (
-                Array.isArray(categoryDrivers) &&
-                categoryDrivers.includes(driver.driver)
-              );
-            });
+      const isDriverAllowed = noCategoriesProvided
+        ? true
+        : (() => {
+            const categoryDrivers =
+              (DRIVER_CATEGORIES as any)[currentSelectedCategory]?.drivers ||
+              [];
+            return (
+              Array.isArray(categoryDrivers) &&
+              categoryDrivers.includes(driver.driver)
+            );
+          })();
       const isMicroMarket = driver.driver == "micro-market";
       return isMicroMarket && isDriverAllowed && isDriverMatchingFilter(driver);
     });
@@ -1425,17 +1434,17 @@ const MapViewV2 = ({
 
     const filteredDrivers = drivers.filter((driver) => {
       if (!driver.location?.lat || !driver.location?.lng) return false;
-      const isDriverAllowed =
-        !categories || categories.length === 0
-          ? true
-          : categories.some((category) => {
-              const categoryDrivers =
-                (DRIVER_CATEGORIES as any)[category]?.drivers || [];
-              return (
-                Array.isArray(categoryDrivers) &&
-                categoryDrivers.includes(driver.driver)
-              );
-            });
+      const isDriverAllowed = noCategoriesProvided
+        ? true
+        : (() => {
+            const categoryDrivers =
+              (DRIVER_CATEGORIES as any)[currentSelectedCategory]?.drivers ||
+              [];
+            return (
+              Array.isArray(categoryDrivers) &&
+              categoryDrivers.includes(driver.driver)
+            );
+          })();
       return (
         isDriverAllowed &&
         isDriverMatchingFilter(driver) &&
@@ -1814,6 +1823,56 @@ const MapViewV2 = ({
         position: "relative",
       }}
     >
+      {/* Category Selection Tags */}
+      {showCategorySelection && (
+        <Flex
+          style={{
+            position: "absolute",
+            zIndex: 9999,
+            top: 16,
+            left: 8,
+            right: 8,
+            width: "calc(100% - 16px)",
+            overflowX: "auto",
+            scrollbarWidth: "none",
+          }}
+          gap={8}
+        >
+          {categories.map((category) => (
+            <Tag.CheckableTag
+              key={category}
+              checked={selectedCategory === category}
+              onChange={(checked) => {
+                if (checked) {
+                  setSelectedCategory(category);
+                }
+              }}
+              style={{
+                textTransform: "capitalize",
+                border: `1px solid ${
+                  selectedCategory === category
+                    ? COLORS.primaryColor
+                    : COLORS.borderColor
+                }`,
+                marginRight: 0,
+                padding: "4px 12px",
+                borderRadius: 16,
+                backgroundColor:
+                  selectedCategory === category ? COLORS.primaryColor : "white",
+                color:
+                  selectedCategory === category
+                    ? "white"
+                    : COLORS.textColorMedium,
+                whiteSpace: "nowrap",
+                cursor: "pointer",
+              }}
+            >
+              {capitalize(category)}
+            </Tag.CheckableTag>
+          ))}
+        </Flex>
+      )}
+
       <Flex
         style={{
           position: "absolute",
@@ -1834,7 +1893,7 @@ const MapViewV2 = ({
         {/* Drivers filters */}
         {drivers &&
         drivers.length &&
-        driverFilters.length > 1 &&
+        showDriverFilters &&
         currentSelectedCategory !== "surroundings" ? (
           <Flex
             style={{
@@ -1855,7 +1914,7 @@ const MapViewV2 = ({
                 }
 
                 // If no categories provided, show all driver types
-                if (!categories || categories.length === 0) {
+                if (noCategoriesProvided) {
                   return true;
                 }
 
