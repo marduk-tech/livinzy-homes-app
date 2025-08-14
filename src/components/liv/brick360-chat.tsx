@@ -30,7 +30,7 @@ import {
   DRIVER_CATEGORIES,
 } from "../../libs/constants";
 import { captureAnalyticsEvent } from "../../libs/lvnzy-helper";
-import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { COLORS, FONT_SIZE, MAX_WIDTH } from "../../theme/style-constants";
 import { LvnzyProject } from "../../types/LvnzyProject";
 import { ISurroundingElement } from "../../types/Project";
 import DynamicReactIcon from "../common/dynamic-react-icon";
@@ -551,8 +551,8 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
           },
         }}
         rootStyle={{
-          maxWidth: 885,
-          marginLeft: isMobile ? 0 : "calc(50% - 447px)",
+          maxWidth: MAX_WIDTH,
+          marginLeft: isMobile ? 0 : `calc(50% - ${MAX_WIDTH / 2}px)`,
         }}
         closable={false}
         height={
@@ -788,7 +788,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                 position: "fixed",
                 bottom: 16,
                 width: "95%",
-                maxWidth: 850,
+                maxWidth: MAX_WIDTH,
               }}
             >
               <Form

@@ -8,6 +8,7 @@ import { ScrollableContainer } from "../scrollable-container";
 import { SnapshotModal } from "./snapshot-modal";
 import { forwardRef, useState } from "react";
 import DynamicReactIcon from "../common/dynamic-react-icon";
+const { Paragraph } = Typography;
 
 interface Brick360TabProps {
   lvnzyProject: any;
@@ -59,9 +60,12 @@ export const Brick360Tab = forwardRef<any, Brick360TabProps>(
           </Flex>
           <div
             dangerouslySetInnerHTML={{
-              __html: pt.replace(`<b>${title}</b><br>`, ""),
+              __html: `${pt.replace(
+                `<b>${title}</b><br>`,
+                ""
+              )} <span class="read-more">Read more</span>`,
             }}
-            className={`reasoning ${isPro ? "" : "con"}`}
+            className={`reasoning truncated ${isPro ? "" : "con"}`}
             style={{
               fontSize: FONT_SIZE.HEADING_4,
               margin: 0,

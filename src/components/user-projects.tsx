@@ -10,7 +10,11 @@ import {
   getCategoryScore,
   rupeeAmountFormat,
 } from "../libs/lvnzy-helper";
-import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
+import {
+  COLORS,
+  FONT_SIZE,
+  HORIZONTAL_PADDING,
+} from "../theme/style-constants";
 import { LvnzyProject } from "../types/LvnzyProject";
 import DynamicReactIcon from "./common/dynamic-react-icon";
 import GradientBar from "./common/grading-bar";
@@ -61,9 +65,11 @@ export function UserProjects({
           marginBottom: 8,
           cursor: "pointer",
           backgroundColor: "white",
-          width: isMobile ? "100%" : (MAX_WIDTH - 150) / 4,
+          width: isMobile
+            ? "100%"
+            : (window.innerWidth - 40 * 3 - HORIZONTAL_PADDING * 2) / 4,
           borderBottom: isMobile ? `1px solid ${COLORS.borderColor}` : "none",
-          paddingBottom: 24,
+          paddingBottom: isMobile ? 24 : 0,
         }}
         onClick={() => {
           navigate(`/app/brick360/${itemInfo._id}`);
@@ -215,7 +221,7 @@ export function UserProjects({
     <Flex
       style={{
         width: "100%",
-        padding: "0 16px",
+        padding: 0,
         paddingBottom: 100,
         border: 0,
       }}

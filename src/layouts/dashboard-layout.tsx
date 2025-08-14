@@ -7,8 +7,13 @@ import { LoginForm } from "../components/login-forms";
 import { UserDetailsForm } from "../components/user-details-form";
 import { useUser } from "../hooks/use-user";
 import { LandingConstants, LocalStorageKeys } from "../libs/constants";
-import { COLORS, FONT_SIZE, MAX_WIDTH } from "../theme/style-constants";
+import {
+  COLORS,
+  FONT_SIZE,
+  HORIZONTAL_PADDING,
+} from "../theme/style-constants";
 import { NavLink } from "../types/Common";
+import { useDevice } from "../hooks/use-device";
 
 const { Header, Content } = Layout;
 
@@ -17,6 +22,7 @@ export const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [showUserDetailsForm, setShowUserDetailsForm] = useState(false);
+  const { isMobile } = useDevice();
 
   const { lvnzyProjectId, collectionId } = useParams();
 
@@ -241,9 +247,9 @@ export const DashboardLayout: React.FC = () => {
               style={{
                 margin: "auto",
                 backgroundColor: "#FFF",
-                maxWidth: MAX_WIDTH,
                 width: "100%",
-                height: "calc(100vh - 100px)",
+                padding: isMobile ? 0 : `0 ${HORIZONTAL_PADDING}px`,
+                height: "calc(100vh - 300px)",
                 overflowY: "scroll",
                 scrollbarWidth: "none",
               }}

@@ -567,12 +567,14 @@ const MapViewV2 = ({
         if (customFilters.length > 0) {
           // Use custom filters for the selected category
           setDriverFilters(customFilters);
+          setSelectedDriverFilter(customFilters[0].key);
         } else {
           // Fallback to driver types for the selected category
           const driverTypes = (categoryData?.drivers || []).filter(
             (driverType) => drivers.some((d) => d.driver === driverType)
           );
           setDriverFilters(driverTypes);
+          setSelectedDriverFilter(driverTypes[0]);
         }
       } else {
         // use unique driver types - no categories provided
@@ -1635,11 +1637,7 @@ const MapViewV2 = ({
             cursor: "pointer",
           }}
           onClick={() => {
-            if (isSelected) {
-              setSelectedDriverFilter(undefined);
-            } else {
-              setSelectedDriverFilter(filterItem.key);
-            }
+            setSelectedDriverFilter(filterItem.key);
           }}
         >
           <Typography.Text
@@ -1677,11 +1675,7 @@ const MapViewV2 = ({
           cursor: "pointer",
         }}
         onClick={() => {
-          if (isSelected) {
-            setSelectedDriverFilter(undefined);
-          } else {
-            setSelectedDriverFilter(k);
-          }
+          setSelectedDriverFilter(k);
         }}
       >
         <DynamicReactIcon
@@ -1995,6 +1989,7 @@ const MapViewV2 = ({
         open={infoModalOpen}
         footer={null}
         onCancel={() => setInfoModalOpen(false)}
+        zIndex={2000}
       >
         <Flex
           vertical
