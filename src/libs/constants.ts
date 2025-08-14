@@ -62,7 +62,7 @@ export const LivIndexDriversConfig = {
     icon: { name: "FaStore", set: "fa" },
   },
   "industrial-hitech": {
-    label: "Business Tech Park",
+    label: "Tech Parks",
     icon: { name: "BiSolidFactory", set: "bi" },
   },
   "industrial-general": {
