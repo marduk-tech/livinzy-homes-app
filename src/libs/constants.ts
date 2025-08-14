@@ -387,6 +387,7 @@ export const LandingConstants = {
 
 export const DRIVER_CATEGORIES = {
   schools: {
+    icon: { name: "IoMdSchool", set: "io" },
     drivers: ["school", "university"],
     filters: [
       { label: "CBSE", key: "cbse" },
@@ -422,9 +423,11 @@ export const DRIVER_CATEGORIES = {
     },
   },
   workplace: {
+    icon: { name: "BiSolidFactory", set: "bi" },
     drivers: ["industrial-hitech", "industrial-general"],
   },
   conveniences: {
+    icon: { name: "FaStore", set: "fa" },
     drivers: ["food", "hospital", "commercial", "micro-market"],
     filters: [
       { key: "pop-dining", label: "Popular Dining" },
@@ -454,8 +457,10 @@ export const DRIVER_CATEGORIES = {
   },
   connectivity: {
     drivers: ["highway", "transit"],
+    icon: { name: "FaRoad", set: "fa" },
   },
   "growth potential": {
+    icon: { name: "TbChartAreaLineFilled", set: "tb" },
     drivers: [
       "industrial-hitech",
       "industrial-general",
@@ -488,6 +493,7 @@ export const DRIVER_CATEGORIES = {
     },
   },
   surroundings: {
+    icon: { name: "TbMapPlus", set: "tb" },
     drivers: [],
   },
 };

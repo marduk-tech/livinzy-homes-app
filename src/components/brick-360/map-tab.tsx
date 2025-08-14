@@ -114,9 +114,17 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
           footer={null}
           width={isMobile ? "100%" : 900}
           style={{ top: 10 }}
+          closeIcon={
+            <DynamicReactIcon
+              iconName="IoCloseCircle"
+              iconSet="io5"
+              size={32}
+              color={COLORS.textColorMedium}
+            ></DynamicReactIcon>
+          }
           styles={{
             content: {
-              backgroundColor: COLORS.bgColorMedium,
+              backgroundColor: COLORS.bgColor,
               borderRadius: 8,
               padding: 16,
               overflowY: "hidden",
@@ -124,7 +132,10 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
           }}
         >
           <Flex
-            style={{ height: Math.min(window.innerHeight - 20, 800) }}
+            style={{
+              height: Math.min(window.innerHeight - 40, 800),
+              paddingTop: 28,
+            }}
             vertical
             gap={16}
           >

@@ -604,9 +604,8 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                     vertical
                     style={{
                       position: "relative",
-                      border: "2px solid",
-                      borderColor: COLORS.borderColor,
                       borderRadius: 16,
+                      overflowX: "hidden",
                     }}
                   >
                     <Flex
@@ -653,6 +652,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
                     >
                       <MapViewV2
                         projectId={lvnzyProject?.originalProjectId?._id}
+                        hideAllFilters={true}
                         surroundingElements={surroundingElements}
                         projectSqftPricing={Math.round(
                           lvnzyProject?.originalProjectId.info.rate
@@ -863,15 +863,25 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
           style={{ top: 10 }}
           styles={{
             content: {
-              backgroundColor: COLORS.bgColorMedium,
+              backgroundColor: COLORS.bgColor,
               borderRadius: 8,
-              padding: 0,
+              padding: "16px 8px",
               overflowY: "hidden",
             },
           }}
+          closeIcon={
+            <DynamicReactIcon
+              iconName="IoCloseCircle"
+              iconSet="io5"
+              size={32}
+              color={COLORS.textColorMedium}
+            ></DynamicReactIcon>
+          }
         >
           <Flex
-            style={{ height: Math.min(window.innerHeight - 20, 800) }}
+            style={{
+              height: Math.min(window.innerHeight - 20, 800),
+            }}
             vertical
             gap={8}
           >

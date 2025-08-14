@@ -390,6 +390,7 @@ const MapViewV2 = ({
   showCorridors = true,
   minMapZoom = 12,
   categories,
+  hideAllFilters,
 }: {
   drivers?: any[];
   projectId?: string;
@@ -407,6 +408,7 @@ const MapViewV2 = ({
   showCorridors?: boolean;
   minMapZoom?: number;
   categories?: string[];
+  hideAllFilters?: boolean;
 }) => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [driverFilters, setDriverFilters] = useState<any[]>([]);
@@ -1631,10 +1633,13 @@ const MapViewV2 = ({
             borderRadius: 16,
             padding: "4px 8px",
             marginRight: 4,
-            backgroundColor: isSelected ? COLORS.primaryColor : "white",
+            backgroundColor: isSelected
+              ? COLORS.textColorDark
+              : " rgba(255,255,255,.9)",
             color: isSelected ? "white" : "initial",
             marginLeft: 0,
             cursor: "pointer",
+            border: `1.5px solid ${COLORS.textColorDark}`,
           }}
           onClick={() => {
             setSelectedDriverFilter(filterItem.key);
@@ -1658,7 +1663,6 @@ const MapViewV2 = ({
     if (!(LivIndexDriversConfig as any)[k]) {
       return null;
     }
-    const icon = (LivIndexDriversConfig as any)[k].icon;
     const isSelected = k == selectedDriverFilter;
     return (
       <Tag
@@ -1669,27 +1673,24 @@ const MapViewV2 = ({
           borderRadius: 16,
           padding: "4px 8px",
           marginRight: 4,
-          backgroundColor: isSelected ? COLORS.primaryColor : "white",
+          backgroundColor: isSelected
+            ? COLORS.textColorDark
+            : " rgba(255,255,255,.5)",
           color: isSelected ? "white" : "initial",
           marginLeft: 0,
+          border: `1.5px solid ${COLORS.textColorDark}`,
           cursor: "pointer",
         }}
         onClick={() => {
           setSelectedDriverFilter(k);
         }}
       >
-        <DynamicReactIcon
-          iconName={icon.name}
-          iconSet={icon.set}
-          size={20}
-          color={isSelected ? "white" : COLORS.textColorDark}
-        ></DynamicReactIcon>
         <Typography.Text
           style={{
             color: isSelected ? "white" : COLORS.textColorDark,
             marginLeft: 4,
-            fontSize: FONT_SIZE.SUB_TEXT,
-            fontWeight: 500,
+            fontSize: FONT_SIZE.PARA,
+            fontWeight: isSelected ? 400 : 600,
           }}
         >
           {(LivIndexDriversConfig as any)[k]
@@ -1714,7 +1715,9 @@ const MapViewV2 = ({
           borderRadius: 16,
           padding: "4px 8px",
           backgroundColor:
-            k == selectedSurroundingElementType ? COLORS.primaryColor : "white",
+            k == selectedSurroundingElementType
+              ? COLORS.textColorDark
+              : "white",
           color: k == selectedSurroundingElementType ? "white" : "initial",
           marginLeft: 4,
           fontSize: FONT_SIZE.HEADING_3,
@@ -1785,7 +1788,7 @@ const MapViewV2 = ({
       }}
     >
       {/* Category Selection Tags  */}
-      {showCategorySelection && (
+      {showCategorySelection && !hideAllFilters ? (
         <Flex
           style={{
             overflowX: "auto",
@@ -1796,14 +1799,15 @@ const MapViewV2 = ({
           gap={8}
         >
           {categories.map((category) => (
-            <Tag.CheckableTag
+            <Flex
               key={category}
-              checked={selectedCategory === category}
-              onChange={(checked) => {
+              onClick={(checked) => {
                 if (checked) {
                   setSelectedCategory(category);
                 }
               }}
+              align="center"
+              gap={4}
               style={{
                 textTransform: "capitalize",
                 border: `1px solid ${
@@ -1816,73 +1820,90 @@ const MapViewV2 = ({
                 borderRadius: 16,
                 backgroundColor:
                   selectedCategory === category ? COLORS.primaryColor : "white",
-                color:
-                  selectedCategory === category
-                    ? "white"
-                    : COLORS.textColorMedium,
+
                 whiteSpace: "nowrap",
                 cursor: "pointer",
               }}
             >
-              {capitalize(category)}
-            </Tag.CheckableTag>
+              <DynamicReactIcon
+                color={
+                  selectedCategory === category ? "white" : COLORS.textColorDark
+                }
+                iconName={(DRIVER_CATEGORIES as any)[category].icon.name}
+                iconSet={(DRIVER_CATEGORIES as any)[category].icon.set}
+                size={16}
+              ></DynamicReactIcon>
+              <Typography.Text
+                style={{
+                  color:
+                    selectedCategory === category
+                      ? "white"
+                      : COLORS.textColorDark,
+                }}
+              >
+                {capitalize(category)}
+              </Typography.Text>
+            </Flex>
           ))}
         </Flex>
-      )}
+      ) : null}
 
-      <Flex
-        style={{
-          position: "absolute",
-          zIndex: 9999,
-          bottom: surroundingElements && surroundingElements.length && 32,
-          paddingLeft: 8,
-          width: "100%",
-        }}
-        align={isMobile ? "flex-start" : "center"}
-        gap={8}
-        vertical={isMobile}
-      >
-        {/* Drivers filters */}
-        {drivers &&
-        drivers.length &&
-        showDriverFilters &&
-        currentSelectedCategory !== "surroundings" ? (
-          <Flex
-            style={{
-              width: "100%",
-              overflowX: "scroll",
-              scrollbarWidth: "none",
-              height: 32,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {(driverFilters || [])
-              .filter((d) => {
-                if (!d) return false;
+      {!hideAllFilters ? (
+        <Flex
+          style={{
+            position: "absolute",
+            zIndex: 9999,
+            bottom: 24,
+            paddingLeft: 8,
+            width: "100%",
+          }}
+          align={isMobile ? "flex-start" : "center"}
+          gap={8}
+          vertical={isMobile}
+        >
+          {/* Drivers filters */}
+          {drivers &&
+          drivers.length &&
+          showDriverFilters &&
+          currentSelectedCategory !== "surroundings" ? (
+            <Flex
+              style={{
+                width: "100%",
+                overflowX: "scroll",
+                scrollbarWidth: "none",
+                height: 32,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {(driverFilters || [])
+                .filter((d) => {
+                  if (!d) return false;
 
-                // custom filter object always show it (it's already filtered by category)
-                if (typeof d === "object" && d.key && d.label) {
-                  return true;
-                }
+                  // custom filter object always show it (it's already filtered by category)
+                  if (typeof d === "object" && d.key && d.label) {
+                    return true;
+                  }
 
-                // If no categories provided, show all driver types
-                if (noCategoriesProvided) {
-                  return true;
-                }
+                  // If no categories provided, show all driver types
+                  if (noCategoriesProvided) {
+                    return true;
+                  }
 
-                // For driver type strings, filter by currently selected category
-                const categoryDrivers =
-                  (DRIVER_CATEGORIES as any)[selectedCategory]?.drivers || [];
-                return (
-                  Array.isArray(categoryDrivers) && categoryDrivers.includes(d)
-                );
-              })
-              .map((filterItem: any) => {
-                return renderDriverFilters(filterItem);
-              })}
-          </Flex>
-        ) : null}
-      </Flex>
+                  // For driver type strings, filter by currently selected category
+                  const categoryDrivers =
+                    (DRIVER_CATEGORIES as any)[selectedCategory]?.drivers || [];
+                  return (
+                    Array.isArray(categoryDrivers) &&
+                    categoryDrivers.includes(d)
+                  );
+                })
+                .map((filterItem: any) => {
+                  return renderDriverFilters(filterItem);
+                })}
+            </Flex>
+          ) : null}
+        </Flex>
+      ) : null}
 
       {/* Surrounding Elements Filters */}
       {surroundingElements &&
