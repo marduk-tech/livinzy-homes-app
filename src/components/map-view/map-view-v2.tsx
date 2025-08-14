@@ -427,7 +427,7 @@ const MapViewV2 = ({
 
   // first available category from DRIVER_CATEGORIES
   const getDefaultCategory = () => {
-    if (hasCategories) return categories[0];
+    if (hasCategories && categories.length > 0) return categories[0];
     const allCategories = Object.keys(DRIVER_CATEGORIES);
     return allCategories[0];
   };
@@ -438,6 +438,12 @@ const MapViewV2 = ({
   const currentSelectedCategory = selectedCategory;
 
   const { isMobile } = useDevice();
+
+  useEffect(() => {
+    if (hasCategories && categories.length > 0) {
+      setSelectedCategory(categories[0]);
+    }
+  }, [categories, hasCategories]);
 
   // Reset selected driver filter when category changes
   useEffect(() => {
@@ -555,6 +561,36 @@ const MapViewV2 = ({
       setSimpleDriverMarkerIcons(validIcons);
     }
 
+    // filter that has matching drivers
+    const findValidFilter = (
+      filters: any[],
+      drivers: any[],
+      categoryData: any
+    ) => {
+      for (const filter of filters) {
+        if (
+          typeof filter === "object" &&
+          filter.key &&
+          categoryData?.onFilter
+        ) {
+          const hasMatchingDrivers = drivers.some((driver) =>
+            categoryData.onFilter(filter.key, driver)
+          );
+          if (hasMatchingDrivers) {
+            return filter.key;
+          }
+        } else if (typeof filter === "string") {
+          const hasMatchingDrivers = drivers.some(
+            (driver) => driver.driver === filter
+          );
+          if (hasMatchingDrivers) {
+            return filter;
+          }
+        }
+      }
+      return null;
+    };
+
     // Fetch icons, set unique driver types based on categories
     if (drivers && drivers?.length) {
       fetchDriverIcons();
@@ -569,14 +605,24 @@ const MapViewV2 = ({
         if (customFilters.length > 0) {
           // Use custom filters for the selected category
           setDriverFilters(customFilters);
-          setSelectedDriverFilter(customFilters[0].key);
+
+          // Find the first filter that has matching drivers
+          const validFilter = findValidFilter(
+            customFilters,
+            drivers,
+            categoryData
+          );
+          setSelectedDriverFilter(validFilter || customFilters[0].key);
         } else {
           // Fallback to driver types for the selected category
           const driverTypes = (categoryData?.drivers || []).filter(
             (driverType) => drivers.some((d) => d.driver === driverType)
           );
           setDriverFilters(driverTypes);
-          setSelectedDriverFilter(driverTypes[0]);
+
+          // Find the first driver type that has matching drivers
+          const validDriverType = findValidFilter(driverTypes, drivers, null);
+          setSelectedDriverFilter(validDriverType || driverTypes[0]);
         }
       } else {
         // use unique driver types - no categories provided
@@ -586,7 +632,7 @@ const MapViewV2 = ({
         setDriverFilters(uniqueDriverTypes);
       }
     }
-  }, [drivers, categories, selectedCategory]);
+  }, [drivers, categories, selectedCategory, hasCategories]);
 
   // Setting the unique surrounding elements for filters
   useEffect(() => {
