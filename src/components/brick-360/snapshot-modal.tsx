@@ -1,10 +1,11 @@
 import { Flex, Modal, Typography } from "antd";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
+import { ReactNode } from "react";
 
 interface SnapshotModalProps {
   isOpen: boolean;
   onClose: () => void;
-  pt: string;
+  pt: ReactNode;
 }
 
 export const SnapshotModal = ({ isOpen, onClose, pt }: SnapshotModalProps) => {
@@ -17,20 +18,20 @@ export const SnapshotModal = ({ isOpen, onClose, pt }: SnapshotModalProps) => {
       footer={null}
       open={isOpen}
       closable={true}
-      style={{ top: 150 }}
+      style={{ top: 100 }}
       onCancel={onClose}
       onClose={onClose}
     >
       <Flex vertical>
-        <div
-          dangerouslySetInnerHTML={{ __html: pt }}
-          className="reasoning"
-          style={{ fontSize: FONT_SIZE.HEADING_4, margin: 0 }}
-        ></div>
+        {pt}
         <Typography.Text
-          style={{ marginTop: 24, color: COLORS.textColorLight }}
+          style={{
+            marginTop: 16,
+            color: COLORS.textColorLight,
+            fontSize: FONT_SIZE.PARA,
+          }}
         >
-          See full report for details.
+          * See full report for specific details.
         </Typography.Text>
       </Flex>
     </Modal>

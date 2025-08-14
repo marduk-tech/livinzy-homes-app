@@ -6,7 +6,7 @@ import GradientBar from "../common/grading-bar";
 import RatingBar from "../common/rating-bar";
 import { ScrollableContainer } from "../scrollable-container";
 import { SnapshotModal } from "./snapshot-modal";
-import { forwardRef, useState } from "react";
+import { forwardRef, ReactNode, useState } from "react";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 const { Paragraph } = Typography;
 
@@ -21,11 +21,49 @@ export const Brick360Tab = forwardRef<any, Brick360TabProps>(
     const [quickSnapshotDialogOpen, setQuickSnapshotDialogOpen] =
       useState(false);
     const [quickSnapshotDialogContent, setQuickSnapshotDialogContent] =
-      useState<string>("");
+      useState<ReactNode>("");
 
     function renderSummaryPoint(pt: string, isPro: boolean) {
       const match = pt.match(/<b>(.*?)<\/b>/);
       const title = match ? match[1] : null;
+
+      function reasoningStmt(truncate: boolean) {
+        return (
+          <Flex vertical>
+            <Flex align="center" gap={4}>
+              <DynamicReactIcon
+                size={isPro ? 20 : 24}
+                iconName={isPro ? "FaRegLaugh" : "PiSmileySadBold"}
+                iconSet={isPro ? "fa" : "pi"}
+                color={isPro ? COLORS.primaryColor : COLORS.redIdentifier}
+              ></DynamicReactIcon>
+              <Typography.Text
+                style={{ fontWeight: 500, fontSize: FONT_SIZE.HEADING_2 }}
+              >
+                {title}
+              </Typography.Text>
+            </Flex>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: `${pt.replace(`<b>${title}</b><br>`, "")} ${
+                  truncate ? '<span class="read-more">Read more</span>' : ""
+                }`,
+              }}
+              className={`reasoning ${truncate ? "truncated" : ""} ${
+                isPro ? "" : "con"
+              }`}
+              style={{
+                fontSize: truncate ? FONT_SIZE.HEADING_4 : FONT_SIZE.HEADING_3,
+                margin: 0,
+                marginTop: truncate ? 0 : 16,
+                width: truncate ? 275 : "100%",
+                color: COLORS.textColorMedium,
+                textWrap: "wrap",
+              }}
+            ></div>
+          </Flex>
+        );
+      }
       return (
         <Flex
           align="flex-start"
@@ -33,47 +71,19 @@ export const Brick360Tab = forwardRef<any, Brick360TabProps>(
             padding: "8px",
             backgroundColor: isPro ? "#f7fcff" : "#fffafa",
             borderRadius: 8,
+            cursor: "pointer",
             borderWidth: "0.05px",
             borderColor: COLORS.borderColorMedium,
             borderStyle: "solid",
-            width: 1000,
           }}
           onClick={() => {
-            // setQuickSnapshotDialogOpen(true);
-            // setQuickSnapshotDialogContent(pt);
+            setQuickSnapshotDialogOpen(true);
+            setQuickSnapshotDialogContent(reasoningStmt(false));
           }}
           gap={4}
           vertical
         >
-          <Flex align="center" gap={4}>
-            <DynamicReactIcon
-              size={isPro ? 20 : 24}
-              iconName={isPro ? "FaRegLaugh" : "PiSmileySadBold"}
-              iconSet={isPro ? "fa" : "pi"}
-              color={isPro ? COLORS.primaryColor : COLORS.redIdentifier}
-            ></DynamicReactIcon>
-            <Typography.Text
-              style={{ fontWeight: 500, fontSize: FONT_SIZE.HEADING_2 }}
-            >
-              {title}
-            </Typography.Text>
-          </Flex>
-          <div
-            dangerouslySetInnerHTML={{
-              __html: `${pt.replace(
-                `<b>${title}</b><br>`,
-                ""
-              )} <span class="read-more">Read more</span>`,
-            }}
-            className={`reasoning truncated ${isPro ? "" : "con"}`}
-            style={{
-              fontSize: FONT_SIZE.HEADING_4,
-              margin: 0,
-              width: 275,
-              color: COLORS.textColorMedium,
-              textWrap: "wrap",
-            }}
-          ></div>
+          {reasoningStmt(true)}
         </Flex>
       );
     }
