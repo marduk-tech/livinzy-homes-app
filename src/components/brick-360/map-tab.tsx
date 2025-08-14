@@ -46,7 +46,6 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
 
   return (
     <ScrollableContainer>
-
       <Flex
         style={{
           position: "relative",
@@ -60,7 +59,7 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
           <Flex
             style={{
               position: "absolute",
-              top: 16,
+              top: 66,
               right: 16,
               zIndex: 9999,
             }}
@@ -129,7 +128,6 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
             vertical
             gap={16}
           >
-
             <MapViewV2
               projectId={lvnzyProject?.originalProjectId._id}
               drivers={drivers}

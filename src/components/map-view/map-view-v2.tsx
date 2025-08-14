@@ -436,6 +436,11 @@ const MapViewV2 = ({
   const currentSelectedCategory = selectedCategory;
 
   const { isMobile } = useDevice();
+
+  // Reset selected driver filter when category changes
+  useEffect(() => {
+    setSelectedDriverFilter(undefined);
+  }, [selectedCategory]);
   const [uniqueSurroundingElements, setUniqueSurroundingElements] = useState<
     ISurroundingElement[]
   >([]);
@@ -553,29 +558,20 @@ const MapViewV2 = ({
       fetchDriverIcons();
 
       // Set driver filters - use custom filters if available, otherwise use driver types
-      if (hasCategories) {
-        // Check if any category has custom filters
-        const customFilters = categories.flatMap((category) => {
-          const categoryData =
-            DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES];
-          const filters = (categoryData as any)?.filters || [];
-          return filters;
-        });
+      if (hasCategories && selectedCategory) {
+        // Get data for the currently selected category only
+        const categoryData =
+          DRIVER_CATEGORIES[selectedCategory as keyof typeof DRIVER_CATEGORIES];
+        const customFilters = (categoryData as any)?.filters || [];
 
         if (customFilters.length > 0) {
-          // Use custom filters
+          // Use custom filters for the selected category
           setDriverFilters(customFilters);
         } else {
-          // Fallback to driver types
-          const driverTypes = categories
-            .flatMap(
-              (category) =>
-                DRIVER_CATEGORIES[category as keyof typeof DRIVER_CATEGORIES]
-                  ?.drivers || []
-            )
-            .filter((driverType) =>
-              drivers.some((d) => d.driver === driverType)
-            );
+          // Fallback to driver types for the selected category
+          const driverTypes = (categoryData?.drivers || []).filter(
+            (driverType) => drivers.some((d) => d.driver === driverType)
+          );
           setDriverFilters(driverTypes);
         }
       } else {
@@ -586,7 +582,7 @@ const MapViewV2 = ({
         setDriverFilters(uniqueDriverTypes);
       }
     }
-  }, [drivers, categories]);
+  }, [drivers, categories, selectedCategory]);
 
   // Setting the unique surrounding elements for filters
   useEffect(() => {
@@ -1790,20 +1786,18 @@ const MapViewV2 = ({
         overflowY: "hidden",
         borderRadius: 8,
         position: "relative",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      {/* Category Selection Tags */}
+      {/* Category Selection Tags  */}
       {showCategorySelection && (
         <Flex
           style={{
-            position: "absolute",
-            zIndex: 9999,
-            top: 16,
-            left: 8,
-            right: 8,
-            width: "calc(100% - 16px)",
             overflowX: "auto",
             scrollbarWidth: "none",
+            flexShrink: 0,
+            marginBottom: 20,
           }}
           gap={8}
         >
@@ -1846,12 +1840,7 @@ const MapViewV2 = ({
         style={{
           position: "absolute",
           zIndex: 9999,
-          bottom:
-            surroundingElements &&
-            surroundingElements.length &&
-            currentSelectedCategory === "surroundings"
-              ? 72
-              : 32,
+          bottom: surroundingElements && surroundingElements.length && 32,
           paddingLeft: 8,
           width: "100%",
         }}
@@ -1887,15 +1876,12 @@ const MapViewV2 = ({
                   return true;
                 }
 
-                // For driver type strings, filter by category
-                return categories.some((category) => {
-                  const categoryDrivers =
-                    (DRIVER_CATEGORIES as any)[category]?.drivers || [];
-                  return (
-                    Array.isArray(categoryDrivers) &&
-                    categoryDrivers.includes(d)
-                  );
-                });
+                // For driver type strings, filter by currently selected category
+                const categoryDrivers =
+                  (DRIVER_CATEGORIES as any)[selectedCategory]?.drivers || [];
+                return (
+                  Array.isArray(categoryDrivers) && categoryDrivers.includes(d)
+                );
               })
               .map((filterItem: any) => {
                 return renderDriverFilters(filterItem);
@@ -1927,10 +1913,10 @@ const MapViewV2 = ({
       ) : null}
 
       {/* Map container */}
-      <Flex
+      <div
         style={{
-          height: "100%",
-          width: "100%",
+          flex: 1,
+          position: "relative",
         }}
       >
         <MapContainer
@@ -1977,9 +1963,15 @@ const MapViewV2 = ({
                 {drivers && drivers.length ? (
                   <>
                     <BoundsAwareDrivers
-                      renderRoadDrivers={(bounds) => <RoadDriversComponent bounds={bounds} />}
-                      renderTransitDrivers={(bounds) => <TransitDriversComponent bounds={bounds} />}
-                      renderSimpleDrivers={(bounds) => <SimpleDriversRenderer bounds={bounds} />}
+                      renderRoadDrivers={(bounds) => (
+                        <RoadDriversComponent bounds={bounds} />
+                      )}
+                      renderTransitDrivers={(bounds) => (
+                        <TransitDriversComponent bounds={bounds} />
+                      )}
+                      renderSimpleDrivers={(bounds) => (
+                        <SimpleDriversRenderer bounds={bounds} />
+                      )}
                     />
                     <MapPolygons
                       polygons={processDriversToPolygons(
@@ -1994,7 +1986,7 @@ const MapViewV2 = ({
             );
           })()}
         </MapContainer>
-      </Flex>
+      </div>
 
       {/* Dynamic modal to show map click content */}
       <Modal
