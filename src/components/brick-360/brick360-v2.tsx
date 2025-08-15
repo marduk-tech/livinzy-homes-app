@@ -218,7 +218,6 @@ export function Brick360v2() {
       style={{
         width: "100%",
         margin: "auto",
-        maxWidth: 900,
         overflowX: "hidden",
       }}
     >

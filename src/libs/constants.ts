@@ -62,7 +62,7 @@ export const LivIndexDriversConfig = {
     icon: { name: "FaStore", set: "fa" },
   },
   "industrial-hitech": {
-    label: "Business Tech Park",
+    label: "Tech Parks",
     icon: { name: "BiSolidFactory", set: "bi" },
   },
   "industrial-general": {
@@ -387,35 +387,80 @@ export const LandingConstants = {
 
 export const DRIVER_CATEGORIES = {
   schools: {
+    icon: { name: "IoMdSchool", set: "io" },
     drivers: ["school", "university"],
     filters: [
-      { label: "Pre School", key: "pre-school" },
-      { label: "International", key: "international" },
       { label: "CBSE", key: "cbse" },
       { label: "ICSE", key: "icse" },
-      { label: "university", key: "university" },
+      { label: "International", key: "international" },
+      { label: "Pre School", key: "pre-school" },
+      { label: "University", key: "university" },
     ],
     onFilter: (filter: string, driver: IDriverPlace) => {
-      if (
-        filter == "international" &&
-        (driver.tags?.includes("ib") ||
-          driver.tags?.includes("cambridge-igcse"))
-      ) {
-        return true;
+      if (filter == "international") {
+        return (
+          driver.tags?.includes("ib") ||
+          driver.tags?.includes("cambridge-igcse")
+        );
+      }
+      if (filter == "pre-school") {
+        return (
+          driver.tags?.includes("pre-school") &&
+          driver.distance &&
+          driver.distance <= 5
+        );
+      }
+      if (filter == "cbse") {
+        return driver.tags?.includes("cbse");
+      }
+      if (filter == "icse") {
+        return driver.tags?.includes("icse");
+      }
+      if (filter == "university") {
+        return driver.driver === "university";
       }
       return false;
     },
   },
   workplace: {
+    icon: { name: "BiSolidFactory", set: "bi" },
     drivers: ["industrial-hitech", "industrial-general"],
   },
   conveniences: {
+    icon: { name: "FaStore", set: "fa" },
     drivers: ["food", "hospital", "commercial", "micro-market"],
+    filters: [
+      { key: "pop-dining", label: "Popular Dining" },
+      { key: "hospital", label: "Hospital" },
+      { key: "malls", label: "Large Mall" },
+      { key: "market", label: "Market Area" },
+    ],
+    onFilter: (filter: string, driver: IDriverPlace) => {
+      if (filter == "pop-dining") {
+        return (
+          ["food"].includes(driver.driver) &&
+          driver.tags &&
+          driver.tags.some((t) => ["popular brand", "fine dining"].includes(t))
+        );
+      }
+      if (filter == "hospital") {
+        return driver.driver == "hospital";
+      }
+      if (filter == "malls") {
+        return driver.driver == "commercial";
+      }
+      if (filter == "market") {
+        return driver.driver == "micro-market";
+      }
+      return false;
+    },
   },
   connectivity: {
     drivers: ["highway", "transit"],
+    icon: { name: "FaRoad", set: "fa" },
   },
   "growth potential": {
+    icon: { name: "TbChartAreaLineFilled", set: "tb" },
     drivers: [
       "industrial-hitech",
       "industrial-general",
@@ -423,8 +468,32 @@ export const DRIVER_CATEGORIES = {
       "transit",
       "micro-market",
     ],
+    filters: [
+      { label: "Infra Push", key: "major-infra" },
+      { label: "Upcoming Tech Park", key: "upcoming-tech" },
+    ],
+    onFilter: (filter: string, driver: IDriverPlace) => {
+      if (filter == "major-infra") {
+        return (
+          ["highway", "industrial-general", "transit"].includes(
+            driver.driver
+          ) &&
+          driver.status !== "post-launch" &&
+          driver.distance &&
+          driver.distance <= 6
+        );
+      }
+      if (filter == "upcoming-tech") {
+        return (
+          ["industrial-hitech"].includes(driver.driver) &&
+          driver.status !== "post-launch"
+        );
+      }
+      return false;
+    },
   },
   surroundings: {
+    icon: { name: "TbMapPlus", set: "tb" },
     drivers: [],
   },
 };

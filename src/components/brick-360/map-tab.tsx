@@ -1,8 +1,7 @@
-import { Button, Flex, Modal, Tag, Typography } from "antd";
+import { Button, Flex, Modal } from "antd";
 import { useEffect, useState } from "react";
 import { useDevice } from "../../hooks/use-device";
 import { DRIVER_CATEGORIES } from "../../libs/constants";
-import { capitalize } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import DynamicReactIcon from "../common/dynamic-react-icon";
 import MapViewV2 from "../map-view/map-view-v2";
@@ -18,15 +17,8 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
   const [drivers, setDrivers] = useState<any[]>([]);
   const [surroundingElements, setSurroundingElements] = useState<any[]>([]);
 
-  // first available category from DRIVER_CATEGORIES
-  const getDefaultCategory = () => {
-    const categories = Object.keys(DRIVER_CATEGORIES);
-    return categories[0];
-  };
-
-  const [selectedCategory, setSelectedCategory] = useState<string>(
-    getDefaultCategory()
-  );
+  // Get all available categories from DRIVER_CATEGORIES
+  const allCategories = Object.keys(DRIVER_CATEGORIES);
 
   useEffect(() => {
     if (!lvnzyProject) {
@@ -54,51 +46,6 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
 
   return (
     <ScrollableContainer>
-      {!isMapFullScreen && (
-        <Flex
-          style={{
-            width: "100%",
-            overflowX: "auto",
-            scrollbarWidth: "none",
-            marginBottom: 16,
-          }}
-          gap={8}
-        >
-          {Object.keys(DRIVER_CATEGORIES).map((category) => (
-            <Tag.CheckableTag
-              key={category}
-              checked={selectedCategory === category}
-              onChange={(checked) => {
-                if (checked) {
-                  setSelectedCategory(category);
-                }
-              }}
-              style={{
-                textTransform: "capitalize",
-                border: `1px solid ${
-                  selectedCategory === category
-                    ? COLORS.primaryColor
-                    : COLORS.borderColor
-                }`,
-                marginRight: 0,
-                padding: "4px 12px",
-                borderRadius: 16,
-                backgroundColor:
-                  selectedCategory === category ? COLORS.primaryColor : "white",
-                color:
-                  selectedCategory === category
-                    ? "white"
-                    : COLORS.textColorMedium,
-                whiteSpace: "nowrap",
-                cursor: "pointer",
-              }}
-            >
-              {capitalize(category)}
-            </Tag.CheckableTag>
-          ))}
-        </Flex>
-      )}
-
       <Flex
         style={{
           position: "relative",
@@ -112,7 +59,7 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
           <Flex
             style={{
               position: "absolute",
-              top: 16,
+              top: 66,
               right: 16,
               zIndex: 9999,
             }}
@@ -152,8 +99,7 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
             projectId={lvnzyProject?.originalProjectId._id}
             drivers={drivers}
             surroundingElements={surroundingElements}
-            isFromTab={true}
-            selectedCategory={selectedCategory}
+            categories={allCategories}
           />
         )}
 
@@ -168,9 +114,17 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
           footer={null}
           width={isMobile ? "100%" : 900}
           style={{ top: 10 }}
+          closeIcon={
+            <DynamicReactIcon
+              iconName="IoCloseCircle"
+              iconSet="io5"
+              size={32}
+              color={COLORS.textColorMedium}
+            ></DynamicReactIcon>
+          }
           styles={{
             content: {
-              backgroundColor: COLORS.bgColorMedium,
+              backgroundColor: COLORS.bgColor,
               borderRadius: 8,
               padding: 16,
               overflowY: "hidden",
@@ -178,61 +132,19 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
           }}
         >
           <Flex
-            style={{ height: Math.min(window.innerHeight - 20, 800) }}
+            style={{
+              height: Math.min(window.innerHeight - 40, 800),
+              paddingTop: 28,
+            }}
             vertical
             gap={16}
           >
-            <Flex
-              style={{
-                width: "100%",
-                overflowX: "auto",
-                scrollbarWidth: "none",
-              }}
-              gap={8}
-            >
-              {Object.keys(DRIVER_CATEGORIES).map((category) => (
-                <Tag.CheckableTag
-                  key={category}
-                  checked={selectedCategory === category}
-                  onChange={(checked) => {
-                    if (checked) {
-                      setSelectedCategory(category);
-                    }
-                  }}
-                  style={{
-                    textTransform: "capitalize",
-                    border: `1px solid ${
-                      selectedCategory === category
-                        ? COLORS.primaryColor
-                        : COLORS.borderColor
-                    }`,
-                    marginRight: 0,
-                    padding: "4px 12px",
-                    borderRadius: 16,
-                    backgroundColor:
-                      selectedCategory === category
-                        ? COLORS.primaryColor
-                        : "white",
-                    color:
-                      selectedCategory === category
-                        ? "white"
-                        : COLORS.textColorMedium,
-                    whiteSpace: "nowrap",
-                    cursor: "pointer",
-                  }}
-                >
-                  {capitalize(category)}
-                </Tag.CheckableTag>
-              ))}
-            </Flex>
-
             <MapViewV2
               projectId={lvnzyProject?.originalProjectId._id}
               drivers={drivers}
               surroundingElements={surroundingElements}
               fullSize={true}
-              isFromTab={true}
-              selectedCategory={selectedCategory}
+              categories={allCategories}
             />
           </Flex>
         </Modal>
