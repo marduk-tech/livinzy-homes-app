@@ -133,7 +133,7 @@ export const MapTab = ({ lvnzyProject }: MapTabProps) => {
         >
           <Flex
             style={{
-              height: Math.min(window.innerHeight - 40, 800),
+              height: Math.min(window.innerHeight - 75, 800),
               paddingTop: 28,
             }}
             vertical

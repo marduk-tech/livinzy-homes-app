@@ -880,7 +880,7 @@ export const Brick360Chat = forwardRef<Brick360ChatRef, Brick360Props>(
         >
           <Flex
             style={{
-              height: Math.min(window.innerHeight - 20, 800),
+              height: Math.min(window.innerHeight - 75, 800),
             }}
             vertical
             gap={8}
