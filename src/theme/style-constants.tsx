@@ -35,6 +35,6 @@ export const FONT_SIZE = {
 };
 
 export const MOBILE_MARGIN = 16;
-export const MAX_WIDTH = 1250;
+export const MAX_WIDTH = 1150;
 export const HORIZONTAL_PADDING =
   window.innerWidth > MAX_WIDTH ? (window.innerWidth - MAX_WIDTH) / 2 : 16;
