@@ -731,7 +731,7 @@ const MapViewV2 = ({
         "FaRoad",
         "fa",
         false,
-        undefined,
+        "undefined",
         undefined,
         {
           iconBgColor: COLORS.textColorDark,

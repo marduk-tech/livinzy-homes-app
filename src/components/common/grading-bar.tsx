@@ -91,7 +91,11 @@ const GradientBar: React.FC<GradientBarProps> = ({ value, showBadgeOnly }) => {
         align="center"
       >
         <Typography.Text
-          style={{ fontWeight: 500, fontSize: FONT_SIZE.HEADING_3 }}
+          style={{
+            fontWeight: 300,
+            fontSize: FONT_SIZE.HEADING_4,
+            color: COLORS.textColorDark,
+          }}
         >
           {value ? Math.round(value * 5) / 100 : ""}
         </Typography.Text>

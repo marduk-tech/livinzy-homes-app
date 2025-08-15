@@ -68,8 +68,6 @@ export function UserProjects({
           width: isMobile
             ? "100%"
             : (window.innerWidth - 40 * 3 - HORIZONTAL_PADDING * 2) / 4,
-          borderBottom: isMobile ? `1px solid ${COLORS.borderColor}` : "none",
-          paddingBottom: isMobile ? 24 : 0,
         }}
         onClick={() => {
           navigate(`/app/brick360/${itemInfo._id}`);
@@ -259,10 +257,15 @@ export function UserProjects({
           width: "100%",
           flexWrap: "wrap",
           marginTop: 16,
+          padding: isMobile ? `0 8px` : 0,
         }}
-        gap={24}
+        gap={32}
       >
-        {filteredProjects.map((p: any) => renderLvnzyProject(p))}
+        {filteredProjects
+          .sort((a: any, b: any) =>
+            a.meta.projectName > b.meta.projectName ? 1 : -1
+          )
+          .map((p: any) => renderLvnzyProject(p))}
       </Flex>
       {/* <BrickfiAssist
         ref={chatRef}
