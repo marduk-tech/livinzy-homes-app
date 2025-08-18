@@ -3,6 +3,7 @@ import { rupeeAmountFormat } from "../../libs/lvnzy-helper";
 import { COLORS, FONT_SIZE } from "../../theme/style-constants";
 import { ScrollableContainer } from "../scrollable-container";
 import { useDevice } from "../../hooks/use-device";
+import { useEffect, useState } from "react";
 
 interface UnitsTabProps {
   lvnzyProject: any;
@@ -54,7 +55,9 @@ const getMinMaxSize = (configs: any[]) => {
   if (sizes.length) {
     sizes = sizes.sort((a, b) => a - b);
     return (
-      <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
+      <Typography.Text
+        style={{ fontSize: FONT_SIZE.HEADING_4, color: COLORS.textColorMedium }}
+      >
         {sizes[0] == sizes[sizes.length - 1]
           ? sizes[0]
           : `${sizes[0]} - ${sizes[sizes.length - 1]}`}{" "}
@@ -65,8 +68,44 @@ const getMinMaxSize = (configs: any[]) => {
   return null;
 };
 
+const getBhkType = (config: string) => {
+  const splits = config.split("-");
+  if (
+    splits &&
+    splits.length > 1 &&
+    splits[0].toLowerCase().indexOf("bhk") > -1
+  ) {
+    return `${parseInt(splits[0])} BHK`;
+  }
+  return "";
+};
+
 export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
   const { isMobile } = useDevice();
+  const [configFilters, setConfigFilters] = useState<string[]>([]);
+  const [selectedConfigFilter, setSelectedConfigFilter] = useState<string>();
+
+  useEffect(() => {
+    if (
+      !lvnzyProject?.originalProjectId.info.unitConfigWithPricing ||
+      lvnzyProject?.originalProjectId.info.unitConfigWithPricing.length < 5
+    ) {
+      return;
+    }
+    let filters: string[] = [];
+    lvnzyProject?.originalProjectId.info.unitConfigWithPricing.forEach(
+      (unitConfig: any) => {
+        const bhkType = getBhkType(unitConfig.config);
+        if (!filters.includes(bhkType)) {
+          filters.push(bhkType);
+        }
+      }
+    );
+    filters = filters.sort((a: string, b: string) => parseInt(a) - parseInt(b));
+    setConfigFilters(filters);
+    setSelectedConfigFilter(filters[0]);
+  }, [lvnzyProject]);
+
   return (
     <ScrollableContainer>
       <Flex
@@ -79,9 +118,9 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
         <Flex vertical style={{ marginBottom: 8, paddingBottom: 80 }}>
           {/* Sqft & Configs */}
 
-          <Flex align="center" gap={8}>
+          <Flex align="flex-start">
             {lvnzyProject?.meta.costingDetails && (
-              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_2 }}>
+              <Typography.Text style={{ fontSize: FONT_SIZE.HEADING_1 }}>
                 ₹
                 {rupeeAmountFormat(
                   `${Math.round(
@@ -89,14 +128,32 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                       lvnzyProject?.originalProjectId.info.rate.minimumUnitSize
                   )}`
                 )}{" "}
-                per sq.ft ·
               </Typography.Text>
-            )}{" "}
-            {getMinMaxSize(
-              lvnzyProject?.originalProjectId.info.unitConfigWithPricing
             )}
+            <Typography.Text
+              style={{
+                fontSize: FONT_SIZE.HEADING_3,
+                color: COLORS.textColorDark,
+                marginTop: 4,
+                marginLeft: 2,
+              }}
+            >
+              per sq.ft
+            </Typography.Text>
           </Flex>
-          <Flex>
+          <Flex gap={4} style={{ color: COLORS.textColorMedium }}>
+            <Typography.Text
+              style={{
+                fontSize: FONT_SIZE.HEADING_4,
+                color: COLORS.textColorMedium,
+              }}
+            >
+              {Math.round(
+                lvnzyProject?.property.layout.totalLandArea / 4046.8564
+              )}{" "}
+              Acre
+            </Typography.Text>{" "}
+            ·
             {lvnzyProject?.property.layout.totalUnits && (
               <Typography.Text
                 style={{
@@ -105,19 +162,20 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                   color: COLORS.textColorMedium,
                 }}
               >
-                {lvnzyProject?.property.layout.totalUnits} Units (
-                {Math.round(
-                  lvnzyProject?.property.layout.totalLandArea / 4046.8564
-                )}{" "}
-                Acre)
+                {lvnzyProject?.property.layout.totalUnits} Units
               </Typography.Text>
+            )}{" "}
+            ·
+            {getMinMaxSize(
+              lvnzyProject?.originalProjectId.info.unitConfigWithPricing
             )}{" "}
             ·
             {lvnzyProject?.originalProjectId.info.unitConfigWithPricing &&
             lvnzyProject!.meta.projectConfigurations.unitsBreakup
               ? getTotalFloors(lvnzyProject)
               : null}
-            {lvnzyProject?.property.layout.totalPhases ? (
+            {lvnzyProject?.property.layout.totalPhases &&
+            lvnzyProject?.property.layout.totalPhases > 1 ? (
               <Typography.Text
                 style={{
                   fontSize: FONT_SIZE.HEADING_4,
@@ -157,9 +215,48 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
             </Flex>
           ) : null}
 
-          <Flex vertical gap={8}>
-            {lvnzyProject?.originalProjectId.info.unitConfigWithPricing.map(
-              (c: any, index: number) => {
+          <Flex style={{ marginTop: 24 }}>
+            {configFilters?.map((filter: string) => {
+              return (
+                <Tag
+                  color={
+                    filter == selectedConfigFilter
+                      ? COLORS.primaryColor
+                      : "default"
+                  }
+                  style={{
+                    fontSize: FONT_SIZE.HEADING_3,
+                    padding: "4px 8px",
+                    borderRadius: 8,
+                  }}
+                  onClick={() => {
+                    setSelectedConfigFilter(filter);
+                  }}
+                >
+                  {filter}
+                </Tag>
+              );
+            })}
+          </Flex>
+          <Flex
+            vertical={isMobile}
+            gap={16}
+            style={{
+              width: "100%",
+              overflowX: "scroll",
+              whiteSpace: "nowrap",
+              scrollbarWidth: "none",
+            }}
+          >
+            {lvnzyProject?.originalProjectId.info.unitConfigWithPricing
+              .filter(
+                (c: any) =>
+                  !configFilters ||
+                  !configFilters.length ||
+                  getBhkType(c.config) == selectedConfigFilter
+              )
+              .sort((a: any, b: any) => a.price - b.price)
+              .map((c: any, index: number) => {
                 return (
                   <Flex
                     key={`config-${index}`}
@@ -168,6 +265,8 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                       marginTop: 16,
                       padding: 8,
                       paddingBottom: 16,
+                      borderRadius: 8,
+                      border: `2px solid ${COLORS.borderColor}`,
                     }}
                   >
                     <Typography.Text
@@ -209,8 +308,7 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
                     )}
                   </Flex>
                 );
-              }
-            )}
+              })}
           </Flex>
         </Flex>
       </Flex>
