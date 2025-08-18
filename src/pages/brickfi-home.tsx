@@ -69,6 +69,10 @@ const BrickfiHome: React.FC = () => {
       fetchLvnzyProjectsByIds(
         "67f0f60f3ef53b74b67d12f5,67e83fe1a06e471b3d14b6b5,687b4d291541e1a0ecb321ca,687b401e8a68a0900797180b,67f0046ca58ac2b37e530f2b,6870af1904ec49de98b9b1fa,680736af3ff1a71676450fbb,68073ba59f670b1afc3f03f4"
       );
+    } else if (collectionId === "yellow-line") {
+      fetchLvnzyProjectsByIds(
+        "6870af1904ec49de98b9b1fa,68930f117f715b3ee58ca9d5,6879e74423db3840fc951225"
+      );
     } else {
       // Check if user is admin and show all projects
       if (user.role === "admin") {
