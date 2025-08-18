@@ -2014,9 +2014,10 @@ const MapViewV2 = ({
                 {showLocalities && localities ? renderLocalities() : null}
                 {/* {renderSurroundings()} */}
                 {showCorridors && <CorridorsComponent></CorridorsComponent>}
-                {currentSelectedCategory === "surroundings" && (
+                {currentSelectedCategory === "surroundings" ||
+                (!drivers?.length && !!surroundingElements?.length) ? (
                   <SurroundingsComponent></SurroundingsComponent>
-                )}
+                ) : null}
                 <MicroMarketDriversComponent></MicroMarketDriversComponent>
                 {projectsNearby?.length && projectsNearbyIcons?.length
                   ? renderProjectsNearby()
