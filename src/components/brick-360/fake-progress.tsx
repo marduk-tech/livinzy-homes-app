@@ -20,9 +20,6 @@ export const FakeProgress = ({ progress, projectName }: FakeProgressProps) => {
         left: `calc(50% - ${progressWidth / 2}px)`,
       }}
     >
-      {/* <Flex vertical>
-        <DataSources disableDetailsDialog={true}></DataSources>
-      </Flex> */}
       <Typography.Text
         style={{
           margin: 0,
