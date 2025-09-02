@@ -276,7 +276,7 @@ export const Brick360CategoryInfo: Record<
     title: "Developer",
     iconName: "FaPeopleGroup",
     iconSet: "fa6",
-    note: "Only projects from the developer registered under RERA in the state of Karnataka are taken up for analysis.",
+    note: "Only projects registered under RERA Karnataka are taken up for complete analysis.",
   },
   financials: {
     title: "Financials",
@@ -469,10 +469,21 @@ export const DRIVER_CATEGORIES = {
       "micro-market",
     ],
     filters: [
+      { label: "Established Demand", key: "est-infra" },
       { label: "Infra Push", key: "major-infra" },
       { label: "Upcoming Tech Park", key: "upcoming-tech" },
     ],
     onFilter: (filter: string, driver: IDriverPlace) => {
+      if (filter == "est-infra") {
+        return (
+          ["industrial-general", "industrial-hitech", "transit"].includes(
+            driver.driver
+          ) &&
+          (driver.status === "post-launch" || driver.status === "launched") &&
+          driver.distance &&
+          driver.distance <= 15
+        );
+      }
       if (filter == "major-infra") {
         return (
           ["highway", "industrial-general", "transit"].includes(
@@ -480,13 +491,14 @@ export const DRIVER_CATEGORIES = {
           ) &&
           driver.status !== "post-launch" &&
           driver.distance &&
-          driver.distance <= 6
+          driver.distance <= 10
         );
       }
       if (filter == "upcoming-tech") {
         return (
           ["industrial-hitech"].includes(driver.driver) &&
-          driver.status !== "post-launch"
+          driver.status !== "post-launch" &&
+          driver.status !== "launched"
         );
       }
       return false;
