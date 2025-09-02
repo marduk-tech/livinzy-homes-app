@@ -298,6 +298,7 @@ export const Brick360DataPoints = {
     },
     density: {
       label: "Density",
+      note: "The numbers are as per the approved layout plan on RERA.",
       prompts: [
         "Total units?",
         "Breakup units by size/bhk",
