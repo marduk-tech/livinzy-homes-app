@@ -25,23 +25,27 @@ const getTotalFloors = (lvnzyProject: any) => {
   const minFloors = Math.min(...floorCounts);
   const maxFloors = Math.max(...floorCounts);
 
-  let totalFloors = "";
-  if (minFloors == maxFloors) {
-    totalFloors = `${minFloors}`;
-  } else {
-    totalFloors = `${minFloors} - ${maxFloors}`;
+  if (minFloors && maxFloors) {
+    let totalFloors = "";
+    if (minFloors == maxFloors) {
+      totalFloors = `${minFloors}`;
+    } else {
+      totalFloors = `${minFloors} - ${maxFloors}`;
+    }
+    return (
+      <Typography.Text
+        style={{
+          fontSize: FONT_SIZE.HEADING_4,
+          marginLeft: 4,
+          color: COLORS.textColorMedium,
+        }}
+      >
+        · {totalFloors} Floors
+      </Typography.Text>
+    );
   }
-  return (
-    <Typography.Text
-      style={{
-        fontSize: FONT_SIZE.HEADING_4,
-        marginLeft: 4,
-        color: COLORS.textColorMedium,
-      }}
-    >
-      {totalFloors} Floors
-    </Typography.Text>
-  );
+
+  return null;
 };
 
 const getMinMaxSize = (configs: any[]) => {
@@ -169,7 +173,6 @@ export const UnitsTab = ({ lvnzyProject }: UnitsTabProps) => {
             {getMinMaxSize(
               lvnzyProject?.originalProjectId.info.unitConfigWithPricing
             )}{" "}
-            ·
             {lvnzyProject?.originalProjectId.info.unitConfigWithPricing &&
             lvnzyProject!.meta.projectConfigurations.unitsBreakup
               ? getTotalFloors(lvnzyProject)
